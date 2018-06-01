@@ -1,0 +1,7 @@
+syntax: glob
+.vs
+*.aps
+*.user
+x64/
+Debug/
+Release/
