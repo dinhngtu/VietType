@@ -22,12 +22,8 @@ extern HINSTANCE dllInstanceHandle;
 extern LONG dllRefCount;
 
 extern CRITICAL_SECTION CS;
-extern HFONT defaultlFontHandle; // Global font object we use everywhere
 
 extern const CLSID SampleIMECLSID;
 extern const CLSID SampleIMEGuidProfile;
-extern const CLSID SampleIMEGuidImeModePreserveKey;
-extern const CLSID SampleIMEGuidDoubleSingleBytePreserveKey;
-extern const CLSID SampleIMEGuidPunctuationPreserveKey;
 
 } // namespace Global

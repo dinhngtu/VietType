@@ -13,12 +13,6 @@
 #include <iostream>
 #include <fstream>
 
-class CLangBarItemButton;
-class CCandidateListUIPresenter;
-class CCompositionProcessorEngine;
-
-const DWORD WM_CheckGlobalCompartment = WM_USER;
-
 class CSampleIME : public ITfTextInputProcessorEx,
                    public ITfThreadMgrEventSink,
                    public ITfTextEditSink,

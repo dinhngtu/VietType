@@ -29,7 +29,7 @@ HRESULT CSampleIME::CreateInstance(_In_ IUnknown *pUnkOuter, REFIID riid, _Outpt
         return CLASS_E_NOAGGREGATION;
     }
 
-    pSampleIME = new CSampleIME();
+    pSampleIME = new (std::nothrow) CSampleIME();
     if (pSampleIME == nullptr) {
         return E_OUTOFMEMORY;
     }

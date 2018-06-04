@@ -5,10 +5,10 @@
 //
 // Copyright (c) Microsoft Corporation. All rights reserved
 
-#include "stdafx.h"
-#include "Globals.h"
 #include "Define.h"
+#include "Globals.h"
 #include "SampleIME.h"
+#include "stdafx.h"
 
 // from Register.cpp
 BOOL RegisterProfiles();
@@ -162,7 +162,7 @@ STDAPI CClassFactory::LockServer(BOOL fLock) {
 
 void BuildGlobalObjects(void) {
     classFactoryObjects[0] =
-        new CClassFactory(Global::SampleIMECLSID, CSampleIME::CreateInstance);
+        new (std::nothrow) CClassFactory(Global::SampleIMECLSID, CSampleIME::CreateInstance);
 }
 
 //+---------------------------------------------------------------------------
@@ -178,8 +178,6 @@ void FreeGlobalObjects(void) {
             classFactoryObjects[i] = nullptr;
         }
     }
-
-    DeleteObject(Global::defaultlFontHandle);
 }
 
 //+---------------------------------------------------------------------------
