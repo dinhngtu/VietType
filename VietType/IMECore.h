@@ -10,18 +10,19 @@
 #include "Globals.h"
 #include "stdafx.h"
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
-class CSampleIME : public ITfTextInputProcessorEx,
-                   public ITfThreadMgrEventSink,
-                   public ITfTextEditSink,
-                   public ITfKeyEventSink,
-                   public ITfThreadFocusSink,
-                   public ITfFunctionProvider {
-  public:
-    CSampleIME();
-    ~CSampleIME();
+class IMECore :
+    public ITfTextInputProcessorEx,
+    public ITfThreadMgrEventSink,
+    public ITfTextEditSink,
+    public ITfKeyEventSink,
+    public ITfThreadFocusSink,
+    public ITfFunctionProvider {
+public:
+    IMECore();
+    ~IMECore();
 
     // IUnknown
     STDMETHODIMP QueryInterface(REFIID riid, _Outptr_ void **ppvObj);
@@ -39,16 +40,12 @@ class CSampleIME : public ITfTextInputProcessorEx,
     // ITfThreadMgrEventSink
     STDMETHODIMP OnInitDocumentMgr(_In_ ITfDocumentMgr *pDocMgr);
     STDMETHODIMP OnUninitDocumentMgr(_In_ ITfDocumentMgr *pDocMgr);
-    STDMETHODIMP
-    OnSetFocus(_In_ ITfDocumentMgr *pDocMgrFocus, _In_ ITfDocumentMgr *pDocMgrPrevFocus);
+    STDMETHODIMP OnSetFocus(_In_ ITfDocumentMgr *pDocMgrFocus, _In_ ITfDocumentMgr *pDocMgrPrevFocus);
     STDMETHODIMP OnPushContext(_In_ ITfContext *pContext);
     STDMETHODIMP OnPopContext(_In_ ITfContext *pContext);
 
     // ITfTextEditSink
-    STDMETHODIMP OnEndEdit(
-        __RPC__in_opt ITfContext *pContext,
-        TfEditCookie ecReadOnly,
-        __RPC__in_opt ITfEditRecord *pEditRecord);
+    STDMETHODIMP OnEndEdit(__RPC__in_opt ITfContext *pContext, TfEditCookie ecReadOnly, __RPC__in_opt ITfEditRecord *pEditRecord);
 
     // ITfKeyEventSink
     STDMETHODIMP OnSetFocus(BOOL fForeground);
@@ -65,8 +62,7 @@ class CSampleIME : public ITfTextInputProcessorEx,
     // ITfFunctionProvider
     STDMETHODIMP GetType(__RPC__out GUID *pguid);
     STDMETHODIMP GetDescription(__RPC__deref_out_opt BSTR *pbstrDesc);
-    STDMETHODIMP GetFunction(
-        __RPC__in REFGUID rguid, __RPC__in REFIID riid, __RPC__deref_out_opt IUnknown **ppunk);
+    STDMETHODIMP GetFunction(__RPC__in REFGUID rguid, __RPC__in REFIID riid, __RPC__deref_out_opt IUnknown **ppunk);
 
     // ITfFunction
     STDMETHODIMP GetDisplayName(_Out_ BSTR *pbstrDisplayName);
@@ -97,22 +93,22 @@ class CSampleIME : public ITfTextInputProcessorEx,
 
     // comless helpers
     /*
-    static HRESULT CSampleIME::CreateInstance(
+    static HRESULT IMECore::CreateInstance(
         REFCLSID rclsid,
         REFIID riid,
         _Outptr_result_maybenull_ LPVOID *ppv,
         _Out_opt_ HINSTANCE *phInst,
         BOOL isComLessMode);
-    static HRESULT CSampleIME::ComLessCreateInstance(
+    static HRESULT IMECore::ComLessCreateInstance(
         REFGUID rclsid,
         REFIID riid,
         _Outptr_result_maybenull_ void **ppv,
         _Out_opt_ HINSTANCE *phInst);
-    static HRESULT CSampleIME::GetComModuleName(
+    static HRESULT IMECore::GetComModuleName(
         REFGUID rclsid, _Out_writes_(cchPath) WCHAR *wchPath, DWORD cchPath);
         */
 
-  private:
+private:
     BOOL _InitThreadMgrEventSink();
     void _UninitThreadMgrEventSink();
 
@@ -127,8 +123,10 @@ class CSampleIME : public ITfTextInputProcessorEx,
     BOOL _InitFunctionProviderSink();
     void _UninitFunctionProviderSink();
 
-  private:
-    ITfThreadMgr *_pThreadMgr;
+private:
+    //HKL _hkl;
+
+    ITfThreadMgr * _pThreadMgr;
     TfClientId _tfClientId;
     DWORD _dwActivateFlags;
 
@@ -146,6 +144,4 @@ class CSampleIME : public ITfTextInputProcessorEx,
     ITfContext *_pContext;
 
     LONG _refCount;
-
-    std::ofstream logfile;
 };

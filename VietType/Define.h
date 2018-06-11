@@ -11,8 +11,14 @@
 #include "resource.h"
 
 #define TEXTSERVICE_MODEL L"Apartment"
-#define TEXTSERVICE_LANGID MAKELANGID(LANG_VIETNAMESE, SUBLANG_VIETNAMESE_VIETNAM)
-#define TEXTSERVICE_ICON_INDEX -IDIS_SAMPLEIME
+
+//#define TEXTSERVICE_LANGID MAKELANGID(LANG_VIETNAMESE, SUBLANG_VIETNAMESE_VIETNAM)
+// HACK: A Vietnamese LANGID forces us to use the horrible KBDVNTC.DLL keyboard layout, which is not compatible with Telex.
+// Using English (India) lets us define a text service based on the QWERTY layout without having to remap keys.
+// Note that English (US) doesn't work as LANGID, the TIP just fails to register.
+#define TEXTSERVICE_LANGID MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_INDIA)
+
+#define TEXTSERVICE_ICON_INDEX -IDIS_IMELOGO
 
 #define IME_MODE_ON_ICON_INDEX IDI_IME_MODE_ON
 #define IME_MODE_OFF_ICON_INDEX IDI_IME_MODE_OFF

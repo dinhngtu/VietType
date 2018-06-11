@@ -6,7 +6,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved
 
 #include "stdafx.h"
-#include "SampleIME.h"
+#include "IMECore.h"
 
 //+---------------------------------------------------------------------------
 //
@@ -14,7 +14,7 @@
 //
 //----------------------------------------------------------------------------
 
-STDAPI CSampleIME::OnSetThreadFocus() {
+STDAPI IMECore::OnSetThreadFocus() {
     return S_OK;
 }
 
@@ -24,11 +24,11 @@ STDAPI CSampleIME::OnSetThreadFocus() {
 //
 //----------------------------------------------------------------------------
 
-STDAPI CSampleIME::OnKillThreadFocus() {
+STDAPI IMECore::OnKillThreadFocus() {
     return S_OK;
 }
 
-BOOL CSampleIME::_InitThreadFocusSink() {
+BOOL IMECore::_InitThreadFocusSink() {
     ITfSource *pSource = nullptr;
 
     if (FAILED(_pThreadMgr->QueryInterface(IID_ITfSource, (void **)&pSource))) {
@@ -36,7 +36,7 @@ BOOL CSampleIME::_InitThreadFocusSink() {
     }
 
     if (FAILED(pSource->AdviseSink(
-            IID_ITfThreadFocusSink, (ITfThreadFocusSink *)this, &_dwThreadFocusSinkCookie))) {
+        IID_ITfThreadFocusSink, (ITfThreadFocusSink *)this, &_dwThreadFocusSinkCookie))) {
         pSource->Release();
         return FALSE;
     }
@@ -46,7 +46,7 @@ BOOL CSampleIME::_InitThreadFocusSink() {
     return TRUE;
 }
 
-void CSampleIME::_UninitThreadFocusSink() {
+void IMECore::_UninitThreadFocusSink() {
     ITfSource *pSource = nullptr;
 
     if (FAILED(_pThreadMgr->QueryInterface(IID_ITfSource, (void **)&pSource))) {

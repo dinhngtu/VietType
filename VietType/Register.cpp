@@ -27,8 +27,7 @@ static const GUID SupportCategories[] = {
 };
 static const int SupportCategoriesCount = 8;
 
-const BYTE GuidSymbols[] = {3,   2, 1, 0,   '-', 5,  4,  '-', 7,  6,
-                            '-', 8, 9, '-', 10,  11, 12, 13,  14, 15};
+const BYTE GuidSymbols[] = { 3, 2, 1, 0, '-', 5, 4, '-', 7, 6, '-', 8, 9, '-', 10, 11, 12, 13, 14, 15 };
 
 const WCHAR HexDigits[] = L"0123456789ABCDEF";
 
@@ -59,6 +58,7 @@ BOOL CLSIDToString(REFGUID refGUID, _Out_writes_(39) WCHAR *pCLSIDString) {
 //----------------------------------------------------------------------------
 
 BOOL RegisterProfiles() {
+    DBGPRINT(L"RegisterProfile langid %u", TEXTSERVICE_LANGID);
     HRESULT hr = S_FALSE;
 
     ITfInputProcessorProfileMgr *pITfInputProcessorProfileMgr = nullptr;
@@ -72,11 +72,16 @@ BOOL RegisterProfiles() {
         return FALSE;
     }
 
-    WCHAR achIconFile[MAX_PATH] = {'\0'};
+    WCHAR achIconFile[MAX_PATH] = { '\0' };
     DWORD cchA = 0;
     cchA = GetModuleFileName(Global::dllInstanceHandle, achIconFile, MAX_PATH);
     cchA = cchA >= MAX_PATH ? (MAX_PATH - 1) : cchA;
     achIconFile[cchA] = '\0';
+
+    /*
+    HKL hkl = LoadKeyboardLayout(L"a000042a", 0);
+    DBGPRINT(L"RegisterProfiles hkl %zu", hkl);
+    */
 
     size_t lenOfDesc = 0;
     hr = StringCchLength(TEXTSERVICE_DESC, STRSAFE_MAX_CCH, &lenOfDesc);
@@ -84,9 +89,9 @@ BOOL RegisterProfiles() {
         goto Exit;
     }
     hr = pITfInputProcessorProfileMgr->RegisterProfile(
-        Global::SampleIMECLSID,
+        Global::IMECLSID,
         TEXTSERVICE_LANGID,
-        Global::SampleIMEGuidProfile,
+        Global::IMEGuidProfile,
         TEXTSERVICE_DESC,
         static_cast<ULONG>(lenOfDesc),
         achIconFile,
@@ -96,6 +101,8 @@ BOOL RegisterProfiles() {
         0,
         TRUE,
         0);
+
+    DBGPRINT(L"RegisterProfile hr %ld", hr);
 
     if (FAILED(hr)) {
         goto Exit;
@@ -130,7 +137,7 @@ void UnregisterProfiles() {
     }
 
     hr = pITfInputProcessorProfileMgr->UnregisterProfile(
-        Global::SampleIMECLSID, TEXTSERVICE_LANGID, Global::SampleIMEGuidProfile, 0);
+        Global::IMECLSID, TEXTSERVICE_LANGID, Global::IMEGuidProfile, 0);
     if (FAILED(hr)) {
         goto Exit;
     }
@@ -165,7 +172,7 @@ BOOL RegisterCategories() {
 
     for (int i = 0; i < SupportCategoriesCount; i++) {
         hr = pCategoryMgr->RegisterCategory(
-            Global::SampleIMECLSID, SupportCategories[i], Global::SampleIMECLSID);
+            Global::IMECLSID, SupportCategories[i], Global::IMECLSID);
     }
 
     pCategoryMgr->Release();
@@ -195,7 +202,7 @@ void UnregisterCategories() {
 
     for (int i = 0; i < SupportCategoriesCount; i++) {
         pCategoryMgr->UnregisterCategory(
-            Global::SampleIMECLSID, SupportCategories[i], Global::SampleIMECLSID);
+            Global::IMECLSID, SupportCategories[i], Global::IMECLSID);
     }
 
     pCategoryMgr->Release();
@@ -215,7 +222,7 @@ LONG RecurseDeleteKey(_In_ HKEY hParentKey, _In_ LPCTSTR lpszKey) {
     HKEY regKeyHandle = nullptr;
     LONG res = 0;
     FILETIME time;
-    WCHAR stringBuffer[256] = {'\0'};
+    WCHAR stringBuffer[256] = { '\0' };
     DWORD size = ARRAYSIZE(stringBuffer);
 
     if (RegOpenKey(hParentKey, lpszKey, &regKeyHandle) != ERROR_SUCCESS) {
@@ -224,7 +231,7 @@ LONG RecurseDeleteKey(_In_ HKEY hParentKey, _In_ LPCTSTR lpszKey) {
 
     res = ERROR_SUCCESS;
     while (RegEnumKeyEx(regKeyHandle, 0, stringBuffer, &size, NULL, NULL, NULL, &time) ==
-           ERROR_SUCCESS) {
+        ERROR_SUCCESS) {
         stringBuffer[ARRAYSIZE(stringBuffer) - 1] = '\0';
         res = RecurseDeleteKey(regKeyHandle, stringBuffer);
         if (res != ERROR_SUCCESS) {
@@ -248,64 +255,64 @@ BOOL RegisterServer() {
     HKEY regKeyHandle = nullptr;
     HKEY regSubkeyHandle = nullptr;
     BOOL ret = FALSE;
-    WCHAR achIMEKey[ARRAYSIZE(RegInfo_Prefix_CLSID) + CLSID_STRLEN] = {'\0'};
-    WCHAR achFileName[MAX_PATH] = {'\0'};
+    WCHAR achIMEKey[ARRAYSIZE(RegInfo_Prefix_CLSID) + CLSID_STRLEN] = { '\0' };
+    WCHAR achFileName[MAX_PATH] = { '\0' };
 
-    if (!CLSIDToString(Global::SampleIMECLSID, achIMEKey + ARRAYSIZE(RegInfo_Prefix_CLSID) - 1)) {
+    if (!CLSIDToString(Global::IMECLSID, achIMEKey + ARRAYSIZE(RegInfo_Prefix_CLSID) - 1)) {
         return FALSE;
     }
 
     memcpy(achIMEKey, RegInfo_Prefix_CLSID, sizeof(RegInfo_Prefix_CLSID) - sizeof(WCHAR));
 
     if (RegCreateKeyEx(
-            HKEY_CLASSES_ROOT,
-            achIMEKey,
+        HKEY_CLASSES_ROOT,
+        achIMEKey,
+        0,
+        NULL,
+        REG_OPTION_NON_VOLATILE,
+        KEY_WRITE,
+        NULL,
+        &regKeyHandle,
+        &copiedStringLen) == ERROR_SUCCESS) {
+        if (RegSetValueEx(
+            regKeyHandle,
+            NULL,
+            0,
+            REG_SZ,
+            (const BYTE *)TEXTSERVICE_DESC,
+            (_countof(TEXTSERVICE_DESC)) * sizeof(WCHAR)) != ERROR_SUCCESS) {
+            goto Exit;
+        }
+
+        if (RegCreateKeyEx(
+            regKeyHandle,
+            RegInfo_Key_InProSvr32,
             0,
             NULL,
             REG_OPTION_NON_VOLATILE,
             KEY_WRITE,
             NULL,
-            &regKeyHandle,
+            &regSubkeyHandle,
             &copiedStringLen) == ERROR_SUCCESS) {
-        if (RegSetValueEx(
-                regKeyHandle,
-                NULL,
-                0,
-                REG_SZ,
-                (const BYTE *)TEXTSERVICE_DESC,
-                (_countof(TEXTSERVICE_DESC)) * sizeof(WCHAR)) != ERROR_SUCCESS) {
-            goto Exit;
-        }
-
-        if (RegCreateKeyEx(
-                regKeyHandle,
-                RegInfo_Key_InProSvr32,
-                0,
-                NULL,
-                REG_OPTION_NON_VOLATILE,
-                KEY_WRITE,
-                NULL,
-                &regSubkeyHandle,
-                &copiedStringLen) == ERROR_SUCCESS) {
             copiedStringLen =
                 GetModuleFileNameW(Global::dllInstanceHandle, achFileName, ARRAYSIZE(achFileName));
             copiedStringLen = (copiedStringLen >= (MAX_PATH - 1)) ? MAX_PATH : (++copiedStringLen);
             if (RegSetValueEx(
-                    regSubkeyHandle,
-                    NULL,
-                    0,
-                    REG_SZ,
-                    (const BYTE *)achFileName,
-                    (copiedStringLen) * sizeof(WCHAR)) != ERROR_SUCCESS) {
+                regSubkeyHandle,
+                NULL,
+                0,
+                REG_SZ,
+                (const BYTE *)achFileName,
+                (copiedStringLen) * sizeof(WCHAR)) != ERROR_SUCCESS) {
                 goto Exit;
             }
             if (RegSetValueEx(
-                    regSubkeyHandle,
-                    RegInfo_Key_ThreadModel,
-                    0,
-                    REG_SZ,
-                    (const BYTE *)TEXTSERVICE_MODEL,
-                    (_countof(TEXTSERVICE_MODEL)) * sizeof(WCHAR)) != ERROR_SUCCESS) {
+                regSubkeyHandle,
+                RegInfo_Key_ThreadModel,
+                0,
+                REG_SZ,
+                (const BYTE *)TEXTSERVICE_MODEL,
+                (_countof(TEXTSERVICE_MODEL)) * sizeof(WCHAR)) != ERROR_SUCCESS) {
                 goto Exit;
             }
 
@@ -333,9 +340,9 @@ Exit:
 //----------------------------------------------------------------------------
 
 void UnregisterServer() {
-    WCHAR achIMEKey[ARRAYSIZE(RegInfo_Prefix_CLSID) + CLSID_STRLEN] = {'\0'};
+    WCHAR achIMEKey[ARRAYSIZE(RegInfo_Prefix_CLSID) + CLSID_STRLEN] = { '\0' };
 
-    if (!CLSIDToString(Global::SampleIMECLSID, achIMEKey + ARRAYSIZE(RegInfo_Prefix_CLSID) - 1)) {
+    if (!CLSIDToString(Global::IMECLSID, achIMEKey + ARRAYSIZE(RegInfo_Prefix_CLSID) - 1)) {
         return;
     }
 

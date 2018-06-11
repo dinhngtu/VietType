@@ -6,7 +6,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved
 
 #include "stdafx.h"
-#include "SampleIME.h"
+#include "IMECore.h"
 
 //+---------------------------------------------------------------------------
 //
@@ -14,14 +14,14 @@
 //
 //----------------------------------------------------------------------------
 
-BOOL CSampleIME::_InitFunctionProviderSink() {
+BOOL IMECore::_InitFunctionProviderSink() {
     ITfSourceSingle *pSourceSingle = nullptr;
     BOOL ret = FALSE;
     if (SUCCEEDED(_pThreadMgr->QueryInterface(IID_ITfSourceSingle, (void **)&pSourceSingle))) {
         IUnknown *punk = nullptr;
         if (SUCCEEDED(QueryInterface(IID_IUnknown, (void **)&punk))) {
             if (SUCCEEDED(
-                    pSourceSingle->AdviseSingleSink(_tfClientId, IID_ITfFunctionProvider, punk))) {
+                pSourceSingle->AdviseSingleSink(_tfClientId, IID_ITfFunctionProvider, punk))) {
                 ret = TRUE;
             }
             punk->Release();
@@ -37,7 +37,7 @@ BOOL CSampleIME::_InitFunctionProviderSink() {
 //
 //----------------------------------------------------------------------------
 
-void CSampleIME::_UninitFunctionProviderSink() {
+void IMECore::_UninitFunctionProviderSink() {
     ITfSourceSingle *pSourceSingle = nullptr;
     if (SUCCEEDED(_pThreadMgr->QueryInterface(IID_ITfSourceSingle, (void **)&pSourceSingle))) {
         pSourceSingle->UnadviseSingleSink(_tfClientId, IID_ITfFunctionProvider);

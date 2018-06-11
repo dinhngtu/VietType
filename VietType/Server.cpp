@@ -7,7 +7,7 @@
 
 #include "Define.h"
 #include "Globals.h"
-#include "SampleIME.h"
+#include "IMECore.h"
 #include "stdafx.h"
 
 // from Register.cpp
@@ -21,7 +21,7 @@ void UnregisterServer();
 void FreeGlobalObjects(void);
 
 class CClassFactory;
-static CClassFactory *classFactoryObjects[1] = {nullptr};
+static CClassFactory *classFactoryObjects[1] = { nullptr };
 
 //+---------------------------------------------------------------------------
 //
@@ -59,7 +59,7 @@ void DllRelease(void) {
 //----------------------------------------------------------------------------
 
 class CClassFactory : public IClassFactory {
-  public:
+public:
     // IUnknown methods
     STDMETHODIMP QueryInterface(REFIID riid, _Outptr_ void **ppvObj);
     STDMETHODIMP_(ULONG) AddRef(void);
@@ -67,23 +67,23 @@ class CClassFactory : public IClassFactory {
 
     // IClassFactory methods
     STDMETHODIMP
-    CreateInstance(_In_opt_ IUnknown *pUnkOuter, _In_ REFIID riid, _COM_Outptr_ void **ppvObj);
+        CreateInstance(_In_opt_ IUnknown *pUnkOuter, _In_ REFIID riid, _COM_Outptr_ void **ppvObj);
     STDMETHODIMP LockServer(BOOL fLock);
 
     // Constructor
     CClassFactory(
         REFCLSID rclsid,
-        HRESULT (*pfnCreateInstance)(IUnknown *pUnkOuter, REFIID riid, void **ppvObj))
+        HRESULT(*pfnCreateInstance)(IUnknown *pUnkOuter, REFIID riid, void **ppvObj))
         : _rclsid(rclsid) {
         _pfnCreateInstance = pfnCreateInstance;
     }
 
-  public:
+public:
     REFCLSID _rclsid;
-    HRESULT (*_pfnCreateInstance)(IUnknown *pUnkOuter, REFIID riid, _COM_Outptr_ void **ppvObj);
+    HRESULT(*_pfnCreateInstance)(IUnknown *pUnkOuter, REFIID riid, _COM_Outptr_ void **ppvObj);
 
-  private:
-    CClassFactory &operator=(const CClassFactory &rhn) {
+private:
+    CClassFactory & operator=(const CClassFactory &rhn) {
         rhn;
     };
 };
@@ -162,7 +162,7 @@ STDAPI CClassFactory::LockServer(BOOL fLock) {
 
 void BuildGlobalObjects(void) {
     classFactoryObjects[0] =
-        new (std::nothrow) CClassFactory(Global::SampleIMECLSID, CSampleIME::CreateInstance);
+        new (std::nothrow) CClassFactory(Global::IMECLSID, IMECore::CreateInstance);
 }
 
 //+---------------------------------------------------------------------------

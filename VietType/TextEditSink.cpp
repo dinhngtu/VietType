@@ -6,7 +6,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved
 
 #include "stdafx.h"
-#include "SampleIME.h"
+#include "IMECore.h"
 #include "globals.h"
 
 //+---------------------------------------------------------------------------
@@ -16,7 +16,7 @@
 // Called by the system whenever anyone releases a write-access document lock.
 //----------------------------------------------------------------------------
 
-STDAPI CSampleIME::OnEndEdit(
+STDAPI IMECore::OnEndEdit(
     __RPC__in_opt ITfContext *pContext,
     TfEditCookie ecReadOnly,
     __RPC__in_opt ITfEditRecord *pEditRecord) {
@@ -42,7 +42,7 @@ STDAPI CSampleIME::OnEndEdit(
 // Always release any previous sink.
 //----------------------------------------------------------------------------
 
-BOOL CSampleIME::_InitTextEditSink(_In_ ITfDocumentMgr *pDocMgr) {
+BOOL IMECore::_InitTextEditSink(_In_ ITfDocumentMgr *pDocMgr) {
     ITfSource *pSource = nullptr;
     BOOL ret = TRUE;
 
@@ -73,7 +73,7 @@ BOOL CSampleIME::_InitTextEditSink(_In_ ITfDocumentMgr *pDocMgr) {
     ret = FALSE;
     if (SUCCEEDED(_pTextEditSinkContext->QueryInterface(IID_ITfSource, (void **)&pSource))) {
         if (SUCCEEDED(pSource->AdviseSink(
-                IID_ITfTextEditSink, (ITfTextEditSink *)this, &_textEditSinkCookie))) {
+            IID_ITfTextEditSink, (ITfTextEditSink *)this, &_textEditSinkCookie))) {
             ret = TRUE;
         } else {
             _textEditSinkCookie = TF_INVALID_COOKIE;

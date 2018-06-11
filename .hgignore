@@ -5,3 +5,4 @@ syntax: glob
 x64/
 Debug/
 Release/
+*.APS

@@ -6,7 +6,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved
 
 #include "stdafx.h"
-#include "SampleIME.h"
+#include "IMECore.h"
 
 //+---------------------------------------------------------------------------
 //
@@ -15,8 +15,8 @@
 //----------------------------------------------------------------------------
 
 /* static */
-HRESULT CSampleIME::CreateInstance(_In_ IUnknown *pUnkOuter, REFIID riid, _Outptr_ void **ppvObj) {
-    CSampleIME *pSampleIME = nullptr;
+HRESULT IMECore::CreateInstance(_In_ IUnknown *pUnkOuter, REFIID riid, _Outptr_ void **ppvObj) {
+    IMECore *ime = nullptr;
     HRESULT hr = S_OK;
 
     if (ppvObj == nullptr) {
@@ -29,14 +29,14 @@ HRESULT CSampleIME::CreateInstance(_In_ IUnknown *pUnkOuter, REFIID riid, _Outpt
         return CLASS_E_NOAGGREGATION;
     }
 
-    pSampleIME = new (std::nothrow) CSampleIME();
-    if (pSampleIME == nullptr) {
+    ime = new (std::nothrow) IMECore();
+    if (ime == nullptr) {
         return E_OUTOFMEMORY;
     }
 
-    hr = pSampleIME->QueryInterface(riid, ppvObj);
+    hr = ime->QueryInterface(riid, ppvObj);
 
-    pSampleIME->Release();
+    ime->Release();
 
     return hr;
 }
@@ -47,8 +47,10 @@ HRESULT CSampleIME::CreateInstance(_In_ IUnknown *pUnkOuter, REFIID riid, _Outpt
 //
 //----------------------------------------------------------------------------
 
-CSampleIME::CSampleIME() {
+IMECore::IMECore() {
     DllAddRef();
+
+    //_hkl = LoadKeyboardLayout(L"00000409", 0);
 
     _pThreadMgr = nullptr;
 
@@ -72,7 +74,9 @@ CSampleIME::CSampleIME() {
 //
 //----------------------------------------------------------------------------
 
-CSampleIME::~CSampleIME() {
+IMECore::~IMECore() {
+    //UnloadKeyboardLayout(_hkl);
+
     DllRelease();
 }
 
@@ -82,7 +86,7 @@ CSampleIME::~CSampleIME() {
 //
 //----------------------------------------------------------------------------
 
-STDAPI CSampleIME::QueryInterface(REFIID riid, _Outptr_ void **ppvObj) {
+STDAPI IMECore::QueryInterface(REFIID riid, _Outptr_ void **ppvObj) {
     if (ppvObj == nullptr) {
         return E_INVALIDARG;
     }
@@ -121,7 +125,7 @@ STDAPI CSampleIME::QueryInterface(REFIID riid, _Outptr_ void **ppvObj) {
 //
 //----------------------------------------------------------------------------
 
-STDAPI_(ULONG) CSampleIME::AddRef() {
+STDAPI_(ULONG) IMECore::AddRef() {
     return ++_refCount;
 }
 
@@ -131,7 +135,7 @@ STDAPI_(ULONG) CSampleIME::AddRef() {
 //
 //----------------------------------------------------------------------------
 
-STDAPI_(ULONG) CSampleIME::Release() {
+STDAPI_(ULONG) IMECore::Release() {
     LONG cr = --_refCount;
 
     assert(_refCount >= 0);
@@ -149,7 +153,7 @@ STDAPI_(ULONG) CSampleIME::Release() {
 //
 //----------------------------------------------------------------------------
 
-STDAPI CSampleIME::ActivateEx(ITfThreadMgr *pThreadMgr, TfClientId tfClientId, DWORD dwFlags) {
+STDAPI IMECore::ActivateEx(ITfThreadMgr *pThreadMgr, TfClientId tfClientId, DWORD dwFlags) {
     _pThreadMgr = pThreadMgr;
     _pThreadMgr->AddRef();
 
@@ -192,7 +196,7 @@ ExitError:
 //
 //----------------------------------------------------------------------------
 
-STDAPI CSampleIME::Deactivate() {
+STDAPI IMECore::Deactivate() {
     _UninitFunctionProviderSink();
 
     _UninitThreadFocusSink();
@@ -220,10 +224,10 @@ STDAPI CSampleIME::Deactivate() {
 // ITfFunctionProvider::GetType
 //
 //----------------------------------------------------------------------------
-HRESULT CSampleIME::GetType(__RPC__out GUID *pguid) {
+HRESULT IMECore::GetType(__RPC__out GUID *pguid) {
     HRESULT hr = E_INVALIDARG;
     if (pguid) {
-        *pguid = Global::SampleIMECLSID;
+        *pguid = Global::IMECLSID;
         hr = S_OK;
     }
     return hr;
@@ -234,7 +238,7 @@ HRESULT CSampleIME::GetType(__RPC__out GUID *pguid) {
 // ITfFunctionProvider::::GetDescription
 //
 //----------------------------------------------------------------------------
-HRESULT CSampleIME::GetDescription(__RPC__deref_out_opt BSTR *pbstrDesc) {
+HRESULT IMECore::GetDescription(__RPC__deref_out_opt BSTR *pbstrDesc) {
     HRESULT hr = E_INVALIDARG;
     if (pbstrDesc != nullptr) {
         *pbstrDesc = nullptr;
@@ -248,7 +252,7 @@ HRESULT CSampleIME::GetDescription(__RPC__deref_out_opt BSTR *pbstrDesc) {
 // ITfFunctionProvider::::GetFunction
 //
 //----------------------------------------------------------------------------
-HRESULT CSampleIME::GetFunction(
+HRESULT IMECore::GetFunction(
     __RPC__in REFGUID rguid, __RPC__in REFIID riid, __RPC__deref_out_opt IUnknown **ppunk) {
     HRESULT hr = E_NOINTERFACE;
 
@@ -264,7 +268,7 @@ HRESULT CSampleIME::GetFunction(
 // ITfFunction::GetDisplayName
 //
 //----------------------------------------------------------------------------
-HRESULT CSampleIME::GetDisplayName(_Out_ BSTR *pbstrDisplayName) {
+HRESULT IMECore::GetDisplayName(_Out_ BSTR *pbstrDisplayName) {
     HRESULT hr = E_INVALIDARG;
     if (pbstrDisplayName != nullptr) {
         *pbstrDisplayName = nullptr;
@@ -279,6 +283,6 @@ HRESULT CSampleIME::GetDisplayName(_Out_ BSTR *pbstrDisplayName) {
 // The tkblayout will be Optimized layout.
 //----------------------------------------------------------------------------
 HRESULT
-CSampleIME::GetLayout(_Out_ TKBLayoutType *ptkblayoutType, _Out_ WORD *pwPreferredLayoutId) {
+IMECore::GetLayout(_Out_ TKBLayoutType *ptkblayoutType, _Out_ WORD *pwPreferredLayoutId) {
     return E_NOTIMPL;
 }

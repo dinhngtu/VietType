@@ -7,7 +7,7 @@
 
 #include "stdafx.h"
 #include "Globals.h"
-#include "SampleIME.h"
+#include "IMECore.h"
 
 //+---------------------------------------------------------------------------
 //
@@ -17,7 +17,7 @@
 // a document.
 //----------------------------------------------------------------------------
 
-STDAPI CSampleIME::OnInitDocumentMgr(_In_ ITfDocumentMgr *pDocMgr) {
+STDAPI IMECore::OnInitDocumentMgr(_In_ ITfDocumentMgr *pDocMgr) {
     pDocMgr;
     return E_NOTIMPL;
 }
@@ -30,7 +30,7 @@ STDAPI CSampleIME::OnInitDocumentMgr(_In_ ITfDocumentMgr *pDocMgr) {
 // document.
 //----------------------------------------------------------------------------
 
-STDAPI CSampleIME::OnUninitDocumentMgr(_In_ ITfDocumentMgr *pDocMgr) {
+STDAPI IMECore::OnUninitDocumentMgr(_In_ ITfDocumentMgr *pDocMgr) {
     pDocMgr;
     return E_NOTIMPL;
 }
@@ -45,7 +45,7 @@ STDAPI CSampleIME::OnUninitDocumentMgr(_In_ ITfDocumentMgr *pDocMgr) {
 //----------------------------------------------------------------------------
 
 STDAPI
-CSampleIME::OnSetFocus(_In_ ITfDocumentMgr *pDocMgrFocus, _In_ ITfDocumentMgr *pDocMgrPrevFocus) {
+IMECore::OnSetFocus(_In_ ITfDocumentMgr *pDocMgrFocus, _In_ ITfDocumentMgr *pDocMgrPrevFocus) {
     pDocMgrPrevFocus;
 
     _InitTextEditSink(pDocMgrFocus);
@@ -71,7 +71,7 @@ CSampleIME::OnSetFocus(_In_ ITfDocumentMgr *pDocMgrFocus, _In_ ITfDocumentMgr *p
 // Sink called by the framework when a context is pushed.
 //----------------------------------------------------------------------------
 
-STDAPI CSampleIME::OnPushContext(_In_ ITfContext *pContext) {
+STDAPI IMECore::OnPushContext(_In_ ITfContext *pContext) {
     pContext;
 
     return E_NOTIMPL;
@@ -84,7 +84,7 @@ STDAPI CSampleIME::OnPushContext(_In_ ITfContext *pContext) {
 // Sink called by the framework when a context is popped.
 //----------------------------------------------------------------------------
 
-STDAPI CSampleIME::OnPopContext(_In_ ITfContext *pContext) {
+STDAPI IMECore::OnPopContext(_In_ ITfContext *pContext) {
     pContext;
 
     return E_NOTIMPL;
@@ -97,7 +97,7 @@ STDAPI CSampleIME::OnPopContext(_In_ ITfContext *pContext) {
 // Advise our sink.
 //----------------------------------------------------------------------------
 
-BOOL CSampleIME::_InitThreadMgrEventSink() {
+BOOL IMECore::_InitThreadMgrEventSink() {
     ITfSource *pSource = nullptr;
     BOOL ret = FALSE;
 
@@ -106,9 +106,9 @@ BOOL CSampleIME::_InitThreadMgrEventSink() {
     }
 
     if (FAILED(pSource->AdviseSink(
-            IID_ITfThreadMgrEventSink,
-            (ITfThreadMgrEventSink *)this,
-            &_threadMgrEventSinkCookie))) {
+        IID_ITfThreadMgrEventSink,
+        (ITfThreadMgrEventSink *)this,
+        &_threadMgrEventSinkCookie))) {
         _threadMgrEventSinkCookie = TF_INVALID_COOKIE;
         goto Exit;
     }
@@ -127,7 +127,7 @@ Exit:
 // Unadvise our sink.
 //----------------------------------------------------------------------------
 
-void CSampleIME::_UninitThreadMgrEventSink() {
+void IMECore::_UninitThreadMgrEventSink() {
     ITfSource *pSource = nullptr;
 
     if (_threadMgrEventSinkCookie == TF_INVALID_COOKIE) {

@@ -14,16 +14,31 @@ void DllRelease();
 
 namespace Global {
 
-//---------------------------------------------------------------------
-// extern
-//---------------------------------------------------------------------
-extern HINSTANCE dllInstanceHandle;
+    //---------------------------------------------------------------------
+    // extern
+    //---------------------------------------------------------------------
+    extern HINSTANCE dllInstanceHandle;
 
-extern LONG dllRefCount;
+    extern LONG dllRefCount;
 
-extern CRITICAL_SECTION CS;
+    extern CRITICAL_SECTION CS;
 
-extern const CLSID SampleIMECLSID;
-extern const CLSID SampleIMEGuidProfile;
+    extern const CLSID IMECLSID;
+    extern const CLSID IMEGuidProfile;
 
 } // namespace Global
+
+#ifdef _DEBUG
+template <typename... Args>
+void dbgprint(const wchar_t *func, int line, const wchar_t *fmt, Args... args) {
+    // Format the string, maybe with vsprintf, log it, etc.
+    wchar_t buf[2048];
+    StringCchPrintf(buf, 2048, fmt, args...);
+    //wchar_t buf2[2048];
+    //StringCchPrintf(buf2, 2048, L"%s:%s: %s", func, line, buf);
+    OutputDebugString(buf);
+}
+#define DBGPRINT(fmt, ...) dbgprint(__FUNCTIONW__, __LINE__, fmt, __VA_ARGS__)
+#else
+#define DBGPRINT(fmt, ...)
+#endif
