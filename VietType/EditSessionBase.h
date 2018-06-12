@@ -9,10 +9,10 @@
 
 #include "IMECore.h"
 
-class CEditSessionBase : public ITfEditSession {
+class EditSessionBase : public ITfEditSession {
 public:
-    CEditSessionBase(_In_ IMECore *pTextService, _In_ ITfContext *pContext);
-    virtual ~CEditSessionBase();
+    EditSessionBase(_In_ IMECore *pTextService, _In_ ITfContext *pContext);
+    virtual ~EditSessionBase();
 
     // IUnknown
     STDMETHODIMP QueryInterface(REFIID riid, _Outptr_ void **ppvObj);

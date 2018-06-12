@@ -1,14 +1,14 @@
 #include "TestEditSession.h"
 
-CTestEditSession::CTestEditSession(IMECore *pTextService, ITfContext *pContext, WPARAM wParam, LPARAM lParam, PBYTE keyState, HKL hkl)
-    : CEditSessionBase(pTextService, pContext) {
+TestEditSession::TestEditSession(IMECore *pTextService, ITfContext *pContext, WPARAM wParam, LPARAM lParam, PBYTE keyState, HKL hkl)
+    : EditSessionBase(pTextService, pContext) {
     _wParam = wParam;
     _lParam = lParam;
     _keyState = keyState;
     _hkl = hkl;
 }
 
-STDMETHODIMP CTestEditSession::DoEditSession(TfEditCookie ec) {
+STDMETHODIMP TestEditSession::DoEditSession(TfEditCookie ec) {
     ITfInsertAtSelection *pInsertAtSelection = nullptr;
     ITfRange *pRangeInsert = nullptr;
     WCHAR buf[8] = { 0 };

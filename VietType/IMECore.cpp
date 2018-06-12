@@ -7,6 +7,7 @@
 
 #include "stdafx.h"
 #include "IMECore.h"
+#include "Define.h"
 
 //+---------------------------------------------------------------------------
 //
@@ -47,12 +48,16 @@ HRESULT IMECore::CreateInstance(_In_ IUnknown *pUnkOuter, REFIID riid, _Outptr_ 
 //
 //----------------------------------------------------------------------------
 
-IMECore::IMECore() {
+static Telex::TelexConfig TELEX_DEFAULT_CONFIG = {
+    true,
+};
+
+IMECore::IMECore() noexcept : _engine(TELEX_DEFAULT_CONFIG) {
     DllAddRef();
 
-    //_hkl = LoadKeyboardLayout(L"00000409", 0);
-
     _pThreadMgr = nullptr;
+    _tfClientId = TF_CLIENTID_NULL;
+    _dwActivateFlags = 0;
 
     _threadMgrEventSinkCookie = TF_INVALID_COOKIE;
 
@@ -65,6 +70,10 @@ IMECore::IMECore() {
 
     _pContext = nullptr;
 
+    _pComposition = nullptr;
+
+    _disabled = 0;
+
     _refCount = 1;
 }
 
@@ -75,8 +84,6 @@ IMECore::IMECore() {
 //----------------------------------------------------------------------------
 
 IMECore::~IMECore() {
-    //UnloadKeyboardLayout(_hkl);
-
     DllRelease();
 }
 
@@ -105,8 +112,6 @@ STDAPI IMECore::QueryInterface(REFIID riid, _Outptr_ void **ppvObj) {
         *ppvObj = (ITfKeyEventSink *)this;
     } else if (IsEqualIID(riid, IID_ITfThreadFocusSink)) {
         *ppvObj = (ITfThreadFocusSink *)this;
-    } else if (IsEqualIID(riid, IID_ITfFunctionProvider)) {
-        *ppvObj = (ITfFunctionProvider *)this;
     } else if (IsEqualIID(riid, IID_ITfFunction)) {
         *ppvObj = (ITfFunction *)this;
     }
@@ -179,10 +184,6 @@ STDAPI IMECore::ActivateEx(ITfThreadMgr *pThreadMgr, TfClientId tfClientId, DWOR
         goto ExitError;
     }
 
-    if (!_InitFunctionProviderSink()) {
-        goto ExitError;
-    }
-
     return S_OK;
 
 ExitError:
@@ -197,8 +198,6 @@ ExitError:
 //----------------------------------------------------------------------------
 
 STDAPI IMECore::Deactivate() {
-    _UninitFunctionProviderSink();
-
     _UninitThreadFocusSink();
 
     _UninitKeyEventSink();
@@ -221,68 +220,18 @@ STDAPI IMECore::Deactivate() {
 
 //+---------------------------------------------------------------------------
 //
-// ITfFunctionProvider::GetType
-//
-//----------------------------------------------------------------------------
-HRESULT IMECore::GetType(__RPC__out GUID *pguid) {
-    HRESULT hr = E_INVALIDARG;
-    if (pguid) {
-        *pguid = Global::IMECLSID;
-        hr = S_OK;
-    }
-    return hr;
-}
-
-//+---------------------------------------------------------------------------
-//
-// ITfFunctionProvider::::GetDescription
-//
-//----------------------------------------------------------------------------
-HRESULT IMECore::GetDescription(__RPC__deref_out_opt BSTR *pbstrDesc) {
-    HRESULT hr = E_INVALIDARG;
-    if (pbstrDesc != nullptr) {
-        *pbstrDesc = nullptr;
-        hr = E_NOTIMPL;
-    }
-    return hr;
-}
-
-//+---------------------------------------------------------------------------
-//
-// ITfFunctionProvider::::GetFunction
-//
-//----------------------------------------------------------------------------
-HRESULT IMECore::GetFunction(
-    __RPC__in REFGUID rguid, __RPC__in REFIID riid, __RPC__deref_out_opt IUnknown **ppunk) {
-    HRESULT hr = E_NOINTERFACE;
-
-    if (IsEqualGUID(rguid, GUID_NULL)) {
-        hr = QueryInterface(riid, (void **)ppunk);
-    }
-
-    return hr;
-}
-
-//+---------------------------------------------------------------------------
-//
 // ITfFunction::GetDisplayName
 //
 //----------------------------------------------------------------------------
 HRESULT IMECore::GetDisplayName(_Out_ BSTR *pbstrDisplayName) {
-    HRESULT hr = E_INVALIDARG;
-    if (pbstrDisplayName != nullptr) {
-        *pbstrDisplayName = nullptr;
-        hr = E_NOTIMPL;
+    if (!pbstrDisplayName) {
+        return E_INVALIDARG;
     }
-    return hr;
-}
-
-//+---------------------------------------------------------------------------
-//
-// ITfFnGetPreferredTouchKeyboardLayout::GetLayout
-// The tkblayout will be Optimized layout.
-//----------------------------------------------------------------------------
-HRESULT
-IMECore::GetLayout(_Out_ TKBLayoutType *ptkblayoutType, _Out_ WORD *pwPreferredLayoutId) {
-    return E_NOTIMPL;
+    BSTR ret = SysAllocString(TEXTSERVICE_DISPLAYNAME);
+    if (ret) {
+        *pbstrDisplayName = ret;
+        return S_OK;
+    } else {
+        return E_OUTOFMEMORY;
+    }
 }

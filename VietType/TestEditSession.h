@@ -2,9 +2,9 @@
 
 #include "EditSessionBase.h"
 
-class CTestEditSession : public CEditSessionBase {
+class TestEditSession : public EditSessionBase {
 public:
-    CTestEditSession(
+    TestEditSession(
         IMECore *pTextService,
         ITfContext *pContext,
         WPARAM wParam,

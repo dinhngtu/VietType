@@ -26,6 +26,8 @@ namespace Global {
     extern const CLSID IMECLSID;
     extern const CLSID IMEGuidProfile;
 
+    extern const GUID IME_PreservedKey_ToggleDisabled;
+
 } // namespace Global
 
 #ifdef _DEBUG

@@ -15,7 +15,7 @@
 //
 //----------------------------------------------------------------------------
 
-CEditSessionBase::CEditSessionBase(_In_ IMECore *pTextService, _In_ ITfContext *pContext) {
+EditSessionBase::EditSessionBase(_In_ IMECore *pTextService, _In_ ITfContext *pContext) {
     _refCount = 1;
     _pContext = pContext;
     _pContext->AddRef();
@@ -30,7 +30,7 @@ CEditSessionBase::CEditSessionBase(_In_ IMECore *pTextService, _In_ ITfContext *
 //
 //----------------------------------------------------------------------------
 
-CEditSessionBase::~CEditSessionBase() {
+EditSessionBase::~EditSessionBase() {
     _pContext->Release();
     _pTextService->Release();
 }
@@ -41,7 +41,7 @@ CEditSessionBase::~CEditSessionBase() {
 //
 //----------------------------------------------------------------------------
 
-STDAPI CEditSessionBase::QueryInterface(REFIID riid, _Outptr_ void **ppvObj) {
+STDAPI EditSessionBase::QueryInterface(REFIID riid, _Outptr_ void **ppvObj) {
     if (ppvObj == nullptr) {
         return E_INVALIDARG;
     }
@@ -66,7 +66,7 @@ STDAPI CEditSessionBase::QueryInterface(REFIID riid, _Outptr_ void **ppvObj) {
 //
 //----------------------------------------------------------------------------
 
-STDAPI_(ULONG) CEditSessionBase::AddRef(void) {
+STDAPI_(ULONG) EditSessionBase::AddRef(void) {
     return ++_refCount;
 }
 
@@ -76,7 +76,7 @@ STDAPI_(ULONG) CEditSessionBase::AddRef(void) {
 //
 //----------------------------------------------------------------------------
 
-STDAPI_(ULONG) CEditSessionBase::Release(void) {
+STDAPI_(ULONG) EditSessionBase::Release(void) {
     LONG cr = --_refCount;
 
     assert(_refCount >= 0);

@@ -6,10 +6,24 @@
 // Copyright (c) Microsoft Corporation. All rights reserved
 
 #include "Globals.h"
-#include "VirtualKeys.h"
 #include "IMECore.h"
 #include "TestEditSession.h"
+#include "KeyHandlerEditSession.h"
 #include "stdafx.h"
+#include "TelexKeyTranslator.h"
+
+HRESULT IMECore::_CallKeyEdit(ITfContext *pContext, WPARAM wParam, LPARAM lParam, PBYTE keyState) {
+    auto khSession = new (std::nothrow) KeyHandlerEditSession(this, pContext, wParam, lParam, keyState, _engine);
+    if (khSession != nullptr) {
+        HRESULT hrSession = S_OK;
+        HRESULT hr = pContext->RequestEditSession(_tfClientId, khSession, TF_ES_SYNC | TF_ES_READWRITE, &hrSession);
+        khSession->Release();
+
+        return hr;
+    } else {
+        return E_FAIL;
+    }
+}
 
 //+---------------------------------------------------------------------------
 //
@@ -33,43 +47,24 @@ STDAPI IMECore::OnSetFocus(BOOL fForeground) {
 
 STDAPI
 IMECore::OnTestKeyDown(ITfContext *pContext, WPARAM wParam, LPARAM lParam, BOOL *pIsEaten) {
-    VK_CATEGORIES keyCat = ClassifyVirtualKey(wParam, lParam);
+    DBGPRINT(L"OnTestKeyDown key %x", wParam);
 
-#ifdef _DEBUG
-    if (keyCat == VK_CATEGORIES::DEBUG) {
-        *pIsEaten = TRUE;
-        DBGPRINT(
-            L"debug OnTestKeyDown wParam %zu lParam %zx %s",
-            wParam,
-            lParam,
-            *pIsEaten ? L"eaten" : L"not eaten");
+    if (_disabled) {
+        *pIsEaten = FALSE;
         return S_OK;
     }
-#endif
 
-    switch (keyCat) {
-    case VK_CATEGORIES::UNCATEGORIZED:
-        *pIsEaten = FALSE;
-        break;
-    case VK_CATEGORIES::CHARACTER:
-        *pIsEaten = FALSE;
-        break;
-    case VK_CATEGORIES::RELAYOUT:
-        *pIsEaten = FALSE;
-        break;
-    case VK_CATEGORIES::MODIFIER:
-        *pIsEaten = FALSE;
-        break;
-    case VK_CATEGORIES::EDIT:
-        *pIsEaten = FALSE;
-        break;
+    BYTE keyState[256] = { 0 };
+    if (!GetKeyboardState(keyState)) {
+        return E_FAIL;
+    }
+    *pIsEaten = Telex::EngineWantsKey(wParam, lParam, keyState);
+
+    if (!*pIsEaten && _IsComposing()) {
+        _CallKeyEdit(pContext, 0, 0, NULL);
     }
 
-    DBGPRINT(
-        L"OnTestKeyDown wParam %zu lParam %zx %s",
-        wParam,
-        lParam,
-        *pIsEaten ? L"eaten" : L"not eaten");
+    DBGPRINT(L"OnTestKeyDown key %x %s", wParam, *pIsEaten ? L"eaten" : L"not eaten");
 
     return S_OK;
 }
@@ -83,68 +78,20 @@ IMECore::OnTestKeyDown(ITfContext *pContext, WPARAM wParam, LPARAM lParam, BOOL 
 //----------------------------------------------------------------------------
 
 STDAPI IMECore::OnKeyDown(ITfContext *pContext, WPARAM wParam, LPARAM lParam, BOOL *pIsEaten) {
-    OnTestKeyDown(pContext, wParam, lParam, pIsEaten);
-    if (!*pIsEaten) {
-        return S_OK;
+    DBGPRINT(L"OnKeyDown key %x", wParam);
+
+    BYTE keyState[256] = { 0 };
+    if (!GetKeyboardState(keyState)) {
+        return E_FAIL;
     }
+    *pIsEaten = Telex::EngineWantsKey(wParam, lParam, keyState);
 
-    VK_CATEGORIES keyCat = ClassifyVirtualKey(wParam, lParam);
+    DBGPRINT(L"OnKeyDown key %x %s", wParam, *pIsEaten ? L"eaten" : L"not eaten");
 
-#ifdef _DEBUG
-    if (keyCat == VK_CATEGORIES::DEBUG) {
-        *pIsEaten = FALSE;
-
-        BYTE keyState[256] = { 0 };
-        if (!GetKeyboardState(keyState)) {
-            return E_FAIL;
-        }
-
-        CTestEditSession *session = new (std::nothrow) CTestEditSession(
-            this, pContext, 48, MapVirtualKey(48, MAPVK_VK_TO_VSC), keyState, NULL); // "0"
-        if (session != nullptr) {
-            HRESULT hrSession = S_OK;
-            HRESULT hr = pContext->RequestEditSession(
-                _tfClientId, session, TF_ES_SYNC | TF_ES_READWRITE, &hrSession);
-            session->Release();
-
-            if (FAILED(hr)) {
-                DBGPRINT(L"RequestEditSession failed %lx", hr);
-                return hr;
-            }
-        }
-
-        DBGPRINT(
-            L"debug OnKeyDown wParam %zu lParam %zx %s",
-            wParam,
-            lParam,
-            *pIsEaten ? L"eaten" : L"not eaten");
-
-        return S_OK;
+    HRESULT hr = _CallKeyEdit(pContext, wParam, lParam, keyState);
+    if (FAILED(hr)) {
+        return hr;
     }
-#endif
-
-    switch (keyCat) {
-    case VK_CATEGORIES::UNCATEGORIZED:
-        *pIsEaten = FALSE;
-        break;
-    case VK_CATEGORIES::CHARACTER:
-        *pIsEaten = FALSE;
-        break;
-    case VK_CATEGORIES::RELAYOUT: {
-        // remap not needed any more thanks to English (India) hack
-        *pIsEaten = FALSE;
-        break;
-    }
-    case VK_CATEGORIES::MODIFIER:
-        *pIsEaten = FALSE;
-        break;
-    case VK_CATEGORIES::EDIT:
-        *pIsEaten = FALSE;
-        break;
-    }
-
-    DBGPRINT(
-        L"OnKeyDown wParam %zu lParam %zx %s", wParam, lParam, *pIsEaten ? L"eaten" : L"not eaten");
 
     return S_OK;
 }
@@ -157,19 +104,25 @@ STDAPI IMECore::OnKeyDown(ITfContext *pContext, WPARAM wParam, LPARAM lParam, BO
 //----------------------------------------------------------------------------
 
 STDAPI IMECore::OnTestKeyUp(ITfContext *pContext, WPARAM wParam, LPARAM lParam, BOOL *pIsEaten) {
-    VK_CATEGORIES keyCat = ClassifyVirtualKey(wParam, lParam);
-    switch (keyCat) {
-    case VK_CATEGORIES::UNCATEGORIZED:
+    DBGPRINT(L"OnTestKeyUp key %x", wParam);
+
+    if (_disabled) {
         *pIsEaten = FALSE;
-        break;
-    case VK_CATEGORIES::CHARACTER:
-    case VK_CATEGORIES::RELAYOUT:
-    case VK_CATEGORIES::MODIFIER:
-    case VK_CATEGORIES::EDIT:
-        //*pIsEaten = TRUE;
-        *pIsEaten = TRUE;
-        break;
+        return S_OK;
     }
+
+    // TODO: essentially we eat the KeyUp event if a composition is active; is this the correct behavior?
+    if (_IsComposing()) {
+        BYTE keyState[256] = { 0 };
+        if (!GetKeyboardState(keyState)) {
+            return E_FAIL;
+        }
+        *pIsEaten = Telex::EngineWantsKey(wParam, lParam, keyState);
+    } else {
+        *pIsEaten = FALSE;
+    }
+
+    DBGPRINT(L"OnTestKeyUp key %x %s", wParam, *pIsEaten ? L"eaten" : L"not eaten");
 
     return S_OK;
 }
@@ -183,14 +136,30 @@ STDAPI IMECore::OnTestKeyUp(ITfContext *pContext, WPARAM wParam, LPARAM lParam, 
 //----------------------------------------------------------------------------
 
 STDAPI IMECore::OnKeyUp(ITfContext *pContext, WPARAM wParam, LPARAM lParam, BOOL *pIsEaten) {
-    if (wParam == 49) {
-        *pIsEaten = TRUE;
+    DBGPRINT(L"OnKeyUp key %x", wParam);
+
+    if (_disabled) {
+        *pIsEaten = FALSE;
+        return S_OK;
+    }
+
+    // TODO: essentially we eat the KeyUp event if a composition is active; is this the correct behavior?
+    if (_IsComposing()) {
+        BYTE keyState[256] = { 0 };
+        if (!GetKeyboardState(keyState)) {
+            return E_FAIL;
+        }
+        *pIsEaten = Telex::EngineWantsKey(wParam, lParam, keyState);
     } else {
         *pIsEaten = FALSE;
     }
 
+    DBGPRINT(L"OnKeyUp key %x %s", wParam, *pIsEaten ? L"eaten" : L"not eaten");
+
     return S_OK;
 }
+
+static TF_PRESERVEDKEY PK_TOGGLEDISABLED = { VK_OEM_3, TF_MOD_ALT }; // Alt-`
 
 //+---------------------------------------------------------------------------
 //
@@ -201,6 +170,16 @@ STDAPI IMECore::OnKeyUp(ITfContext *pContext, WPARAM wParam, LPARAM lParam, BOOL
 
 STDAPI IMECore::OnPreservedKey(ITfContext *pContext, REFGUID rguid, BOOL *pIsEaten) {
     pContext;
+
+    if (IsEqualGUID(Global::IME_PreservedKey_ToggleDisabled, rguid)) {
+        DBGPRINT(L"%s", L"eaten toggle key");
+        *pIsEaten = TRUE;
+        // if still composing, abort it first or we'll have a composition during when no key is eaten
+        if (_IsComposing()) {
+            _EndComposition(pContext);
+        }
+        _disabled = !_disabled;
+    }
 
     return S_OK;
 }
@@ -222,6 +201,8 @@ BOOL IMECore::_InitKeyEventSink() {
 
     hr = pKeystrokeMgr->AdviseKeyEventSink(_tfClientId, (ITfKeyEventSink *)this, TRUE);
 
+    pKeystrokeMgr->PreserveKey(_tfClientId, Global::IME_PreservedKey_ToggleDisabled, &PK_TOGGLEDISABLED, NULL, 0);
+
     pKeystrokeMgr->Release();
 
     return (hr == S_OK);
@@ -240,6 +221,8 @@ void IMECore::_UninitKeyEventSink() {
     if (FAILED(_pThreadMgr->QueryInterface(IID_ITfKeystrokeMgr, (void **)&pKeystrokeMgr))) {
         return;
     }
+
+    pKeystrokeMgr->UnpreserveKey(Global::IME_PreservedKey_ToggleDisabled, &PK_TOGGLEDISABLED);
 
     pKeystrokeMgr->UnadviseKeyEventSink(_tfClientId);
 

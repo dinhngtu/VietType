@@ -5,6 +5,7 @@ namespace Telex {
         { { L'a', L'a' },{ L'\xe2' } },
     { { L'a', L'w' },{ L'\x103' } },
     { { L'e', L'e' },{ L'\xea' } },
+    { { L'i', L'e', L'e' },{ L'i', L'\xea' } },
     { { L'o', L'o' },{ L'\xf4' } },
     { { L'o', L'w' },{ L'\x1a1' } },
     { { L'u', L'o', L'o' },{ L'u', L'\xf4' } },
@@ -36,6 +37,7 @@ namespace Telex {
     };
 
     std::set<std::vector<wchar_t>> valid_c1 = {
+        {},
         { L'b' },
     { L'c' },
     { L'c', L'h' },
@@ -128,6 +130,7 @@ namespace Telex {
     };
 
     std::set<std::vector<wchar_t>> valid_c2 = {
+        {},
         { L'c' },
     { L'n' },
     { L'p' },

@@ -46,7 +46,7 @@ void DllRelease(void) {
         if (nullptr != classFactoryObjects[0]) {
             FreeGlobalObjects();
         }
-        assert(Global::dllRefCount == -1);
+        assert(InterlockedCompareExchange(&Global::dllRefCount, 0, 0) == -1);
 
         LeaveCriticalSection(&Global::CS);
     }
@@ -80,12 +80,10 @@ public:
 
 public:
     REFCLSID _rclsid;
-    HRESULT(*_pfnCreateInstance)(IUnknown *pUnkOuter, REFIID riid, _COM_Outptr_ void **ppvObj);
+    HRESULT(*_pfnCreateInstance)(_In_opt_ IUnknown *pUnkOuter, _In_ REFIID riid, _COM_Outptr_ void **ppvObj);
 
 private:
-    CClassFactory & operator=(const CClassFactory &rhn) {
-        rhn;
-    };
+    CClassFactory & operator=(const CClassFactory &rhn) = delete;
 };
 
 //+---------------------------------------------------------------------------

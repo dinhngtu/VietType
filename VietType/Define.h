@@ -10,6 +10,8 @@
 #include "stdafx.h"
 #include "resource.h"
 
+#define TEXTSERVICE_DISPLAYNAME L"VietType"
+
 #define TEXTSERVICE_MODEL L"Apartment"
 
 //#define TEXTSERVICE_LANGID MAKELANGID(LANG_VIETNAMESE, SUBLANG_VIETNAMESE_VIETNAM)

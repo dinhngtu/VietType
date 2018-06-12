@@ -9,9 +9,7 @@
 
 #include "Globals.h"
 #include "stdafx.h"
-
-#include <fstream>
-#include <iostream>
+#include "Telex.h"
 
 class IMECore :
     public ITfTextInputProcessorEx,
@@ -19,9 +17,11 @@ class IMECore :
     public ITfTextEditSink,
     public ITfKeyEventSink,
     public ITfThreadFocusSink,
-    public ITfFunctionProvider {
+    public ITfFunction,
+    public ITfCompositionSink {
+
 public:
-    IMECore();
+    IMECore() noexcept;
     ~IMECore();
 
     // IUnknown
@@ -59,27 +59,30 @@ public:
     STDMETHODIMP OnSetThreadFocus();
     STDMETHODIMP OnKillThreadFocus();
 
-    // ITfFunctionProvider
-    STDMETHODIMP GetType(__RPC__out GUID *pguid);
-    STDMETHODIMP GetDescription(__RPC__deref_out_opt BSTR *pbstrDesc);
-    STDMETHODIMP GetFunction(__RPC__in REFGUID rguid, __RPC__in REFIID riid, __RPC__deref_out_opt IUnknown **ppunk);
-
     // ITfFunction
     STDMETHODIMP GetDisplayName(_Out_ BSTR *pbstrDisplayName);
 
-    // ITfFnGetPreferredTouchKeyboardLayout, it is the Optimized layout feature.
-    STDMETHODIMP GetLayout(_Out_ TKBLayoutType *ptkblayoutType, _Out_ WORD *pwPreferredLayoutId);
+    // Inherited via ITfCompositionSink
+    STDMETHODIMP OnCompositionTerminated(TfEditCookie ecWrite, ITfComposition * pComposition);
+
+    void _StartComposition(_In_ ITfContext *pContext);
+    void _EndComposition(_In_opt_ ITfContext *pContext);
+    void _TerminateComposition(TfEditCookie ec, _In_ ITfContext *pContext, BOOL isCalledFromDeactivate);
+
+    /// <summary>edit session utilities, don't call</summary>
+    void _SetComposition(_In_ ITfComposition *pComposition);
+    /// <summary>edit session utilities, don't call</summary>
+    void _SaveCompositionContext(_In_ ITfContext *pContext);
+    /// <summary>edit session utilities, don't call</summary>
+    bool _IsComposing() const;
+
+    /// <summary>edit session utilities, don't call</summary>
+    BOOL _IsRangeCovered(TfEditCookie ec, _In_ ITfRange *pRangeTest, _In_ ITfRange *pRangeCover);
+    /// <summary>edit session utilities, don't call</summary>
+    STDMETHODIMP _SetCompositionText(TfEditCookie ec, _In_ ITfContext *pContext, std::wstring content);
 
     // CClassFactory factory callback
     static HRESULT CreateInstance(_In_ IUnknown *pUnkOuter, REFIID riid, _Outptr_ void **ppvObj);
-
-    // utility function for thread manager.
-    ITfThreadMgr *_GetThreadMgr() {
-        return _pThreadMgr;
-    }
-    TfClientId _GetClientId() {
-        return _tfClientId;
-    }
 
     BOOL _IsSecureMode(void) {
         return (_dwActivateFlags & TF_TMAE_SECUREMODE) ? TRUE : FALSE;
@@ -90,23 +93,6 @@ public:
     BOOL _IsStoreAppMode(void) {
         return (_dwActivateFlags & TF_TMF_IMMERSIVEMODE) ? TRUE : FALSE;
     };
-
-    // comless helpers
-    /*
-    static HRESULT IMECore::CreateInstance(
-        REFCLSID rclsid,
-        REFIID riid,
-        _Outptr_result_maybenull_ LPVOID *ppv,
-        _Out_opt_ HINSTANCE *phInst,
-        BOOL isComLessMode);
-    static HRESULT IMECore::ComLessCreateInstance(
-        REFGUID rclsid,
-        REFIID riid,
-        _Outptr_result_maybenull_ void **ppv,
-        _Out_opt_ HINSTANCE *phInst);
-    static HRESULT IMECore::GetComModuleName(
-        REFGUID rclsid, _Out_writes_(cchPath) WCHAR *wchPath, DWORD cchPath);
-        */
 
 private:
     BOOL _InitThreadMgrEventSink();
@@ -120,12 +106,9 @@ private:
     BOOL _InitThreadFocusSink();
     void _UninitThreadFocusSink();
 
-    BOOL _InitFunctionProviderSink();
-    void _UninitFunctionProviderSink();
+    HRESULT _CallKeyEdit(ITfContext *pContext, WPARAM wParam, LPARAM lParam, PBYTE keyState);
 
 private:
-    //HKL _hkl;
-
     ITfThreadMgr * _pThreadMgr;
     TfClientId _tfClientId;
     DWORD _dwActivateFlags;
@@ -143,5 +126,14 @@ private:
 
     ITfContext *_pContext;
 
+    ITfComposition* _pComposition;
+
+    Telex::TelexEngine _engine;
+    BOOL _disabled;
+
     LONG _refCount;
+
+private:
+    IMECore(const IMECore &) = delete;
+    IMECore& operator=(const IMECore &) = delete;
 };
