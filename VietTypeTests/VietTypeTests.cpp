@@ -67,14 +67,14 @@ void main2() {
     size_t len = 0;
     for (int i = 0; i < ITERATIONS; i++) {
         tx.Reset();
-        tx.PushChar(L'n');
-        tx.PushChar(L'g');
-        tx.PushChar(L'u');
+        tx.PushChar(L'N');
+        tx.PushChar(L'G');
+        tx.PushChar(L'U');
         tx.PushChar(L'y');
-        tx.PushChar(L'e');
+        tx.PushChar(L'E');
         tx.PushChar(L'e');
         tx.PushChar(L'n');
-        tx.PushChar(L'x');
+        tx.PushChar(L'X');
         tx.Commit();
         len += tx.Retrieve().length();
     }
@@ -100,8 +100,44 @@ void main3() {
     DBGPRINT(L"%s", x.c_str());
 }
 
+void main4() {
+    TelexConfig c;
+    c.oa_uy_tone1 = true;
+    TelexEngine tx(c);
+
+    tx.Reset();
+    tx.PushChar(L'D');
+    tx.PushChar(L'd');
+    tx.PushChar(L'I');
+    tx.PushChar(L'n');
+    tx.PushChar(L'h');
+    tx.PushChar(L'j');
+    tx.Commit();
+    std::wstring x = tx.Retrieve();
+    DBGPRINT(L"%s", x.c_str());
+}
+
+void main5() {
+    TelexConfig c;
+    c.oa_uy_tone1 = true;
+    TelexEngine tx(c);
+
+    tx.Reset();
+    tx.PushChar(L'N');
+    tx.PushChar(L'G');
+    tx.PushChar(L'U');
+    tx.PushChar(L'y');
+    tx.PushChar(L'E');
+    tx.PushChar(L'e');
+    tx.PushChar(L'n');
+    tx.PushChar(L'X');
+    tx.Commit();
+    std::wstring x = tx.Retrieve();
+    DBGPRINT(L"%s", x.c_str());
+}
+
 int main() {
-    main3();
+    main5();
 
     return 0;
 }

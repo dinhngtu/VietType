@@ -19,6 +19,7 @@ namespace Telex {
         SHORTHANDS,
     };
 
+    /// <summary>classifies lower characters only</summary>
     CHR_CATEGORIES ClassifyCharacter(wchar_t c);
     TONES GetTone(wchar_t c);
 }

@@ -1,4 +1,5 @@
 #include <cassert>
+#include <locale>
 
 #include "Telex.h"
 #include "TelexData.h"
@@ -6,10 +7,23 @@
 #include "Globals.h"
 
 namespace Telex {
+    // not sure if using the preferred locale will break upper/lower
+    static std::locale const internal_locale("");
+
     static wchar_t TranslateTone(wchar_t c, TONES t) {
         auto it = transitions_tones.find(c);
         assert(it != transitions_tones.end());
         return (it->second)[(int)t];
+    }
+
+    /// <summary>destructive</summary>
+    static void ApplyCases(std::wstring& str, std::vector<int> const& cases) {
+        assert(str.length() == cases.size());
+        for (int i = 0; i < cases.size(); i++) {
+            if (cases[i]) {
+                str[i] = std::toupper(str[i], internal_locale);
+            }
+        }
     }
 
     TelexEngine::TelexEngine(_In_ TelexConfig config) {
@@ -29,10 +43,14 @@ namespace Telex {
         _v.clear();
         _c2.clear();
         _t = TONES::Z;
+        _cases.clear();
     }
 
-    TELEX_STATES TelexEngine::PushChar(_In_ wchar_t c) {
-        auto cat = ClassifyCharacter(towlower(c));
+    // remember to push into _cases when adding a new character
+    TELEX_STATES TelexEngine::PushChar(_In_ wchar_t corig) {
+        auto ccase = std::isupper(corig, internal_locale);
+        auto c = std::tolower(corig, internal_locale);
+        auto cat = ClassifyCharacter(c);
 
         _keyBuffer.push_back(c);
 
@@ -41,21 +59,33 @@ namespace Telex {
 
         } else if (!_c1.size() && !_v.size() && (cat == CHR_CATEGORIES::WORDENDCONSO || cat == CHR_CATEGORIES::OTHERCONSO || cat == CHR_CATEGORIES::CONSOCONTINUE)) {
             _c1.push_back(c);
+            _cases.push_back(ccase);
 
         } else if (!_v.size() && !_c2.size() && (cat == CHR_CATEGORIES::CONSOCONTINUE)) {
             _c1.push_back(c);
+            auto before = _c1.size();
             auto it = transitions.find(_c1);
             if (it != transitions.end()) {
                 _c1 = it->second;
+            }
+            auto after = _c1.size();
+            // remember that c1 cannot grow when adding a char
+            if (after == before) {
+                _cases.push_back(ccase);
             }
 
         } else if (cat == CHR_CATEGORIES::VOWEL || cat == CHR_CATEGORIES::VOWELW) {
             // vowel parts (aeiouy)
             if (!_c2.size()) {
                 _v.push_back(c);
+                auto before = _v.size();
                 auto it = transitions.find(_v);
                 if (it != transitions.end()) {
                     _v = it->second;
+                }
+                auto after = _v.size();
+                if (after == before) {
+                    _cases.push_back(ccase);
                 }
             }
 
@@ -66,10 +96,12 @@ namespace Telex {
                 _v = it->second;
             }
             _c2.push_back(c);
+            _cases.push_back(ccase);
 
         } else if (cat == CHR_CATEGORIES::CONSOCONTINUE) {
             // consonant continuation (dgh)
             _c2.push_back(c);
+            _cases.push_back(ccase);
 
         } else if (_v.size() && cat == CHR_CATEGORIES::TONES) {
             // tones-only (fjz)
@@ -84,6 +116,7 @@ namespace Telex {
         } else if (!_c1.size() && !_v.size() && cat == CHR_CATEGORIES::TONECONSO) {
             // ambiguous (rsx) -> first character
             _c1.push_back(c);
+            _cases.push_back(ccase);
 
         } else if (_v.size() && cat == CHR_CATEGORIES::TONECONSO) {
             // ambiguous (rsx) -> tone
@@ -211,6 +244,7 @@ namespace Telex {
         std::wstring result(_c1.begin(), _c1.end());
         result.append(_v.begin(), _v.end());
         result.append(_c2.begin(), _c2.end());
+        ApplyCases(result, _cases);
         return result;
     }
 
@@ -255,6 +289,7 @@ namespace Telex {
         result.append(_v.begin(), _v.end());
         result[_c1.size() + tonepos] = vatpos;
         result.append(_c2.begin(), _c2.end());
+        ApplyCases(result, _cases);
 
         return result;
     }

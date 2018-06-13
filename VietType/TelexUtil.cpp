@@ -1,11 +1,9 @@
 #include "TelexUtil.h"
 #include "TelexData.h"
 
-#include <cctype>
-
 namespace Telex {
     CHR_CATEGORIES ClassifyCharacter(wchar_t c) {
-        switch (towlower(c)) {
+        switch (c) {
         case L'w':
             return CHR_CATEGORIES::VOWELW;
         case L'\b':

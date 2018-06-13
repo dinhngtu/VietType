@@ -25,6 +25,10 @@ namespace Telex {
         C2MODE c2mode;
     };
 
+    /// <summary>
+    /// transition.
+    /// ensure that c1 or v only shrinks by 1 character or stays a constant length with this transition.
+    /// </summary>
     extern std::map<std::vector<wchar_t>, std::vector<wchar_t>> const transitions;
     extern std::map<std::vector<wchar_t>, std::vector<wchar_t>> const transitions_v_c2;
     extern std::map<wchar_t, std::vector<wchar_t>> const transitions_tones;

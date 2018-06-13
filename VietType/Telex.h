@@ -8,6 +8,11 @@
 
 #include "Export.h"
 
+// A word of warning:
+// This class only deals with characters that can be represented by wchar_t.
+// For example, German character input (where upper('ß') = 'SS') is not supported,
+// nor are CJK languages supported.
+
 namespace Telex {
     // State transition is as follows:
 
@@ -61,5 +66,8 @@ namespace Telex {
         std::vector<wchar_t> _v;
         std::vector<wchar_t> _c2;
         TONES _t;
+        // don't use vector<bool> since that's special
+        // 1 = uppercase, 0 = lowercase
+        std::vector<int> _cases;
     };
 }
