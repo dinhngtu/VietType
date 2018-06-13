@@ -26,6 +26,7 @@ namespace Telex {
         case L'y':
             return CHR_CATEGORIES::VOWEL;
         case L'c':
+        case L'm':
         case L'n':
         case L'p':
         case L't':
@@ -33,7 +34,6 @@ namespace Telex {
         case L'b':
         case L'k':
         case L'l':
-        case L'm':
         case L'q':
         case L'v':
             return CHR_CATEGORIES::OTHERCONSO;
@@ -67,22 +67,22 @@ namespace Telex {
         return CHR_CATEGORIES::UNCATEGORIZED;
     }
 
-    WORDTONES GetTone(wchar_t c) {
+    TONES GetTone(wchar_t c) {
         switch (c) {
         case L'z':
-            return WORDTONES::Z;
+            return TONES::Z;
         case L'f':
-            return WORDTONES::F;
+            return TONES::F;
         case L'j':
-            return WORDTONES::J;
+            return TONES::J;
         case L'r':
-            return WORDTONES::R;
+            return TONES::R;
         case L's':
-            return WORDTONES::S;
+            return TONES::S;
         case L'x':
-            return WORDTONES::X;
+            return TONES::X;
         default:
-            return WORDTONES::Z;
+            return TONES::Z;
         }
     }
 }

@@ -20,5 +20,5 @@ namespace Telex {
     };
 
     CHR_CATEGORIES ClassifyCharacter(wchar_t c);
-    WORDTONES GetTone(wchar_t c);
+    TONES GetTone(wchar_t c);
 }

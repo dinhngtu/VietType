@@ -49,6 +49,7 @@ namespace Telex {
 
         std::wstring Retrieve() const;
         std::wstring RetrieveInvalid() const;
+        std::wstring Peek() const;
 
     private:
         struct TelexConfig _config;
@@ -59,6 +60,6 @@ namespace Telex {
         std::vector<wchar_t> _c1;
         std::vector<wchar_t> _v;
         std::vector<wchar_t> _c2;
-        WORDTONES _t;
+        TONES _t;
     };
 }
