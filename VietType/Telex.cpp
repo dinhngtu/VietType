@@ -83,12 +83,13 @@ namespace Telex {
             _c1.push_back(c);
             _cases.push_back(ccase);
 
-        } else if (_c1.size() && !_v.size() && (_c1[0] == 'g' && c == 'i')) {
+        } else if (_c1.size() && !_v.size() && _c1 == L"g" && c == L'i') {
             // special treatment for 'gi'
             _c1.push_back(c);
             _cases.push_back(ccase);
 
-        } else if (!_v.size() && !_c2.size() && (cat == CHR_CATEGORIES::CONSOCONTINUE)) {
+        } else if (!_c2.size() && cat == CHR_CATEGORIES::CONSOCONTINUE) {
+            // relaxed constraint: !_v.size()
             _c1.push_back(c);
             auto before = _c1.size();
             // only used for 'dd'
@@ -102,7 +103,8 @@ namespace Telex {
                 _cases.push_back(ccase);
             }
 
-        } else if (!_c2.size() && cat == CHR_CATEGORIES::VOWEL) {
+        } else if (cat == CHR_CATEGORIES::VOWEL) {
+            // relaxed vowel position constraint: !_c2.size()
             // vowel parts (aeiouy)
             _v.push_back(c);
             auto before = _v.size();
@@ -238,6 +240,12 @@ namespace Telex {
 
         // routine changes buffers from this point
 
+        // fixup 'gi'
+        if (_c1 == L"gi" && !_v.size()) {
+            _c1.pop_back();
+            _v.push_back(L'i');
+        }
+
         _v[it->second.tonepos] = TranslateTone(_v[it->second.tonepos], _t);
 
         _state = TELEX_STATES::COMMITTED;
@@ -312,7 +320,12 @@ namespace Telex {
             }
         }
 
-        if (tonepos >= 0) {
+        // fixup 'gi'
+        if (_c1 == L"gi" && !_v.size()) {
+            tonepos = (int)_c1.size() - 1;
+            wchar_t vatpos = TranslateTone(_c1[tonepos], _t);
+            result[tonepos] = vatpos;
+        } else if (tonepos >= 0) {
             wchar_t vatpos = TranslateTone(_v[tonepos], _t);
             result[_c1.size() + tonepos] = vatpos;
         }
@@ -328,10 +341,10 @@ namespace Telex {
     }
 
     bool TelexEngine::FindTable(_Out_ map_iterator * it) const {
-        if (_c1.size() == 1 && _c1[0] == L'q') {
+        if (_c1 == L"q") {
             *it = valid_v_q.find(_v);
             return *it != valid_v_q.end();
-        } else if (_c1.size() == 2 && _c1[0] == L'g') {
+        } else if (_c1 == L"gi") {
             *it = valid_v_gi.find(_v);
             return *it != valid_v_gi.end();
         } else {

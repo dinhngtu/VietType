@@ -13,6 +13,9 @@ namespace Telex {
         {L"u\x1a1u", L"\x1b0\x1a1u"},
         {L"uyee", L"uy\xea"},
         {L"dd", L"\x111"},
+        // relaxed transformations
+        {L"ieue", L"i\xeau"},
+        {L"yeue", L"y\xeau"},
     };
 
     std::unordered_map<std::wstring, std::wstring> const transitions_w = {
@@ -174,6 +177,7 @@ namespace Telex {
     };
 
     std::unordered_map<std::wstring, VINFO> const valid_v_gi = {
+        {L"", {-1, C2MODE::EITHER}},
         {L"a", {0, C2MODE::EITHER}},
         {L"\x103", {0, C2MODE::MUSTC2}}, // ă
         {L"\xe2", {0, C2MODE::MUSTC2}},  // â
@@ -201,7 +205,7 @@ namespace Telex {
         {L"ua", {0, C2MODE::NOC2}},     // c2 either with qu
         {L"ui", {0, C2MODE::NOC2}},
 
-        {L"\x1b0a", {0, C2MODE::NOC2}}, // ưa
+        {L"\x1b0\x61", {0, C2MODE::NOC2}}, // ưa
     };
 
     // bool is whether tones are restricted to s/j or not
