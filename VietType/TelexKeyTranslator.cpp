@@ -53,7 +53,7 @@ bool Telex::EngineWantsKey(bool isComposing, _In_ WPARAM wParam, _In_ LPARAM lPa
 
 Telex::TELEX_STATES Telex::PushKey(_In_ Telex::TelexEngine& engine, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_ BYTE const *keyState) {
     if (IsTranslatableKey(wParam, lParam)) {
-        WCHAR c;
+        WCHAR c = 0;
         assert(ToUnicode((UINT)wParam, (lParam >> 16) & 0xff, keyState, &c, 1, 0) == 1);
         return engine.PushChar(c);
     } else if (wParam == VK_BACK) {

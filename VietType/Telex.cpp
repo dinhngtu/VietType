@@ -1,5 +1,4 @@
 #include <cassert>
-#include <locale>
 
 #include "Telex.h"
 #include "TelexData.h"
@@ -7,8 +6,34 @@
 #include "Globals.h"
 
 namespace Telex {
-    // not sure if using the preferred locale will break upper/lower
-    static std::locale const internal_locale("");
+    struct LOWER {
+        int found;
+        wchar_t c;
+    };
+
+    static wchar_t ToUpper(wchar_t c) {
+        auto it = touppermap.find(c);
+        if (it != touppermap.end()) {
+            return it->second;
+        } else {
+            return c;
+        }
+    }
+
+    static LOWER FindLower(wchar_t c) {
+        auto it = tolowermap.find(c);
+        if (it != tolowermap.end()) {
+            return LOWER{
+                1,
+                it->second
+            };
+        } else {
+            return LOWER{
+                0,
+                c
+            };
+        }
+    }
 
     static wchar_t TranslateTone(wchar_t c, TONES t) {
         auto it = transitions_tones.find(c);
@@ -26,7 +51,7 @@ namespace Telex {
         assert(str.length() == cases.size());
         for (int i = 0; i < cases.size(); i++) {
             if (cases[i]) {
-                str[i] = std::toupper(str[i], internal_locale);
+                str[i] = ToUpper(str[i]);
             }
         }
     }
@@ -53,8 +78,9 @@ namespace Telex {
 
     // remember to push into _cases when adding a new character
     TELEX_STATES TelexEngine::PushChar(_In_ wchar_t corig) {
-        auto ccase = std::isupper(corig, internal_locale);
-        auto c = std::tolower(corig, internal_locale);
+        auto lower = FindLower(corig);
+        auto ccase = lower.found;
+        auto c = lower.c;
         auto cat = ClassifyCharacter(c);
 
         _keyBuffer.push_back(corig);

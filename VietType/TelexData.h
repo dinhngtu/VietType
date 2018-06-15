@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <unordered_map>
 #include <set>
 #include <vector>
 
@@ -40,4 +41,7 @@ namespace Telex {
     extern std::map<std::vector<wchar_t>, VINFO> const valid_v_gi; // value: accent position
     extern std::map<std::vector<wchar_t>, bool> const valid_c2;
     extern std::map<std::vector<wchar_t>, VINFO> const valid_v_oa_uy;
+
+    extern std::unordered_map<wchar_t, wchar_t> const touppermap;
+    extern std::unordered_map<wchar_t, wchar_t> const tolowermap;
 }

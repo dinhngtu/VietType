@@ -318,6 +318,7 @@
     <ClCompile Include="KeyHandlerEditSession.cpp" />
     <ClCompile Include="StartComposition.cpp" />
     <ClCompile Include="Telex.cpp" />
+    <ClCompile Include="TelexCaseMap.cpp" />
     <ClCompile Include="TelexData.cpp" />
     <ClCompile Include="TelexKeyTranslator.cpp" />
     <ClCompile Include="TelexUtil.cpp" />
