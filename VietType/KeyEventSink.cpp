@@ -13,11 +13,11 @@
 #include "TelexKeyTranslator.h"
 
 HRESULT IMECore::_CallKeyEdit(ITfContext *pContext, WPARAM wParam, LPARAM lParam, PBYTE keyState) {
-    auto khSession = new (std::nothrow) KeyHandlerEditSession(this, pContext, wParam, lParam, keyState, _engine);
-    if (khSession != nullptr) {
+    auto session = new (std::nothrow) KeyHandlerEditSession(this, pContext, wParam, lParam, keyState, _engine);
+    if (session != nullptr) {
         HRESULT hrSession = S_OK;
-        HRESULT hr = pContext->RequestEditSession(_tfClientId, khSession, TF_ES_SYNC | TF_ES_READWRITE, &hrSession);
-        khSession->Release();
+        HRESULT hr = pContext->RequestEditSession(_tfClientId, session, TF_ES_SYNC | TF_ES_READWRITE, &hrSession);
+        session->Release();
 
         return hr;
     } else {
@@ -47,6 +47,7 @@ STDAPI IMECore::OnSetFocus(BOOL fForeground) {
 
 STDAPI
 IMECore::OnTestKeyDown(ITfContext *pContext, WPARAM wParam, LPARAM lParam, BOOL *pIsEaten) {
+    // potential fix: eat edit keys if composition is under way, then replay them after composition ends (how?)
     DBGPRINT(L"OnTestKeyDown key %x", wParam);
 
     if (_disabled) {
@@ -58,10 +59,11 @@ IMECore::OnTestKeyDown(ITfContext *pContext, WPARAM wParam, LPARAM lParam, BOOL 
     if (!GetKeyboardState(keyState)) {
         return E_FAIL;
     }
-    *pIsEaten = Telex::EngineWantsKey(wParam, lParam, keyState);
+    *pIsEaten = Telex::EngineWantsKey(_IsComposing(), wParam, lParam, keyState);
 
+    // TODO: break off the composition early at OnTestKeyDown so?
     if (!*pIsEaten && _IsComposing()) {
-        _CallKeyEdit(pContext, 0, 0, NULL);
+        _CallKeyEdit(pContext, wParam, lParam, keyState);
     }
 
     DBGPRINT(L"OnTestKeyDown key %x %s", wParam, *pIsEaten ? L"eaten" : L"not eaten");
@@ -84,7 +86,7 @@ STDAPI IMECore::OnKeyDown(ITfContext *pContext, WPARAM wParam, LPARAM lParam, BO
     if (!GetKeyboardState(keyState)) {
         return E_FAIL;
     }
-    *pIsEaten = Telex::EngineWantsKey(wParam, lParam, keyState);
+    *pIsEaten = Telex::EngineWantsKey(_IsComposing(), wParam, lParam, keyState);
 
     DBGPRINT(L"OnKeyDown key %x %s", wParam, *pIsEaten ? L"eaten" : L"not eaten");
 
@@ -117,7 +119,7 @@ STDAPI IMECore::OnTestKeyUp(ITfContext *pContext, WPARAM wParam, LPARAM lParam, 
         if (!GetKeyboardState(keyState)) {
             return E_FAIL;
         }
-        *pIsEaten = Telex::EngineWantsKey(wParam, lParam, keyState);
+        *pIsEaten = Telex::EngineWantsKey(_IsComposing(), wParam, lParam, keyState);
     } else {
         *pIsEaten = FALSE;
     }
@@ -149,7 +151,7 @@ STDAPI IMECore::OnKeyUp(ITfContext *pContext, WPARAM wParam, LPARAM lParam, BOOL
         if (!GetKeyboardState(keyState)) {
             return E_FAIL;
         }
-        *pIsEaten = Telex::EngineWantsKey(wParam, lParam, keyState);
+        *pIsEaten = Telex::EngineWantsKey(_IsComposing(), wParam, lParam, keyState);
     } else {
         *pIsEaten = FALSE;
     }

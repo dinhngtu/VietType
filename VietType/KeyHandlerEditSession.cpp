@@ -6,7 +6,7 @@ KeyHandlerEditSession::KeyHandlerEditSession(
     ITfContext * pContext,
     WPARAM wParam,
     LPARAM lParam,
-    PBYTE keyState,
+    BYTE const *keyState,
     Telex::TelexEngine& engine)
     : EditSessionBase(pTextService, pContext), _engine(engine) {
     DBGPRINT(L"creating key handler session key %x", wParam);
@@ -20,12 +20,15 @@ KeyHandlerEditSession::~KeyHandlerEditSession() {
 
 STDMETHODIMP KeyHandlerEditSession::DoEditSession(TfEditCookie ec) {
     DBGPRINT(L"%s", L"entering key handler session");
-    WCHAR buf;
 
     if (_wParam == 0) {
         Commit(ec);
-    } else if (Telex::TranslateKey(_wParam, _lParam, _keyState, &buf)) {
-        ComposeChar(ec, buf);
+    } else if (Telex::IsEditKey(_wParam, _lParam, _keyState)) {
+        _pTextService->_EndComposition(_pContext);
+    } else if (Telex::EngineWantsKey(_pTextService->_IsComposing(), _wParam, _lParam, _keyState)) {
+        ComposeKey(ec);
+    } else if (_wParam == VK_SHIFT) {
+        // drop shift
     } else {
         Commit(ec);
     }
@@ -33,13 +36,15 @@ STDMETHODIMP KeyHandlerEditSession::DoEditSession(TfEditCookie ec) {
     return S_OK;
 }
 
-void KeyHandlerEditSession::ComposeChar(TfEditCookie ec, WCHAR c) {
-    DBGPRINT(L"Translated character '%c'", c);
-    switch (_engine.PushChar(c)) {
+void KeyHandlerEditSession::ComposeKey(TfEditCookie ec) {
+    switch (Telex::PushKey(_engine, _wParam, _lParam, _keyState)) {
     case Telex::TELEX_STATES::VALID: {
-        auto str = _engine.Retrieve();
+        auto str = _engine.Peek();
         DBGPRINT(L"PushChar valid %s", str.c_str());
         _pTextService->_SetCompositionText(ec, _pContext, str);
+        if (!_engine.Count()) {
+            _pTextService->_EndComposition(_pContext);
+        }
         break;
     }
 

@@ -87,57 +87,31 @@ void main3() {
     TelexConfig c;
     c.oa_uy_tone1 = true;
     TelexEngine tx(c);
+    
+    std::wstring x;
 
     tx.Reset();
-    tx.PushChar(L't');
-    tx.PushChar(L'u');
+    tx.PushChar(L'g');
+    x = tx.Peek();
+    tx.PushChar(L'i');
+    x = tx.Peek();
+    tx.PushChar(L'o');
+    x = tx.Peek();
+    tx.PushChar(L'i');
+    x = tx.Peek();
+    tx.PushChar(L'w');
+    x = tx.Peek();
     tx.PushChar(L's');
-    //tx.PushChar(L'e');
-    //tx.PushChar(L't');
-    //tx.PushChar(L'j');
+    x = tx.Peek();
+    //tx.PushChar(L'f');
+    //x = tx.Peek();
     tx.Commit();
-    std::wstring x = tx.Retrieve();
-    DBGPRINT(L"%s", x.c_str());
-}
-
-void main4() {
-    TelexConfig c;
-    c.oa_uy_tone1 = true;
-    TelexEngine tx(c);
-
-    tx.Reset();
-    tx.PushChar(L'D');
-    tx.PushChar(L'd');
-    tx.PushChar(L'I');
-    tx.PushChar(L'n');
-    tx.PushChar(L'h');
-    tx.PushChar(L'j');
-    tx.Commit();
-    std::wstring x = tx.Retrieve();
-    DBGPRINT(L"%s", x.c_str());
-}
-
-void main5() {
-    TelexConfig c;
-    c.oa_uy_tone1 = true;
-    TelexEngine tx(c);
-
-    tx.Reset();
-    tx.PushChar(L'N');
-    tx.PushChar(L'G');
-    tx.PushChar(L'U');
-    tx.PushChar(L'y');
-    tx.PushChar(L'E');
-    tx.PushChar(L'e');
-    tx.PushChar(L'n');
-    tx.PushChar(L'X');
-    tx.Commit();
-    std::wstring x = tx.Retrieve();
+    x = tx.Retrieve();
     DBGPRINT(L"%s", x.c_str());
 }
 
 int main() {
-    main5();
+    main3();
 
     return 0;
 }
