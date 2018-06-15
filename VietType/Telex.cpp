@@ -6,11 +6,6 @@
 #include "Globals.h"
 
 namespace Telex {
-    struct LOWER {
-        int found;
-        wchar_t c;
-    };
-
     static wchar_t ToUpper(wchar_t c) {
         auto it = touppermap.find(c);
         if (it != touppermap.end()) {
@@ -20,18 +15,14 @@ namespace Telex {
         }
     }
 
-    static LOWER FindLower(wchar_t c) {
+    static int FindLower(wchar_t c, wchar_t *out) {
         auto it = tolowermap.find(c);
         if (it != tolowermap.end()) {
-            return LOWER{
-                1,
-                it->second
-            };
+            *out = it->second;
+            return 1;
         } else {
-            return LOWER{
-                0,
-                c
-            };
+            *out = c;
+            return 0;
         }
     }
 
@@ -47,8 +38,8 @@ namespace Telex {
     }
 
     /// <summary>destructive</summary>
-    static void ApplyCases(std::vector<wchar_t>& str, std::vector<int> const& cases) {
-        assert(str.size() == cases.size());
+    static void ApplyCases(std::wstring& str, std::vector<int> const& cases) {
+        assert(str.length() == cases.size());
         for (int i = 0; i < cases.size(); i++) {
             if (cases[i]) {
                 str[i] = ToUpper(str[i]);
@@ -78,9 +69,9 @@ namespace Telex {
 
     // remember to push into _cases when adding a new character
     TELEX_STATES TelexEngine::PushChar(_In_ wchar_t corig) {
-        auto lower = FindLower(corig);
-        auto ccase = lower.found;
-        auto c = lower.c;
+        wchar_t c;
+        auto ccase = FindLower(corig, &c);
+
         auto cat = ClassifyCharacter(c);
 
         _keyBuffer.push_back(corig);
@@ -278,25 +269,25 @@ namespace Telex {
         return _state;
     }
 
-    std::vector<wchar_t> TelexEngine::Retrieve() const {
+    std::wstring TelexEngine::Retrieve() const {
         if (_state == TELEX_STATES::INVALID || _state == TELEX_STATES::COMMITTED_INVALID) {
             //throw std::exception("invalid retrieval call state");
             DBGPRINT(L"invalid retrieve call state %d", _state);
-            return std::vector<wchar_t>();
+            return std::wstring();
         }
-        std::vector<wchar_t> result(_c1);
+        std::wstring result(_c1);
         result.insert(result.end(), _v.begin(), _v.end());
         result.insert(result.end(), _c2.begin(), _c2.end());
         ApplyCases(result, _cases);
         return result;
     }
 
-    std::vector<wchar_t> TelexEngine::RetrieveInvalid() const {
-        return std::vector<wchar_t>(_keyBuffer);
+    std::wstring TelexEngine::RetrieveInvalid() const {
+        return std::wstring(_keyBuffer);
     }
 
-    std::vector<wchar_t> TelexEngine::Peek() const {
-        std::vector<wchar_t> result(_c1);
+    std::wstring TelexEngine::Peek() const {
+        std::wstring result(_c1);
         result.insert(result.end(), _v.begin(), _v.end());
 
         int tonepos;
@@ -329,12 +320,12 @@ namespace Telex {
         return result;
     }
 
-    std::vector<wchar_t>::size_type TelexEngine::Count() const {
+    std::wstring::size_type TelexEngine::Count() const {
         return _keyBuffer.size();
     }
 
     TelexEngine::FOUNDTABLE TelexEngine::FindTable() const {
-        std::map<std::vector<wchar_t>, VINFO>::const_iterator it;
+        std::unordered_map<std::wstring, VINFO>::const_iterator it;
         bool found;
         if (_c1.size() == 1 && _c1[0] == L'q') {
             it = valid_v_q.find(_v);

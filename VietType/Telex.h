@@ -51,20 +51,20 @@ namespace Telex {
         TELEX_STATES ForceCommit();
         TELEX_STATES Cancel();
 
-        std::vector<wchar_t> Retrieve() const;
-        std::vector<wchar_t> RetrieveInvalid() const;
-        std::vector<wchar_t> Peek() const;
-        std::vector<wchar_t>::size_type Count() const;
+        std::wstring Retrieve() const;
+        std::wstring RetrieveInvalid() const;
+        std::wstring Peek() const;
+        std::wstring::size_type Count() const;
 
     private:
         struct TelexConfig _config;
 
         TELEX_STATES _state;
 
-        std::vector<wchar_t> _keyBuffer;
-        std::vector<wchar_t> _c1;
-        std::vector<wchar_t> _v;
-        std::vector<wchar_t> _c2;
+        std::wstring _keyBuffer;
+        std::wstring _c1;
+        std::wstring _v;
+        std::wstring _c2;
         TONES _t;
         // don't use vector<bool> since that's special
         /// <summary>
@@ -75,7 +75,7 @@ namespace Telex {
 
     private:
         struct FOUNDTABLE {
-            std::map<std::vector<wchar_t>, VINFO>::const_iterator it;
+            std::unordered_map<std::wstring, VINFO>::const_iterator it;
             bool found;
         };
         FOUNDTABLE FindTable() const;

@@ -52,7 +52,8 @@ void main1() {
     if (tx.Commit() != TELEX_STATES::COMMITTED) {
         throw std::exception("push_char error");
     }
-    std::wstring str = tx.Retrieve();
+    auto r = tx.Retrieve();
+    std::wstring str(r.begin(), r.end());
     if (str != L"nguy\x1ec5n") {
         throw std::exception("retrieve bad string");
     }
@@ -76,7 +77,7 @@ void main2() {
         tx.PushChar(L'n');
         tx.PushChar(L'X');
         tx.Commit();
-        len += tx.Retrieve().length();
+        len += tx.Retrieve().size();
     }
     auto t2 = std::chrono::high_resolution_clock::now();
     std::wcout << L"total time: " << ITERATIONS << L" iters = " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms" << std::endl;
@@ -88,11 +89,9 @@ void main3() {
     c.oa_uy_tone1 = true;
     TelexEngine tx(c);
     
-    std::wstring x;
-
     tx.Reset();
     tx.PushChar(L'g');
-    x = tx.Peek();
+    auto x = tx.Peek();
     tx.PushChar(L'i');
     x = tx.Peek();
     tx.PushChar(L'o');
@@ -111,7 +110,7 @@ void main3() {
 }
 
 int main() {
-    main3();
+    main2();
 
     return 0;
 }

@@ -81,7 +81,7 @@ public:
     /// <summary>edit session utilities, don't call</summary>
     BOOL _IsRangeCovered(TfEditCookie ec, _In_ ITfRange *pRangeTest, _In_ ITfRange *pRangeCover);
     /// <summary>edit session utilities, don't call</summary>
-    STDMETHODIMP _SetCompositionText(TfEditCookie ec, _In_ ITfContext *pContext, std::vector<wchar_t> content);
+    STDMETHODIMP _SetCompositionText(TfEditCookie ec, _In_ ITfContext *pContext, std::wstring content);
 
     // CClassFactory factory callback
     static HRESULT CreateInstance(_In_ IUnknown *pUnkOuter, REFIID riid, _Outptr_ void **ppvObj);

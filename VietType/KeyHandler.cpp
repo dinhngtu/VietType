@@ -16,7 +16,7 @@ BOOL IMECore::_IsRangeCovered(TfEditCookie ec, _In_ ITfRange *pRangeTest, _In_ I
     return TRUE;
 }
 
-STDMETHODIMP IMECore::_SetCompositionText(TfEditCookie ec, ITfContext * pContext, std::vector<wchar_t> content) {
+STDMETHODIMP IMECore::_SetCompositionText(TfEditCookie ec, ITfContext * pContext, std::wstring content) {
     ITfRange* pRangeComposition = nullptr;
     HRESULT hr = E_FAIL;
 
@@ -26,7 +26,7 @@ STDMETHODIMP IMECore::_SetCompositionText(TfEditCookie ec, ITfContext * pContext
     }
 
     if (SUCCEEDED(_pComposition->GetRange(&pRangeComposition))) {
-        pRangeComposition->SetText(ec, TF_ST_CORRECTION, &content[0], (LONG)content.size());
+        pRangeComposition->SetText(ec, TF_ST_CORRECTION, &content[0], (LONG)content.length());
         pRangeComposition->Release();
     }
 
