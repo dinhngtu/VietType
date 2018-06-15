@@ -74,11 +74,7 @@ namespace Telex {
         std::vector<int> _cases;
 
     private:
-        struct FOUNDTABLE {
-            std::unordered_map<std::wstring, VINFO>::const_iterator it;
-            bool found;
-        };
-        FOUNDTABLE FindTable() const;
-        bool FindTable(std::unordered_map<std::wstring, VINFO>::const_iterator *it) const;
+        using map_iterator = std::unordered_map<std::wstring, VINFO>::const_iterator;
+        bool FindTable(_Out_ map_iterator *it) const;
     };
 }

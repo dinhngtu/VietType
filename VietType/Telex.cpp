@@ -221,7 +221,7 @@ namespace Telex {
         }
 
         // validate v and get tone position
-        std::unordered_map<std::wstring, VINFO>::const_iterator it;
+        map_iterator it;
         auto found = FindTable(&it);
         if (!found) {
             _state = TELEX_STATES::COMMITTED_INVALID;
@@ -254,7 +254,7 @@ namespace Telex {
             return _state;
         }
 
-        std::unordered_map<std::wstring, VINFO>::const_iterator it;
+        map_iterator it;
         auto found = FindTable(&it);
         if (!found) {
             _state = TELEX_STATES::COMMITTED_INVALID;
@@ -293,7 +293,7 @@ namespace Telex {
         result.insert(result.end(), _v.begin(), _v.end());
 
         int tonepos;
-        std::unordered_map<std::wstring, VINFO>::const_iterator it;
+        map_iterator it;
         auto found = FindTable(&it);
         // guess tone position if V is not known
         if (found) {
@@ -327,26 +327,7 @@ namespace Telex {
         return _keyBuffer.size();
     }
 
-    TelexEngine::FOUNDTABLE TelexEngine::FindTable() const {
-        std::unordered_map<std::wstring, VINFO>::const_iterator it;
-        bool found;
-        if (_c1.size() == 1 && _c1[0] == L'q') {
-            it = valid_v_q.find(_v);
-            found = it != valid_v_q.end();
-        } else if (_c1.size() == 2 && _c1[0] == L'g') {
-            it = valid_v_gi.find(_v);
-            found = it != valid_v_gi.end();
-        } else {
-            it = valid_v.find(_v);
-            found = it != valid_v.end();
-        }
-        return FOUNDTABLE{
-            it,
-            found
-        };
-    }
-
-    bool TelexEngine::FindTable(std::unordered_map<std::wstring, VINFO>::const_iterator * it) const {
+    bool TelexEngine::FindTable(_Out_ map_iterator * it) const {
         if (_c1.size() == 1 && _c1[0] == L'q') {
             *it = valid_v_q.find(_v);
             return *it != valid_v_q.end();
