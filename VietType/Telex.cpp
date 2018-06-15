@@ -146,7 +146,7 @@ namespace Telex {
             _c2.push_back(c);
             _cases.push_back(ccase);
 
-        } else if (_v.size() && cat == CHR_CATEGORIES::TONES) {
+        } else if ((_c1 == L"gi" || _v.size()) && cat == CHR_CATEGORIES::TONES) {
             // tones-only (fjz)
             auto newtone = GetTone(c);
             if (newtone != _t) {
@@ -161,7 +161,7 @@ namespace Telex {
             _c1.push_back(c);
             _cases.push_back(ccase);
 
-        } else if (_v.size() && cat == CHR_CATEGORIES::TONECONSO) {
+        } else if ((_c1 == L"gi" || _v.size()) && cat == CHR_CATEGORIES::TONECONSO) {
             // ambiguous (rsx) -> tone
             auto newtone = GetTone(c);
             if (newtone != _t) {
@@ -229,8 +229,16 @@ namespace Telex {
             _state = TELEX_STATES::COMMITTED_INVALID;
             return _state;
         }
+        auto tonepos = it->second.tonepos;
 
-        if (it->second.c2mode == C2MODE::MUSTC2 && !_c2.size()) {
+        // routine changes buffers from this point
+
+        if (tonepos < 0 && _c1 == L"gi" && !_v.size()) {
+            // fixup 'gi'
+            _c1.pop_back();
+            _v.push_back(L'i');
+            tonepos = 0;
+        } else if (it->second.c2mode == C2MODE::MUSTC2 && !_c2.size()) {
             _state = TELEX_STATES::COMMITTED_INVALID;
             return _state;
         } else if (it->second.c2mode == C2MODE::NOC2 && _c2.size()) {
@@ -238,15 +246,7 @@ namespace Telex {
             return _state;
         }
 
-        // routine changes buffers from this point
-
-        // fixup 'gi'
-        if (_c1 == L"gi" && !_v.size()) {
-            _c1.pop_back();
-            _v.push_back(L'i');
-        }
-
-        _v[it->second.tonepos] = TranslateTone(_v[it->second.tonepos], _t);
+        _v[tonepos] = TranslateTone(_v[tonepos], _t);
 
         _state = TELEX_STATES::COMMITTED;
         return _state;
@@ -321,7 +321,7 @@ namespace Telex {
         }
 
         // fixup 'gi'
-        if (_c1 == L"gi" && !_v.size()) {
+        if (tonepos < 0 && _c1 == L"gi" && !_v.size()) {
             tonepos = (int)_c1.size() - 1;
             wchar_t vatpos = TranslateTone(_c1[tonepos], _t);
             result[tonepos] = vatpos;

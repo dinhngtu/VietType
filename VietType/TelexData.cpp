@@ -185,6 +185,7 @@ namespace Telex {
         {L"\xea", {0, C2MODE::MUSTC2}}, // ê
         {L"o", {0, C2MODE::EITHER}},
         {L"\xf4", {0, C2MODE::EITHER}}, // ô
+        {L"\x1a1", {0, C2MODE::EITHER}}, // ơ
         {L"u", {0, C2MODE::MUSTC2}},
         {L"\x1b0", {0, C2MODE::EITHER}}, // ư
 
