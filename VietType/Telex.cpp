@@ -221,23 +221,24 @@ namespace Telex {
         }
 
         // validate v and get tone position
-        auto vpos = FindTable();
-        if (!vpos.found) {
+        std::unordered_map<std::wstring, VINFO>::const_iterator it;
+        auto found = FindTable(&it);
+        if (!found) {
             _state = TELEX_STATES::COMMITTED_INVALID;
             return _state;
         }
 
-        if (vpos.it->second.c2mode == C2MODE::MUSTC2 && !_c2.size()) {
+        if (it->second.c2mode == C2MODE::MUSTC2 && !_c2.size()) {
             _state = TELEX_STATES::COMMITTED_INVALID;
             return _state;
-        } else if (vpos.it->second.c2mode == C2MODE::NOC2 && _c2.size()) {
+        } else if (it->second.c2mode == C2MODE::NOC2 && _c2.size()) {
             _state = TELEX_STATES::COMMITTED_INVALID;
             return _state;
         }
 
         // routine changes buffers from this point
 
-        _v[vpos.it->second.tonepos] = TranslateTone(_v[vpos.it->second.tonepos], _t);
+        _v[it->second.tonepos] = TranslateTone(_v[it->second.tonepos], _t);
 
         _state = TELEX_STATES::COMMITTED;
         return _state;
@@ -253,12 +254,13 @@ namespace Telex {
             return _state;
         }
 
-        auto vpos = FindTable();
-        if (!vpos.found) {
+        std::unordered_map<std::wstring, VINFO>::const_iterator it;
+        auto found = FindTable(&it);
+        if (!found) {
             _state = TELEX_STATES::COMMITTED_INVALID;
             return _state;
         }
-        _v[vpos.it->second.tonepos] = TranslateTone(_v[vpos.it->second.tonepos], _t);
+        _v[it->second.tonepos] = TranslateTone(_v[it->second.tonepos], _t);
 
         _state = TELEX_STATES::COMMITTED;
         return _state;
@@ -291,10 +293,11 @@ namespace Telex {
         result.insert(result.end(), _v.begin(), _v.end());
 
         int tonepos;
-        auto vpos = FindTable();
+        std::unordered_map<std::wstring, VINFO>::const_iterator it;
+        auto found = FindTable(&it);
         // guess tone position if V is not known
-        if (vpos.found) {
-            tonepos = vpos.it->second.tonepos;
+        if (found) {
+            tonepos = it->second.tonepos;
         } else {
             switch (_v.size()) {
             case 1:
@@ -341,5 +344,18 @@ namespace Telex {
             it,
             found
         };
+    }
+
+    bool TelexEngine::FindTable(std::unordered_map<std::wstring, VINFO>::const_iterator * it) const {
+        if (_c1.size() == 1 && _c1[0] == L'q') {
+            *it = valid_v_q.find(_v);
+            return *it != valid_v_q.end();
+        } else if (_c1.size() == 2 && _c1[0] == L'g') {
+            *it = valid_v_gi.find(_v);
+            return *it != valid_v_gi.end();
+        } else {
+            *it = valid_v.find(_v);
+            return *it != valid_v.end();
+        }
     }
 }

@@ -79,5 +79,6 @@ namespace Telex {
             bool found;
         };
         FOUNDTABLE FindTable() const;
+        bool FindTable(std::unordered_map<std::wstring, VINFO>::const_iterator *it) const;
     };
 }
