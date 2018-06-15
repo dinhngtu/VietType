@@ -75,6 +75,8 @@ public:
     void _SaveCompositionContext(_In_ ITfContext *pContext);
     /// <summary>edit session utilities, don't call</summary>
     bool _IsComposing() const;
+    /// <summary>edit session utilities, don't call</summary>
+    void _MoveCaretToEnd(TfEditCookie ec);
 
     /// <summary>edit session utilities, don't call</summary>
     BOOL _IsRangeCovered(TfEditCookie ec, _In_ ITfRange *pRangeTest, _In_ ITfRange *pRangeCover);

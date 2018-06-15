@@ -30,6 +30,8 @@ void IMECore::_TerminateComposition(TfEditCookie ec, _In_ ITfContext *pContext, 
     _engine.Reset();
 
     if (_pComposition != nullptr) {
+        _MoveCaretToEnd(ec);
+
         // remove the display attribute from the composition range.
         //_ClearCompositionDisplayAttributes(ec, pContext);
 

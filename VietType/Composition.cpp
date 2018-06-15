@@ -43,3 +43,22 @@ void IMECore::_SetComposition(_In_ ITfComposition *pComposition) {
 bool IMECore::_IsComposing() const {
     return _pComposition != nullptr;
 }
+
+void IMECore::_MoveCaretToEnd(TfEditCookie ec) {
+    if (_pComposition != nullptr) {
+        ITfRange* pRangeComposition = nullptr;
+        if (SUCCEEDED(_pComposition->GetRange(&pRangeComposition))) {
+            ITfRange* pRangeCloned = nullptr;
+            if (SUCCEEDED(pRangeComposition->Clone(&pRangeCloned))) {
+                pRangeCloned->Collapse(ec, TF_ANCHOR_END);
+                TF_SELECTION sel;
+                sel.range = pRangeCloned;
+                sel.style.ase = TF_AE_NONE;
+                sel.style.fInterimChar = FALSE;
+                _pContext->SetSelection(ec, 1, &sel);
+                pRangeCloned->Release();
+            }
+            pRangeComposition->Release();
+        }
+    }
+}
