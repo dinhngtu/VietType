@@ -3,18 +3,26 @@
 namespace Telex {
     std::map<std::vector<wchar_t>, std::vector<wchar_t>> const transitions = {
         { { L'a', L'a' },{ L'\xe2' } },
-    { { L'a', L'w' },{ L'\x103' } },
+    //{ { L'a', L'w' },{ L'\x103' } },
     { { L'e', L'e' },{ L'\xea' } },
     { { L'i', L'e', L'e' },{ L'i', L'\xea' } },
     { { L'o', L'o' },{ L'\xf4' } },
-    { { L'o', L'w' },{ L'\x1a1' } },
+    //{ { L'o', L'w' },{ L'\x1a1' } },
     { { L'u', L'o', L'o' },{ L'u', L'\xf4' } },
-    { { L'u', L'w' },{ L'\x1b0' } },
-    { { L'u', L'o', L'w' },{ L'u', L'\x1a1' } },
+    //{ { L'u', L'w' },{ L'\x1b0' } },
+    //{ { L'u', L'o', L'w' },{ L'u', L'\x1a1' } },
     { { L'u', L'\x1a1', L'i' },{ L'\x1b0', L'\x1a1', L'i' } },
     { { L'u', L'\x1a1', L'u' },{ L'\x1b0', L'\x1a1', L'u' } },
     { { L'u', L'y', L'e', L'e' },{ L'u', L'y', L'\xea' } },
     { { L'd', L'd' },{ L'\x111' } },
+    };
+
+    std::map<std::vector<wchar_t>, std::vector<wchar_t>> const transitions_w = {
+    { { L'a', },{ L'\x103' } },
+    { { L'o' },{ L'\x1a1' } },
+    { { L'o', L'i' },{ L'\x1a1', L'i' } },
+    { { L'u' },{ L'\x1b0' } },
+    { { L'u', L'o' },{ L'u', L'\x1a1' } },
     };
 
     std::map<std::vector<wchar_t>, std::vector<wchar_t>> const transitions_v_c2 = {
@@ -82,11 +90,13 @@ namespace Telex {
     { { L'y' },{ 0, C2MODE::NOC2 } },
 
     { { L'i', L'\xea' },{ 1, C2MODE::MUSTC2 } },       // iê
-    { { L'o', L'a' },{ 0, C2MODE::EITHER } },          // oa_uy
+    // oa_uy must be 1 as default since 0 can only be used if there is no c2
+    { { L'o', L'a' },{ 1, C2MODE::EITHER } },          // oa_uy
+    { { L'o', L'e' },{ 1, C2MODE::EITHER } },          // oa_uy
     { { L'o', L'\x103' },{ 1, C2MODE::MUSTC2 } },      // oă
     { { L'u', L'\xe2' },{ 1, C2MODE::MUSTC2 } },       // uâ
     { { L'u', L'\xea' },{ 1, C2MODE::EITHER } },       // uê
-    { { L'u', L'y' },{ 0, C2MODE::EITHER } },          // oa_uy, qu different
+    { { L'u', L'y' },{ 1, C2MODE::EITHER } },          // oa_uy, qu different
     { { L'u', L'y', L'\xea' },{ 2, C2MODE::MUSTC2 } }, // uyê
     { { L'u', L'y', L'u' },{ 1, C2MODE::NOC2 } },
     { { L'\x1b0', L'\x1a1' },{ 1, C2MODE::MUSTC2 } }, // ươ
@@ -132,11 +142,12 @@ namespace Telex {
 
     std::map<std::vector<wchar_t>, VINFO> const valid_v_q = {
         { { L'u', L'\xe2' },{ 1, C2MODE::MUSTC2 } }, // uâ
+    { { L'u', L'\xf4' },{ 1, C2MODE::EITHER } },  // ô
     { { L'u', L'\xea' },{ 1, C2MODE::EITHER } }, // uê
     { { L'u', L'y' },{ 1, C2MODE::EITHER } },
     { { L'u', L'y', L'\xea' },{ 2, C2MODE::MUSTC2 } }, // uyê
-                                                       //{ { L'u', L'y', L'u' },1 },
-    { { L'u', L'a' },{ 0, C2MODE::EITHER } },        // c2 either with qu
+                                                 //{ { L'u', L'y', L'u' },1 },
+    { { L'u', L'a' },{ 1, C2MODE::EITHER } },        // c2 either with qu
     { { L'u', L'\xe2', L'y' },{ 1, C2MODE::NOC2 } }, // uây
     { { L'u', L'a', L'i' },{ 1, C2MODE::NOC2 } },
     { { L'u', L'a', L'o' },{ 1, C2MODE::NOC2 } },
@@ -144,6 +155,54 @@ namespace Telex {
     { { L'u', L'e' },{ 1, C2MODE::NOC2 } },
     { { L'u', L'i' },{ 1, C2MODE::NOC2 } },
     { { L'u', L'\xf4' },{ 1, C2MODE::MUSTC2 } }, // uô
+    };
+
+    std::map<std::vector<wchar_t>, VINFO> const valid_v_qu = {
+        { { L'\xe2' },{ 0, C2MODE::MUSTC2 } }, // uâ
+    { { L'\xf4' },{ 0, C2MODE::EITHER } },  // ô
+    { { L'\xea' },{ 0, C2MODE::EITHER } }, // uê
+    { { L'y' },{ 0, C2MODE::EITHER } },
+    { { L'y', L'\xea' },{ 1, C2MODE::MUSTC2 } }, // uyê
+                                                       //{ { L'u', L'y', L'u' },1 },
+    { { L'a' },{ 0, C2MODE::EITHER } },        // c2 either with qu
+    { { L'\xe2', L'y' },{ 0, C2MODE::NOC2 } }, // uây
+    { { L'a', L'i' },{ 0, C2MODE::NOC2 } },
+    { { L'a', L'o' },{ 0, C2MODE::NOC2 } },
+    { { L'a', L'y' },{ 0, C2MODE::NOC2 } },
+    { { L'e' },{ 0, C2MODE::NOC2 } },
+    { { L'i' },{ 0, C2MODE::NOC2 } },
+    { { L'\xf4' },{ 0, C2MODE::MUSTC2 } }, // uô
+    };
+
+    std::map<std::vector<wchar_t>, VINFO> const valid_v_gi = {
+        { { L'a' },{ 0, C2MODE::EITHER } },
+    { { L'\x103' },{ 0, C2MODE::MUSTC2 } }, // ă
+    { { L'\xe2' },{ 0, C2MODE::MUSTC2 } },  // â
+    { { L'e' },{ 0, C2MODE::NOC2 } },
+    { { L'\xea' },{ 0, C2MODE::MUSTC2 } }, // ê
+    { { L'o' },{ 0, C2MODE::EITHER } },
+    { { L'\xf4' },{ 0, C2MODE::EITHER } },  // ô
+    { { L'u' },{ 0, C2MODE::MUSTC2 } },
+    { { L'\x1b0' },{ 0, C2MODE::EITHER } }, // ư
+
+    { { L'o', L'\x103' },{ 1, C2MODE::MUSTC2 } },      // oă
+    { { L'\x1b0', L'\x1a1' },{ 1, C2MODE::MUSTC2 } }, // ươ
+
+    { { L'a', L'i' },{ 0, C2MODE::NOC2 } },
+    { { L'a', L'o' },{ 0, C2MODE::NOC2 } },
+    { { L'a', L'u' },{ 0, C2MODE::NOC2 } },
+    { { L'a', L'y' },{ 0, C2MODE::NOC2 } },
+    { { L'\xe2', L'u' },{ 0, C2MODE::NOC2 } }, // âu
+    { { L'\xe2', L'y' },{ 0, C2MODE::NOC2 } }, // ây
+    { { L'e', L'o' },{ 0, C2MODE::NOC2 } },
+    { { L'\xea', L'u' },{ 0, C2MODE::NOC2 } }, // êu
+    { { L'o', L'i' },{ 0, C2MODE::NOC2 } },
+    { { L'\xf4', L'i' },{ 0, C2MODE::NOC2 } },       // ôi
+    { { L'\x1a1', L'i' },{ 0, C2MODE::NOC2 } },      // ơi
+    { { L'u', L'a' },{ 0, C2MODE::NOC2 } },          // c2 either with qu
+    { { L'u', L'i' },{ 0, C2MODE::NOC2 } },
+
+    { { L'\x1b0', L'a' },{ 0, C2MODE::NOC2 } },           // ưa
     };
 
     // bool is whether tones are restricted to s/j or not
@@ -161,6 +220,8 @@ namespace Telex {
     };
 
     std::map<std::vector<wchar_t>, VINFO> const valid_v_oa_uy = {
-        { { L'o', L'a' },{ 1, C2MODE::EITHER } },{ { L'u', L'y' },{ 1, C2MODE::EITHER } }, // oa_uy, qu different
+        { { L'o', L'a' },{ 0, C2MODE::EITHER } },
+    { { L'o', L'e' },{ 0, C2MODE::EITHER } },
+    { { L'u', L'y' },{ 0, C2MODE::EITHER } },
     };
 } // namespace Telex

@@ -47,7 +47,7 @@ namespace Telex {
 
         void Reset();
         TELEX_STATES PushChar(_In_ wchar_t c);
-
+        TELEX_STATES Backspace();
         TELEX_STATES Commit();
         TELEX_STATES ForceCommit();
         TELEX_STATES Cancel();
@@ -55,6 +55,7 @@ namespace Telex {
         std::wstring Retrieve() const;
         std::wstring RetrieveInvalid() const;
         std::wstring Peek() const;
+        std::vector<wchar_t>::size_type Count() const;
 
     private:
         struct TelexConfig _config;
@@ -67,7 +68,17 @@ namespace Telex {
         std::vector<wchar_t> _c2;
         TONES _t;
         // don't use vector<bool> since that's special
-        // 1 = uppercase, 0 = lowercase
+        /// <summary>
+        /// do not use when invalid
+        /// 1 = uppercase, 0 = lowercase
+        /// </summary>
         std::vector<int> _cases;
+
+    private:
+        struct FOUNDTABLE {
+            std::map<std::vector<wchar_t>, VINFO>::const_iterator it;
+            bool found;
+        };
+        FOUNDTABLE FindTable() const;
     };
 }

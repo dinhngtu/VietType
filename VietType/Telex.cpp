@@ -12,8 +12,13 @@ namespace Telex {
 
     static wchar_t TranslateTone(wchar_t c, TONES t) {
         auto it = transitions_tones.find(c);
-        assert(it != transitions_tones.end());
-        return (it->second)[(int)t];
+        // don't fail here since tone position prediction might give invalid v
+        //assert(it != transitions_tones.end());
+        if (it != transitions_tones.end()) {
+            return (it->second)[(int)t];
+        } else {
+            return c;
+        }
     }
 
     /// <summary>destructive</summary>
@@ -52,12 +57,17 @@ namespace Telex {
         auto c = std::tolower(corig, internal_locale);
         auto cat = ClassifyCharacter(c);
 
-        _keyBuffer.push_back(c);
+        _keyBuffer.push_back(corig);
 
         if (_state == TELEX_STATES::INVALID || cat == CHR_CATEGORIES::UNCATEGORIZED) {
             _state = TELEX_STATES::INVALID;
 
         } else if (!_c1.size() && !_v.size() && (cat == CHR_CATEGORIES::WORDENDCONSO || cat == CHR_CATEGORIES::OTHERCONSO || cat == CHR_CATEGORIES::CONSOCONTINUE)) {
+            _c1.push_back(c);
+            _cases.push_back(ccase);
+
+            //} else if (_c1.size() && !_v.size() && ((_c1[0] == 'q' && c == 'u') || (_c1[0] == 'g' && c == 'i'))) {
+        } else if (_c1.size() && !_v.size() && (_c1[0] == 'g' && c == 'i')) {
             _c1.push_back(c);
             _cases.push_back(ccase);
 
@@ -74,20 +84,25 @@ namespace Telex {
                 _cases.push_back(ccase);
             }
 
-        } else if (cat == CHR_CATEGORIES::VOWEL || cat == CHR_CATEGORIES::VOWELW) {
+        } else if (!_c2.size() && cat == CHR_CATEGORIES::VOWEL) {
             // vowel parts (aeiouy)
-            if (!_c2.size()) {
-                _v.push_back(c);
-                auto before = _v.size();
-                auto it = transitions.find(_v);
-                if (it != transitions.end()) {
-                    _v = it->second;
-                }
-                auto after = _v.size();
-                if (after == before) {
-                    _cases.push_back(ccase);
-                }
+            _v.push_back(c);
+            auto before = _v.size();
+            auto it = transitions.find(_v);
+            if (it != transitions.end()) {
+                _v = it->second;
             }
+            auto after = _v.size();
+            if (after == before) {
+                _cases.push_back(ccase);
+            }
+
+        } else if (_v.size() && cat == CHR_CATEGORIES::VOWELW) {
+            auto it = transitions_w.find(_v);
+            if (it != transitions_w.end()) {
+                _v = it->second;
+            }
+            // 'w' always keeps V size constant, don't push case
 
         } else if (cat == CHR_CATEGORIES::WORDENDCONSO) {
             // word-ending consonants(cnpt)
@@ -139,6 +154,18 @@ namespace Telex {
         return _state;
     }
 
+    TELEX_STATES TelexEngine::Backspace() {
+        auto buf = _keyBuffer;
+        if (buf.size()) {
+            buf.pop_back();
+        }
+        Reset();
+        for (auto c : buf) {
+            PushChar(c);
+        }
+        return _state;
+    }
+
     TELEX_STATES TelexEngine::Commit() {
         if (_state == TELEX_STATES::COMMITTED || _state == TELEX_STATES::COMMITTED_INVALID) {
             return _state;
@@ -168,32 +195,23 @@ namespace Telex {
         }
 
         // validate v and get tone position
-        std::map<std::vector<wchar_t>, VINFO>::const_iterator vpos_it;
-        if (_c1.size() == 1 && _c1[0] == L'q') {
-            vpos_it = valid_v_q.find(_v);
-            if (vpos_it == valid_v_q.end()) {
-                _state = TELEX_STATES::COMMITTED_INVALID;
-                return _state;
-            }
-        } else {
-            vpos_it = valid_v.find(_v);
-            if (vpos_it == valid_v.end()) {
-                _state = TELEX_STATES::COMMITTED_INVALID;
-                return _state;
-            }
-        }
-
-        if (vpos_it->second.c2mode == C2MODE::MUSTC2 && !_c2.size()) {
+        auto vpos = FindTable();
+        if (!vpos.found) {
             _state = TELEX_STATES::COMMITTED_INVALID;
             return _state;
-        } else if (vpos_it->second.c2mode == C2MODE::NOC2 && _c2.size()) {
+        }
+
+        if (vpos.it->second.c2mode == C2MODE::MUSTC2 && !_c2.size()) {
+            _state = TELEX_STATES::COMMITTED_INVALID;
+            return _state;
+        } else if (vpos.it->second.c2mode == C2MODE::NOC2 && _c2.size()) {
             _state = TELEX_STATES::COMMITTED_INVALID;
             return _state;
         }
 
         // routine changes buffers from this point
 
-        _v[vpos_it->second.tonepos] = TranslateTone(_v[vpos_it->second.tonepos], _t);
+        _v[vpos.it->second.tonepos] = TranslateTone(_v[vpos.it->second.tonepos], _t);
 
         _state = TELEX_STATES::COMMITTED;
         return _state;
@@ -209,22 +227,12 @@ namespace Telex {
             return _state;
         }
 
-        std::map<std::vector<wchar_t>, VINFO>::const_iterator vpos_it;
-        if (_c1.size() == 1 && _c1[0] == L'q') {
-            vpos_it = valid_v_q.find(_v);
-            if (vpos_it == valid_v_q.end()) {
-                _state = TELEX_STATES::COMMITTED_INVALID;
-                return _state;
-            }
-        } else {
-            vpos_it = valid_v.find(_v);
-            if (vpos_it == valid_v.end()) {
-                _state = TELEX_STATES::COMMITTED_INVALID;
-                return _state;
-            }
+        auto vpos = FindTable();
+        if (!vpos.found) {
+            _state = TELEX_STATES::COMMITTED_INVALID;
+            return _state;
         }
-
-        _v[vpos_it->second.tonepos] = TranslateTone(_v[vpos_it->second.tonepos], _t);
+        _v[vpos.it->second.tonepos] = TranslateTone(_v[vpos.it->second.tonepos], _t);
 
         _state = TELEX_STATES::COMMITTED;
         return _state;
@@ -255,20 +263,10 @@ namespace Telex {
     std::wstring TelexEngine::Peek() const {
         int tonepos;
 
-        // validate v and get tone position
-        std::map<std::vector<wchar_t>, VINFO>::const_iterator vpos_it;
-        bool vpos_found;
-        if (_c1.size() == 1 && _c1[0] == L'q') {
-            vpos_it = valid_v_q.find(_v);
-            vpos_found = vpos_it != valid_v_q.end();
-        } else {
-            vpos_it = valid_v.find(_v);
-            vpos_found = vpos_it != valid_v.end();
-        }
-
+        auto vpos = FindTable();
         // guess tone position if V is not known
-        if (vpos_found) {
-            tonepos = vpos_it->second.tonepos;
+        if (vpos.found) {
+            tonepos = vpos.it->second.tonepos;
         } else {
             switch (_v.size()) {
             case 1:
@@ -292,5 +290,28 @@ namespace Telex {
         ApplyCases(result, _cases);
 
         return result;
+    }
+
+    std::vector<wchar_t>::size_type TelexEngine::Count() const {
+        return _keyBuffer.size();
+    }
+
+    TelexEngine::FOUNDTABLE TelexEngine::FindTable() const {
+        std::map<std::vector<wchar_t>, VINFO>::const_iterator it;
+        bool found;
+        if (_c1.size() == 1 && _c1[0] == L'q') {
+            it = valid_v_q.find(_v);
+            found = it != valid_v_q.end();
+        } else if (_c1.size() == 2 && _c1[0] == L'g') {
+            it = valid_v_gi.find(_v);
+            found = it != valid_v_gi.end();
+        } else {
+            it = valid_v.find(_v);
+            found = it != valid_v.end();
+        }
+        return FOUNDTABLE{
+            it,
+            found
+        };
     }
 }
