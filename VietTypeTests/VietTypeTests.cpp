@@ -69,13 +69,21 @@ void main2() {
     for (int i = 0; i < ITERATIONS; i++) {
         tx.Reset();
         tx.PushChar(L'N');
+        tx.Peek();
         tx.PushChar(L'G');
+        tx.Peek();
         tx.PushChar(L'U');
+        tx.Peek();
         tx.PushChar(L'y');
+        tx.Peek();
         tx.PushChar(L'E');
+        tx.Peek();
         tx.PushChar(L'e');
+        tx.Peek();
         tx.PushChar(L'n');
+        tx.Peek();
         tx.PushChar(L'X');
+        tx.Peek();
         tx.Commit();
         len += tx.Retrieve().size();
     }
