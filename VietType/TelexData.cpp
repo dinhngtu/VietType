@@ -3,15 +3,12 @@
 namespace Telex {
     std::map<std::vector<wchar_t>, std::vector<wchar_t>> const transitions = {
         { { L'a', L'a' },{ L'\xe2' } },
-    //{ { L'a', L'w' },{ L'\x103' } },
     { { L'e', L'e' },{ L'\xea' } },
     { { L'i', L'e', L'e' },{ L'i', L'\xea' } },
     { { L'o', L'o' },{ L'\xf4' } },
-    //{ { L'o', L'w' },{ L'\x1a1' } },
     { { L'u', L'o', L'o' },{ L'u', L'\xf4' } },
-    //{ { L'u', L'w' },{ L'\x1b0' } },
-    //{ { L'u', L'o', L'w' },{ L'u', L'\x1a1' } },
     { { L'\x1b0', L'o' },{ L'\x1b0', L'\x1a1' } },
+    //{ { L'u', L'\x1a1' },{ L'\x1b0', L'\x1a1' } }, // transition in v_c2 only
     { { L'u', L'\x1a1', L'i' },{ L'\x1b0', L'\x1a1', L'i' } },
     { { L'u', L'\x1a1', L'u' },{ L'\x1b0', L'\x1a1', L'u' } },
     { { L'u', L'y', L'e', L'e' },{ L'u', L'y', L'\xea' } },

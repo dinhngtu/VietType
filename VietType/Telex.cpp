@@ -66,14 +66,15 @@ namespace Telex {
             _c1.push_back(c);
             _cases.push_back(ccase);
 
-            //} else if (_c1.size() && !_v.size() && ((_c1[0] == 'q' && c == 'u') || (_c1[0] == 'g' && c == 'i'))) {
         } else if (_c1.size() && !_v.size() && (_c1[0] == 'g' && c == 'i')) {
+            // special treatment for 'gi'
             _c1.push_back(c);
             _cases.push_back(ccase);
 
         } else if (!_v.size() && !_c2.size() && (cat == CHR_CATEGORIES::CONSOCONTINUE)) {
             _c1.push_back(c);
             auto before = _c1.size();
+            // only used for 'dd'
             auto it = transitions.find(_c1);
             if (it != transitions.end()) {
                 _c1 = it->second;
@@ -101,11 +102,19 @@ namespace Telex {
             auto it = transitions_w.find(_v);
             if (it != transitions_w.end()) {
                 _v = it->second;
+                if (_c2.size()) {
+                    auto it2 = transitions_v_c2.find(_v);
+                    if (it2 != transitions_v_c2.end()) {
+                        _v = it2->second;
+                    }
+                }
+            } else {
+                _state = TELEX_STATES::INVALID;
             }
             // 'w' always keeps V size constant, don't push case
 
         } else if (cat == CHR_CATEGORIES::WORDENDCONSO) {
-            // word-ending consonants(cnpt)
+            // word-ending consonants (cnpt)
             auto it = transitions_v_c2.find(_v);
             if (it != transitions_v_c2.end()) {
                 _v = it->second;
@@ -113,7 +122,7 @@ namespace Telex {
             _c2.push_back(c);
             _cases.push_back(ccase);
 
-        } else if (cat == CHR_CATEGORIES::CONSOCONTINUE) {
+        } else if (_c2.size() && cat == CHR_CATEGORIES::CONSOCONTINUE) {
             // consonant continuation (dgh)
             _c2.push_back(c);
             _cases.push_back(ccase);
@@ -261,8 +270,10 @@ namespace Telex {
     }
 
     std::wstring TelexEngine::Peek() const {
-        int tonepos;
+        std::wstring result(_c1.begin(), _c1.end());
+        result.append(_v.begin(), _v.end());
 
+        int tonepos;
         auto vpos = FindTable();
         // guess tone position if V is not known
         if (vpos.found) {
@@ -277,15 +288,15 @@ namespace Telex {
                 tonepos = 1;
                 break;
             default:
-                return RetrieveInvalid();
+                tonepos = -1;
             }
         }
 
-        wchar_t vatpos = TranslateTone(_v[tonepos], _t);
+        if (tonepos >= 0) {
+            wchar_t vatpos = TranslateTone(_v[tonepos], _t);
+            result[_c1.size() + tonepos] = vatpos;
+        }
 
-        std::wstring result(_c1.begin(), _c1.end());
-        result.append(_v.begin(), _v.end());
-        result[_c1.size() + tonepos] = vatpos;
         result.append(_c2.begin(), _c2.end());
         ApplyCases(result, _cases);
 
