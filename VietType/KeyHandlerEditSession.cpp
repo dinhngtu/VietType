@@ -40,7 +40,6 @@ void KeyHandlerEditSession::ComposeKey(TfEditCookie ec) {
     switch (Telex::PushKey(_engine, _wParam, _lParam, _keyState)) {
     case Telex::TELEX_STATES::VALID: {
         auto str = _engine.Peek();
-        DBGPRINT(L"PushChar valid %s", str.c_str());
         _pTextService->_SetCompositionText(ec, _pContext, str);
         if (!_engine.Count()) {
             _pTextService->_EndComposition(_pContext);
@@ -50,7 +49,6 @@ void KeyHandlerEditSession::ComposeKey(TfEditCookie ec) {
 
     case Telex::TELEX_STATES::INVALID: {
         auto str = _engine.RetrieveInvalid();
-        DBGPRINT(L"PushChar invalid %s", str.c_str());
         _pTextService->_SetCompositionText(ec, _pContext, str);
         break;
     }
@@ -67,14 +65,12 @@ void KeyHandlerEditSession::Commit(TfEditCookie ec) {
     switch (_engine.Commit()) {
     case Telex::TELEX_STATES::COMMITTED: {
         auto str = _engine.Retrieve();
-        DBGPRINT(L"Valid %s", str.c_str());
         _pTextService->_SetCompositionText(ec, _pContext, str);
         break;
     }
 
     case Telex::TELEX_STATES::COMMITTED_INVALID: {
         auto str = _engine.RetrieveInvalid();
-        DBGPRINT(L"Invalid %s", str.c_str());
         _pTextService->_SetCompositionText(ec, _pContext, str);
         break;
     }

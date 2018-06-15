@@ -47,8 +47,8 @@ namespace Telex {
     }
 
     /// <summary>destructive</summary>
-    static void ApplyCases(std::wstring& str, std::vector<int> const& cases) {
-        assert(str.length() == cases.size());
+    static void ApplyCases(std::vector<wchar_t>& str, std::vector<int> const& cases) {
+        assert(str.size() == cases.size());
         for (int i = 0; i < cases.size(); i++) {
             if (cases[i]) {
                 str[i] = ToUpper(str[i]);
@@ -278,26 +278,26 @@ namespace Telex {
         return _state;
     }
 
-    std::wstring TelexEngine::Retrieve() const {
+    std::vector<wchar_t> TelexEngine::Retrieve() const {
         if (_state == TELEX_STATES::INVALID || _state == TELEX_STATES::COMMITTED_INVALID) {
             //throw std::exception("invalid retrieval call state");
             DBGPRINT(L"invalid retrieve call state %d", _state);
-            return std::wstring();
+            return std::vector<wchar_t>();
         }
-        std::wstring result(_c1.begin(), _c1.end());
-        result.append(_v.begin(), _v.end());
-        result.append(_c2.begin(), _c2.end());
+        std::vector<wchar_t> result(_c1);
+        result.insert(result.end(), _v.begin(), _v.end());
+        result.insert(result.end(), _c2.begin(), _c2.end());
         ApplyCases(result, _cases);
         return result;
     }
 
-    std::wstring TelexEngine::RetrieveInvalid() const {
-        return std::wstring(_keyBuffer.begin(), _keyBuffer.end());
+    std::vector<wchar_t> TelexEngine::RetrieveInvalid() const {
+        return std::vector<wchar_t>(_keyBuffer);
     }
 
-    std::wstring TelexEngine::Peek() const {
-        std::wstring result(_c1.begin(), _c1.end());
-        result.append(_v.begin(), _v.end());
+    std::vector<wchar_t> TelexEngine::Peek() const {
+        std::vector<wchar_t> result(_c1);
+        result.insert(result.end(), _v.begin(), _v.end());
 
         int tonepos;
         auto vpos = FindTable();
@@ -323,7 +323,7 @@ namespace Telex {
             result[_c1.size() + tonepos] = vatpos;
         }
 
-        result.append(_c2.begin(), _c2.end());
+        result.insert(result.end(), _c2.begin(), _c2.end());
         ApplyCases(result, _cases);
 
         return result;

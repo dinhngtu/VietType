@@ -1,7 +1,6 @@
 #pragma once
 
 #include <vector>
-#include <string>
 
 #include "TelexData.h"
 #include "TelexUtil.h"
@@ -52,9 +51,9 @@ namespace Telex {
         TELEX_STATES ForceCommit();
         TELEX_STATES Cancel();
 
-        std::wstring Retrieve() const;
-        std::wstring RetrieveInvalid() const;
-        std::wstring Peek() const;
+        std::vector<wchar_t> Retrieve() const;
+        std::vector<wchar_t> RetrieveInvalid() const;
+        std::vector<wchar_t> Peek() const;
         std::vector<wchar_t>::size_type Count() const;
 
     private:
