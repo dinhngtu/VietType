@@ -40,7 +40,7 @@ namespace Telex {
     /// <summary>destructive</summary>
     static void ApplyCases(std::wstring& str, std::vector<int> const& cases) {
         assert(str.length() == cases.size());
-        for (int i = 0; i < cases.size(); i++) {
+        for (size_t i = 0; i < cases.size(); i++) {
             if (cases[i]) {
                 str[i] = ToUpper(str[i]);
             }
