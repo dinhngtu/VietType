@@ -286,8 +286,8 @@ namespace Telex {
             return std::wstring();
         }
         std::wstring result(_c1);
-        result.insert(result.end(), _v.begin(), _v.end());
-        result.insert(result.end(), _c2.begin(), _c2.end());
+        result.append(_v);
+        result.append(_c2);
         ApplyCases(result, _cases);
         return result;
     }
@@ -298,7 +298,7 @@ namespace Telex {
 
     std::wstring TelexEngine::Peek() const {
         std::wstring result(_c1);
-        result.insert(result.end(), _v.begin(), _v.end());
+        result.append(_v);
 
         int tonepos;
         map_iterator it;
@@ -330,7 +330,7 @@ namespace Telex {
             result[_c1.size() + tonepos] = vatpos;
         }
 
-        result.insert(result.end(), _c2.begin(), _c2.end());
+        result.append(_c2);
         ApplyCases(result, _cases);
 
         return result;
