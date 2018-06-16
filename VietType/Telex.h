@@ -74,7 +74,7 @@ namespace Telex {
         std::vector<int> _cases;
 
     private:
-        using map_iterator = std::unordered_map<std::wstring, VINFO>::const_iterator;
+        using map_iterator = genmap<std::wstring, VINFO>::const_iterator;
         bool FindTable(_Out_ map_iterator *it) const;
     };
 }

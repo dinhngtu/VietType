@@ -1,7 +1,7 @@
 #include "TelexData.h"
 
 namespace Telex {
-    std::unordered_map<wchar_t, wchar_t> const touppermap = {
+    genmap<wchar_t, wchar_t> const touppermap = {
         { L'\x61', L'\x41' },
     { L'\x62', L'\x42' },
     { L'\x63', L'\x43' },
@@ -97,7 +97,7 @@ namespace Telex {
     { L'\x1ef9', L'\x1ef8' },
     };
 
-    std::unordered_map<wchar_t, wchar_t> const tolowermap = {
+    genmap<wchar_t, wchar_t> const tolowermap = {
         { L'\x41', L'\x61' },
     { L'\x42', L'\x62' },
     { L'\x43', L'\x63' },

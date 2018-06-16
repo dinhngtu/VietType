@@ -1,7 +1,7 @@
 #include "TelexData.h"
 
 namespace Telex {
-    std::unordered_map<std::wstring, std::wstring> const transitions = {
+    genmap<std::wstring, std::wstring> const transitions = {
         {L"aa", L"\xe2"},
         {L"ee", L"\xea"},
         {L"iee", L"i\xea"},
@@ -18,7 +18,7 @@ namespace Telex {
         {L"yeue", L"y\xeau"},
     };
 
-    std::unordered_map<std::wstring, std::wstring> const transitions_w = {
+    genmap<std::wstring, std::wstring> const transitions_w = {
         {L"a", L"\x103"},
         {L"o", L"\x1a1"},
         {L"oi", L"\x1a1i"},
@@ -26,11 +26,11 @@ namespace Telex {
         {L"uo", L"u\x1a1"},
     };
 
-    std::unordered_map<std::wstring, std::wstring> const transitions_v_c2 = {
+    genmap<std::wstring, std::wstring> const transitions_v_c2 = {
         {L"u\x1a1", L"\x1b0\x1a1"},
     };
 
-    std::unordered_map<wchar_t, std::wstring> const transitions_tones = {
+    genmap<wchar_t, std::wstring> const transitions_tones = {
         {L'a', L"a\xe0\x1ea1\x1ea3\xe1\xe3"},
         {L'\xe2', L"\xe2\x1ea7\x1ead\x1ea9\x1ea5\x1eab"},
         {L'\x103', L"\x103\x1eb1\x1eb7\x1eb3\x1eaf\x1eb5"},
@@ -45,7 +45,7 @@ namespace Telex {
         {L'y', L"y\x1ef3\x1ef5\x1ef7\xfd\x1ef9"},
     };
 
-    std::set<std::wstring> const valid_c1 = {
+    genset<std::wstring> const valid_c1 = {
         L"",
         L"b",
         L"c",
@@ -77,7 +77,7 @@ namespace Telex {
         L"x",
     };
 
-    std::unordered_map<std::wstring, VINFO> const valid_v = {
+    genmap<std::wstring, VINFO> const valid_v = {
         {L"a", {0, C2MODE::EITHER}},
         {L"\x103", {0, C2MODE::MUSTC2}}, // ă
         {L"\xe2", {0, C2MODE::MUSTC2}},  // â
@@ -142,7 +142,7 @@ namespace Telex {
         {L"y\xeau", {1, C2MODE::NOC2}},      // yêu
     };
 
-    std::unordered_map<std::wstring, VINFO> const valid_v_q = {
+    genmap<std::wstring, VINFO> const valid_v_q = {
         {L"u\xe2", {1, C2MODE::MUSTC2}}, // uâ
         {L"u\xf4", {1, C2MODE::EITHER}}, // ô
         {L"u\xea", {1, C2MODE::EITHER}}, // uê
@@ -159,7 +159,7 @@ namespace Telex {
         {L"u\xf4", {1, C2MODE::MUSTC2}}, // uô
     };
 
-    std::unordered_map<std::wstring, VINFO> const valid_v_qu = {
+    genmap<std::wstring, VINFO> const valid_v_qu = {
         {L"\xe2", {0, C2MODE::MUSTC2}}, // uâ
         {L"\xf4", {0, C2MODE::EITHER}}, // ô
         {L"\xea", {0, C2MODE::EITHER}}, // uê
@@ -176,7 +176,7 @@ namespace Telex {
         {L"\xf4", {0, C2MODE::MUSTC2}}, // uô
     };
 
-    std::unordered_map<std::wstring, VINFO> const valid_v_gi = {
+    genmap<std::wstring, VINFO> const valid_v_gi = {
         {L"", {-1, C2MODE::EITHER}},
         {L"a", {0, C2MODE::EITHER}},
         {L"\x103", {0, C2MODE::MUSTC2}}, // ă
@@ -210,7 +210,7 @@ namespace Telex {
     };
 
     // bool is whether tones are restricted to s/j or not
-    std::unordered_map<std::wstring, bool> const valid_c2 = {
+    genmap<std::wstring, bool> const valid_c2 = {
         {L"", false},
         {L"c", true},
         {L"m", false},
@@ -223,7 +223,7 @@ namespace Telex {
         {L"nh", false},
     };
 
-    std::unordered_map<std::wstring, VINFO> const valid_v_oa_uy = {
+    genmap<std::wstring, VINFO> const valid_v_oa_uy = {
         {L"oa", {0, C2MODE::EITHER}},
         {L"oe", {0, C2MODE::EITHER}},
         {L"uy", {0, C2MODE::EITHER}},
