@@ -29,7 +29,6 @@ namespace Telex {
     static wchar_t TranslateTone(wchar_t c, TONES t) {
         auto it = transitions_tones.find(c);
         // don't fail here since tone position prediction might give invalid v
-        //assert(it != transitions_tones.end());
         if (it != transitions_tones.end()) {
             return (it->second)[(int)t];
         } else {

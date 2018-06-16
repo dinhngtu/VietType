@@ -46,7 +46,10 @@ void DllRelease(void) {
         if (nullptr != classFactoryObjects[0]) {
             FreeGlobalObjects();
         }
-        assert(InterlockedCompareExchange(&Global::dllRefCount, 0, 0) == -1);
+        if (InterlockedCompareExchange(&Global::dllRefCount, 0, 0) != -1) {
+            DBGPRINT(L"%s", L"doh");
+            assert(0);
+        }
 
         LeaveCriticalSection(&Global::CS);
     }
