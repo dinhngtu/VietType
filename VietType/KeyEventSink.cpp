@@ -16,7 +16,7 @@ HRESULT IMECore::_CallKeyEdit(ITfContext *pContext, WPARAM wParam, LPARAM lParam
     auto session = new (std::nothrow) KeyHandlerEditSession(this, pContext, wParam, lParam, keyState, _engine);
     if (session != nullptr) {
         HRESULT hrSession = S_OK;
-        HRESULT hr = pContext->RequestEditSession(_tfClientId, session, TF_ES_SYNC | TF_ES_READWRITE, &hrSession);
+        HRESULT hr = pContext->RequestEditSession(_tfClientId, session, TF_ES_ASYNCDONTCARE | TF_ES_READWRITE, &hrSession);
         session->Release();
 
         return hr;

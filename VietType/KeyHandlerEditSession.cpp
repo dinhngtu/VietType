@@ -24,7 +24,7 @@ STDMETHODIMP KeyHandlerEditSession::DoEditSession(TfEditCookie ec) {
     if (_wParam == 0) {
         Commit(ec);
     } else if (Telex::IsEditKey(_wParam, _lParam, _keyState)) {
-        _pTextService->_EndComposition(_pContext);
+        _pTextService->_TerminateComposition(ec, _pContext, FALSE);
     } else if (Telex::EngineWantsKey(_pTextService->_IsComposing(), _wParam, _lParam, _keyState)) {
         ComposeKey(ec);
     } else if (_wParam == VK_SHIFT) {
@@ -42,7 +42,7 @@ void KeyHandlerEditSession::ComposeKey(TfEditCookie ec) {
         auto str = _engine.Peek();
         _pTextService->_SetCompositionText(ec, _pContext, str);
         if (!_engine.Count()) {
-            _pTextService->_EndComposition(_pContext);
+            _pTextService->_TerminateComposition(ec, _pContext, FALSE);
         }
         break;
     }
@@ -81,5 +81,5 @@ void KeyHandlerEditSession::Commit(TfEditCookie ec) {
         break;
     }
 
-    _pTextService->_EndComposition(_pContext);
+    _pTextService->_TerminateComposition(ec, _pContext, FALSE);
 }

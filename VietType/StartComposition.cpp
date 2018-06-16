@@ -60,7 +60,7 @@ void IMECore::_StartComposition(_In_ ITfContext *pContext) {
 
     if (nullptr != pStartCompositionEditSession) {
         HRESULT hr = S_OK;
-        pContext->RequestEditSession(_tfClientId, pStartCompositionEditSession, TF_ES_SYNC | TF_ES_READWRITE, &hr);
+        pContext->RequestEditSession(_tfClientId, pStartCompositionEditSession, TF_ES_ASYNCDONTCARE | TF_ES_READWRITE, &hr);
 
         pStartCompositionEditSession->Release();
     }
