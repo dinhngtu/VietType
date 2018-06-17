@@ -134,7 +134,7 @@ namespace Telex {
         {L"u\xf4i", {1, C2MODE::NOC2}},      // uôi
         {L"u\x1a1", {1, C2MODE::NOC2}},      // uơ
                                              // "uya" cannot be accented
-        {L"\x1b0a", {0, C2MODE::NOC2}},      // ưa
+        {L"\x1b0\x61", {0, C2MODE::NOC2}},      // ưa
         {L"\x1b0i", {0, C2MODE::NOC2}},      // ưi
         {L"\x1b0\x1a1i", {1, C2MODE::NOC2}}, // ươi
         {L"\x1b0\x1a1u", {1, C2MODE::NOC2}}, // ươu

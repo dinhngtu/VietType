@@ -87,11 +87,11 @@ namespace Telex {
             _c1.push_back(c);
             _cases.push_back(ccase);
 
-        } else if (!_c2.size() && cat == CHR_CATEGORIES::CONSOCONTINUE) {
+        } else if (!_c2.size() && c == L'd') {
+            // only used for 'dd'
             // relaxed constraint: !_v.size()
             _c1.push_back(c);
             auto before = _c1.size();
-            // only used for 'dd'
             auto it = transitions.find(_c1);
             if (it != transitions.end()) {
                 _c1 = it->second;
@@ -101,6 +101,10 @@ namespace Telex {
             if (after == before) {
                 _cases.push_back(ccase);
             }
+
+        } else if (!_v.size() && !_c2.size() && cat == CHR_CATEGORIES::CONSOCONTINUE) {
+            _c1.push_back(c);
+            _cases.push_back(ccase);
 
         } else if (cat == CHR_CATEGORIES::VOWEL) {
             // relaxed vowel position constraint: !_c2.size()
