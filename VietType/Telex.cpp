@@ -5,6 +5,8 @@
 #include "TelexUtil.h"
 #include "Globals.h"
 
+#define IS(cat, type) ((bool)((cat) & CHR_CATEGORIES::type))
+
 namespace Telex {
     static wchar_t ToUpper(wchar_t c) {
         auto it = touppermap.find(c);
@@ -78,7 +80,7 @@ namespace Telex {
         if (_state == TELEX_STATES::INVALID || cat == CHR_CATEGORIES::UNCATEGORIZED) {
             _state = TELEX_STATES::INVALID;
 
-        } else if (!_c1.size() && !_v.size() && (cat == CHR_CATEGORIES::WORDENDCONSO || cat == CHR_CATEGORIES::OTHERCONSO || cat == CHR_CATEGORIES::CONSOCONTINUE)) {
+        } else if (!_c1.size() && !_v.size() && (IS(cat, CONSO_C1) || IS(cat, CONSO_CONTINUE))) {
             _c1.push_back(c);
             _cases.push_back(ccase);
 
@@ -87,7 +89,7 @@ namespace Telex {
             _c1.push_back(c);
             _cases.push_back(ccase);
 
-        } else if (!_c2.size() && c == L'd') {
+        } else if (!_v.size() && !_c2.size() && c == L'd') {
             // only used for 'dd'
             // relaxed constraint: !_v.size()
             _c1.push_back(c);
@@ -102,11 +104,11 @@ namespace Telex {
                 _cases.push_back(ccase);
             }
 
-        } else if (!_v.size() && !_c2.size() && cat == CHR_CATEGORIES::CONSOCONTINUE) {
+        } else if (!_v.size() && !_c2.size() && IS(cat, CONSO_C1)) {
             _c1.push_back(c);
             _cases.push_back(ccase);
 
-        } else if (cat == CHR_CATEGORIES::VOWEL) {
+        } else if (IS(cat, VOWEL)) {
             // relaxed vowel position constraint: !_c2.size()
             // vowel parts (aeiouy)
             _v.push_back(c);
@@ -120,7 +122,7 @@ namespace Telex {
                 _cases.push_back(ccase);
             }
 
-        } else if (_v.size() && cat == CHR_CATEGORIES::VOWELW) {
+        } else if (_v.size() && IS(cat, VOWEL_W)) {
             auto it = transitions_w.find(_v);
             if (it != transitions_w.end()) {
                 _v = it->second;
@@ -135,22 +137,13 @@ namespace Telex {
             }
             // 'w' always keeps V size constant, don't push case
 
-        } else if (cat == CHR_CATEGORIES::WORDENDCONSO) {
-            // word-ending consonants (cnpt)
-            auto it = transitions_v_c2.find(_v);
-            if (it != transitions_v_c2.end()) {
-                _v = it->second;
-            }
-            _c2.push_back(c);
+        } else if (!_c1.size() && !_v.size() && IS(cat, TONE) && IS(cat, CONSO)) {
+            // ambiguous (rsx) -> first character
+            _c1.push_back(c);
             _cases.push_back(ccase);
 
-        } else if (_c2.size() && cat == CHR_CATEGORIES::CONSOCONTINUE) {
-            // consonant continuation (dgh)
-            _c2.push_back(c);
-            _cases.push_back(ccase);
-
-        } else if ((_c1 == L"gi" || _v.size()) && cat == CHR_CATEGORIES::TONES) {
-            // tones-only (fjz)
+        } else if ((_c1 == L"gi" || _v.size()) && IS(cat, TONE) && IS(cat, CONSO)) {
+            // ambiguous (rsx) -> tone
             auto newtone = GetTone(c);
             if (newtone != _t) {
                 _t = newtone;
@@ -159,13 +152,22 @@ namespace Telex {
                 _state = TELEX_STATES::INVALID;
             }
 
-        } else if (!_c1.size() && !_v.size() && cat == CHR_CATEGORIES::TONECONSO) {
-            // ambiguous (rsx) -> first character
-            _c1.push_back(c);
+        } else if (_v.size() && !_c2.size() && IS(cat, CONSO_C2)) {
+            // word-ending consonants (cnpt)
+            auto it = transitions_v_c2.find(_v);
+            if (it != transitions_v_c2.end()) {
+                _v = it->second;
+            }
+            _c2.push_back(c);
             _cases.push_back(ccase);
 
-        } else if ((_c1 == L"gi" || _v.size()) && cat == CHR_CATEGORIES::TONECONSO) {
-            // ambiguous (rsx) -> tone
+        } else if (_c2.size() && IS(cat, CONSO_CONTINUE)) {
+            // consonant continuation (dgh)
+            _c2.push_back(c);
+            _cases.push_back(ccase);
+
+        } else if ((_c1 == L"gi" || _v.size()) && IS(cat, TONE)) {
+            // tones-only (fjz)
             auto newtone = GetTone(c);
             if (newtone != _t) {
                 _t = newtone;
