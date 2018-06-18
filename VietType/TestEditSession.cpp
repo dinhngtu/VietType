@@ -22,7 +22,6 @@ STDMETHODIMP TestEditSession::DoEditSession(TfEditCookie ec) {
         goto Exit;
     }
 
-    //count = ToUnicodeEx((UINT)_wParam, (_lParam >> 16) & 0xff, _keyState, buf, 8, 0, _hkl);
     count = ToUnicode((UINT)_wParam, (_lParam >> 16) & 0xff, _keyState, buf, 8, 0);
     if (count <= 0) {
         goto Exit;

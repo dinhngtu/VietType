@@ -17,8 +17,13 @@ HRESULT _RemoveDummyCompositionForComposing(TfEditCookie ec, _In_ ITfComposition
 }
 
 STDMETHODIMP IMECore::OnCompositionTerminated(TfEditCookie ecWrite, ITfComposition * pComposition) {
+    HRESULT hr = S_OK;
+
     // Clear dummy composition
-    _RemoveDummyCompositionForComposing(ecWrite, pComposition);
+    hr = _RemoveDummyCompositionForComposing(ecWrite, pComposition);
+    if (FAILED(hr)) {
+        DBGPRINT(L"cannot clear dummy composition: error %lx", hr);
+    }
 
     // Clear display attribute and end composition, _EndComposition will release composition for us
     ITfContext* pContext = _pContext;
@@ -26,14 +31,17 @@ STDMETHODIMP IMECore::OnCompositionTerminated(TfEditCookie ecWrite, ITfCompositi
         pContext->AddRef();
     }
 
-    _EndComposition(_pContext);
+    hr = _EndComposition(_pContext);
+    if (FAILED(hr)) {
+        DBGPRINT(L"cannot end composition: error %lx", hr);
+    }
 
     if (pContext) {
         pContext->Release();
         pContext = nullptr;
     }
 
-    return S_OK;
+    return hr;
 }
 
 void IMECore::_SetComposition(_In_ ITfComposition *pComposition) {
@@ -44,12 +52,18 @@ bool IMECore::_IsComposing() const {
     return _pComposition != nullptr;
 }
 
-void IMECore::_MoveCaretToEnd(TfEditCookie ec) {
+HRESULT IMECore::_MoveCaretToEnd(TfEditCookie ec) {
+    HRESULT hr;
+
     if (_pComposition != nullptr) {
         ITfRange* pRangeComposition = nullptr;
-        if (SUCCEEDED(_pComposition->GetRange(&pRangeComposition))) {
+        hr = _pComposition->GetRange(&pRangeComposition);
+
+        if (SUCCEEDED(hr)) {
             ITfRange* pRangeCloned = nullptr;
-            if (SUCCEEDED(pRangeComposition->Clone(&pRangeCloned))) {
+            hr = pRangeComposition->Clone(&pRangeCloned);
+
+            if (SUCCEEDED(hr)) {
                 pRangeCloned->Collapse(ec, TF_ANCHOR_END);
                 TF_SELECTION sel;
                 sel.range = pRangeCloned;
@@ -58,7 +72,10 @@ void IMECore::_MoveCaretToEnd(TfEditCookie ec) {
                 _pContext->SetSelection(ec, 1, &sel);
                 pRangeCloned->Release();
             }
+
             pRangeComposition->Release();
         }
     }
+
+    return hr;
 }

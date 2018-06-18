@@ -9,36 +9,43 @@ public:
 
     // Inherited via EditSessionBase
     STDMETHODIMP DoEditSession(TfEditCookie ec) {
-        _pTextService->_TerminateComposition(ec, _pContext, TRUE);
-        return S_OK;
+        return _pTextService->_TerminateComposition(ec, _pContext, TRUE);
     }
 };
 
-void IMECore::_EndComposition(_In_opt_ ITfContext *pContext) {
+HRESULT IMECore::_EndComposition(_In_opt_ ITfContext *pContext) {
     EndCompositionEditSession *pEditSession = new (std::nothrow) EndCompositionEditSession(this, pContext);
-    HRESULT hr = S_OK;
+    HRESULT hr = S_OK, hrSession = S_OK;
 
     if (nullptr != pEditSession) {
-        pContext->RequestEditSession(_tfClientId, pEditSession, TF_ES_ASYNCDONTCARE | TF_ES_READWRITE, &hr);
+        hr = pContext->RequestEditSession(_tfClientId, pEditSession, TF_ES_ASYNCDONTCARE | TF_ES_READWRITE, &hrSession);
         pEditSession->Release();
     }
+
+    return hr;
 }
 
-void IMECore::_TerminateComposition(TfEditCookie ec, _In_ ITfContext *pContext, BOOL isCalledFromDeactivate) {
+HRESULT IMECore::_TerminateComposition(TfEditCookie ec, _In_ ITfContext *pContext, BOOL isCalledFromDeactivate) {
     isCalledFromDeactivate;
+
+    HRESULT hr = S_OK;
 
     _engine.Reset();
 
     if (_pComposition != nullptr) {
-        _MoveCaretToEnd(ec);
+        hr = _MoveCaretToEnd(ec);
+        if (FAILED(hr)) {
+            DBGPRINT(L"cannot move caret: error %lx", hr);
+        }
 
         // remove the display attribute from the composition range.
         //_ClearCompositionDisplayAttributes(ec, pContext);
 
-        if (FAILED(_pComposition->EndComposition(ec))) {
+        hr = _pComposition->EndComposition(ec);
+        if (FAILED(hr)) {
             // if we fail to EndComposition, then we need to close the reverse reading window.
             //_DeleteCandidateList(TRUE, pContext);
-            DBGPRINT(L"%s", L"cannot end composition");
+            DBGPRINT(L"cannot end composition: error %lx", hr);
         }
 
         _pComposition->Release();
@@ -49,4 +56,6 @@ void IMECore::_TerminateComposition(TfEditCookie ec, _In_ ITfContext *pContext, 
             _pContext = nullptr;
         }
     }
+
+    return hr;
 }

@@ -24,7 +24,7 @@ STDMETHODIMP KeyHandlerEditSession::DoEditSession(TfEditCookie ec) {
     if (_wParam == 0) {
         Commit(ec);
     } else if (Telex::IsEditKey(_wParam, _lParam, _keyState)) {
-        _pTextService->_TerminateComposition(ec, _pContext, FALSE);
+        return _pTextService->_TerminateComposition(ec, _pContext, FALSE);
     } else if (Telex::EngineWantsKey(_pTextService->_IsComposing(), _wParam, _lParam, _keyState)) {
         ComposeKey(ec);
     } else if (_wParam == VK_SHIFT) {
@@ -37,19 +37,32 @@ STDMETHODIMP KeyHandlerEditSession::DoEditSession(TfEditCookie ec) {
 }
 
 void KeyHandlerEditSession::ComposeKey(TfEditCookie ec) {
+    HRESULT hr = S_OK;
+
     switch (Telex::PushKey(_engine, _wParam, _lParam, _keyState)) {
     case Telex::TELEX_STATES::VALID: {
         auto str = _engine.Peek();
-        _pTextService->_SetCompositionText(ec, _pContext, str);
+        hr = _pTextService->_SetCompositionText(ec, _pContext, str);
+        if (FAILED(hr)) {
+            DBGPRINT(L"cannot reset composition text: error %lx", hr);
+        }
+        // backspace only returns VALID on an empty buffer
         if (!_engine.Count()) {
-            _pTextService->_TerminateComposition(ec, _pContext, FALSE);
+            hr = _pTextService->_TerminateComposition(ec, _pContext, FALSE);
+            if (FAILED(hr)) {
+                DBGPRINT(L"cannot terminate composition: error %lx", hr);
+            }
         }
         break;
     }
 
     case Telex::TELEX_STATES::INVALID: {
+        assert(_engine.Count() > 0);
         auto str = _engine.RetrieveInvalid();
-        _pTextService->_SetCompositionText(ec, _pContext, str);
+        hr = _pTextService->_SetCompositionText(ec, _pContext, str);
+        if (FAILED(hr)) {
+            DBGPRINT(L"cannot reset composition text: error %lx", hr);
+        }
         break;
     }
 
@@ -61,17 +74,25 @@ void KeyHandlerEditSession::ComposeKey(TfEditCookie ec) {
 }
 
 void KeyHandlerEditSession::Commit(TfEditCookie ec) {
+    HRESULT hr = S_OK;
+
     DBGPRINT(L"%s", L"Committing");
     switch (_engine.Commit()) {
     case Telex::TELEX_STATES::COMMITTED: {
         auto str = _engine.Retrieve();
-        _pTextService->_SetCompositionText(ec, _pContext, str);
+        hr = _pTextService->_SetCompositionText(ec, _pContext, str);
+        if (FAILED(hr)) {
+            DBGPRINT(L"cannot reset composition text: error %lx", hr);
+        }
         break;
     }
 
     case Telex::TELEX_STATES::COMMITTED_INVALID: {
         auto str = _engine.RetrieveInvalid();
-        _pTextService->_SetCompositionText(ec, _pContext, str);
+        hr = _pTextService->_SetCompositionText(ec, _pContext, str);
+        if (FAILED(hr)) {
+            DBGPRINT(L"cannot reset composition text: error %lx", hr);
+        }
         break;
     }
 
@@ -81,5 +102,8 @@ void KeyHandlerEditSession::Commit(TfEditCookie ec) {
         break;
     }
 
-    _pTextService->_TerminateComposition(ec, _pContext, FALSE);
+    hr = _pTextService->_TerminateComposition(ec, _pContext, FALSE);
+    if (FAILED(hr)) {
+        DBGPRINT(L"cannot terminate composition: error %lx", hr);
+    }
 }

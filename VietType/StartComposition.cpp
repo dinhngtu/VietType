@@ -12,20 +12,25 @@ public:
         ITfRange* pRangeInsert = nullptr;
         ITfContextComposition* pContextComposition = nullptr;
         ITfComposition* pComposition = nullptr;
+        HRESULT hr = S_OK;
 
-        if (FAILED(_pContext->QueryInterface(IID_ITfInsertAtSelection, (void **)&pInsertAtSelection))) {
+        hr = _pContext->QueryInterface(IID_ITfInsertAtSelection, (void **)&pInsertAtSelection);
+        if (FAILED(hr)) {
             goto Exit;
         }
 
-        if (FAILED(pInsertAtSelection->InsertTextAtSelection(ec, TF_IAS_QUERYONLY, NULL, 0, &pRangeInsert))) {
+        hr = pInsertAtSelection->InsertTextAtSelection(ec, TF_IAS_QUERYONLY, NULL, 0, &pRangeInsert);
+        if (FAILED(hr)) {
             goto Exit;
         }
 
-        if (FAILED(_pContext->QueryInterface(IID_ITfContextComposition, (void **)&pContextComposition))) {
+        hr = _pContext->QueryInterface(IID_ITfContextComposition, (void **)&pContextComposition);
+        if (FAILED(hr)) {
             goto Exit;
         }
 
-        if (SUCCEEDED(pContextComposition->StartComposition(ec, pRangeInsert, _pTextService, &pComposition)) && (nullptr != pComposition)) {
+        hr = pContextComposition->StartComposition(ec, pRangeInsert, _pTextService, &pComposition);
+        if (SUCCEEDED(hr) && (nullptr != pComposition)) {
             _pTextService->_SetComposition(pComposition);
 
             // set selection to the adjusted range
@@ -51,19 +56,22 @@ public:
             pInsertAtSelection->Release();
         }
 
-        return S_OK;
+        return hr;
     }
 };
 
-void IMECore::_StartComposition(_In_ ITfContext *pContext) {
+HRESULT IMECore::_StartComposition(_In_ ITfContext *pContext) {
     StartCompositionEditSession* pStartCompositionEditSession = new (std::nothrow) StartCompositionEditSession(this, pContext);
+    HRESULT hr = S_OK, hrSession = S_OK;
 
     if (nullptr != pStartCompositionEditSession) {
-        HRESULT hr = S_OK;
-        pContext->RequestEditSession(_tfClientId, pStartCompositionEditSession, TF_ES_ASYNCDONTCARE | TF_ES_READWRITE, &hr);
+        // note that SampleIME uses TF_ES_SYNC
+        hr = pContext->RequestEditSession(_tfClientId, pStartCompositionEditSession, TF_ES_ASYNCDONTCARE | TF_ES_READWRITE, &hrSession);
 
         pStartCompositionEditSession->Release();
     }
+
+    return hr;
 }
 
 void IMECore::_SaveCompositionContext(_In_ ITfContext *pContext) {

@@ -57,13 +57,17 @@ IMECore::OnTestKeyDown(ITfContext *pContext, WPARAM wParam, LPARAM lParam, BOOL 
 
     BYTE keyState[256] = { 0 };
     if (!GetKeyboardState(keyState)) {
+        DBGPRINT(L"GetKeyboardState error %lx", GetLastError());
         return E_FAIL;
     }
     *pIsEaten = Telex::EngineWantsKey(_IsComposing(), wParam, lParam, keyState);
 
     // TODO: break off the composition early at OnTestKeyDown so?
     if (!*pIsEaten && _IsComposing()) {
-        _CallKeyEdit(pContext, wParam, lParam, keyState);
+        auto hr = _CallKeyEdit(pContext, wParam, lParam, keyState);
+        if (FAILED(hr)) {
+            return hr;
+        }
     }
 
     DBGPRINT(L"OnTestKeyDown key %x %s", wParam, *pIsEaten ? L"eaten" : L"not eaten");
@@ -84,13 +88,14 @@ STDAPI IMECore::OnKeyDown(ITfContext *pContext, WPARAM wParam, LPARAM lParam, BO
 
     BYTE keyState[256] = { 0 };
     if (!GetKeyboardState(keyState)) {
+        DBGPRINT(L"GetKeyboardState error %lx", GetLastError());
         return E_FAIL;
     }
     *pIsEaten = Telex::EngineWantsKey(_IsComposing(), wParam, lParam, keyState);
 
     DBGPRINT(L"OnKeyDown key %x %s", wParam, *pIsEaten ? L"eaten" : L"not eaten");
 
-    HRESULT hr = _CallKeyEdit(pContext, wParam, lParam, keyState);
+    auto hr = _CallKeyEdit(pContext, wParam, lParam, keyState);
     if (FAILED(hr)) {
         return hr;
     }
@@ -117,6 +122,7 @@ STDAPI IMECore::OnTestKeyUp(ITfContext *pContext, WPARAM wParam, LPARAM lParam, 
     if (_IsComposing()) {
         BYTE keyState[256] = { 0 };
         if (!GetKeyboardState(keyState)) {
+            DBGPRINT(L"GetKeyboardState error %lx", GetLastError());
             return E_FAIL;
         }
         *pIsEaten = Telex::EngineWantsKey(_IsComposing(), wParam, lParam, keyState);
@@ -149,6 +155,7 @@ STDAPI IMECore::OnKeyUp(ITfContext *pContext, WPARAM wParam, LPARAM lParam, BOOL
     if (_IsComposing()) {
         BYTE keyState[256] = { 0 };
         if (!GetKeyboardState(keyState)) {
+            DBGPRINT(L"GetKeyboardState error %lx", GetLastError());
             return E_FAIL;
         }
         *pIsEaten = Telex::EngineWantsKey(_IsComposing(), wParam, lParam, keyState);

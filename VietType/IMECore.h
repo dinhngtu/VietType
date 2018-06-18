@@ -65,9 +65,9 @@ public:
     // Inherited via ITfCompositionSink
     STDMETHODIMP OnCompositionTerminated(TfEditCookie ecWrite, ITfComposition * pComposition);
 
-    void _StartComposition(_In_ ITfContext *pContext);
-    void _EndComposition(_In_opt_ ITfContext *pContext);
-    void _TerminateComposition(TfEditCookie ec, _In_ ITfContext *pContext, BOOL isCalledFromDeactivate);
+    HRESULT _StartComposition(_In_ ITfContext *pContext);
+    HRESULT _EndComposition(_In_opt_ ITfContext *pContext);
+    HRESULT _TerminateComposition(TfEditCookie ec, _In_ ITfContext *pContext, BOOL isCalledFromDeactivate);
 
     /// <summary>edit session utilities, don't call</summary>
     void _SetComposition(_In_ ITfComposition *pComposition);
@@ -76,7 +76,7 @@ public:
     /// <summary>edit session utilities, don't call</summary>
     bool _IsComposing() const;
     /// <summary>edit session utilities, don't call</summary>
-    void _MoveCaretToEnd(TfEditCookie ec);
+    HRESULT _MoveCaretToEnd(TfEditCookie ec);
 
     /// <summary>edit session utilities, don't call</summary>
     BOOL _IsRangeCovered(TfEditCookie ec, _In_ ITfRange *pRangeTest, _In_ ITfRange *pRangeCover);
