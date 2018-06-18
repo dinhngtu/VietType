@@ -16,6 +16,11 @@ namespace Telex {
         // relaxed transformations
         {L"ieue", L"i\xeau"},
         {L"yeue", L"y\xeau"},
+        {L"aua", L"\xe2u"},
+        {L"aya", L"\xe2y"},
+        {L"eue", L"\xeau"},
+        {L"uoio", L"u\xf4i"},
+        {L"uaya", L"u\xe2y"},
     };
 
     genmap<std::wstring, std::wstring> const transitions_w = {
