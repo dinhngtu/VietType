@@ -11,13 +11,14 @@ bool IsTranslatableKey(_In_ WPARAM wParam, _In_ LPARAM lParam) {
 }
 
 bool Telex::IsEditKey(_In_ WPARAM wParam, _In_ LPARAM lParam, _In_ BYTE const *keyState) {
+    // only for edit keys that don't commit
     if ((keyState[VK_CONTROL] & 0x80) || (keyState[VK_MENU] & 0x80)) {
         return true;
     }
     if (wParam >= 33 && wParam <= 40) {
         return true;
     }
-    if (wParam == VK_TAB || wParam == VK_RETURN || wParam == VK_DELETE) {
+    if (wParam == VK_DELETE) {
         return true;
     }
     return false;
