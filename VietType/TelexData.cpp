@@ -28,6 +28,7 @@ namespace Telex {
         {L"o", L"\x1a1"},
         {L"oi", L"\x1a1i"},
         {L"u", L"\x1b0"},
+        {L"ui", L"\x1b0i"},
         {L"uo", L"u\x1a1"},
     };
 
