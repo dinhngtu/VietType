@@ -148,7 +148,7 @@ namespace Telex {
             if (newtone != _t) {
                 _t = newtone;
             } else {
-                _t = TONES::Z;
+                _keyBuffer.pop_back();
                 _state = TELEX_STATES::INVALID;
             }
 
@@ -172,7 +172,7 @@ namespace Telex {
             if (newtone != _t) {
                 _t = newtone;
             } else {
-                _t = TONES::Z;
+                _keyBuffer.pop_back();
                 _state = TELEX_STATES::INVALID;
             }
 
