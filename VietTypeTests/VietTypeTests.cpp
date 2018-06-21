@@ -18,7 +18,7 @@
 #define ITERATIONS 10000000
 #endif
 
-using namespace Telex;
+using namespace VietType::Telex;
 
 void main1() {
     TelexConfig c;
@@ -98,23 +98,23 @@ void main3() {
     TelexEngine tx(c);
     
     tx.Reset();
-    tx.PushChar(L'g');
+    tx.PushChar(L'c');
     auto x = tx.Peek();
-    tx.PushChar(L'i');
+    tx.PushChar(L'h');
     x = tx.Peek();
-    tx.PushChar(L'o');
+    tx.PushChar(L'u');
     x = tx.Peek();
-    tx.PushChar(L'i');
+    tx.PushChar(L'a');
     x = tx.Peek();
-    tx.PushChar(L'w');
+    tx.PushChar(L'a');
     x = tx.Peek();
-    tx.PushChar(L's');
+    tx.PushChar(L'n');
     x = tx.Peek();
-    //tx.PushChar(L'f');
+    tx.PushChar(L'r');
     //x = tx.Peek();
     tx.Commit();
     x = tx.Retrieve();
-    DBGPRINT(L"%s", x.c_str());
+    DPRINT(L"%s", x.c_str());
 }
 
 int main() {

@@ -1,0 +1,15 @@
+HKCR
+{
+	NoRemove CLSID
+	{
+		ForceRemove {c0dd01a1-0deb-454b-8b42-d22ced1b4b23} = s 'VietType'
+		{
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Apartment'
+			}
+			TypeLib = s '{4914ef26-8318-4608-aa14-4f7cbb6229e5}'
+			Version = s '1.0'
+		}
+	}
+}

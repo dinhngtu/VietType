@@ -1,0 +1,175 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Generated Files">
+      <UniqueIdentifier>{223edd06-5f22-4d25-b32f-918b9ec2e875}</UniqueIdentifier>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Telex">
+      <UniqueIdentifier>{fa6b0a6d-744d-4d22-8410-9f7cddbc2699}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Telex\Header Files">
+      <UniqueIdentifier>{d10e76fd-74a8-4cc9-8cfc-bfa7d3225c38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Telex\Source Files">
+      <UniqueIdentifier>{f441515e-b3c8-4211-983c-29985653ad2d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VietTypeATL.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VietTypeATL_i.c">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TextService.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Globals.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ThreadMgrEventSink.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TextEditSink.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SmartComPtr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="KeyEventSink.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CompositionManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TelexCaseMap.cpp">
+      <Filter>Telex\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TelexData.cpp">
+      <Filter>Telex\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TelexKeyTranslator.cpp">
+      <Filter>Telex\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TelexUtil.cpp">
+      <Filter>Telex\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TelexEngine.cpp">
+      <Filter>Telex\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="KeyHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dllmain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VietTypeATL_i.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TextService.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Globals.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SinkAdvisor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Define.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ThreadMgrEventSink.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TextEditSink.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SmartComPtr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="KeyEventSink.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CompositionManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EditSession.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TelexData.h">
+      <Filter>Telex\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TelexKeyTranslator.h">
+      <Filter>Telex\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TelexUtil.h">
+      <Filter>Telex\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Export.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TelexEngine.h">
+      <Filter>Telex\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Telex.h">
+      <Filter>Telex\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="KeyHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="VietTypeATL.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="VietTypeATL.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="VietTypeATL.def">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="TextService.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="VietTypeATL.idl">
+      <Filter>Source Files</Filter>
+    </Midl>
+  </ItemGroup>
+</Project>
