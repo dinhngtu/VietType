@@ -52,9 +52,9 @@ public:
 
 public:
     // Inherited via ITfTextInputProcessorEx
-    virtual HRESULT Activate(ITfThreadMgr * ptim, TfClientId tid) override;
-    virtual HRESULT Deactivate(void) override;
-    virtual HRESULT ActivateEx(ITfThreadMgr * ptim, TfClientId tid, DWORD dwFlags) override;
+    virtual STDMETHODIMP Activate(ITfThreadMgr * ptim, TfClientId tid) override;
+    virtual STDMETHODIMP Deactivate(void) override;
+    virtual STDMETHODIMP ActivateEx(ITfThreadMgr * ptim, TfClientId tid, DWORD dwFlags) override;
 
 private:
     SmartComPtr<ITfThreadMgr> _threadMgr;

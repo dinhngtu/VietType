@@ -33,11 +33,11 @@ VietType::TextService::TextService() {
 VietType::TextService::~TextService() {
 }
 
-HRESULT VietType::TextService::Activate(ITfThreadMgr * ptim, TfClientId tid) {
+STDMETHODIMP VietType::TextService::Activate(ITfThreadMgr * ptim, TfClientId tid) {
     return ActivateEx(ptim, tid, 0);
 }
 
-HRESULT VietType::TextService::ActivateEx(ITfThreadMgr * ptim, TfClientId tid, DWORD dwFlags) {
+STDMETHODIMP VietType::TextService::ActivateEx(ITfThreadMgr * ptim, TfClientId tid, DWORD dwFlags) {
     HRESULT hr;
 
     _threadMgr = ptim;
@@ -68,7 +68,7 @@ HRESULT VietType::TextService::ActivateEx(ITfThreadMgr * ptim, TfClientId tid, D
     return S_OK;
 }
 
-HRESULT VietType::TextService::Deactivate(void) {
+STDMETHODIMP VietType::TextService::Deactivate(void) {
     HRESULT hr;
 
     if (_keyEventSink) {

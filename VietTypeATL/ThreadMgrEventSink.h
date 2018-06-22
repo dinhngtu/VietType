@@ -40,11 +40,11 @@ public:
 
 public:
     // Inherited via ITfThreadMgrEventSink
-    virtual HRESULT OnInitDocumentMgr(ITfDocumentMgr * pdim) override;
-    virtual HRESULT OnUninitDocumentMgr(ITfDocumentMgr * pdim) override;
-    virtual HRESULT OnSetFocus(ITfDocumentMgr * pdimFocus, ITfDocumentMgr * pdimPrevFocus) override;
-    virtual HRESULT OnPushContext(ITfContext * pic) override;
-    virtual HRESULT OnPopContext(ITfContext * pic) override;
+    virtual STDMETHODIMP OnInitDocumentMgr(ITfDocumentMgr * pdim) override;
+    virtual STDMETHODIMP OnUninitDocumentMgr(ITfDocumentMgr * pdim) override;
+    virtual STDMETHODIMP OnSetFocus(ITfDocumentMgr * pdimFocus, ITfDocumentMgr * pdimPrevFocus) override;
+    virtual STDMETHODIMP OnPushContext(ITfContext * pic) override;
+    virtual STDMETHODIMP OnPopContext(ITfContext * pic) override;
 
     HRESULT Initialize(ITfThreadMgr *threadMgr, TfClientId tid);
     HRESULT Uninitialize();

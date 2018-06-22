@@ -23,7 +23,7 @@ VietType::TextEditSink::TextEditSink() {
 VietType::TextEditSink::~TextEditSink() {
 }
 
-HRESULT VietType::TextEditSink::OnEndEdit(ITfContext * pic, TfEditCookie ecReadOnly, ITfEditRecord * pEditRecord) {
+STDMETHODIMP VietType::TextEditSink::OnEndEdit(ITfContext * pic, TfEditCookie ecReadOnly, ITfEditRecord * pEditRecord) {
     if (pEditRecord == nullptr) {
         return E_INVALIDARG;
     }

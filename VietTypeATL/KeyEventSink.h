@@ -40,15 +40,15 @@ public:
     DECLARE_PROTECT_FINAL_CONSTRUCT()
 
     // Inherited via ITfKeyEventSink
-    virtual HRESULT OnSetFocus(BOOL fForeground) override;
-    virtual HRESULT OnTestKeyDown(ITfContext * pic, WPARAM wParam, LPARAM lParam, BOOL * pfEaten) override;
-    virtual HRESULT OnTestKeyUp(ITfContext * pic, WPARAM wParam, LPARAM lParam, BOOL * pfEaten) override;
-    virtual HRESULT OnKeyDown(ITfContext * pic, WPARAM wParam, LPARAM lParam, BOOL * pfEaten) override;
-    virtual HRESULT OnKeyUp(ITfContext * pic, WPARAM wParam, LPARAM lParam, BOOL * pfEaten) override;
-    virtual HRESULT OnPreservedKey(ITfContext * pic, REFGUID rguid, BOOL * pfEaten) override;
+    virtual STDMETHODIMP OnSetFocus(BOOL fForeground) override;
+    virtual STDMETHODIMP OnTestKeyDown(ITfContext * pic, WPARAM wParam, LPARAM lParam, BOOL * pfEaten) override;
+    virtual STDMETHODIMP OnTestKeyUp(ITfContext * pic, WPARAM wParam, LPARAM lParam, BOOL * pfEaten) override;
+    virtual STDMETHODIMP OnKeyDown(ITfContext * pic, WPARAM wParam, LPARAM lParam, BOOL * pfEaten) override;
+    virtual STDMETHODIMP OnKeyUp(ITfContext * pic, WPARAM wParam, LPARAM lParam, BOOL * pfEaten) override;
+    virtual STDMETHODIMP OnPreservedKey(ITfContext * pic, REFGUID rguid, BOOL * pfEaten) override;
 
     // Inherited via ITfCompartmentEventSink
-    virtual HRESULT OnChange(REFGUID rguid) override;
+    virtual STDMETHODIMP OnChange(REFGUID rguid) override;
 
     HRESULT Initialize(ITfThreadMgr * threadMgr, TfClientId clientid, SmartComObjPtr<CompositionManager> const& compositionManager, std::shared_ptr<Telex::TelexEngine> const& engine);
     HRESULT Uninitialize();

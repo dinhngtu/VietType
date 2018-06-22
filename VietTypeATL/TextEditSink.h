@@ -37,7 +37,7 @@ public:
 
 public:
     // Inherited via ITfTextEditSink
-    virtual HRESULT OnEndEdit(ITfContext * pic, TfEditCookie ecReadOnly, ITfEditRecord * pEditRecord) override;
+    virtual STDMETHODIMP OnEndEdit(ITfContext * pic, TfEditCookie ecReadOnly, ITfEditRecord * pEditRecord) override;
 
     HRESULT Initialize(ITfDocumentMgr *documentMgr);
     HRESULT Uninitialize();

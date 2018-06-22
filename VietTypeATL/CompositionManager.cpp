@@ -31,7 +31,7 @@ VietType::CompositionManager::~CompositionManager() {
 }
 
 
-HRESULT VietType::CompositionManager::OnCompositionTerminated(TfEditCookie ecWrite, ITfComposition * pComposition) {
+STDMETHODIMP VietType::CompositionManager::OnCompositionTerminated(TfEditCookie ecWrite, ITfComposition * pComposition) {
     HRESULT hr;
 
     hr = EndComposition();

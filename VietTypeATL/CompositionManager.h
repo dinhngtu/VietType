@@ -36,7 +36,7 @@ public:
     DECLARE_PROTECT_FINAL_CONSTRUCT()
 
     // Inherited via ITfCompositionSink
-    virtual HRESULT OnCompositionTerminated(TfEditCookie ecWrite, ITfComposition * pComposition) override;
+    virtual STDMETHODIMP OnCompositionTerminated(TfEditCookie ecWrite, ITfComposition * pComposition) override;
 
     void Initialize(TfClientId clientid);
 

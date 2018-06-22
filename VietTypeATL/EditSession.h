@@ -40,7 +40,7 @@ public:
     DECLARE_PROTECT_FINAL_CONSTRUCT()
 
     // Inherited via ITfEditSession
-    virtual HRESULT DoEditSession(TfEditCookie ec) {
+    virtual STDMETHODIMP DoEditSession(TfEditCookie ec) {
         auto args_ec = std::tuple_cat(std::make_tuple(ec), _args);
         return std::apply(_callback, args_ec);
     }

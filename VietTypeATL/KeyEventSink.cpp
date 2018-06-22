@@ -34,11 +34,11 @@ VietType::KeyEventSink::KeyEventSink() {
 VietType::KeyEventSink::~KeyEventSink() {
 }
 
-HRESULT VietType::KeyEventSink::OnSetFocus(BOOL fForeground) {
+STDMETHODIMP VietType::KeyEventSink::OnSetFocus(BOOL fForeground) {
     return S_OK;
 }
 
-HRESULT VietType::KeyEventSink::OnTestKeyDown(ITfContext * pic, WPARAM wParam, LPARAM lParam, BOOL * pfEaten) {
+STDMETHODIMP VietType::KeyEventSink::OnTestKeyDown(ITfContext * pic, WPARAM wParam, LPARAM lParam, BOOL * pfEaten) {
     HRESULT hr;
 
     if (!_enabled) {
@@ -61,7 +61,7 @@ HRESULT VietType::KeyEventSink::OnTestKeyDown(ITfContext * pic, WPARAM wParam, L
     return S_OK;
 }
 
-HRESULT VietType::KeyEventSink::OnTestKeyUp(ITfContext * pic, WPARAM wParam, LPARAM lParam, BOOL * pfEaten) {
+STDMETHODIMP VietType::KeyEventSink::OnTestKeyUp(ITfContext * pic, WPARAM wParam, LPARAM lParam, BOOL * pfEaten) {
     if (!_enabled) {
         *pfEaten = FALSE;
         return S_OK;
@@ -80,7 +80,7 @@ HRESULT VietType::KeyEventSink::OnTestKeyUp(ITfContext * pic, WPARAM wParam, LPA
     return S_OK;
 }
 
-HRESULT VietType::KeyEventSink::OnKeyDown(ITfContext * pic, WPARAM wParam, LPARAM lParam, BOOL * pfEaten) {
+STDMETHODIMP VietType::KeyEventSink::OnKeyDown(ITfContext * pic, WPARAM wParam, LPARAM lParam, BOOL * pfEaten) {
     HRESULT hr;
 
     if (!_enabled) {
@@ -101,11 +101,11 @@ HRESULT VietType::KeyEventSink::OnKeyDown(ITfContext * pic, WPARAM wParam, LPARA
     return S_OK;
 }
 
-HRESULT VietType::KeyEventSink::OnKeyUp(ITfContext * pic, WPARAM wParam, LPARAM lParam, BOOL * pfEaten) {
+STDMETHODIMP VietType::KeyEventSink::OnKeyUp(ITfContext * pic, WPARAM wParam, LPARAM lParam, BOOL * pfEaten) {
     return OnTestKeyUp(pic, wParam, lParam, pfEaten);
 }
 
-HRESULT VietType::KeyEventSink::OnPreservedKey(ITfContext * pic, REFGUID rguid, BOOL * pfEaten) {
+STDMETHODIMP VietType::KeyEventSink::OnPreservedKey(ITfContext * pic, REFGUID rguid, BOOL * pfEaten) {
     if (IsEqualGUID(Globals::GUID_KeyEventSink_PreservedKey_Toggle, rguid)) {
         *pfEaten = TRUE;
         _engine->Reset();
@@ -117,7 +117,7 @@ HRESULT VietType::KeyEventSink::OnPreservedKey(ITfContext * pic, REFGUID rguid, 
     return S_OK;
 }
 
-HRESULT VietType::KeyEventSink::OnChange(REFGUID rguid) {
+STDMETHODIMP VietType::KeyEventSink::OnChange(REFGUID rguid) {
     if (IsEqualGUID(rguid, Globals::GUID_KeyEventSink_Compartment_Toggle)) {
         ReadEnabled(&_enabled);
     }

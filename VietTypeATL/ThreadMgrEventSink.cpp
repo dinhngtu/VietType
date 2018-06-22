@@ -30,15 +30,15 @@ VietType::ThreadMgrEventSink::ThreadMgrEventSink() {
 VietType::ThreadMgrEventSink::~ThreadMgrEventSink() {
 }
 
-HRESULT VietType::ThreadMgrEventSink::OnInitDocumentMgr(ITfDocumentMgr * pdim) {
+STDMETHODIMP VietType::ThreadMgrEventSink::OnInitDocumentMgr(ITfDocumentMgr * pdim) {
     return E_NOTIMPL;
 }
 
-HRESULT VietType::ThreadMgrEventSink::OnUninitDocumentMgr(ITfDocumentMgr * pdim) {
+STDMETHODIMP VietType::ThreadMgrEventSink::OnUninitDocumentMgr(ITfDocumentMgr * pdim) {
     return E_NOTIMPL;
 }
 
-HRESULT VietType::ThreadMgrEventSink::OnSetFocus(ITfDocumentMgr * pdimFocus, ITfDocumentMgr * pdimPrevFocus) {
+STDMETHODIMP VietType::ThreadMgrEventSink::OnSetFocus(ITfDocumentMgr * pdimFocus, ITfDocumentMgr * pdimPrevFocus) {
     HRESULT hr;
     
     hr = _textEditSink->Initialize(pdimFocus);
@@ -47,11 +47,11 @@ HRESULT VietType::ThreadMgrEventSink::OnSetFocus(ITfDocumentMgr * pdimFocus, ITf
     return S_OK;
 }
 
-HRESULT VietType::ThreadMgrEventSink::OnPushContext(ITfContext * pic) {
+STDMETHODIMP VietType::ThreadMgrEventSink::OnPushContext(ITfContext * pic) {
     return E_NOTIMPL;
 }
 
-HRESULT VietType::ThreadMgrEventSink::OnPopContext(ITfContext * pic) {
+STDMETHODIMP VietType::ThreadMgrEventSink::OnPopContext(ITfContext * pic) {
     return E_NOTIMPL;
 }
 

@@ -24,7 +24,7 @@ VietType::KeyHandlerEditSession::KeyHandlerEditSession() {
 VietType::KeyHandlerEditSession::~KeyHandlerEditSession() {
 }
 
-HRESULT VietType::KeyHandlerEditSession::DoEditSession(TfEditCookie ec) {
+STDMETHODIMP VietType::KeyHandlerEditSession::DoEditSession(TfEditCookie ec) {
     assert((bool)_compositionManager);
     DBG_DPRINT(L"%s", L"entering key handler session");
 

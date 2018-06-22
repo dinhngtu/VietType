@@ -37,7 +37,7 @@ public:
     DECLARE_PROTECT_FINAL_CONSTRUCT()
 
     // Inherited via ITfEditSession
-    virtual HRESULT DoEditSession(TfEditCookie ec) override;
+    virtual STDMETHODIMP DoEditSession(TfEditCookie ec) override;
 
     void Initialize(const SmartComObjPtr<CompositionManager>& compositionManager, ITfContext *context, WPARAM wParam, LPARAM lParam, BYTE const *keyState, std::shared_ptr<Telex::TelexEngine> const& engine);
 
