@@ -46,9 +46,14 @@ void VietType::CompositionManager::Initialize(TfClientId clientid) {
 
 
 HRESULT VietType::CompositionManager::RequestEditSession(ITfEditSession * session) {
+    return RequestEditSession(session, _context);
+}
+
+HRESULT VietType::CompositionManager::RequestEditSession(ITfEditSession *session, ITfContext *context) {
     assert(_clientid != TF_CLIENTID_NULL);
+    assert(context);
     HRESULT hrSession;
-    return _context->RequestEditSession(_clientid, session, TF_ES_ASYNCDONTCARE | TF_ES_READWRITE, &hrSession);
+    return context->RequestEditSession(_clientid, session, TF_ES_ASYNCDONTCARE | TF_ES_READWRITE, &hrSession);
 }
 
 HRESULT VietType::CompositionManager::StartComposition(ITfContext * pContext) {
@@ -103,12 +108,14 @@ HRESULT VietType::CompositionManager::MoveCaretToEnd(TfEditCookie ec) {
 HRESULT VietType::CompositionManager::EndCompositionNow(TfEditCookie ec) {
     HRESULT hr;
 
+    DBG_DPRINT(L"%s", L"ending composition");
+
     if (_composition) {
         hr = MoveCaretToEnd(ec);
         DBG_HRESULT_CHECK(hr, L"%s", L"MoveCaretToEnd failed");
 
         hr = _composition->EndComposition(ec);
-        HRESULT_CHECK_RETURN(hr, L"%s", L"_composition->EndComposition failed");
+        DBG_HRESULT_CHECK(hr, L"%s", L"_composition->EndComposition failed");
 
         _composition.Release();
         _context.Release();
@@ -131,6 +138,17 @@ HRESULT VietType::CompositionManager::SetCompositionText(TfEditCookie ec, WCHAR 
     }
 
     return S_OK;
+}
+
+HRESULT VietType::CompositionManager::EnsureCompositionText(ITfContext *context, TfEditCookie ec, WCHAR const * str, LONG length) {
+    HRESULT hr;
+
+    if (!_composition) {
+        hr = StartComposition(context);
+        HRESULT_CHECK_RETURN(hr, L"%s", L"StartComposition failed");
+    }
+
+    return SetCompositionText(ec, str, length);
 }
 
 HRESULT VietType::CompositionManager::_StartComposition(TfEditCookie ec, CompositionManager *instance, ITfContext *context) {

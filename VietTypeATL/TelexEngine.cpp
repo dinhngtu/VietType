@@ -74,6 +74,7 @@ TelexEngine::~TelexEngine() {
 }
 
 void TelexEngine::Reset() {
+    DBG_DPRINT(L"%s", L"resetting engine");
     _state = TELEX_STATES::VALID;
     _keyBuffer.clear();
     _c1.clear();
@@ -336,6 +337,7 @@ std::wstring TelexEngine::Peek() const {
             break;
         default:
             tonepos = -1;
+            break;
         }
     }
 

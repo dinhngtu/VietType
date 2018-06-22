@@ -28,9 +28,15 @@ HRESULT VietType::KeyHandlerEditSession::DoEditSession(TfEditCookie ec) {
     assert((bool)_compositionManager);
     DBG_DPRINT(L"%s", L"entering key handler session");
 
+    // recover from situations that terminate the composition without us knowing (e.g. mouse clicks)
+    if (!_compositionManager->IsComposing() && _engine->Count()) {
+        _engine->Reset();
+    }
+
     if (_wParam == 0) {
         Commit(ec);
     } else if (Telex::IsEditKey(_wParam, _lParam, _keyState)) {
+        _engine->Reset();
         return _compositionManager->EndCompositionNow(ec);
     } else if (Telex::EngineWantsKey(_compositionManager->IsComposing(), _wParam, _lParam, _keyState)) {
         ComposeKey(ec);
@@ -65,16 +71,15 @@ HRESULT VietType::KeyHandlerEditSession::ComposeKey(TfEditCookie ec) {
     switch (Telex::PushKey(*_engine, _wParam, _lParam, _keyState)) {
     case Telex::TELEX_STATES::VALID: {
         if (_engine->Count()) {
-            if (!_compositionManager->IsComposing()) {
-                hr = _compositionManager->StartComposition(_context);
-                HRESULT_CHECK_RETURN(hr, L"%s", L"_compositionManager->StartComposition failed");
-            }
-
             auto str = _engine->Peek();
-            hr = _compositionManager->SetCompositionText(ec, &str[0], (LONG)str.length());
-            DBG_HRESULT_CHECK(hr, L"%s", L"_compositionManager->SetCompositionText failed");
+            hr = _compositionManager->EnsureCompositionText(_context, ec, &str[0], (LONG)str.length());
+            DBG_HRESULT_CHECK(hr, L"%s", L"_compositionManager->EnsureCompositionText failed");
         } else {
             // backspace only returns VALID on an empty buffer
+            _engine->Reset();
+            // EndComposition* will not empty composition text so we have to do it manually
+            hr = _compositionManager->EmptyCompositionText(ec);
+            HRESULT_CHECK_RETURN(hr, L"%s", L"_compositionManager->EmptyCompositionText failed");
             hr = _compositionManager->EndCompositionNow(ec);
             HRESULT_CHECK_RETURN(hr, L"%s", L"_compositionManager->EndCompositionNow failed");
         }
@@ -85,8 +90,9 @@ HRESULT VietType::KeyHandlerEditSession::ComposeKey(TfEditCookie ec) {
         assert(_engine->Count() > 0);
         assert(_compositionManager->IsComposing());
         auto str = _engine->RetrieveInvalid();
-        hr = _compositionManager->SetCompositionText(ec, &str[0], (LONG)str.length());
-        DBG_HRESULT_CHECK(hr, L"%s", L"_compositionManager->SetCompositionText failed");
+        hr = _compositionManager->EnsureCompositionText(_context, ec, &str[0], (LONG)str.length());
+        DBG_HRESULT_CHECK(hr, L"%s", L"_compositionManager->EnsureCompositionText failed");
+        break;
     }
 
     default:
@@ -101,19 +107,25 @@ HRESULT VietType::KeyHandlerEditSession::ComposeKey(TfEditCookie ec) {
 HRESULT VietType::KeyHandlerEditSession::Commit(TfEditCookie ec) {
     HRESULT hr;
 
+    if (!_compositionManager->IsComposing()) {
+        goto exit;
+    }
+
     switch (_engine->Commit()) {
     case Telex::TELEX_STATES::COMMITTED: {
         assert(_engine->Count() > 0);
         auto str = _engine->Retrieve();
         hr = _compositionManager->SetCompositionText(ec, &str[0], (LONG)str.length());
-        DBG_HRESULT_CHECK(hr, L"%s", L"_compositionManager->SetCompositionText failed");
+        DBG_HRESULT_CHECK(hr, L"%s", L"_compositionManager->EnsureCompositionText failed");
+        break;
     }
 
     case Telex::TELEX_STATES::COMMITTED_INVALID: {
         assert(_engine->Count() > 0);
         auto str = _engine->RetrieveInvalid();
         hr = _compositionManager->SetCompositionText(ec, &str[0], (LONG)str.length());
-        DBG_HRESULT_CHECK(hr, L"%s", L"_compositionManager->SetCompositionText failed");
+        DBG_HRESULT_CHECK(hr, L"%s", L"_compositionManager->EnsureCompositionText failed");
+        break;
     }
 
     default:
@@ -121,6 +133,10 @@ HRESULT VietType::KeyHandlerEditSession::Commit(TfEditCookie ec) {
         assert(0);
         break;
     }
+
+exit:
+    _engine->Reset();
+    _compositionManager->EndCompositionNow(ec);
 
     return S_OK;
 }

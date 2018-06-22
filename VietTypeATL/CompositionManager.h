@@ -40,7 +40,9 @@ public:
 
     void Initialize(TfClientId clientid);
 
+    // only use when there is an active composition
     HRESULT RequestEditSession(ITfEditSession *session);
+    HRESULT RequestEditSession(ITfEditSession *session, ITfContext *context);
     HRESULT StartComposition(ITfContext *pContext);
     HRESULT EndComposition();
     bool IsComposing() const;
@@ -49,6 +51,7 @@ public:
     HRESULT MoveCaretToEnd(TfEditCookie ec);
     HRESULT EndCompositionNow(TfEditCookie ec);
     HRESULT SetCompositionText(TfEditCookie ec, WCHAR const *str, LONG length);
+    HRESULT EnsureCompositionText(ITfContext *context, TfEditCookie ec, WCHAR const *str, LONG length);
 
     template <typename... Args>
     static HRESULT RequestEditSession(
@@ -59,6 +62,7 @@ public:
         Args... args) {
 
         assert(compositionManager->_clientid != TF_CLIENTID_NULL);
+        assert(context);
         HRESULT hr;
 
         SmartComObjPtr<EditSession<CompositionManager *, ITfContext *, Args...>> session;

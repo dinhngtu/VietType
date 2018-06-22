@@ -53,6 +53,7 @@ HRESULT VietType::KeyEventSink::OnTestKeyDown(ITfContext * pic, WPARAM wParam, L
 
     // break off the composition early at OnTestKeyDown on an uneaten key
     if (!*pfEaten && _compositionManager->IsComposing()) {
+        DBG_DPRINT(L"calling key edit wParam = %lx", wParam);
         hr = CallKeyEdit(pic, wParam, lParam, _keyState);
         HRESULT_CHECK_RETURN(hr, L"%s", L"CallKeyEdit failed");
     }
@@ -107,6 +108,7 @@ HRESULT VietType::KeyEventSink::OnKeyUp(ITfContext * pic, WPARAM wParam, LPARAM 
 HRESULT VietType::KeyEventSink::OnPreservedKey(ITfContext * pic, REFGUID rguid, BOOL * pfEaten) {
     if (IsEqualGUID(Globals::GUID_KeyEventSink_PreservedKey_Toggle, rguid)) {
         *pfEaten = TRUE;
+        _engine->Reset();
         _compositionManager->EndComposition();
         _enabled = !_enabled;
         WriteEnabled(_enabled);
@@ -224,7 +226,7 @@ HRESULT VietType::KeyEventSink::CallKeyEdit(ITfContext *context, WPARAM wParam, 
     hr = keyHandlerEditSession.CreateInstance();
     HRESULT_CHECK_RETURN(hr, L"%s", L"_keyHandlerEditSession.CreateInstance failed");
     keyHandlerEditSession->Initialize(_compositionManager, context, wParam, lParam, _keyState, _engine);
-    hr = _compositionManager->RequestEditSession(keyHandlerEditSession);
+    hr = _compositionManager->RequestEditSession(keyHandlerEditSession, context);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_compositionManager->RequestEditSession failed");
 
     return S_OK;
