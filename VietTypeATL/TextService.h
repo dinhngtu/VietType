@@ -45,6 +45,7 @@ public:
 
     DECLARE_NOT_AGGREGATABLE(TextService)
     BEGIN_COM_MAP(TextService)
+        COM_INTERFACE_ENTRY(ITfTextInputProcessor)
         COM_INTERFACE_ENTRY(ITfTextInputProcessorEx)
     END_COM_MAP()
     DECLARE_PROTECT_FINAL_CONSTRUCT()

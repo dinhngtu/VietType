@@ -18,6 +18,8 @@
 #include "stdafx.h"
 #include "Globals.h"
 
+HINSTANCE VietType::Globals::dllInstance = nullptr;
+
 // {c0dd01a1-0deb-454b-8b42-d22ced1b4b23}
 const CLSID VietType::Globals::CLSID_TextService = { 0xc0dd01a1, 0x0deb, 0x454b, { 0x8b, 0x42, 0xd2, 0x2c, 0xed, 0x1b, 0x4b, 0x23 } };
 
@@ -26,3 +28,8 @@ const GUID VietType::Globals::GUID_KeyEventSink_PreservedKey_Toggle = { 0x8cc27c
 
 // {B31B741B-63CE-413A-9B5A-D2B69C695A78}
 const GUID VietType::Globals::GUID_KeyEventSink_Compartment_Toggle = { 0xb31b741b, 0x63ce, 0x413a, { 0x9b, 0x5a, 0xd2, 0xb6, 0x9c, 0x69, 0x5a, 0x78 } };
+
+// {8D93D10A-203B-4C5F-A122-8898EF9C56F5}
+const GUID VietType::Globals::GUID_Profile = { 0x8d93d10a, 0x203b, 0x4c5f, { 0xa1, 0x22, 0x88, 0x98, 0xef, 0x9c, 0x56, 0xf5 } };
+
+const std::wstring VietType::Globals::TextServiceDescription = L"VietType";

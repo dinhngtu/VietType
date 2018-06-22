@@ -8,8 +8,6 @@ HKCR
 			{
 				val ThreadingModel = s 'Apartment'
 			}
-			TypeLib = s '{4914ef26-8318-4608-aa14-4f7cbb6229e5}'
-			Version = s '1.0'
 		}
 	}
 }

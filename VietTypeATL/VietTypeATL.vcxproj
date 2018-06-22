@@ -455,6 +455,7 @@
     <ClCompile Include="Globals.cpp" />
     <ClCompile Include="KeyEventSink.cpp" />
     <ClCompile Include="KeyHandler.cpp" />
+    <ClCompile Include="Register.cpp" />
     <ClCompile Include="SmartComPtr.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -537,6 +538,9 @@
   </ItemGroup>
   <ItemGroup>
     <Midl Include="VietTypeATL.idl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\logo.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

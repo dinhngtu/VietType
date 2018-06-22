@@ -22,10 +22,16 @@
 namespace VietType {
 namespace Globals {
 
+extern HINSTANCE dllInstance;
+
 extern const CLSID CLSID_TextService;
 
 extern const GUID GUID_KeyEventSink_PreservedKey_Toggle;
 extern const GUID GUID_KeyEventSink_Compartment_Toggle;
+
+extern const GUID GUID_Profile;
+
+extern const std::wstring TextServiceDescription;
 
 }
 }
