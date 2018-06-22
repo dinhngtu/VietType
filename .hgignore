@@ -7,3 +7,5 @@ Debug/
 Release/
 *.APS
 *.i
+*_i.c
+*_i.h
