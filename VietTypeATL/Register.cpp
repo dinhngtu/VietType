@@ -25,8 +25,8 @@
 #include "Common.h"
 #include <MsiQuery.h>
 
-#define MSI_ACTION_ENTRY_POINT(fun) extern "C" UINT __stdcall fun(MSIHANDLE hInstall) { \
-    auto hr = _ ## fun(); \
+#define MSI_ACTION_ENTRY_POINT(fun) extern "C" __declspec(dllexport) UINT __stdcall fun ## Msi(MSIHANDLE hInstall) { \
+    auto hr = fun(); \
     if (SUCCEEDED(hr)) { \
         return ERROR_SUCCESS; \
     } else { \
@@ -43,7 +43,7 @@ static std::vector<GUID> SupportedCategories = {
     GUID_TFCAT_TIPCAP_SYSTRAYSUPPORT, // systray on win8+?
 };
 
-HRESULT _RegisterTextServiceProfiles() {
+__declspec(dllexport) HRESULT RegisterProfiles() {
     HRESULT hr;
 
     if (!VietType::Globals::dllInstance) {
@@ -86,9 +86,9 @@ HRESULT _RegisterTextServiceProfiles() {
 
     return S_OK;
 }
-MSI_ACTION_ENTRY_POINT(RegisterTextServiceProfiles);
+MSI_ACTION_ENTRY_POINT(RegisterProfiles);
 
-HRESULT _UnregisterTextServiceProfiles() {
+__declspec(dllexport) HRESULT UnregisterProfiles() {
     HRESULT hr;
 
     SmartComPtr<ITfInputProcessorProfileMgr> profileMgr;
@@ -104,9 +104,9 @@ HRESULT _UnregisterTextServiceProfiles() {
 
     return S_OK;
 }
-MSI_ACTION_ENTRY_POINT(UnregisterTextServiceProfiles);
+MSI_ACTION_ENTRY_POINT(UnregisterProfiles);
 
-HRESULT _RegisterTextServiceCategories() {
+__declspec(dllexport) HRESULT RegisterCategories() {
     HRESULT hr;
 
     SmartComPtr<ITfCategoryMgr> categoryMgr;
@@ -121,9 +121,9 @@ HRESULT _RegisterTextServiceCategories() {
 
     return S_OK;
 }
-MSI_ACTION_ENTRY_POINT(RegisterTextServiceCategories);
+MSI_ACTION_ENTRY_POINT(RegisterCategories);
 
-HRESULT _UnregisterTextServiceCategories() {
+__declspec(dllexport) HRESULT UnregisterCategories() {
     HRESULT hr;
 
     SmartComPtr<ITfCategoryMgr> categoryMgr;
@@ -151,4 +151,4 @@ HRESULT _UnregisterTextServiceCategories() {
 
     return S_OK;
 }
-MSI_ACTION_ENTRY_POINT(UnregisterTextServiceCategories);
+MSI_ACTION_ENTRY_POINT(UnregisterCategories);

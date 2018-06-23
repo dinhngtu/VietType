@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) Dinh Ngoc Tu.
+
+This file is part of VietType.
+
+VietType is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+VietType is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with VietType.  If not, see <https://www.gnu.org/licenses/>.
+-->
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="*" Name="VietType" Language="1033" Version="1.0.0.0" Manufacturer="Dinh Ngoc Tu" UpgradeCode="e00ac838-881d-4301-aac5-0a723bb0b0ef">
+    <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <Feature Id="ProductFeature" Title="VietTypeSetup" Level="1">
+      <ComponentGroupRef Id="ProductComponents" />
+    </Feature>
+
+    <Condition Message="VietType is only compatible with Windows 8 and newer.">
+      <![CDATA[Installed OR (VersionNT >= 602)]]>
+    </Condition>
+
+    <?if $(var.Platform) = x86 ?>
+    <Condition Message="32-bit setup can only run on a 32-bit OS.">Installed OR (Not VersionNT64)</Condition>
+    <?endif ?>
+
+    <InstallExecuteSequence>
+      <Custom Action="RegisterCategoriesRollback" After="InstallFiles">(NOT Installed) OR REINSTALL</Custom>
+      <Custom Action="RegisterCategories" After="RegisterCategoriesRollback">(NOT Installed) OR REINSTALL</Custom>
+      <Custom Action="RegisterProfilesRollback" After="RegisterCategories">(NOT Installed) OR REINSTALL</Custom>
+      <Custom Action="RegisterProfiles" After="RegisterProfilesRollback">(NOT Installed) OR REINSTALL</Custom>
+
+      <Custom Action="UnregisterProfilesRollback" After="InstallInitialize">Installed OR REINSTALL</Custom>
+      <Custom Action="UnregisterProfiles" After="UnregisterProfilesRollback">Installed OR REINSTALL</Custom>
+      <Custom Action="UnregisterCategoriesRollback" After="UnregisterProfiles">Installed OR REINSTALL</Custom>
+      <Custom Action="UnregisterCategories" After="UnregisterCategoriesRollback">Installed OR REINSTALL</Custom>
+    </InstallExecuteSequence>
+  </Product>
+
+  <?if $(var.Platform) = x86 ?>
+  <?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
+  <?elseif $(var.Platform) = x64 ?>
+  <?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
+  <?else ?>
+  <?error Unknown architecture ?>
+  <?endif ?>
+
+  <Fragment>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="$(var.PlatformProgramFilesFolder)">
+        <Directory Id="INSTALLFOLDER" Name="VietType" />
+      </Directory>
+    </Directory>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+      <Component Id="VietTypeATL32">
+        <File Id="VietTypeATL32.dll" Source="$(var.SolutionDir)\Win32\Release\VietTypeATL32.dll" Name="VietTypeATL32.dll">
+          <Class Id="{C0DD01A1-0DEB-454B-8B42-D22CED1B4B23}" Context="InprocServer32" Description="VietType" ThreadingModel="apartment" />
+        </File>
+        <File Id="Registrar.exe" Source="$(var.SolutionDir)\Win32\Release\VietTypeRegistrar.exe" Name="Registrar.exe" />
+      </Component>
+
+      <?if $(var.Platform) = x64 ?>
+      <Component Id="VietTypeATL64" Win64="yes">
+        <File Id="VietTypeATL64.dll" Source="$(var.SolutionDir)\x64\Release\VietTypeATL64.dll" Name="VietTypeATL64.dll">
+          <Class Id="{C0DD01A1-0DEB-454B-8B42-D22CED1B4B23}" Context="InprocServer32" Description="VietType" ThreadingModel="apartment" />
+        </File>
+      </Component>
+      <?endif ?>
+    </ComponentGroup>
+  </Fragment>
+
+  <Fragment>
+    <CustomAction Id="RegisterCategories" Directory="INSTALLFOLDER" ExeCommand="[INSTALLFOLDER]\Registrar.exe 0 0" Impersonate="no" Execute="deferred" />
+    <CustomAction Id="RegisterCategoriesRollback" Directory="INSTALLFOLDER" ExeCommand="[INSTALLFOLDER]\Registrar.exe 1 0" Impersonate="no" Execute="rollback" />
+    <CustomAction Id="UnregisterCategories" Directory="INSTALLFOLDER" ExeCommand="[INSTALLFOLDER]\Registrar.exe 1 0" Impersonate="no" Execute="deferred" />
+    <CustomAction Id="UnregisterCategoriesRollback" Directory="INSTALLFOLDER" ExeCommand="[INSTALLFOLDER]\Registrar.exe 0 0" Impersonate="no" Execute="rollback" />
+
+    <CustomAction Id="RegisterProfiles" Directory="INSTALLFOLDER" ExeCommand="[INSTALLFOLDER]\Registrar.exe 0 1" Impersonate="no" Execute="deferred" />
+    <CustomAction Id="RegisterProfilesRollback" Directory="INSTALLFOLDER" ExeCommand="[INSTALLFOLDER]\Registrar.exe 1 1" Impersonate="no" Execute="rollback" />
+    <CustomAction Id="UnregisterProfiles" Directory="INSTALLFOLDER" ExeCommand="[INSTALLFOLDER]\Registrar.exe 1 1" Impersonate="no" Execute="deferred" />
+    <CustomAction Id="UnregisterProfilesRollback" Directory="INSTALLFOLDER" ExeCommand="[INSTALLFOLDER]\Registrar.exe 0 1" Impersonate="no" Execute="rollback" />
+  </Fragment>
+</Wix>

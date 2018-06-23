@@ -2,9 +2,12 @@ syntax: glob
 .vs
 *.aps
 *.user
+Win32/
 x64/
 Debug/
 Release/
+TestDebug/
+TestRelease/
 *.APS
 *.i
 *_i.c
