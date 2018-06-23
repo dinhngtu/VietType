@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) Dinh Ngoc Tu.
+
+This file is part of VietType.
+
+VietType is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+VietType is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with VietType.  If not, see <https://www.gnu.org/licenses/>.
+-->
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:bal="http://schemas.microsoft.com/wix/BalExtension">
+  <Bundle Name="VietType" Version="1.0.0.0" Manufacturer="Dinh Ngoc Tu" UpgradeCode="1139ce87-c648-4d3c-8f2a-61ab9d04c396">
+    <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
+      <bal:WixStandardBootstrapperApplication LicenseFile="$(var.SolutionDir)\LICENSE.rtf" />
+    </BootstrapperApplicationRef>
+
+    <Chain>
+      <MsiPackage SourceFile="$(var.SolutionDir)\VietTypeSetup\bin\Release\VietTypeSetupx86.msi" InstallCondition="NOT VersionNT64 AND VersionNT >= v6.2" />
+      <MsiPackage SourceFile="$(var.SolutionDir)\VietTypeSetup\bin\Release\VietTypeSetupx64.msi" InstallCondition="VersionNT64 >= v6.2" />
+    </Chain>
+  </Bundle>
+</Wix>
