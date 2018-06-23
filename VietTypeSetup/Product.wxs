@@ -28,6 +28,9 @@ along with VietType.  If not, see <https://www.gnu.org/licenses/>.
       <ComponentGroupRef Id="ProductComponents" />
     </Feature>
 
+    <UIRef Id="WixUI_Minimal" />
+    <WixVariable Id="WixUILicenseRtf" Value="LICENSE.rtf" />
+
     <Condition Message="VietType is only compatible with Windows 8 and newer.">
       <![CDATA[Installed OR (VersionNT >= 602)]]>
     </Condition>
