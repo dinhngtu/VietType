@@ -60,16 +60,16 @@ int main(int argc, wchar_t **argv) {
     }
 
     if (a1 == 0 && a2 == 0) {
-        wprintf_s(L"RegisterCategories");
+        wprintf_s(L"RegisterCategories ");
         hr = RegisterCategories();
     } else if (a1 == 0 && a2 == 1) {
-        wprintf_s(L"RegisterProfiles");
+        wprintf_s(L"RegisterProfiles ");
         hr = RegisterProfiles();
     } else if (a1 == 1 && a2 == 1) {
-        wprintf_s(L"UnregisterProfiles");
+        wprintf_s(L"UnregisterProfiles ");
         hr = UnregisterProfiles();
     } else if (a1 == 1 && a2 == 0) {
-        wprintf_s(L"UnregisterCategories");
+        wprintf_s(L"UnregisterCategories ");
         hr = UnregisterCategories();
     }
 
