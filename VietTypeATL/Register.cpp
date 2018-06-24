@@ -74,7 +74,7 @@ __declspec(dllexport) HRESULT RegisterProfiles() {
         MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
         VietType::Globals::GUID_Profile,
         VietType::Globals::TextServiceDescription.c_str(),
-        (LONG)VietType::Globals::TextServiceDescription.length(),
+        static_cast<LONG>(VietType::Globals::TextServiceDescription.length()),
         dllPath, // icon file path
         dllPathLength, // icon file name path
         -IDI_IMELOGO, // icon index has to be negative for some reason
@@ -110,11 +110,11 @@ __declspec(dllexport) HRESULT RegisterCategories() {
     HRESULT hr;
 
     SmartComPtr<ITfCategoryMgr> categoryMgr;
-    //hr = categoryMgr.CoCreate(CLSID_TF_CategoryMgr, NULL, CLSCTX_INPROC_SERVER);
-    hr = CoCreateInstance(CLSID_TF_CategoryMgr, NULL, CLSCTX_INPROC_SERVER, IID_ITfCategoryMgr, (void **)categoryMgr.GetAddress());
+    // categoryMgr.CoCreate uses IID_IUnknown then does a QI, while we want to use IID_ITfCategoryMgr directly
+    hr = CoCreateInstance(CLSID_TF_CategoryMgr, NULL, CLSCTX_INPROC_SERVER, IID_ITfCategoryMgr, reinterpret_cast<void **>(categoryMgr.GetAddress()));
     HRESULT_CHECK_RETURN(hr, L"%s", L"categoryMgr.CoCreate failed");
 
-    for (auto cat : SupportedCategories) {
+    for (auto const& cat : SupportedCategories) {
         hr = categoryMgr->RegisterCategory(VietType::Globals::CLSID_TextService, cat, VietType::Globals::CLSID_TextService);
         DBG_HRESULT_CHECK(hr, L"%s", L"categoryMgr->RegisterCategory failed");
     }
@@ -127,7 +127,8 @@ __declspec(dllexport) HRESULT UnregisterCategories() {
     HRESULT hr;
 
     SmartComPtr<ITfCategoryMgr> categoryMgr;
-    hr = CoCreateInstance(CLSID_TF_CategoryMgr, NULL, CLSCTX_INPROC_SERVER, IID_ITfCategoryMgr, (void **)categoryMgr.GetAddress());
+    // categoryMgr.CoCreate uses IID_IUnknown then does a QI, while we want to use IID_ITfCategoryMgr directly
+    hr = CoCreateInstance(CLSID_TF_CategoryMgr, NULL, CLSCTX_INPROC_SERVER, IID_ITfCategoryMgr, reinterpret_cast<void **>(categoryMgr.GetAddress()));
     HRESULT_CHECK_RETURN(hr, L"%s", L"categoryMgr.CoCreate failed");
 
     SmartComPtr<IEnumGUID> registeredCategories;
