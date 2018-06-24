@@ -94,6 +94,9 @@ HRESULT VietType::CompositionManager::MoveCaretToEnd(TfEditCookie ec) {
         hr = range->Clone(rangeClone.GetAddress());
         HRESULT_CHECK_RETURN(hr, L"%s", L"range->Clone failed");
 
+        hr = rangeClone->Collapse(ec, TF_ANCHOR_END);
+        HRESULT_CHECK_RETURN(hr, L"%s", L"rangeClone->Collapse failed");
+
         TF_SELECTION sel;
         sel.range = rangeClone;
         sel.style.ase = TF_AE_NONE;
