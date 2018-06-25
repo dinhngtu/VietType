@@ -31,6 +31,8 @@ extern const GUID GUID_KeyEventSink_Compartment_Toggle;
 
 extern const GUID GUID_Profile;
 
+extern const GUID GUID_LBI_INPUTMODE;
+
 extern const std::wstring TextServiceDescription;
 
 }
