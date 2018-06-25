@@ -38,7 +38,6 @@ static std::vector<GUID> SupportedCategories = {
     GUID_TFCAT_TIP_KEYBOARD,
     GUID_TFCAT_TIPCAP_UIELEMENTENABLED, // UI-less
     GUID_TFCAT_TIPCAP_COMLESS, // Google says this is required for WoW apps
-    GUID_TFCAT_TIPCAP_SECUREMODE,
     GUID_TFCAT_TIPCAP_IMMERSIVESUPPORT, // store apps?
     GUID_TFCAT_TIPCAP_SYSTRAYSUPPORT, // systray on win8+?
 };
@@ -115,6 +114,9 @@ __declspec(dllexport) HRESULT RegisterCategories() {
     HRESULT_CHECK_RETURN(hr, L"%s", L"categoryMgr.CoCreate failed");
 
     for (auto const& cat : SupportedCategories) {
+        DBG_DPRINT(
+            L"unregistering %08lx-%04hx-%04hx-%02hhx%02hhx-%02hhx%02hhx%02hhx%02hhx%02hhx%02hhx",
+            cat.Data1, cat.Data2, cat.Data3, cat.Data4[0], cat.Data4[1], cat.Data4[2], cat.Data4[3], cat.Data4[4], cat.Data4[5], cat.Data4[6], cat.Data4[7]);
         hr = categoryMgr->RegisterCategory(VietType::Globals::CLSID_TextService, cat, VietType::Globals::CLSID_TextService);
         DBG_HRESULT_CHECK(hr, L"%s", L"categoryMgr->RegisterCategory failed");
     }
@@ -141,7 +143,7 @@ __declspec(dllexport) HRESULT UnregisterCategories() {
         hr = registeredCategories->Next(1, &cat, &fetched);
         if (hr == S_OK) {
             DBG_DPRINT(
-                L"unregistering %lx-%hx-%hx-%hhx%hhx%hhx%hhx%hhx%hhx%hhx%hhx",
+                L"unregistering %08lx-%04hx-%04hx-%02hhx%02hhx-%02hhx%02hhx%02hhx%02hhx%02hhx%02hhx",
                 cat.Data1, cat.Data2, cat.Data3, cat.Data4[0], cat.Data4[1], cat.Data4[2], cat.Data4[3], cat.Data4[4], cat.Data4[5], cat.Data4[6], cat.Data4[7]);
             hr = categoryMgr->UnregisterCategory(VietType::Globals::CLSID_TextService, cat, VietType::Globals::CLSID_TextService);
             DBG_HRESULT_CHECK(hr, L"%s", L"categoryMgr->UnregisterCategory failed");
