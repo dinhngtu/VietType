@@ -24,6 +24,9 @@
 #include "ThreadMgrEventSink.h"
 #include "KeyEventSink.h"
 #include "CompositionManager.h"
+#include "EngineState.h"
+#include "EngineController.h"
+#include "LanguageBar.h"
 
 #if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)
 #error "Single-threaded COM objects are not properly supported on Windows CE platform, such as the Windows Mobile platforms that do not include full DCOM support. Define _CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA to force ATL to support creating single-thread COM object's and allow use of it's single-threaded COM object implementations. The threading model in your rgs file was set to 'Free' as that is the only threading model supported in non DCOM Windows CE platforms."
@@ -61,12 +64,15 @@ private:
     TfClientId _clientId = TF_CLIENTID_NULL;
     DWORD _activateFlags = 0;
 
-    std::shared_ptr<Telex::TelexEngine> _engine;
+    std::shared_ptr<EngineState> _engine;
 
     SmartComObjPtr<ThreadMgrEventSink> _threadMgrEventSink;
     SmartComObjPtr<KeyEventSink> _keyEventSink;
 
     SmartComObjPtr<CompositionManager> _compositionManager;
+
+    SmartComObjPtr<EngineController> _engineController;
+    SmartComObjPtr<LanguageBarButton> _languageBarButton;
 
 private:
     DISALLOW_COPY_AND_ASSIGN(TextService);

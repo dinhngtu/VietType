@@ -55,7 +55,7 @@ void VietType::KeyHandlerEditSession::Initialize(
     WPARAM wParam,
     LPARAM lParam,
     BYTE const * keyState,
-    std::shared_ptr<Telex::TelexEngine> const& engine) {
+    std::shared_ptr<EngineState> const& engine) {
 
     _compositionManager = compositionManager;
     _context = context;
@@ -68,7 +68,7 @@ void VietType::KeyHandlerEditSession::Initialize(
 HRESULT VietType::KeyHandlerEditSession::ComposeKey(TfEditCookie ec) {
     HRESULT hr;
 
-    switch (Telex::PushKey(*_engine, _wParam, _lParam, _keyState)) {
+    switch (Telex::PushKey(_engine->Engine(), _wParam, _lParam, _keyState)) {
     case Telex::TELEX_STATES::VALID: {
         if (_engine->Count()) {
             auto str = _engine->Peek();

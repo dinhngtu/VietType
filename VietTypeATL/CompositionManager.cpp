@@ -58,12 +58,17 @@ HRESULT VietType::CompositionManager::RequestEditSession(ITfEditSession *session
 
 HRESULT VietType::CompositionManager::StartComposition(ITfContext * pContext) {
     assert(_clientid != TF_CLIENTID_NULL);
+    assert(!_composition);
     return RequestEditSession(&_StartComposition, this, pContext);
 }
 
 HRESULT VietType::CompositionManager::EndComposition() {
     assert(_clientid != TF_CLIENTID_NULL);
-    return RequestEditSession(&_EndComposition, this, _context);
+    if (_composition) {
+        return RequestEditSession(&_EndComposition, this, _context);
+    } else {
+        return S_OK;
+    }
 }
 
 bool VietType::CompositionManager::IsComposing() const {

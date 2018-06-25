@@ -46,23 +46,36 @@ STDMETHODIMP VietType::TextService::ActivateEx(ITfThreadMgr * ptim, TfClientId t
 
     Telex::TelexConfig engineconfig;
     engineconfig.oa_uy_tone1 = true;
-    _engine = std::make_shared<Telex::TelexEngine>(engineconfig);
+    _engine = std::make_shared<EngineState>(engineconfig);
 
     hr = _compositionManager.CreateInstance();
     HRESULT_CHECK_RETURN(hr, L"%s", L"_compositionManager.CreateInstance failed");
     _compositionManager->Initialize(tid);
 
-    // we probably don't need this thread manager sink since it does nothing right now anyway
-    /*
-    hr = _threadMgrEventSink.CreateInstance();
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_threadMgrEventSink.CreateInstance failed");
-    hr = _threadMgrEventSink->Initialize(ptim, tid);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_threadMgrEventSink->Initialize failed");
-    */
+    hr = _languageBarButton.CreateInstance();
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_languageBarButton.CreateInstance failed");
+    hr = _engineController.CreateInstance();
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_engineController.CreateInstance failed");
+    hr = _engineController->Initialize(_engine, _languageBarButton, ptim, tid);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_engineController->Initialize failed");
+    hr = _languageBarButton->Initialize(VietType::GUID_LanguageBarButton_Item, 0, Globals::TextServiceDescription, _engineController);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_languageBarButton->Initialize failed");
+
+    SmartComPtr<ITfLangBarItemMgr> langBarItemMgr(_threadMgr);
+    if (!langBarItemMgr) {
+        DBG_DPRINT(L"%s", L"ITfLangBarItemMgr QI failed");
+        return E_NOINTERFACE;
+    }
+
+    hr = langBarItemMgr->AddItem(_languageBarButton);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"langBarItemMgr->AddItem failed");
+
+    hr = _engineController->UpdateEnabled();
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_engineController->UpdateEnabled failed");
 
     hr = _keyEventSink.CreateInstance();
     HRESULT_CHECK_RETURN(hr, L"%s", L"_keyEventSink.CreateInstance failed");
-    hr = _keyEventSink->Initialize(ptim, tid, _compositionManager, _engine);
+    hr = _keyEventSink->Initialize(ptim, tid, _compositionManager, _engineController);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_keyEventSink->Initialize failed");
 
     return S_OK;
@@ -77,14 +90,25 @@ STDMETHODIMP VietType::TextService::Deactivate(void) {
         _keyEventSink.Release();
     }
 
-    /*
-    if (_threadMgrEventSink) {
-        _threadMgrEventSink->Uninitialize();
-        _threadMgrEventSink.Release();
-    }
-    */
+    if (_languageBarButton) {
+        SmartComPtr<ITfLangBarItemMgr> langBarItemMgr(_threadMgr);
+        if (!langBarItemMgr) {
+            DBG_DPRINT(L"%s", L"ITfLangBarItemMgr QI failed");
+            return E_NOINTERFACE;
+        }
 
-    _compositionManager.Release();
+        hr = langBarItemMgr->RemoveItem(_languageBarButton);
+        DBG_HRESULT_CHECK(hr, L"%s", L"langBarItemMgr->RemoveItem failed");
+
+        _languageBarButton->Uninitialize();
+        _engineController->Uninitialize();
+        _languageBarButton.Release();
+        _engineController.Release();
+    }
+
+    if (_compositionManager) {
+        _compositionManager.Release();
+    }
 
     return S_OK;
 }

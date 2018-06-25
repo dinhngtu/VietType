@@ -476,9 +476,12 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TestRelease|x64'">
       </PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="EngineController.cpp" />
+    <ClCompile Include="EngineState.cpp" />
     <ClCompile Include="Globals.cpp" />
     <ClCompile Include="KeyEventSink.cpp" />
     <ClCompile Include="KeyHandler.cpp" />
+    <ClCompile Include="LanguageBar.cpp" />
     <ClCompile Include="Register.cpp" />
     <ClCompile Include="SmartComPtr.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -533,10 +536,13 @@
     <ClInclude Include="Define.h" />
     <ClInclude Include="dllmain.h" />
     <ClInclude Include="EditSession.h" />
+    <ClInclude Include="EngineController.h" />
+    <ClInclude Include="EngineState.h" />
     <ClInclude Include="Export.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="KeyEventSink.h" />
     <ClInclude Include="KeyHandler.h" />
+    <ClInclude Include="LanguageBar.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SinkAdvisor.h" />
     <ClInclude Include="SmartComPtr.h" />

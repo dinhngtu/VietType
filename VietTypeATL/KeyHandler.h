@@ -19,7 +19,7 @@
 
 #include "Common.h"
 #include "CompositionManager.h"
-#include "Telex.h"
+#include "EngineState.h"
 
 namespace VietType {
 
@@ -39,7 +39,13 @@ public:
     // Inherited via ITfEditSession
     virtual STDMETHODIMP DoEditSession(TfEditCookie ec) override;
 
-    void Initialize(const SmartComObjPtr<CompositionManager>& compositionManager, ITfContext *context, WPARAM wParam, LPARAM lParam, BYTE const *keyState, std::shared_ptr<Telex::TelexEngine> const& engine);
+    void Initialize(
+        SmartComObjPtr<CompositionManager> const& compositionManager,
+        ITfContext *context,
+        WPARAM wParam,
+        LPARAM lParam,
+        BYTE const *keyState,
+        std::shared_ptr<EngineState> const& engine);
 
 private:
     HRESULT ComposeKey(TfEditCookie ec);
@@ -51,7 +57,7 @@ private:
     WPARAM _wParam;
     LPARAM _lParam;
     BYTE const *_keyState;
-    std::shared_ptr<Telex::TelexEngine> _engine;
+    std::shared_ptr<EngineState> _engine;
 
 private:
     DISALLOW_COPY_AND_ASSIGN(KeyHandlerEditSession);

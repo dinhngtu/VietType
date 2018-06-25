@@ -41,7 +41,7 @@ STDMETHODIMP VietType::KeyEventSink::OnSetFocus(BOOL fForeground) {
 STDMETHODIMP VietType::KeyEventSink::OnTestKeyDown(ITfContext * pic, WPARAM wParam, LPARAM lParam, BOOL * pfEaten) {
     HRESULT hr;
 
-    if (!_enabled) {
+    if (!_engine->IsEnabled()) {
         *pfEaten = FALSE;
         return S_OK;
     }
@@ -62,7 +62,7 @@ STDMETHODIMP VietType::KeyEventSink::OnTestKeyDown(ITfContext * pic, WPARAM wPar
 }
 
 STDMETHODIMP VietType::KeyEventSink::OnTestKeyUp(ITfContext * pic, WPARAM wParam, LPARAM lParam, BOOL * pfEaten) {
-    if (!_enabled) {
+    if (!_engine->IsEnabled()) {
         *pfEaten = FALSE;
         return S_OK;
     }
@@ -83,7 +83,7 @@ STDMETHODIMP VietType::KeyEventSink::OnTestKeyUp(ITfContext * pic, WPARAM wParam
 STDMETHODIMP VietType::KeyEventSink::OnKeyDown(ITfContext * pic, WPARAM wParam, LPARAM lParam, BOOL * pfEaten) {
     HRESULT hr;
 
-    if (!_enabled) {
+    if (!_engine->IsEnabled()) {
         *pfEaten = FALSE;
         return S_OK;
     }
@@ -106,20 +106,15 @@ STDMETHODIMP VietType::KeyEventSink::OnKeyUp(ITfContext * pic, WPARAM wParam, LP
 }
 
 STDMETHODIMP VietType::KeyEventSink::OnPreservedKey(ITfContext * pic, REFGUID rguid, BOOL * pfEaten) {
+    HRESULT hr;
+
     if (IsEqualGUID(Globals::GUID_KeyEventSink_PreservedKey_Toggle, rguid)) {
         *pfEaten = TRUE;
-        _engine->Reset();
-        _compositionManager->EndComposition();
-        _enabled = !_enabled;
-        WriteEnabled(_enabled);
-    }
-
-    return S_OK;
-}
-
-STDMETHODIMP VietType::KeyEventSink::OnChange(REFGUID rguid) {
-    if (IsEqualGUID(rguid, Globals::GUID_KeyEventSink_Compartment_Toggle)) {
-        ReadEnabled(&_enabled);
+        _engine->GetEngine().Reset();
+        hr = _compositionManager->EndComposition();
+        DBG_HRESULT_CHECK(hr, L"%s", L"_compositionManager->EndComposition failed");
+        hr = _engine->ToggleEnabled();
+        DBG_HRESULT_CHECK(hr, L"%s", L"_engine->ToggleEnabled failed");
     }
 
     return S_OK;
@@ -129,7 +124,7 @@ HRESULT VietType::KeyEventSink::Initialize(
     ITfThreadMgr * threadMgr,
     TfClientId clientid,
     SmartComObjPtr<CompositionManager> const& compositionManager,
-    std::shared_ptr<Telex::TelexEngine> const& engine) {
+    SmartComObjPtr<EngineController> const& engine) {
 
     HRESULT hr;
 
@@ -148,33 +143,11 @@ HRESULT VietType::KeyEventSink::Initialize(
     // probably not fatal
     DBG_HRESULT_CHECK(hr, L"%s", L"_keystrokeMgr->PreserveKey failed");
 
-    // deadly but not quite fatal
-    SmartComPtr<ITfCompartmentMgr> compartmentMgr;
-    hr = threadMgr->GetGlobalCompartment(compartmentMgr.GetAddress());
-    if (SUCCEEDED(hr)) {
-
-        hr = compartmentMgr->GetCompartment(Globals::GUID_KeyEventSink_Compartment_Toggle, _compartment.GetAddress());
-        if (SUCCEEDED(hr)) {
-
-            SmartComPtr<ITfSource> compartmentSource(_compartment);
-            if (!compartmentSource) {
-                return E_FAIL;
-            }
-            hr = _compartmentEventSink.Advise(compartmentSource, this);
-            DBG_HRESULT_CHECK(hr, L"%s", L"_compartmentEventSink.Advise failed");
-
-        } else DBG_HRESULT_CHECK(hr, L"%s", L"compartmentMgr->GetCompartment failed");
-
-    } else DBG_HRESULT_CHECK(hr, L"%s", L"threadMgr->GetGlobalCompartment failed");
-
     return S_OK;
 }
 
 HRESULT VietType::KeyEventSink::Uninitialize() {
     HRESULT hr;
-
-    hr = _compartmentEventSink.Unadvise();
-    DBG_HRESULT_CHECK(hr, L"%s", L"_compartmentEventSink.Unadvise failed");
 
     hr = _keystrokeMgr->UnpreserveKey(Globals::GUID_KeyEventSink_PreservedKey_Toggle, &PK_Toggle);
     DBG_HRESULT_CHECK(hr, L"%s", L"_keystrokeMgr->UnpreserveKey failed");
@@ -187,45 +160,13 @@ HRESULT VietType::KeyEventSink::Uninitialize() {
     return S_OK;
 }
 
-HRESULT VietType::KeyEventSink::ReadEnabled(int * pEnabled) {
-    HRESULT hr;
-
-    VARIANT v;
-    hr = _compartment->GetValue(&v);
-    if (hr == S_FALSE) {
-        v.vt = VT_I4;
-        v.lVal = 1;
-        hr = _compartment->SetValue(_clientid, &v);
-        DBG_HRESULT_CHECK(hr, L"%s", L"_compartment->SetValue failed");
-    } else if (hr == S_OK) {
-        if (v.vt != VT_I4) {
-            return E_FAIL;
-        }
-        *pEnabled = v.lVal;
-    }
-
-    return hr;
-}
-
-HRESULT VietType::KeyEventSink::WriteEnabled(int enabled) {
-    HRESULT hr;
-
-    VARIANT v;
-    v.vt = VT_I4;
-    v.lVal = enabled;
-    hr = _compartment->SetValue(_clientid, &v);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_compartment->SetValue failed");
-
-    return S_OK;
-}
-
 HRESULT VietType::KeyEventSink::CallKeyEdit(ITfContext *context, WPARAM wParam, LPARAM lParam, BYTE const * keyState) {
     HRESULT hr;
 
     SmartComObjPtr<KeyHandlerEditSession> keyHandlerEditSession;
     hr = keyHandlerEditSession.CreateInstance();
     HRESULT_CHECK_RETURN(hr, L"%s", L"_keyHandlerEditSession.CreateInstance failed");
-    keyHandlerEditSession->Initialize(_compositionManager, context, wParam, lParam, _keyState, _engine);
+    keyHandlerEditSession->Initialize(_compositionManager, context, wParam, lParam, _keyState, _engine->GetEngineShared());
     hr = _compositionManager->RequestEditSession(keyHandlerEditSession, context);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_compositionManager->RequestEditSession failed");
 

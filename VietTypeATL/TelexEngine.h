@@ -91,6 +91,9 @@ private:
 private:
     using map_iterator = genmap<std::wstring, VINFO>::const_iterator;
     bool FindTable(_Out_ map_iterator *it) const;
+
+private:
+    DISALLOW_COPY_AND_ASSIGN(TelexEngine);
 };
 
 }
