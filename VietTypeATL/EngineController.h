@@ -39,16 +39,16 @@ public:
     DECLARE_PROTECT_FINAL_CONSTRUCT()
 
     // Inherited via ILanguageBarCallbacks
-    virtual HRESULT OnClick(TfLBIClick click) override;
+    virtual HRESULT OnClick(TfLBIClick click, POINT pt, const RECT *area) override;
     virtual HRESULT InitMenu(ITfMenu * menu) override;
     virtual HRESULT OnMenuSelect(UINT id) override;
+    virtual HRESULT GetIcon(HICON * hicon) override;
 
     // Inherited via ITfCompartmentEventSink
     virtual STDMETHODIMP OnChange(REFGUID rguid) override;
 
     HRESULT Initialize(
         std::shared_ptr<EngineState> const & engine,
-        SmartComObjPtr<LanguageBarButton> const & languageBar,
         ITfThreadMgr * threadMgr,
         TfClientId clientid);
     HRESULT Uninitialize();
@@ -66,15 +66,30 @@ public:
 private:
     HRESULT CompartmentReadEnabled(int *pEnabled);
     HRESULT CompartmentWriteEnabled(int enabled);
+    HRESULT InitLanguageBar();
+    HRESULT UninitLanguageBar();
+    HRESULT InitLangBarItem(
+        SmartComObjPtr<LanguageBarButton>& button,
+        GUID const& guidItem,
+        DWORD style,
+        ULONG sort,
+        const std::wstring& description,
+        ILanguageBarCallbacks *callbacks);
+    HRESULT UninitLangBarItem(SmartComObjPtr<LanguageBarButton>& button);
+    HMENU GetMenu();
+    HRESULT RefreshButton(SmartComObjPtr<LanguageBarButton>& button);
 
 private:
     std::shared_ptr<EngineState> _engine;
-    SmartComObjPtr<LanguageBarButton> _languageBar;
+    SmartComPtr<ITfLangBarItemMgr> _langBarItemMgr;
 
     TfClientId _clientid;
 
     SmartComPtr<ITfCompartment> _compartment;
     SinkAdvisor<ITfCompartmentEventSink> _compartmentEventSink;
+
+    SmartComObjPtr<LanguageBarButton> _indicatorButton;
+    SmartComObjPtr<LanguageBarButton> _langBarButton;
 
 private:
     DISALLOW_COPY_AND_ASSIGN(EngineController);

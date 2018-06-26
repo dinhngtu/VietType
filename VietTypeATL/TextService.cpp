@@ -52,23 +52,10 @@ STDMETHODIMP VietType::TextService::ActivateEx(ITfThreadMgr * ptim, TfClientId t
     HRESULT_CHECK_RETURN(hr, L"%s", L"_compositionManager.CreateInstance failed");
     _compositionManager->Initialize(tid);
 
-    hr = _languageBarButton.CreateInstance();
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_languageBarButton.CreateInstance failed");
     hr = _engineController.CreateInstance();
     HRESULT_CHECK_RETURN(hr, L"%s", L"_engineController.CreateInstance failed");
-    hr = _engineController->Initialize(_engine, _languageBarButton, ptim, tid);
+    hr = _engineController->Initialize(_engine, ptim, tid);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_engineController->Initialize failed");
-    hr = _languageBarButton->Initialize(VietType::GUID_LanguageBarButton_Item, 0, Globals::TextServiceDescription, _engineController);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_languageBarButton->Initialize failed");
-
-    SmartComPtr<ITfLangBarItemMgr> langBarItemMgr(_threadMgr);
-    if (!langBarItemMgr) {
-        DBG_DPRINT(L"%s", L"ITfLangBarItemMgr QI failed");
-        return E_NOINTERFACE;
-    }
-
-    hr = langBarItemMgr->AddItem(_languageBarButton);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"langBarItemMgr->AddItem failed");
 
     hr = _engineController->UpdateEnabled();
     HRESULT_CHECK_RETURN(hr, L"%s", L"_engineController->UpdateEnabled failed");
@@ -90,21 +77,9 @@ STDMETHODIMP VietType::TextService::Deactivate(void) {
         _keyEventSink.Release();
     }
 
-    if (_languageBarButton) {
-        SmartComPtr<ITfLangBarItemMgr> langBarItemMgr(_threadMgr);
-        if (!langBarItemMgr) {
-            DBG_DPRINT(L"%s", L"ITfLangBarItemMgr QI failed");
-            return E_NOINTERFACE;
-        }
-
-        hr = langBarItemMgr->RemoveItem(_languageBarButton);
-        DBG_HRESULT_CHECK(hr, L"%s", L"langBarItemMgr->RemoveItem failed");
-
-        _languageBarButton->Uninitialize();
-        _engineController->Uninitialize();
-        _languageBarButton.Release();
-        _engineController.Release();
-    }
+    hr = _engineController->Uninitialize();
+    DBG_HRESULT_CHECK(hr, L"%s", L"_engineController->Uninitialize failed");
+    _engineController.Release();
 
     if (_compositionManager) {
         _compositionManager.Release();

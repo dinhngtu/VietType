@@ -197,5 +197,11 @@
     <Image Include="resources\logo.ico">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="resources\E.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\V.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

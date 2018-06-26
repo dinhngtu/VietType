@@ -26,9 +26,10 @@ extern const GUID GUID_LanguageBarButton_Item;
 
 class ILanguageBarCallbacks {
 public:
-    virtual HRESULT OnClick(TfLBIClick click) = 0;
+    virtual HRESULT OnClick(TfLBIClick click, POINT pt, const RECT *area) = 0;
     virtual HRESULT InitMenu(ITfMenu *menu) = 0;
     virtual HRESULT OnMenuSelect(UINT id) = 0;
+    virtual HRESULT GetIcon(HICON *hicon) = 0;
 };
 
 class LanguageBarButton :
@@ -64,6 +65,7 @@ public:
 
     HRESULT Initialize(
         GUID const& guidItem,
+        DWORD style,
         ULONG sort,
         std::wstring const& description,
         ILanguageBarCallbacks *callbacks);
@@ -75,6 +77,7 @@ public:
 
 private:
     GUID _guidItem;
+    DWORD _style;
     ULONG _sort;
     std::wstring _description;
     ILanguageBarCallbacks *_callbacks;

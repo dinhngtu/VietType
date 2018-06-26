@@ -72,7 +72,6 @@ private:
     SmartComObjPtr<CompositionManager> _compositionManager;
 
     SmartComObjPtr<EngineController> _engineController;
-    SmartComObjPtr<LanguageBarButton> _languageBarButton;
 
 private:
     DISALLOW_COPY_AND_ASSIGN(TextService);

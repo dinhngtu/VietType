@@ -570,7 +570,9 @@
     <Midl Include="VietTypeATL.idl" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="resources\E.ico" />
     <Image Include="resources\logo.ico" />
+    <Image Include="resources\V.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
