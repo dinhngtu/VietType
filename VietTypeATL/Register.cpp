@@ -50,10 +50,6 @@ __declspec(dllexport) HRESULT RegisterProfiles() {
         return E_UNEXPECTED;
     }
 
-    SmartComPtr<ITfInputProcessorProfileMgr> profileMgr;
-    hr = profileMgr.CoCreate(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"profileMgr.CoCreate failed");
-
     WCHAR dllPath[MAX_PATH] = { 0 };
 
     auto dllPathLength = GetModuleFileName(VietType::Globals::dllInstance, dllPath, MAX_PATH);
@@ -67,6 +63,10 @@ __declspec(dllexport) HRESULT RegisterProfiles() {
     }
     dllPath[dllPathLength] = 0;
     DPRINT(L"found text service DLL: %s", dllPath);
+
+    SmartComPtr<ITfInputProcessorProfileMgr> profileMgr;
+    hr = profileMgr.CoCreate(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"profileMgr.CoCreate failed");
 
     hr = profileMgr->RegisterProfile(
         VietType::Globals::CLSID_TextService,
@@ -98,7 +98,7 @@ __declspec(dllexport) HRESULT UnregisterProfiles() {
         VietType::Globals::CLSID_TextService,
         MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
         VietType::Globals::GUID_Profile,
-        0);
+        TF_URP_ALLPROFILES);
     HRESULT_CHECK_RETURN(hr, L"%s", L"profileMgr->UnregisterProfile failed");
 
     return S_OK;
