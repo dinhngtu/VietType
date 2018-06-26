@@ -153,9 +153,11 @@ HRESULT VietType::KeyEventSink::Uninitialize() {
     DBG_HRESULT_CHECK(hr, L"%s", L"_keystrokeMgr->UnpreserveKey failed");
 
     hr = _keystrokeMgr->UnadviseKeyEventSink(_clientid);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_keystrokeMgr->UnadviseKeyEventSink failed");
+    DBG_HRESULT_CHECK(hr, L"%s", L"_keystrokeMgr->UnadviseKeyEventSink failed");
 
+    _engine.Release();
     _compositionManager.Release();
+    _keystrokeMgr.Release();
 
     return S_OK;
 }

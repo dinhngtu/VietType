@@ -57,6 +57,8 @@ void VietType::KeyHandlerEditSession::Initialize(
     BYTE const * keyState,
     std::shared_ptr<EngineState> const& engine) {
 
+    // since edit sessions are asynchronous, we can't know when the reference to the edit session will die
+    // therefore, we don't explicitly uninit the class, leaving it to the destructor when the refcount runs out
     _compositionManager = compositionManager;
     _context = context;
     _wParam = wParam;
@@ -72,10 +74,10 @@ HRESULT VietType::KeyHandlerEditSession::ComposeKey(TfEditCookie ec) {
     case Telex::TELEX_STATES::VALID: {
         if (_engine->Count()) {
             auto str = _engine->Peek();
-            hr = _compositionManager->EnsureCompositionText(_context, ec, &str[0], (LONG)str.length());
+            hr = _compositionManager->EnsureCompositionText(_context, ec, &str[0], static_cast<LONG>(str.length()));
             DBG_HRESULT_CHECK(hr, L"%s", L"_compositionManager->EnsureCompositionText failed");
         } else {
-            // backspace only returns VALID on an empty buffer
+            // backspace returns VALID on an empty buffer
             _engine->Reset();
             // EndComposition* will not empty composition text so we have to do it manually
             hr = _compositionManager->EmptyCompositionText(ec);
@@ -89,7 +91,7 @@ HRESULT VietType::KeyHandlerEditSession::ComposeKey(TfEditCookie ec) {
     case Telex::TELEX_STATES::INVALID: {
         assert(_engine->Count() > 0);
         auto str = _engine->RetrieveInvalid();
-        hr = _compositionManager->EnsureCompositionText(_context, ec, &str[0], (LONG)str.length());
+        hr = _compositionManager->EnsureCompositionText(_context, ec, &str[0], static_cast<LONG>(str.length()));
         DBG_HRESULT_CHECK(hr, L"%s", L"_compositionManager->EnsureCompositionText failed");
         break;
     }
@@ -114,7 +116,7 @@ HRESULT VietType::KeyHandlerEditSession::Commit(TfEditCookie ec) {
     case Telex::TELEX_STATES::COMMITTED: {
         assert(_engine->Count() > 0);
         auto str = _engine->Retrieve();
-        hr = _compositionManager->SetCompositionText(ec, &str[0], (LONG)str.length());
+        hr = _compositionManager->SetCompositionText(ec, &str[0], static_cast<LONG>(str.length()));
         DBG_HRESULT_CHECK(hr, L"%s", L"_compositionManager->EnsureCompositionText failed");
         break;
     }
@@ -122,7 +124,7 @@ HRESULT VietType::KeyHandlerEditSession::Commit(TfEditCookie ec) {
     case Telex::TELEX_STATES::COMMITTED_INVALID: {
         assert(_engine->Count() > 0);
         auto str = _engine->RetrieveInvalid();
-        hr = _compositionManager->SetCompositionText(ec, &str[0], (LONG)str.length());
+        hr = _compositionManager->SetCompositionText(ec, &str[0], static_cast<LONG>(str.length()));
         DBG_HRESULT_CHECK(hr, L"%s", L"_compositionManager->EnsureCompositionText failed");
         break;
     }

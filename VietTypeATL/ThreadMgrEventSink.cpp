@@ -84,8 +84,11 @@ HRESULT VietType::ThreadMgrEventSink::Uninitialize() {
 
     if (_textEditSink) {
         _textEditSink->Uninitialize();
+        DBG_HRESULT_CHECK(hr, L"%s", L"_textEditSink->Uninitialize failed");
         _textEditSink.Release();
     }
+
+    _prevFocusDocumentMgr.Release();
 
     return hr;
 }

@@ -68,5 +68,7 @@ HRESULT VietType::TextEditSink::Uninitialize() {
     hr = _textEditSinkAdvisor.Unadvise();
     DBG_HRESULT_CHECK(hr, L"%s", L"_textEditSinkAdvisor.Unadvise failed");
 
+    _editContext.Release();
+
     return S_OK;
 }

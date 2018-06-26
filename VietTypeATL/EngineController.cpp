@@ -18,7 +18,7 @@
 #include "EngineController.h"
 
 // {CCA3D390-EF1A-4DE4-B2FF-B6BC76D68C3B}
-const GUID VietType::GUID_LanguageBarButton_Item = { 0xcca3d390, 0xef1a, 0x4de4,{ 0xb2, 0xff, 0xb6, 0xbc, 0x76, 0xd6, 0x8c, 0x3b } };
+const GUID VietType::GUID_LanguageBarButton_Item = { 0xcca3d390, 0xef1a, 0x4de4, { 0xb2, 0xff, 0xb6, 0xbc, 0x76, 0xd6, 0x8c, 0x3b } };
 
 VietType::EngineController::EngineController() {
 }
@@ -162,7 +162,8 @@ HRESULT VietType::EngineController::Initialize(
 
     } else DBG_HRESULT_CHECK(hr, L"%s", L"threadMgr->GetGlobalCompartment failed");
 
-    return InitLanguageBar();
+    hr = InitLanguageBar();
+    HRESULT_CHECK_RETURN(hr, L"%s", L"InitLanguageBar failed");
 
     return S_OK;
 }
@@ -171,6 +172,7 @@ HRESULT VietType::EngineController::Uninitialize() {
     HRESULT hr;
 
     hr = UninitLanguageBar();
+    DBG_HRESULT_CHECK(hr, L"%s", L"UninitLanguageBar failed");
 
     hr = _compartmentEventSink.Unadvise();
     DBG_HRESULT_CHECK(hr, L"%s", L"_compartmentEventSink.Unadvise failed");
