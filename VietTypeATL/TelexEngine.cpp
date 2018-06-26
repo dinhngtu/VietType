@@ -164,7 +164,12 @@ TELEX_STATES TelexEngine::PushChar(_In_ wchar_t corig) {
         if (newtone != _t) {
             _t = newtone;
         } else {
-            _keyBuffer.pop_back();
+            // the condition "_c1 == L"gi" || _v.size()" should ensure this already
+            assert(_keyBuffer.length() > 1);
+            // pop back only if same char entered twice in a row
+            if (c == _keyBuffer.rbegin()[1]) {
+                _keyBuffer.pop_back();
+            }
             _state = TELEX_STATES::INVALID;
         }
 
@@ -188,7 +193,11 @@ TELEX_STATES TelexEngine::PushChar(_In_ wchar_t corig) {
         if (newtone != _t) {
             _t = newtone;
         } else {
-            _keyBuffer.pop_back();
+            assert(_keyBuffer.length() > 1);
+            // pop back only if same char entered twice in a row
+            if (c == _keyBuffer.rbegin()[1]) {
+                _keyBuffer.pop_back();
+            }
             _state = TELEX_STATES::INVALID;
         }
 
