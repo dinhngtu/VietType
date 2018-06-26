@@ -88,7 +88,6 @@ HRESULT VietType::KeyHandlerEditSession::ComposeKey(TfEditCookie ec) {
 
     case Telex::TELEX_STATES::INVALID: {
         assert(_engine->Count() > 0);
-        assert(_compositionManager->IsComposing());
         auto str = _engine->RetrieveInvalid();
         hr = _compositionManager->EnsureCompositionText(_context, ec, &str[0], (LONG)str.length());
         DBG_HRESULT_CHECK(hr, L"%s", L"_compositionManager->EnsureCompositionText failed");
