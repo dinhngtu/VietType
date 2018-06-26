@@ -124,6 +124,7 @@ HRESULT VietType::EngineController::OnChange(REFGUID rguid) {
 
 HRESULT VietType::EngineController::GetIcon(HICON * hicon) {
     // Windows docs is a liar, icons are mandatory
+    assert(Globals::dllInstance);
     if (IsEnabled()) {
         *hicon = static_cast<HICON>(LoadImage(Globals::dllInstance, MAKEINTRESOURCE(IDI_ICONV), IMAGE_ICON, 16, 16, 0));
     } else {
@@ -336,6 +337,7 @@ HRESULT VietType::EngineController::UninitLangBarItem(SmartComObjPtr<LanguageBar
 }
 
 HMENU VietType::EngineController::GetMenu() {
+    assert(Globals::dllInstance);
     HMENU menu = LoadMenu(Globals::dllInstance, MAKEINTRESOURCE(IDR_MENU_TRAY));
     menu = GetSubMenu(menu, 0);
 
