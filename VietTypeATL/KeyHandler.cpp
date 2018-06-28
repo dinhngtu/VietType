@@ -25,8 +25,10 @@ VietType::KeyHandlerEditSession::~KeyHandlerEditSession() {
 }
 
 STDMETHODIMP VietType::KeyHandlerEditSession::DoEditSession(TfEditCookie ec) {
-    assert((bool)_compositionManager);
+    assert(_compositionManager);
     DBG_DPRINT(L"%s", L"entering key handler session");
+
+    HRESULT hr;
 
     // recover from situations that terminate the composition without us knowing (e.g. mouse clicks)
     if (!_compositionManager->IsComposing() && _engine->Count()) {
@@ -36,13 +38,22 @@ STDMETHODIMP VietType::KeyHandlerEditSession::DoEditSession(TfEditCookie ec) {
     if (_wParam == 0) {
         Commit(ec);
     } else if (Telex::IsEditKey(_wParam, _lParam, _keyState)) {
+        // uneaten, ends composition
         _engine->Reset();
         return _compositionManager->EndCompositionNow(ec);
-    } else if (Telex::EngineWantsKey(_compositionManager->IsComposing(), _wParam, _lParam, _keyState)) {
+    } else if (_wParam == VK_ESCAPE) {
+        // eaten, empties and ends composition
+        _engine->Reset();
+        hr = _compositionManager->EmptyCompositionText(ec);
+        DBG_HRESULT_CHECK(hr, L"%s", L"_compositionManager->EmptyCompositionText failed");
+        return _compositionManager->EndCompositionNow(ec);
+    } else if (Telex::IsKeyEaten(_compositionManager->IsComposing(), _wParam, _lParam, _keyState)) {
+        // eaten, updates composition
         ComposeKey(ec);
     } else if (_wParam == VK_SHIFT) {
         // drop shift
     } else {
+        // uneaten, commits
         Commit(ec);
     }
 

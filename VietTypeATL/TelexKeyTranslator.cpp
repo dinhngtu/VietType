@@ -40,7 +40,7 @@ bool VietType::Telex::IsEditKey(_In_ WPARAM wParam, _In_ LPARAM lParam, _In_ BYT
     return false;
 }
 
-bool VietType::Telex::EngineWantsKey(bool isComposing, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_ BYTE const *keyState) {
+bool VietType::Telex::IsKeyEaten(bool isComposing, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_ BYTE const *keyState) {
     if ((keyState[VK_CONTROL] & 0x80) || (keyState[VK_MENU] & 0x80) || (keyState[VK_LWIN] & 0x80) || (keyState[VK_RWIN] & 0x80)) {
         // engine doesn't want modifiers
         return false;
@@ -48,7 +48,7 @@ bool VietType::Telex::EngineWantsKey(bool isComposing, _In_ WPARAM wParam, _In_ 
     if (IsTranslatableKey(wParam, lParam)) {
         return true;
     }
-    if (isComposing && wParam == VK_BACK) {
+    if (isComposing && (wParam == VK_BACK || wParam == VK_ESCAPE)) {
         return true;
     }
     return false;
