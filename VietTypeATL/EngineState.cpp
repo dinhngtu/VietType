@@ -69,15 +69,15 @@ std::wstring::size_type VietType::EngineState::Count() const {
     return _engine.Count();
 }
 
-int VietType::EngineState::Enabled() const {
+bool VietType::EngineState::Enabled() const {
     return _enabled;
 }
 
-void VietType::EngineState::Enabled(int value) {
+void VietType::EngineState::Enabled(bool value) {
     _enabled = value;
 }
 
-int VietType::EngineState::ToggleEnabled() {
+bool VietType::EngineState::ToggleEnabled() {
     _enabled = !_enabled;
     return _enabled;
 }

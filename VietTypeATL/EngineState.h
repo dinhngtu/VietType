@@ -41,12 +41,12 @@ public:
     std::wstring Peek() const;
     std::wstring::size_type Count() const;
 
-    int Enabled() const;
-    void Enabled(int value);
-    int ToggleEnabled();
+    bool Enabled() const;
+    void Enabled(bool value);
+    bool ToggleEnabled();
 
 private:
-    int _enabled = 1;
+    bool _enabled = true;
     Telex::TelexEngine _engine;
 
 private:
