@@ -56,7 +56,7 @@ struct TelexConfig {
 
 class TESTEXPORT TelexEngine {
 public:
-    TelexEngine(_In_ struct TelexConfig config);
+    explicit TelexEngine(_In_ struct TelexConfig config);
     ~TelexEngine();
 
     void Reset();

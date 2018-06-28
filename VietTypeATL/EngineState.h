@@ -24,7 +24,7 @@ namespace VietType {
 
 class EngineState {
 public:
-    EngineState(Telex::TelexConfig const& config);
+    explicit EngineState(Telex::TelexConfig const& config);
 
     Telex::TelexEngine& Engine();
     Telex::TelexEngine const& Engine() const;
