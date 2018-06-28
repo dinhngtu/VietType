@@ -16,102 +16,17 @@
 // along with VietType.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "EngineController.h"
+#include "LanguageBarHandlers.h"
 
 // {CCA3D390-EF1A-4DE4-B2FF-B6BC76D68C3B}
 const GUID VietType::GUID_LanguageBarButton_Item = { 0xcca3d390, 0xef1a, 0x4de4, { 0xb2, 0xff, 0xb6, 0xbc, 0x76, 0xd6, 0x8c, 0x3b } };
 
 VietType::EngineController::EngineController() {
+    _indicatorButton = std::make_unique<IndicatorButton>(this);
+    _langBarButton = std::make_unique<LangBarButton>(this);
 }
 
 VietType::EngineController::~EngineController() {
-}
-
-HRESULT VietType::EngineController::OnClick(TfLBIClick click, POINT pt, const RECT *area) {
-    if (click == TF_LBI_CLK_LEFT) {
-        return ToggleEnabled();
-    } else if (click == TF_LBI_CLK_RIGHT) {
-        HMENU menu = GetMenu();
-        if (!menu) {
-            DBG_DPRINT(L"%s", L"load menu failed");
-        }
-        UINT flags = TPM_NONOTIFY | TPM_RETURNCMD;
-        if (GetSystemMetrics(SM_MENUDROPALIGNMENT)) {
-            flags |= TPM_RIGHTALIGN;
-        }
-        int itemId = TrackPopupMenuEx(menu, flags, pt.x, pt.y, /* doesn't matter */ GetFocus(), NULL);
-        DestroyMenu(menu);
-        if (itemId) {
-            return OnMenuSelect(itemId);
-        } else {
-            return S_OK;
-        }
-    } else {
-        return S_OK;
-    }
-}
-
-HRESULT VietType::EngineController::InitMenu(ITfMenu * menu) {
-    HRESULT hr;
-
-    HMENU menuSource = GetMenu();
-    for (int i = 0; i < GetMenuItemCount(menuSource); i++) {
-        MENUITEMINFO mii;
-        mii.cbSize = sizeof(MENUITEMINFO);
-        mii.dwTypeData = NULL;
-        mii.fMask = MIIM_STRING;
-        if (!GetMenuItemInfo(menuSource, i, TRUE, &mii)) {
-            WINERROR_RETURN_HRESULT(L"%s", L"GetMenuItemInfo failed");
-        }
-
-        mii.cch++;
-        mii.fMask = MIIM_BITMAP | MIIM_CHECKMARKS | MIIM_FTYPE | MIIM_ID | MIIM_STATE | MIIM_STRING;
-        std::vector<wchar_t> buf(mii.cch);
-        mii.dwTypeData = &buf[0];
-        if (!GetMenuItemInfo(menuSource, i, TRUE, &mii)) {
-            WINERROR_RETURN_HRESULT(L"%s", L"GetMenuItemInfo failed");
-        }
-
-        DWORD tfFlags = 0;
-        if (mii.fState & MFS_CHECKED) {
-            tfFlags |= TF_LBMENUF_CHECKED;
-        }
-        if (mii.fType & MFT_SEPARATOR) {
-            tfFlags |= TF_LBMENUF_SEPARATOR;
-        }
-        if (mii.fType & MFT_RADIOCHECK) {
-            tfFlags |= TF_LBMENUF_RADIOCHECKED;
-        }
-        if (mii.fState & MFS_GRAYED) {
-            tfFlags |= TF_LBMENUF_GRAYED;
-        }
-
-        HBITMAP tfBitmap = NULL;
-        if (mii.hbmpItem && mii.hbmpItem != reinterpret_cast<HBITMAP>(-1)) {
-            tfBitmap = static_cast<HBITMAP>(CopyImage(mii.hbmpItem, IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE));
-        }
-
-        hr = menu->AddMenuItem(
-            mii.wID,
-            tfFlags,
-            tfBitmap,
-            NULL,
-            &buf[0],
-            static_cast<ULONG>(buf.size()),
-            NULL);
-        DBG_HRESULT_CHECK(hr, L"menu->AddMenuItem failed for %s", buf);
-    }
-    DestroyMenu(menuSource);
-
-    return S_OK;
-}
-
-HRESULT VietType::EngineController::OnMenuSelect(UINT id) {
-    switch (id) {
-    case ID_TRAY_ABOUT:
-        MessageBox(NULL, L"VietType", L"VietType", MB_OK | MB_ICONINFORMATION);
-        break;
-    }
-    return S_OK;
 }
 
 HRESULT VietType::EngineController::OnChange(REFGUID rguid) {
@@ -120,17 +35,6 @@ HRESULT VietType::EngineController::OnChange(REFGUID rguid) {
     }
 
     return S_OK;
-}
-
-HRESULT VietType::EngineController::GetIcon(HICON * hicon) {
-    // Windows docs is a liar, icons are mandatory
-    assert(Globals::dllInstance);
-    if (IsEnabled()) {
-        *hicon = static_cast<HICON>(LoadImage(Globals::dllInstance, MAKEINTRESOURCE(IDI_ICONV), IMAGE_ICON, 16, 16, 0));
-    } else {
-        *hicon = static_cast<HICON>(LoadImage(Globals::dllInstance, MAKEINTRESOURCE(IDI_ICONE), IMAGE_ICON, 16, 16, 0));
-    }
-    return *hicon ? S_OK : E_FAIL;
 }
 
 HRESULT VietType::EngineController::Initialize(
@@ -224,8 +128,10 @@ HRESULT VietType::EngineController::UpdateEnabled() {
     hr = CompartmentReadEnabled(&enabled);
     HRESULT_CHECK_RETURN(hr, L"%s", L"CompartmentReadEnabled failed");
     _engine->Enabled(enabled);
-    RefreshButton(_indicatorButton);
-    RefreshButton(_langBarButton);
+    hr = _indicatorButton->Refresh();
+    DBG_HRESULT_CHECK(hr, L"%s", L"_indicatorButton->Refresh failed");
+    hr = _langBarButton->Refresh();
+    DBG_HRESULT_CHECK(hr, L"%s", L"_langBarButton->Refresh failed");
 
     return S_OK;
 }
@@ -266,91 +172,28 @@ HRESULT VietType::EngineController::CompartmentWriteEnabled(int enabled) {
 HRESULT VietType::EngineController::InitLanguageBar() {
     HRESULT hr;
 
-    hr = InitLangBarItem(
-        _indicatorButton,
+    hr = _indicatorButton->Initialize(
+        _langBarItemMgr,
         Globals::GUID_LBI_INPUTMODE,
         TF_LBI_STYLE_BTN_BUTTON | TF_LBI_STYLE_SHOWNINTRAY,
         0,
-        Globals::TextServiceDescription,
-        this);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"InitLangBarItem failed for _indicatorButton");
+        Globals::TextServiceDescription);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_indicatorButton->Initialize failed");
 
-    hr = InitLangBarItem(
-        _langBarButton,
+    hr = _langBarButton->Initialize(
+        _langBarItemMgr,
         VietType::GUID_LanguageBarButton_Item,
         TF_LBI_STYLE_BTN_BUTTON | TF_LBI_STYLE_BTN_MENU | TF_LBI_STYLE_SHOWNINTRAY,
         0,
-        Globals::TextServiceDescription,
-        this);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"InitLangBarItem failed for _langBarButton");
+        Globals::TextServiceDescription);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_langBarButton->Initialize failed");
 
     return S_OK;
 }
 
 HRESULT VietType::EngineController::UninitLanguageBar() {
-    HRESULT hr;
-
-    hr = UninitLangBarItem(_indicatorButton);
-    DBG_HRESULT_CHECK(hr, L"%s", L"UninitLangBarItem failed for _indicatorButton");
-    hr = UninitLangBarItem(_langBarButton);
-    DBG_HRESULT_CHECK(hr, L"%s", L"UninitLangBarItem failed for _langBarButton");
+    _indicatorButton->Uninitialize();
+    _langBarButton->Uninitialize();
 
     return S_OK;
-}
-
-HRESULT VietType::EngineController::InitLangBarItem(
-    SmartComObjPtr<LanguageBarButton>& button,
-    GUID const & guidItem,
-    DWORD style,
-    ULONG sort,
-    const std::wstring & description,
-    ILanguageBarCallbacks * callbacks) {
-
-    HRESULT hr;
-
-    hr = button.CreateInstance();
-    HRESULT_CHECK_RETURN(hr, L"%s", L"button.CreateInstance failed");
-    hr = button->Initialize(
-        guidItem,
-        style,
-        sort,
-        description,
-        callbacks);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"button->Initialize failed");
-
-    hr = _langBarItemMgr->AddItem(button);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_langBarItemMgr->AddItem failed");
-
-    return S_OK;
-}
-
-HRESULT VietType::EngineController::UninitLangBarItem(SmartComObjPtr<LanguageBarButton>& button) {
-    if (button) {
-        HRESULT hr = _langBarItemMgr->RemoveItem(button);
-        DBG_HRESULT_CHECK(hr, L"%s", L"button->RemoveItem failed");
-
-        button->Uninitialize();
-        button.Release();
-    }
-
-    return S_OK;
-}
-
-HMENU VietType::EngineController::GetMenu() {
-    assert(Globals::dllInstance);
-    HMENU menu = LoadMenu(Globals::dllInstance, MAKEINTRESOURCE(IDR_MENU_TRAY));
-    menu = GetSubMenu(menu, 0);
-
-    return menu;
-}
-
-HRESULT VietType::EngineController::RefreshButton(SmartComObjPtr<LanguageBarButton>& button) {
-    HRESULT hr;
-
-    hr = button->SetText(IsEnabled() ? std::wstring(L"VIE") : std::wstring(L"ENG"));
-    HRESULT_CHECK_RETURN(hr, L"%s", L"button->SetText failed");
-    hr = button->NotifyUpdate(TF_LBI_ICON);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"button->NotifyUpdate failed");
-
-    return hr;
 }

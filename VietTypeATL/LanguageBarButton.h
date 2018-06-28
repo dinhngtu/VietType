@@ -30,6 +30,8 @@ public:
     virtual HRESULT InitMenu(ITfMenu *menu) = 0;
     virtual HRESULT OnMenuSelect(UINT id) = 0;
     virtual HRESULT GetIcon(HICON *hicon) = 0;
+    virtual DWORD GetStatus() = 0;
+    virtual std::wstring GetText() = 0;
 };
 
 class LanguageBarButton :
@@ -72,9 +74,6 @@ public:
     HRESULT NotifyUpdate(DWORD flags);
     void Uninitialize();
 
-    HRESULT SetStatus(DWORD flags);
-    HRESULT SetText(std::wstring text);
-
 private:
     GUID _guidItem;
     DWORD _style;
@@ -83,9 +82,6 @@ private:
     ILanguageBarCallbacks *_callbacks;
 
     SmartComPtr<ITfLangBarItemSink> _itemSink;
-
-    DWORD _status = 0;
-    std::wstring _text;
 
 private:
     DISALLOW_COPY_AND_ASSIGN(LanguageBarButton);

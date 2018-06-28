@@ -20,13 +20,15 @@
 #include "Common.h"
 #include "SinkAdvisor.h"
 #include "EngineState.h"
-#include "LanguageBar.h"
+#include "LanguageBarButton.h"
 
 namespace VietType {
 
+class IndicatorButton;
+class LangBarButton;
+
 class EngineController :
     public CComObjectRootEx<CComSingleThreadModel>,
-    public ILanguageBarCallbacks,
     public ITfCompartmentEventSink {
 public:
     EngineController();
@@ -37,12 +39,6 @@ public:
         COM_INTERFACE_ENTRY(ITfCompartmentEventSink)
     END_COM_MAP()
     DECLARE_PROTECT_FINAL_CONSTRUCT()
-
-    // Inherited via ILanguageBarCallbacks
-    virtual HRESULT OnClick(TfLBIClick click, POINT pt, const RECT *area) override;
-    virtual HRESULT InitMenu(ITfMenu * menu) override;
-    virtual HRESULT OnMenuSelect(UINT id) override;
-    virtual HRESULT GetIcon(HICON * hicon) override;
 
     // Inherited via ITfCompartmentEventSink
     virtual STDMETHODIMP OnChange(REFGUID rguid) override;
@@ -68,16 +64,6 @@ private:
     HRESULT CompartmentWriteEnabled(int enabled);
     HRESULT InitLanguageBar();
     HRESULT UninitLanguageBar();
-    HRESULT InitLangBarItem(
-        SmartComObjPtr<LanguageBarButton>& button,
-        GUID const& guidItem,
-        DWORD style,
-        ULONG sort,
-        const std::wstring& description,
-        ILanguageBarCallbacks *callbacks);
-    HRESULT UninitLangBarItem(SmartComObjPtr<LanguageBarButton>& button);
-    HMENU GetMenu();
-    HRESULT RefreshButton(SmartComObjPtr<LanguageBarButton>& button);
 
 private:
     std::shared_ptr<EngineState> _engine;
@@ -88,8 +74,9 @@ private:
     SmartComPtr<ITfCompartment> _compartment;
     SinkAdvisor<ITfCompartmentEventSink> _compartmentEventSink;
 
-    SmartComObjPtr<LanguageBarButton> _indicatorButton;
-    SmartComObjPtr<LanguageBarButton> _langBarButton;
+    // unique_ptr might not be necessary but used just to simplify headers
+    std::unique_ptr<IndicatorButton> _indicatorButton;
+    std::unique_ptr<LangBarButton> _langBarButton;
 
 private:
     DISALLOW_COPY_AND_ASSIGN(EngineController);

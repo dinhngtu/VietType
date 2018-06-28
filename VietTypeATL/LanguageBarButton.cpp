@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with VietType.  If not, see <https://www.gnu.org/licenses/>.
 
-#include "LanguageBar.h"
+#include "LanguageBarButton.h"
 
 const DWORD LanguageBarButtonCookie = 0x5a6fdd5e;
 
@@ -72,7 +72,7 @@ STDMETHODIMP VietType::LanguageBarButton::GetInfo(TF_LANGBARITEMINFO * pInfo) {
 }
 
 STDMETHODIMP VietType::LanguageBarButton::GetStatus(DWORD * pdwStatus) {
-    *pdwStatus = _status;
+    *pdwStatus = _callbacks->GetStatus();
     return S_OK;
 }
 
@@ -117,7 +117,7 @@ STDMETHODIMP VietType::LanguageBarButton::GetIcon(HICON * phIcon) {
 }
 
 STDMETHODIMP VietType::LanguageBarButton::GetText(BSTR * pbstrText) {
-    *pbstrText = SysAllocString(_text.c_str());
+    *pbstrText = SysAllocString(_callbacks->GetText().c_str());
     return *pbstrText ? S_OK : E_OUTOFMEMORY;
 }
 
@@ -141,14 +141,4 @@ HRESULT VietType::LanguageBarButton::NotifyUpdate(DWORD flags) {
 
 void VietType::LanguageBarButton::Uninitialize() {
     _callbacks = nullptr;
-}
-
-HRESULT VietType::LanguageBarButton::SetStatus(DWORD flags) {
-    _status = flags;
-    return NotifyUpdate(TF_LBI_STATUS);
-}
-
-HRESULT VietType::LanguageBarButton::SetText(std::wstring text) {
-    _text = text;
-    return NotifyUpdate(TF_LBI_TEXT);
 }
