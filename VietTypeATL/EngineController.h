@@ -74,7 +74,7 @@ private:
     SmartComPtr<ITfCompartment> _compartment;
     SinkAdvisor<ITfCompartmentEventSink> _compartmentEventSink;
 
-    // unique_ptr might not be necessary but used just to simplify headers
+    // unique_ptr is not necessary but used just to break include cycle
     std::unique_ptr<IndicatorButton> _indicatorButton;
     std::unique_ptr<LangBarButton> _langBarButton;
 
