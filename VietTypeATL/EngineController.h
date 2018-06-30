@@ -20,12 +20,22 @@
 #include "Common.h"
 #include "SinkAdvisor.h"
 #include "EngineState.h"
-#include "LanguageBarButton.h"
 
 namespace VietType {
 
 class IndicatorButton;
 class LangBarButton;
+class CompositionManager;
+class EngineController;
+
+enum class BlockedKind {
+    // don't change enable setting
+    FREE,
+    // don't change enable setting, but also completely block the engine
+    BLOCKED,
+    // change enable setting to disabled; automatically restore enable setting once free (or if overridden by user)
+    ADVISED,
+};
 
 class EngineController :
     public CComObjectRootEx<CComSingleThreadModel>,
@@ -53,11 +63,18 @@ public:
     EngineState const& GetEngine() const;
     std::shared_ptr<EngineState> const& GetEngineShared();
 
+    int IsUserEnabled();
+    HRESULT WriteUserEnabled(int enabled);
+    HRESULT ToggleUserEnabled();
+
     int IsEnabled() const;
-    HRESULT WriteEnabled(int enabled);
-    HRESULT ToggleEnabled();
-    // update engine and langbar enabled state to match compartment value
-    HRESULT UpdateEnabled();
+    BlockedKind GetBlocked() const;
+    void SetBlocked(BlockedKind blocked);
+    HRESULT RequestEditBlocked(CompositionManager *compMgr, ITfContext *context);
+    bool IsEditBlockedPending() const;
+
+    // update engine and langbar enabled state to match enabled/blocked value
+    HRESULT UpdateStates();
 
 private:
     HRESULT CompartmentReadEnabled(int *pEnabled);
@@ -77,6 +94,9 @@ private:
     // unique_ptr is not necessary but used just to break include cycle
     std::unique_ptr<IndicatorButton> _indicatorButton;
     std::unique_ptr<LangBarButton> _langBarButton;
+
+    BlockedKind _blocked = BlockedKind::FREE;
+    bool _editBlockedPending = false;
 
 private:
     DISALLOW_COPY_AND_ASSIGN(EngineController);

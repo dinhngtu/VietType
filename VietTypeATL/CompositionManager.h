@@ -40,7 +40,7 @@ public:
 
     void Initialize(TfClientId clientid);
 
-    // only use when there is an active composition
+    // this uses the saved context, only use when there is an active composition
     HRESULT RequestEditSession(ITfEditSession *session);
     HRESULT RequestEditSession(ITfEditSession *session, ITfContext *context);
     HRESULT StartComposition(ITfContext *pContext);

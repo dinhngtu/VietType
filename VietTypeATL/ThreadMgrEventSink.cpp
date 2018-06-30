@@ -23,6 +23,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved
 
 #include "ThreadMgrEventSink.h"
+#include "CompositionManager.h"
+#include "EngineController.h"
 
 VietType::ThreadMgrEventSink::ThreadMgrEventSink() {
 }
@@ -40,9 +42,21 @@ STDMETHODIMP VietType::ThreadMgrEventSink::OnUninitDocumentMgr(ITfDocumentMgr * 
 
 STDMETHODIMP VietType::ThreadMgrEventSink::OnSetFocus(ITfDocumentMgr * pdimFocus, ITfDocumentMgr * pdimPrevFocus) {
     HRESULT hr;
-    
-    hr = _textEditSink->Initialize(pdimFocus);
-    _prevFocusDocumentMgr = pdimPrevFocus;
+
+    if (!pdimFocus || _controller->IsEditBlockedPending()) {
+        return S_OK;
+    }
+
+    SmartComPtr<ITfContext> context;
+    hr = pdimFocus->GetTop(context.GetAddress());
+    HRESULT_CHECK_RETURN(hr, L"%s", L"pdimFocus->GetTop failed");
+
+    if (!context) {
+        return S_OK;
+    }
+
+    hr = _controller->RequestEditBlocked(_compMgr, context);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_controller->RequestEditBlocked failed");
 
     return S_OK;
 }
@@ -55,23 +69,19 @@ STDMETHODIMP VietType::ThreadMgrEventSink::OnPopContext(ITfContext * pic) {
     return E_NOTIMPL;
 }
 
-HRESULT VietType::ThreadMgrEventSink::Initialize(ITfThreadMgr *threadMgr, TfClientId tid) {
+HRESULT VietType::ThreadMgrEventSink::Initialize(
+    ITfThreadMgr *threadMgr,
+    TfClientId tid,
+    SmartComObjPtr<CompositionManager> const& compMgr,
+    SmartComObjPtr<EngineController> const& controller) {
+
     HRESULT hr;
 
-    // create text edit sink before advising thread manager event sink
-    // since text edit sink is used in thread manager event sink handler
-    hr = _textEditSink.CreateInstance();
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_textEditSink.CreateInstance failed");
+    _compMgr = compMgr;
+    _controller = controller;
 
     hr = _threadMgrEventSinkAdvisor.Advise(threadMgr, this);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_threadMgrEventSinkAdvisor.Advise failed");
-
-    SmartComPtr<ITfDocumentMgr> documentMgr;
-    hr = threadMgr->GetFocus(documentMgr.GetAddress());
-    if (SUCCEEDED(hr)) {
-        hr = _textEditSink->Initialize(documentMgr);
-        DBG_HRESULT_CHECK(hr, L"%s", L"_textEditSink->Initialize failed");
-    } else DBG_HRESULT_CHECK(hr, L"%s", L"threadMgr->GetFocus failed");
 
     return hr;
 }
@@ -82,13 +92,8 @@ HRESULT VietType::ThreadMgrEventSink::Uninitialize() {
     hr = _threadMgrEventSinkAdvisor.Unadvise();
     DBG_HRESULT_CHECK(hr, L"%s", L"_threadMgrEventSinkAdvisor.Unadvise failed");
 
-    if (_textEditSink) {
-        _textEditSink->Uninitialize();
-        DBG_HRESULT_CHECK(hr, L"%s", L"_textEditSink->Uninitialize failed");
-        _textEditSink.Release();
-    }
-
-    _prevFocusDocumentMgr.Release();
+    _controller.Release();
+    _compMgr.Release();
 
     return hr;
 }

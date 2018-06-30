@@ -49,7 +49,7 @@ public:
         ITfThreadMgr * threadMgr,
         TfClientId clientid,
         SmartComObjPtr<CompositionManager> const& compositionManager,
-        SmartComObjPtr<EngineController> const& engine);
+        SmartComObjPtr<EngineController> const& controller);
     HRESULT Uninitialize();
 
 private:
@@ -58,8 +58,9 @@ private:
 private:
     TfClientId _clientid;
     SmartComPtr<ITfKeystrokeMgr> _keystrokeMgr;
+    SmartComPtr<ITfThreadMgr> _threadMgr;
     SmartComObjPtr<CompositionManager> _compositionManager;
-    SmartComObjPtr<EngineController> _engine;
+    SmartComObjPtr<EngineController> _controller;
 
     // shared key state buffer; for temporary use only
     BYTE _keyState[256];

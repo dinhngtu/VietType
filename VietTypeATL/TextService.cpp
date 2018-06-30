@@ -38,6 +38,8 @@ STDMETHODIMP VietType::TextService::Activate(ITfThreadMgr * ptim, TfClientId tid
 }
 
 STDMETHODIMP VietType::TextService::ActivateEx(ITfThreadMgr * ptim, TfClientId tid, DWORD dwFlags) {
+    DBG_DPRINT(L"h = %p, threadno = %ld, tid = %ld, flags = %lx", Globals::dllInstance, GetCurrentThreadId(), tid, dwFlags);
+
     HRESULT hr;
 
     _threadMgr = ptim;
@@ -57,33 +59,40 @@ STDMETHODIMP VietType::TextService::ActivateEx(ITfThreadMgr * ptim, TfClientId t
     hr = _engineController->Initialize(_engine, ptim, tid);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_engineController->Initialize failed");
 
-    hr = _engineController->UpdateEnabled();
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_engineController->UpdateEnabled failed");
+    //hr = _engineController->UpdateStates();
+    //HRESULT_CHECK_RETURN(hr, L"%s", L"_engineController->UpdateEnabled failed");
 
     hr = _keyEventSink.CreateInstance();
     HRESULT_CHECK_RETURN(hr, L"%s", L"_keyEventSink.CreateInstance failed");
     hr = _keyEventSink->Initialize(ptim, tid, _compositionManager, _engineController);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_keyEventSink->Initialize failed");
 
+    hr = _threadMgrEventSink.CreateInstance();
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_threadMgrEventSink.CreateInstance failed");
+    hr = _threadMgrEventSink->Initialize(ptim, tid, _compositionManager, _engineController);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_threadMgrEventSink->Initialize failed");
+
     return S_OK;
 }
 
 STDMETHODIMP VietType::TextService::Deactivate(void) {
+    DBG_DPRINT(L"h = %p, threadno = %ld, tid = %ld", Globals::dllInstance, GetCurrentThreadId(), _clientId);
+
     HRESULT hr;
 
-    if (_keyEventSink) {
-        hr = _keyEventSink->Uninitialize();
-        DBG_HRESULT_CHECK(hr, L"%s", L"_keyEventSink->Uninitialize failed");
-        _keyEventSink.Release();
-    }
+    hr = _threadMgrEventSink->Uninitialize();
+    DBG_HRESULT_CHECK(hr, L"%s", L"_threadMgrEventSink->Uninitialize failed");
+    _threadMgrEventSink.Release();
+
+    hr = _keyEventSink->Uninitialize();
+    DBG_HRESULT_CHECK(hr, L"%s", L"_keyEventSink->Uninitialize failed");
+    _keyEventSink.Release();
 
     hr = _engineController->Uninitialize();
     DBG_HRESULT_CHECK(hr, L"%s", L"_engineController->Uninitialize failed");
     _engineController.Release();
 
-    if (_compositionManager) {
-        _compositionManager.Release();
-    }
+    _compositionManager.Release();
 
     return S_OK;
 }

@@ -49,3 +49,4 @@
 
 #include <strsafe.h>
 #include <msctf.h>
+#include <InputScope.h>

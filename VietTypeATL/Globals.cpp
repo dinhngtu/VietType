@@ -35,4 +35,6 @@ const GUID VietType::Globals::GUID_Profile = { 0x8d93d10a, 0x203b, 0x4c5f, { 0xa
 // pass this as guidItem of language bar item to make it show on the input indicator (the one next to the clock) instead of the language bar
 const GUID VietType::Globals::GUID_LBI_INPUTMODE = { 0x2C77A81E, 0x41CC, 0x4178,{ 0xA3, 0xA7, 0x5F, 0x8A, 0x98, 0x75, 0x68, 0xE6 } };
 
+const GUID VietType::Globals::GUID_PROP_INPUTSCOPE = { 0x1713dd5a, 0x68e7, 0x4a5b, { 0x9a, 0xf6, 0x59, 0x2a, 0x59, 0x5c, 0x77, 0x8d } };
+
 const std::wstring VietType::Globals::TextServiceDescription = L"VietType";

@@ -134,7 +134,7 @@ VietType::IndicatorButton::IndicatorButton(EngineController * ec) : RefreshableB
 
 HRESULT VietType::IndicatorButton::OnClick(TfLBIClick click, POINT pt, const RECT * area) {
     if (click == TF_LBI_CLK_LEFT) {
-        return _ec->ToggleEnabled();
+        return _ec->ToggleUserEnabled();
     } else if (click == TF_LBI_CLK_RIGHT) {
         int itemId = PopMenu(pt, area);
         if (itemId) {
@@ -190,7 +190,7 @@ VietType::LangBarButton::LangBarButton(EngineController * ec) : RefreshableButto
 
 HRESULT VietType::LangBarButton::OnClick(TfLBIClick click, POINT pt, const RECT * area) {
     if (click == TF_LBI_CLK_LEFT) {
-        return _ec->ToggleEnabled();
+        return _ec->ToggleUserEnabled();
     } else if (click == TF_LBI_CLK_RIGHT) {
         int itemId = PopMenu(pt, area);
         if (itemId) {

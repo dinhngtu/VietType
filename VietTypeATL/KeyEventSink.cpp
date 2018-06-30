@@ -35,13 +35,39 @@ VietType::KeyEventSink::~KeyEventSink() {
 }
 
 STDMETHODIMP VietType::KeyEventSink::OnSetFocus(BOOL fForeground) {
+    HRESULT hr;
+    DBG_DPRINT(L"KeyEventSink::OnSetFocus %d", fForeground);
+
+    if (!fForeground || _controller->IsEditBlockedPending()) {
+        return S_OK;
+    }
+
+    SmartComPtr<ITfDocumentMgr> docMgr;
+    hr = _threadMgr->GetFocus(docMgr.GetAddress());
+    if (FAILED(hr)) {
+        // we don't care about the error since there might be no focused document manager
+        return S_OK;
+    }
+
+    if (!docMgr) {
+        return S_OK;
+    }
+
+    SmartComPtr<ITfContext> context;
+    hr = docMgr->GetTop(context.GetAddress());
+    if (FAILED(hr)) {
+        return S_OK;
+    }
+
+    _controller->RequestEditBlocked(_compositionManager, context);
+
     return S_OK;
 }
 
 STDMETHODIMP VietType::KeyEventSink::OnTestKeyDown(ITfContext * pic, WPARAM wParam, LPARAM lParam, BOOL * pfEaten) {
     HRESULT hr;
 
-    if (!_engine->IsEnabled()) {
+    if (!_controller->IsEnabled()) {
         *pfEaten = FALSE;
         return S_OK;
     }
@@ -62,7 +88,7 @@ STDMETHODIMP VietType::KeyEventSink::OnTestKeyDown(ITfContext * pic, WPARAM wPar
 }
 
 STDMETHODIMP VietType::KeyEventSink::OnTestKeyUp(ITfContext * pic, WPARAM wParam, LPARAM lParam, BOOL * pfEaten) {
-    if (!_engine->IsEnabled()) {
+    if (!_controller->IsEnabled()) {
         *pfEaten = FALSE;
         return S_OK;
     }
@@ -83,7 +109,7 @@ STDMETHODIMP VietType::KeyEventSink::OnTestKeyUp(ITfContext * pic, WPARAM wParam
 STDMETHODIMP VietType::KeyEventSink::OnKeyDown(ITfContext * pic, WPARAM wParam, LPARAM lParam, BOOL * pfEaten) {
     HRESULT hr;
 
-    if (!_engine->IsEnabled()) {
+    if (!_controller->IsEnabled()) {
         *pfEaten = FALSE;
         return S_OK;
     }
@@ -110,10 +136,10 @@ STDMETHODIMP VietType::KeyEventSink::OnPreservedKey(ITfContext * pic, REFGUID rg
 
     if (IsEqualGUID(Globals::GUID_KeyEventSink_PreservedKey_Toggle, rguid)) {
         *pfEaten = TRUE;
-        _engine->GetEngine().Reset();
+        _controller->GetEngine().Reset();
         hr = _compositionManager->EndComposition();
         DBG_HRESULT_CHECK(hr, L"%s", L"_compositionManager->EndComposition failed");
-        hr = _engine->ToggleEnabled();
+        hr = _controller->ToggleUserEnabled();
         DBG_HRESULT_CHECK(hr, L"%s", L"_engine->ToggleEnabled failed");
     }
 
@@ -133,8 +159,9 @@ HRESULT VietType::KeyEventSink::Initialize(
     if (!_keystrokeMgr) {
         return E_NOINTERFACE;
     }
+    _threadMgr = threadMgr;
     _compositionManager = compositionManager;
-    _engine = engine;
+    _controller = engine;
 
     hr = _keystrokeMgr->AdviseKeyEventSink(_clientid, this, TRUE);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_keystrokeMgr->AdviseKeyEventSink failed");
@@ -155,8 +182,9 @@ HRESULT VietType::KeyEventSink::Uninitialize() {
     hr = _keystrokeMgr->UnadviseKeyEventSink(_clientid);
     DBG_HRESULT_CHECK(hr, L"%s", L"_keystrokeMgr->UnadviseKeyEventSink failed");
 
-    _engine.Release();
+    _controller.Release();
     _compositionManager.Release();
+    _threadMgr.Release();
     _keystrokeMgr.Release();
 
     return S_OK;
@@ -168,7 +196,7 @@ HRESULT VietType::KeyEventSink::CallKeyEdit(ITfContext *context, WPARAM wParam, 
     SmartComObjPtr<KeyHandlerEditSession> keyHandlerEditSession;
     hr = keyHandlerEditSession.CreateInstance();
     HRESULT_CHECK_RETURN(hr, L"%s", L"_keyHandlerEditSession.CreateInstance failed");
-    keyHandlerEditSession->Initialize(_compositionManager, context, wParam, lParam, _keyState, _engine->GetEngineShared());
+    keyHandlerEditSession->Initialize(_compositionManager, context, wParam, lParam, _keyState, _controller->GetEngineShared());
     hr = _compositionManager->RequestEditSession(keyHandlerEditSession, context);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_compositionManager->RequestEditSession failed");
 

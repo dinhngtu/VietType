@@ -19,11 +19,13 @@
 
 #include "Common.h"
 #include "SinkAdvisor.h"
-#include "TextEditSink.h"
 
 using namespace ATL;
 
 namespace VietType {
+
+class CompositionManager;
+class EngineController;
 
 class ThreadMgrEventSink :
     public CComObjectRootEx<CComSingleThreadModel>,
@@ -46,13 +48,13 @@ public:
     virtual STDMETHODIMP OnPushContext(ITfContext * pic) override;
     virtual STDMETHODIMP OnPopContext(ITfContext * pic) override;
 
-    HRESULT Initialize(ITfThreadMgr *threadMgr, TfClientId tid);
+    HRESULT Initialize(ITfThreadMgr *threadMgr, TfClientId tid, SmartComObjPtr<CompositionManager> const& compMgr, SmartComObjPtr<EngineController> const& controller);
     HRESULT Uninitialize();
 
 private:
     SinkAdvisor<ITfThreadMgrEventSink> _threadMgrEventSinkAdvisor;
-    SmartComObjPtr<TextEditSink> _textEditSink;
-    SmartComPtr<ITfDocumentMgr> _prevFocusDocumentMgr;
+    SmartComObjPtr<CompositionManager> _compMgr;
+    SmartComObjPtr<EngineController> _controller;
 
 private:
     DISALLOW_COPY_AND_ASSIGN(ThreadMgrEventSink);

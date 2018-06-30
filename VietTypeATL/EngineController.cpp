@@ -17,9 +17,67 @@
 
 #include "EngineController.h"
 #include "LanguageBarHandlers.h"
+#include "CompositionManager.h"
 
 // {CCA3D390-EF1A-4DE4-B2FF-B6BC76D68C3B}
 const GUID VietType::GUID_LanguageBarButton_Item = { 0xcca3d390, 0xef1a, 0x4de4, { 0xb2, 0xff, 0xb6, 0xbc, 0x76, 0xd6, 0x8c, 0x3b } };
+
+HRESULT EditBlocked(
+    TfEditCookie ec,
+    VietType::CompositionManager *compositionManager,
+    ITfContext *context,
+    VietType::EngineController *controller,
+    bool *editBlockedPending) {
+
+    HRESULT hr;
+    VietType::BlockedKind blocked;
+
+    SmartComPtr<ITfReadOnlyProperty> prop;
+    hr = context->GetAppProperty(VietType::Globals::GUID_PROP_INPUTSCOPE, prop.GetAddress());
+    HRESULT_CHECK_RETURN(hr, L"%s", L"context->GetAppProperty failed");
+
+    TF_SELECTION sel;
+    ULONG fetched;
+    context->GetSelection(ec, TF_DEFAULT_SELECTION, 1, &sel, &fetched);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"context->GetSelection failed");
+
+    VARIANT var;
+    hr = prop->GetValue(ec, sel.range, &var);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"prop->GetValue failed");
+
+    SmartComPtr<ITfInputScope> iis(var.punkVal);
+    if (!iis) {
+        DBG_DPRINT(L"QI on ITfInputScope failed");
+        return E_NOINTERFACE;
+    }
+
+    CComHeapPtr<InputScope> pscopes;
+    UINT scount;
+    hr = iis->GetInputScopes(&pscopes, &scount);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"iis->GetInputScopes failed");
+
+    InputScope *scopes = pscopes;
+    for (UINT i = 0; i < scount; i++) {
+        switch (scopes[i]) {
+        case IS_EMAIL_SMTPEMAILADDRESS:
+        case IS_EMAIL_USERNAME:
+        case IS_LOGINNAME:
+        case IS_PASSWORD:
+            blocked = VietType::BlockedKind::BLOCKED;
+            goto commit;
+        //case IS_URL:
+            //blocked = VietType::BlockedKind::ADVISED;
+            //goto commit;
+        }
+    }
+    blocked = VietType::BlockedKind::FREE;
+
+commit:
+    DBG_DPRINT(L"setting blocked %d", blocked);
+    controller->SetBlocked(blocked);
+    *editBlockedPending = false;
+    return S_OK;
+}
 
 VietType::EngineController::EngineController() {
     _indicatorButton = std::make_unique<IndicatorButton>(this);
@@ -31,7 +89,7 @@ VietType::EngineController::~EngineController() {
 
 HRESULT VietType::EngineController::OnChange(REFGUID rguid) {
     if (IsEqualGUID(rguid, Globals::GUID_KeyEventSink_Compartment_Toggle)) {
-        UpdateEnabled();
+        UpdateStates();
     }
 
     return S_OK;
@@ -102,32 +160,81 @@ std::shared_ptr<VietType::EngineState> const & VietType::EngineController::GetEn
     return _engine;
 }
 
-int VietType::EngineController::IsEnabled() const {
-    return _engine->Enabled();
+int VietType::EngineController::IsUserEnabled() {
+    int enabled;
+    HRESULT hr = CompartmentReadEnabled(&enabled);
+    assert(SUCCEEDED(hr));
+    return enabled;
 }
 
-HRESULT VietType::EngineController::WriteEnabled(int enabled) {
+HRESULT VietType::EngineController::WriteUserEnabled(int enabled) {
     HRESULT hr;
+
+    if (_blocked == BlockedKind::BLOCKED) {
+        DBG_DPRINT("write enabled skipped since engine is blocked");
+        return S_OK;
+    }
 
     hr = CompartmentWriteEnabled(enabled);
     HRESULT_CHECK_RETURN(hr, L"%s", L"CompartmentWriteEnabled failed");
-    hr = UpdateEnabled();
+    hr = UpdateStates();
     HRESULT_CHECK_RETURN(hr, L"%s", L"UpdateEnabled failed");
 
     return S_OK;
 }
 
-HRESULT VietType::EngineController::ToggleEnabled() {
-    return WriteEnabled(!_engine->Enabled());
+HRESULT VietType::EngineController::ToggleUserEnabled() {
+    return WriteUserEnabled(IsUserEnabled());
 }
 
-HRESULT VietType::EngineController::UpdateEnabled() {
+int VietType::EngineController::IsEnabled() const {
+    return _engine->Enabled();
+}
+
+VietType::BlockedKind VietType::EngineController::GetBlocked() const {
+    return _blocked;
+}
+
+void VietType::EngineController::SetBlocked(VietType::BlockedKind blocked) {
+    _blocked = blocked;
+    UpdateStates();
+}
+
+HRESULT VietType::EngineController::RequestEditBlocked(CompositionManager *compMgr, ITfContext *context) {
+    if (_editBlockedPending) {
+        return S_OK;
+    } else {
+        _editBlockedPending = true;
+        HRESULT hr = CompositionManager::RequestEditSession(&EditBlocked, compMgr, context, this, &_editBlockedPending);
+        if (FAILED(hr)) {
+            _editBlockedPending = false;
+        }
+        return hr;
+    }
+}
+
+bool VietType::EngineController::IsEditBlockedPending() const {
+    return _editBlockedPending;
+}
+
+HRESULT VietType::EngineController::UpdateStates() {
     HRESULT hr;
 
-    int enabled;
-    hr = CompartmentReadEnabled(&enabled);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"CompartmentReadEnabled failed");
-    _engine->Enabled(enabled);
+    switch (_blocked) {
+    case BlockedKind::FREE:
+    case BlockedKind::ADVISED: {
+        DBG_DPRINT(L"block = %d", static_cast<int>(_blocked));
+        int enabled;
+        hr = CompartmentReadEnabled(&enabled);
+        HRESULT_CHECK_RETURN(hr, L"%s", L"CompartmentReadEnabled failed");
+        _engine->Enabled(enabled);
+        break;
+    }
+    case BlockedKind::BLOCKED:
+        DBG_DPRINT(L"%s", L"blocked");
+        _engine->Enabled(false);
+    }
+
     hr = _indicatorButton->Refresh();
     DBG_HRESULT_CHECK(hr, L"%s", L"_indicatorButton->Refresh failed");
     hr = _langBarButton->Refresh();
