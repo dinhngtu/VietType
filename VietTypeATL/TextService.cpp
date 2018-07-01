@@ -59,8 +59,11 @@ STDMETHODIMP VietType::TextService::ActivateEx(ITfThreadMgr * ptim, TfClientId t
     hr = _engineController->Initialize(_engine, ptim, tid);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_engineController->Initialize failed");
 
-    //hr = _engineController->UpdateStates();
-    //HRESULT_CHECK_RETURN(hr, L"%s", L"_engineController->UpdateEnabled failed");
+    int enabled;
+    hr = _engineController->IsUserEnabled(&enabled);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_engineController->IsUserEnabled failed");
+    hr = _engineController->WriteUserEnabled(enabled);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_engineController->UpdateEnabled failed");
 
     hr = _keyEventSink.CreateInstance();
     HRESULT_CHECK_RETURN(hr, L"%s", L"_keyEventSink.CreateInstance failed");
