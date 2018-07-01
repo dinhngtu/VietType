@@ -42,6 +42,8 @@ genmap<std::wstring, std::wstring> const transitions = {
     {L"eue", L"\xeau"},
     {L"uoio", L"u\xf4i"},
     {L"uaya", L"u\xe2y"},
+    // only for 'xoong', etc.
+    {L"\xf4o", L"oo"},
 };
 
 genmap<std::wstring, std::wstring> const transitions_w = {
@@ -125,6 +127,7 @@ genmap<std::wstring, VINFO> const valid_v = {
     // oa_uy must be 1 as default since 0 can only be used if there is no c2
     {L"oa", {1, C2MODE::EITHER}},     // oa_uy
     {L"oe", {1, C2MODE::EITHER}},     // oa_uy
+    {L"oo", {1, C2MODE::MUSTC2}},     // oo
     {L"o\x103", {1, C2MODE::MUSTC2}}, // oă
     {L"u\xe2", {1, C2MODE::MUSTC2}},  // uâ
     {L"u\xea", {1, C2MODE::EITHER}},  // uê
