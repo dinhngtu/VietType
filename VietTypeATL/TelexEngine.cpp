@@ -132,9 +132,18 @@ TELEX_STATES TelexEngine::PushChar(_In_ wchar_t corig) {
         auto it = transitions.find(_v);
         if (it != transitions.end()) {
             _v = it->second;
-        }
-        auto after = _v.size();
-        if (after == before) {
+            auto after = _v.size();
+            // we don't yet take into account if _v grows in length due to the transition
+            if (after == before) {
+                _cases.push_back(ccase);
+            }
+        } else {
+            if (_c2.size()) {
+                // in case there exists no transition when _c2 is already typed
+                // fx. 'cace'
+                _state = TELEX_STATES::INVALID;
+            }
+            // if there is no transition, there must be a new character -> must push case
             _cases.push_back(ccase);
         }
 
