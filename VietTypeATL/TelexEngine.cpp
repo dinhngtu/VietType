@@ -138,13 +138,18 @@ TELEX_STATES TelexEngine::PushChar(_In_ wchar_t corig) {
                 _cases.push_back(ccase);
             }
         } else {
+            // if there is no transition, there must be a new character -> must push case
+            _cases.push_back(ccase);
             if (_c2.size()) {
                 // in case there exists no transition when _c2 is already typed
                 // fx. 'cace'
                 _state = TELEX_STATES::INVALID;
             }
-            // if there is no transition, there must be a new character -> must push case
-            _cases.push_back(ccase);
+            // invalidate if same char entered twice in a row
+            if (_keyBuffer.size() > 1 && c == _keyBuffer.rbegin()[1]) {
+                _keyBuffer.pop_back();
+                _state = TELEX_STATES::INVALID;
+            }
         }
 
     } else if (_v.size() && IS(cat, VOWEL_W)) {
@@ -158,6 +163,10 @@ TELEX_STATES TelexEngine::PushChar(_In_ wchar_t corig) {
                 }
             }
         } else {
+            // pop back only if same char entered twice in a row
+            if (c == _keyBuffer.rbegin()[1]) {
+                _keyBuffer.pop_back();
+            }
             _state = TELEX_STATES::INVALID;
         }
         // 'w' always keeps V size constant, don't push case
