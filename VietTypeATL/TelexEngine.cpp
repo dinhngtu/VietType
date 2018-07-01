@@ -207,6 +207,7 @@ TELEX_STATES TelexEngine::PushChar(_In_ wchar_t corig) {
 
     } else if ((_c1 == L"gi" || _v.size()) && IS(cat, TONE)) {
         // tones-only (fjz)
+        // we must check for _c1 == 'gi' to allow typing 'gì'
         auto newtone = GetTone(c);
         if (newtone != _t) {
             _t = newtone;
@@ -282,7 +283,7 @@ TELEX_STATES TelexEngine::Commit() {
     // routine changes buffers from this point
 
     if (tonepos < 0 && _c1 == L"gi" && !_v.size()) {
-        // fixup 'gi'
+        // fixup 'gi' by moving 'i' to _v
         _c1.pop_back();
         _v.push_back(L'i');
         tonepos = 0;
@@ -350,7 +351,7 @@ std::wstring TelexEngine::Peek() const {
     int tonepos;
     map_iterator it;
     auto found = FindTable(&it);
-    // guess tone position if V is not known
+    // guess tone position if _v is not known
     if (found) {
         tonepos = it->second.tonepos;
     } else {
