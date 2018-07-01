@@ -93,7 +93,7 @@ HRESULT OnMenuSelectAll(UINT id) {
 ////////////////////////////////////////////////////////////////////////////////
 
 VietType::RefreshableButton::RefreshableButton(EngineController * ec) {
-    _ec = ec;
+    _controller = ec;
 }
 
 HRESULT VietType::RefreshableButton::Initialize(ITfLangBarItemMgr *langBarItemMgr, GUID const & guidItem, DWORD style, ULONG sort, const std::wstring & description) {
@@ -134,7 +134,7 @@ VietType::IndicatorButton::IndicatorButton(EngineController * ec) : RefreshableB
 
 HRESULT VietType::IndicatorButton::OnClick(TfLBIClick click, POINT pt, const RECT * area) {
     if (click == TF_LBI_CLK_LEFT) {
-        return _ec->ToggleUserEnabled();
+        return _controller->ToggleUserEnabled();
     } else if (click == TF_LBI_CLK_RIGHT) {
         int itemId = PopMenu(pt, area);
         if (itemId) {
@@ -156,7 +156,7 @@ HRESULT VietType::IndicatorButton::OnMenuSelect(UINT id) {
 HRESULT VietType::IndicatorButton::GetIcon(HICON * hicon) {
     // Windows docs is a liar, icons are mandatory
     assert(Globals::dllInstance);
-    if (_ec->IsEnabled()) {
+    if (_controller->IsEnabled()) {
         *hicon = static_cast<HICON>(LoadImage(Globals::dllInstance, MAKEINTRESOURCE(IDI_ICONV), IMAGE_ICON, 16, 16, 0));
     } else {
         *hicon = static_cast<HICON>(LoadImage(Globals::dllInstance, MAKEINTRESOURCE(IDI_ICONE), IMAGE_ICON, 16, 16, 0));
@@ -178,7 +178,7 @@ DWORD VietType::IndicatorButton::GetStatus() {
 }
 
 std::wstring VietType::IndicatorButton::GetText() {
-    return _ec->IsEnabled() ? std::wstring(L"VIE") : std::wstring(L"ENG");
+    return _controller->IsEnabled() ? std::wstring(L"VIE") : std::wstring(L"ENG");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -190,7 +190,7 @@ VietType::LangBarButton::LangBarButton(EngineController * ec) : RefreshableButto
 
 HRESULT VietType::LangBarButton::OnClick(TfLBIClick click, POINT pt, const RECT * area) {
     if (click == TF_LBI_CLK_LEFT) {
-        return _ec->ToggleUserEnabled();
+        return _controller->ToggleUserEnabled();
     } else if (click == TF_LBI_CLK_RIGHT) {
         int itemId = PopMenu(pt, area);
         if (itemId) {
@@ -212,7 +212,7 @@ HRESULT VietType::LangBarButton::OnMenuSelect(UINT id) {
 HRESULT VietType::LangBarButton::GetIcon(HICON * hicon) {
     // Windows docs is a liar, icons are mandatory
     assert(Globals::dllInstance);
-    if (_ec->IsEnabled()) {
+    if (_controller->IsEnabled()) {
         *hicon = static_cast<HICON>(LoadImage(Globals::dllInstance, MAKEINTRESOURCE(IDI_ICONV), IMAGE_ICON, 16, 16, 0));
     } else {
         *hicon = static_cast<HICON>(LoadImage(Globals::dllInstance, MAKEINTRESOURCE(IDI_ICONE), IMAGE_ICON, 16, 16, 0));
@@ -225,7 +225,7 @@ DWORD VietType::LangBarButton::GetStatus() {
 }
 
 std::wstring VietType::LangBarButton::GetText() {
-    return _ec->IsEnabled() ? std::wstring(L"VIE") : std::wstring(L"ENG");
+    return _controller->IsEnabled() ? std::wstring(L"VIE") : std::wstring(L"ENG");
 }
 
 HRESULT VietType::LangBarButton::Refresh() {

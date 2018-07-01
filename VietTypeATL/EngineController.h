@@ -63,7 +63,7 @@ public:
     EngineState const& GetEngine() const;
     std::shared_ptr<EngineState> const& GetEngineShared();
 
-    int IsUserEnabled();
+    HRESULT IsUserEnabled(int *penabled);
     HRESULT WriteUserEnabled(int enabled);
     HRESULT ToggleUserEnabled();
 

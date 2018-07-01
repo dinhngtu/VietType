@@ -26,7 +26,7 @@ public:
     void Uninitialize();
 
 protected:
-    EngineController * _ec;
+    EngineController *_controller;
     SmartComObjPtr<LanguageBarButton> _button;
 
     SmartComPtr<ITfLangBarItemMgr> _langBarItemMgr;

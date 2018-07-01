@@ -160,11 +160,8 @@ std::shared_ptr<VietType::EngineState> const & VietType::EngineController::GetEn
     return _engine;
 }
 
-int VietType::EngineController::IsUserEnabled() {
-    int enabled;
-    HRESULT hr = CompartmentReadEnabled(&enabled);
-    assert(SUCCEEDED(hr));
-    return enabled;
+HRESULT VietType::EngineController::IsUserEnabled(int *penabled) {
+    return CompartmentReadEnabled(penabled);
 }
 
 HRESULT VietType::EngineController::WriteUserEnabled(int enabled) {
@@ -184,7 +181,11 @@ HRESULT VietType::EngineController::WriteUserEnabled(int enabled) {
 }
 
 HRESULT VietType::EngineController::ToggleUserEnabled() {
-    return WriteUserEnabled(IsUserEnabled());
+    HRESULT hr;
+    int enabled;
+    hr = CompartmentReadEnabled(&enabled);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"CompartmentReadEnabled failed");
+    return WriteUserEnabled(enabled);
 }
 
 int VietType::EngineController::IsEnabled() const {
