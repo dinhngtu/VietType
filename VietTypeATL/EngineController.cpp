@@ -233,6 +233,7 @@ HRESULT VietType::EngineController::UpdateStates() {
     case BlockedKind::BLOCKED:
         DBG_DPRINT(L"%s", L"blocked");
         _engine->Enabled(false);
+        break;
     }
 
     hr = _indicatorButton->Refresh();
