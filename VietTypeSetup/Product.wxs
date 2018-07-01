@@ -39,6 +39,16 @@ along with VietType.  If not, see <https://www.gnu.org/licenses/>.
     <Condition Message="32-bit setup can only run on a 32-bit OS.">Installed OR (NOT VersionNT64)</Condition>
     <?endif ?>
 
+    <SetProperty Id="RegisterCategories" Value='"[INSTALLFOLDER]\Registrar.exe" 0 0' After="CostFinalize" Sequence="execute" />
+    <SetProperty Id="RegisterCategoriesRollback" Value='"[INSTALLFOLDER]\Registrar.exe" 1 0' After="CostFinalize" Sequence="execute" />
+    <SetProperty Id="UnregisterCategories" Value='"[INSTALLFOLDER]\Registrar.exe" 1 0' After="CostFinalize" Sequence="execute" />
+    <SetProperty Id="UnregisterCategoriesRollback" Value='"[INSTALLFOLDER]\Registrar.exe" 0 0' After="CostFinalize" Sequence="execute" />
+
+    <SetProperty Id="RegisterProfiles" Value='"[INSTALLFOLDER]\Registrar.exe" 0 1' After="CostFinalize" Sequence="execute" />
+    <SetProperty Id="RegisterProfilesRollback" Value='"[INSTALLFOLDER]\Registrar.exe" 1 1' After="CostFinalize" Sequence="execute" />
+    <SetProperty Id="UnregisterProfiles" Value='"[INSTALLFOLDER]\Registrar.exe" 1 1' After="CostFinalize" Sequence="execute" />
+    <SetProperty Id="UnregisterProfilesRollback" Value='"[INSTALLFOLDER]\Registrar.exe" 0 1' After="CostFinalize" Sequence="execute" />
+
     <InstallExecuteSequence>
       <Custom Action="RegisterCategoriesRollback" After="InstallFiles">(NOT Installed) OR REINSTALL</Custom>
       <Custom Action="RegisterCategories" After="RegisterCategoriesRollback">(NOT Installed) OR REINSTALL</Custom>
@@ -74,6 +84,9 @@ along with VietType.  If not, see <https://www.gnu.org/licenses/>.
         <File Id="VietTypeATL32.dll" Source="$(var.SolutionDir)\Win32\Release\VietTypeATL32.dll" Name="VietTypeATL32.dll">
           <Class Id="{C0DD01A1-0DEB-454B-8B42-D22CED1B4B23}" Context="InprocServer32" Description="VietType" ThreadingModel="apartment" />
         </File>
+      </Component>
+      
+      <Component Id="Registrar">
         <File Id="Registrar.exe" Source="$(var.SolutionDir)\Win32\Release\Registrar.exe" Name="Registrar.exe" />
       </Component>
 
@@ -88,14 +101,14 @@ along with VietType.  If not, see <https://www.gnu.org/licenses/>.
   </Fragment>
 
   <Fragment>
-    <CustomAction Id="RegisterCategories" Directory="INSTALLFOLDER" ExeCommand="[INSTALLFOLDER]\Registrar.exe 0 0" Impersonate="no" Execute="deferred" />
-    <CustomAction Id="RegisterCategoriesRollback" Directory="INSTALLFOLDER" ExeCommand="[INSTALLFOLDER]\Registrar.exe 1 0" Impersonate="no" Execute="rollback" />
-    <CustomAction Id="UnregisterCategories" Directory="INSTALLFOLDER" ExeCommand="[INSTALLFOLDER]\Registrar.exe 1 0" Impersonate="no" Execute="deferred" />
-    <CustomAction Id="UnregisterCategoriesRollback" Directory="INSTALLFOLDER" ExeCommand="[INSTALLFOLDER]\Registrar.exe 0 0" Impersonate="no" Execute="rollback" />
+    <CustomAction Id="RegisterCategories" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="deferred" />
+    <CustomAction Id="RegisterCategoriesRollback" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="rollback" />
+    <CustomAction Id="UnregisterCategories" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="deferred" />
+    <CustomAction Id="UnregisterCategoriesRollback" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="rollback" />
 
-    <CustomAction Id="RegisterProfiles" Directory="INSTALLFOLDER" ExeCommand="[INSTALLFOLDER]\Registrar.exe 0 1" Impersonate="no" Execute="deferred" />
-    <CustomAction Id="RegisterProfilesRollback" Directory="INSTALLFOLDER" ExeCommand="[INSTALLFOLDER]\Registrar.exe 1 1" Impersonate="no" Execute="rollback" />
-    <CustomAction Id="UnregisterProfiles" Directory="INSTALLFOLDER" ExeCommand="[INSTALLFOLDER]\Registrar.exe 1 1" Impersonate="no" Execute="deferred" />
-    <CustomAction Id="UnregisterProfilesRollback" Directory="INSTALLFOLDER" ExeCommand="[INSTALLFOLDER]\Registrar.exe 0 1" Impersonate="no" Execute="rollback" />
+    <CustomAction Id="RegisterProfiles" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="deferred" />
+    <CustomAction Id="RegisterProfilesRollback" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="rollback" />
+    <CustomAction Id="UnregisterProfiles" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="deferred" />
+    <CustomAction Id="UnregisterProfilesRollback" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="rollback" />
   </Fragment>
 </Wix>
