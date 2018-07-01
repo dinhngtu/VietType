@@ -190,7 +190,7 @@ HRESULT VietType::EngineController::ToggleUserEnabled() {
     int enabled;
     hr = CompartmentReadEnabled(&enabled);
     HRESULT_CHECK_RETURN(hr, L"%s", L"CompartmentReadEnabled failed");
-    return WriteUserEnabled(enabled);
+    return WriteUserEnabled(!enabled);
 }
 
 int VietType::EngineController::IsEnabled() const {
