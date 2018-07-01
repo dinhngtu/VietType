@@ -229,10 +229,10 @@ HRESULT VietType::EngineController::UpdateStates() {
     switch (_blocked) {
     case BlockedKind::FREE:
     case BlockedKind::ADVISED: {
-        DBG_DPRINT(L"block = %d", static_cast<int>(_blocked));
         int enabled;
         hr = CompartmentReadEnabled(&enabled);
         HRESULT_CHECK_RETURN(hr, L"%s", L"CompartmentReadEnabled failed");
+        DBG_DPRINT(L"block = %d, enabled = %d", static_cast<int>(_blocked), enabled);
         _engine->Enabled(enabled);
         break;
     }
