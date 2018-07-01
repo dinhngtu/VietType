@@ -20,17 +20,17 @@
 
 #include "stdafx.h"
 
-__declspec(dllimport) HRESULT RegisterProfiles();
-__declspec(dllimport) HRESULT UnregisterProfiles();
-__declspec(dllimport) HRESULT RegisterCategories();
-__declspec(dllimport) HRESULT UnregisterCategories();
+extern "C" typedef HRESULT(__cdecl *funtype)();
 
 // registrar 0|1 0|1
 // first argument: register(0)/unregister(1)
 // second argument: categories(0)/profiles(1)
 // order: install 00-01 / uninstall 11-10
 int main(int argc, wchar_t **argv) {
-    HRESULT hr;
+    // only load from exe directory
+    SetDllDirectory(L"");
+
+    long result;
 
     if (argc != 3) {
         return E_FAIL;
@@ -54,28 +54,60 @@ int main(int argc, wchar_t **argv) {
         return E_FAIL;
     }
 
-    hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
-    if (FAILED(hr)) {
-        return hr;
+    result = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+    if (FAILED(result)) {
+        return result;
     }
+
+#if _WIN64
+    HMODULE mod = LoadLibraryEx(L"VietTypeATL64.dll", NULL, LOAD_LIBRARY_SEARCH_DEFAULT_DIRS);
+#elif _WIN32
+    HMODULE mod = LoadLibraryEx(L"VietTypeATL32.dll", NULL, LOAD_LIBRARY_SEARCH_DEFAULT_DIRS);
+#else
+#error "Unsupported architecture"
+#endif
+
+    if (!mod) {
+        result = GetLastError();
+        wprintf_s(L"LoadLibraryEx failed error %lx", result);
+        goto cleanup;
+    }
+
+    funtype fun;
 
     if (a1 == 0 && a2 == 0) {
         wprintf_s(L"RegisterCategories ");
-        hr = RegisterCategories();
+        fun = reinterpret_cast<funtype>(GetProcAddress(mod, "RegisterCategories"));
     } else if (a1 == 0 && a2 == 1) {
         wprintf_s(L"RegisterProfiles ");
-        hr = RegisterProfiles();
+        fun = reinterpret_cast<funtype>(GetProcAddress(mod, "RegisterProfiles"));
     } else if (a1 == 1 && a2 == 1) {
         wprintf_s(L"UnregisterProfiles ");
-        hr = UnregisterProfiles();
+        fun = reinterpret_cast<funtype>(GetProcAddress(mod, "UnregisterProfiles"));
     } else if (a1 == 1 && a2 == 0) {
         wprintf_s(L"UnregisterCategories ");
-        hr = UnregisterCategories();
+        fun = reinterpret_cast<funtype>(GetProcAddress(mod, "UnregisterCategories"));
+    } else {
+        wprintf_s(L"bad parameters\n");
+        result = 1;
+        goto cleanup;
     }
 
+    if (fun) {
+        result = fun();
+        wprintf_s(L"%lx\n", result);
+    } else {
+        result = GetLastError();
+        wprintf_s(L"GetProcAddress failed error %lx", result);
+        goto cleanup;
+    }
+
+cleanup:
+    if (mod) {
+        FreeLibrary(mod);
+    }
     CoUninitialize();
 
-    wprintf_s(L"%lx\n", hr);
-    return hr;
+    return result;
 }
 

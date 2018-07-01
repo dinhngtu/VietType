@@ -23,16 +23,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved
 
 #include "Common.h"
-#include <MsiQuery.h>
-
-#define MSI_ACTION_ENTRY_POINT(fun) extern "C" __declspec(dllexport) UINT __stdcall fun ## Msi(MSIHANDLE hInstall) { \
-    auto hr = fun(); \
-    if (SUCCEEDED(hr)) { \
-        return ERROR_SUCCESS; \
-    } else { \
-        return ERROR_INSTALL_FAILURE; \
-    } \
-}
 
 static std::vector<GUID> SupportedCategories = {
     GUID_TFCAT_TIP_KEYBOARD,
@@ -42,7 +32,7 @@ static std::vector<GUID> SupportedCategories = {
     GUID_TFCAT_TIPCAP_SYSTRAYSUPPORT, // systray on win8+?
 };
 
-__declspec(dllexport) HRESULT RegisterProfiles() {
+extern "C" __declspec(dllexport) HRESULT __cdecl RegisterProfiles() {
     HRESULT hr;
 
     if (!VietType::Globals::dllInstance) {
@@ -85,9 +75,8 @@ __declspec(dllexport) HRESULT RegisterProfiles() {
 
     return S_OK;
 }
-MSI_ACTION_ENTRY_POINT(RegisterProfiles);
 
-__declspec(dllexport) HRESULT UnregisterProfiles() {
+extern "C" __declspec(dllexport) HRESULT __cdecl UnregisterProfiles() {
     HRESULT hr;
 
     SmartComPtr<ITfInputProcessorProfileMgr> profileMgr;
@@ -103,9 +92,8 @@ __declspec(dllexport) HRESULT UnregisterProfiles() {
 
     return S_OK;
 }
-MSI_ACTION_ENTRY_POINT(UnregisterProfiles);
 
-__declspec(dllexport) HRESULT RegisterCategories() {
+extern "C" __declspec(dllexport) HRESULT __cdecl RegisterCategories() {
     HRESULT hr;
 
     SmartComPtr<ITfCategoryMgr> categoryMgr;
@@ -123,9 +111,8 @@ __declspec(dllexport) HRESULT RegisterCategories() {
 
     return S_OK;
 }
-MSI_ACTION_ENTRY_POINT(RegisterCategories);
 
-__declspec(dllexport) HRESULT UnregisterCategories() {
+extern "C" __declspec(dllexport) HRESULT __cdecl UnregisterCategories() {
     HRESULT hr;
 
     SmartComPtr<ITfCategoryMgr> categoryMgr;
@@ -154,4 +141,3 @@ __declspec(dllexport) HRESULT UnregisterCategories() {
 
     return S_OK;
 }
-MSI_ACTION_ENTRY_POINT(UnregisterCategories);
