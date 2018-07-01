@@ -9,7 +9,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VietTypeATL", "VietTypeATL\
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "VietTypeSetup", "VietTypeSetup\VietTypeSetup.wixproj", "{8882E9D2-7670-4906-98F5-60A147BF5ECA}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Registrar", "VietTypeRegistrar\VietTypeRegistrar.vcxproj", "{21FE5325-5162-4B68-9D65-397FC99D82B1}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VietTypeRegistrar", "VietTypeRegistrar\VietTypeRegistrar.vcxproj", "{21FE5325-5162-4B68-9D65-397FC99D82B1}"
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "VietTypeSetupBootstrapper", "VietTypeSetupBootstrapper\VietTypeSetupBootstrapper.wixproj", "{1139CE87-C648-4D3C-8F2A-61AB9D04C396}"
 EndProject
@@ -80,19 +80,14 @@ Global
 		{21FE5325-5162-4B68-9D65-397FC99D82B1}.TestRelease|x64.ActiveCfg = Release|x64
 		{21FE5325-5162-4B68-9D65-397FC99D82B1}.TestRelease|x64.Build.0 = Release|x64
 		{1139CE87-C648-4D3C-8F2A-61AB9D04C396}.Debug|Win32.ActiveCfg = Debug|x86
-		{1139CE87-C648-4D3C-8F2A-61AB9D04C396}.Debug|Win32.Build.0 = Debug|x86
 		{1139CE87-C648-4D3C-8F2A-61AB9D04C396}.Debug|x64.ActiveCfg = Debug|x86
 		{1139CE87-C648-4D3C-8F2A-61AB9D04C396}.Release|Win32.ActiveCfg = Release|x86
 		{1139CE87-C648-4D3C-8F2A-61AB9D04C396}.Release|Win32.Build.0 = Release|x86
 		{1139CE87-C648-4D3C-8F2A-61AB9D04C396}.Release|x64.ActiveCfg = Release|x86
 		{1139CE87-C648-4D3C-8F2A-61AB9D04C396}.TestDebug|Win32.ActiveCfg = Debug|x86
-		{1139CE87-C648-4D3C-8F2A-61AB9D04C396}.TestDebug|Win32.Build.0 = Debug|x86
 		{1139CE87-C648-4D3C-8F2A-61AB9D04C396}.TestDebug|x64.ActiveCfg = Release|x86
-		{1139CE87-C648-4D3C-8F2A-61AB9D04C396}.TestDebug|x64.Build.0 = Release|x86
 		{1139CE87-C648-4D3C-8F2A-61AB9D04C396}.TestRelease|Win32.ActiveCfg = Release|x86
-		{1139CE87-C648-4D3C-8F2A-61AB9D04C396}.TestRelease|Win32.Build.0 = Release|x86
 		{1139CE87-C648-4D3C-8F2A-61AB9D04C396}.TestRelease|x64.ActiveCfg = Release|x86
-		{1139CE87-C648-4D3C-8F2A-61AB9D04C396}.TestRelease|x64.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
