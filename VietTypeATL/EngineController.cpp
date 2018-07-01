@@ -45,6 +45,11 @@ HRESULT EditBlocked(
     hr = prop->GetValue(ec, sel.range, &var);
     HRESULT_CHECK_RETURN(hr, L"%s", L"prop->GetValue failed");
 
+    if (var.vt != VT_UNKNOWN) {
+        DBG_DPRINT(L"bad variant type %d", static_cast<int>(var.vt));
+        return E_NOINTERFACE;
+    }
+
     SmartComPtr<ITfInputScope> iis(var.punkVal);
     if (!iis) {
         DBG_DPRINT(L"QI on ITfInputScope failed");
