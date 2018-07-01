@@ -74,7 +74,7 @@ along with VietType.  If not, see <https://www.gnu.org/licenses/>.
         <File Id="VietTypeATL32.dll" Source="$(var.SolutionDir)\Win32\Release\VietTypeATL32.dll" Name="VietTypeATL32.dll">
           <Class Id="{C0DD01A1-0DEB-454B-8B42-D22CED1B4B23}" Context="InprocServer32" Description="VietType" ThreadingModel="apartment" />
         </File>
-        <File Id="Registrar.exe" Source="$(var.SolutionDir)\Win32\Release\VietTypeRegistrar.exe" Name="Registrar.exe" />
+        <File Id="Registrar.exe" Source="$(var.SolutionDir)\Win32\Release\Registrar.exe" Name="Registrar.exe" />
       </Component>
 
       <?if $(var.Platform) = x64 ?>

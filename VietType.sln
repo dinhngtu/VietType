@@ -7,11 +7,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VietTypeTests", "VietTypeTe
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VietTypeATL", "VietTypeATL\VietTypeATL.vcxproj", "{6CA483BD-B365-42DC-8AE6-7CFBD2014CBE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Registrar", "Registrar\Registrar.csproj", "{6C40BFBD-4418-4DF3-962B-9DF9D24927DA}"
-EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "VietTypeSetup", "VietTypeSetup\VietTypeSetup.wixproj", "{8882E9D2-7670-4906-98F5-60A147BF5ECA}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VietTypeRegistrar", "VietTypeRegistrar\VietTypeRegistrar.vcxproj", "{21FE5325-5162-4B68-9D65-397FC99D82B1}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Registrar", "VietTypeRegistrar\VietTypeRegistrar.vcxproj", "{21FE5325-5162-4B68-9D65-397FC99D82B1}"
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "VietTypeSetupBootstrapper", "VietTypeSetupBootstrapper\VietTypeSetupBootstrapper.wixproj", "{1139CE87-C648-4D3C-8F2A-61AB9D04C396}"
 EndProject
@@ -55,22 +53,6 @@ Global
 		{6CA483BD-B365-42DC-8AE6-7CFBD2014CBE}.TestRelease|Win32.Build.0 = TestRelease|Win32
 		{6CA483BD-B365-42DC-8AE6-7CFBD2014CBE}.TestRelease|x64.ActiveCfg = TestRelease|x64
 		{6CA483BD-B365-42DC-8AE6-7CFBD2014CBE}.TestRelease|x64.Build.0 = TestRelease|x64
-		{6C40BFBD-4418-4DF3-962B-9DF9D24927DA}.Debug|Win32.ActiveCfg = Debug|Any CPU
-		{6C40BFBD-4418-4DF3-962B-9DF9D24927DA}.Debug|Win32.Build.0 = Debug|Any CPU
-		{6C40BFBD-4418-4DF3-962B-9DF9D24927DA}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{6C40BFBD-4418-4DF3-962B-9DF9D24927DA}.Debug|x64.Build.0 = Debug|Any CPU
-		{6C40BFBD-4418-4DF3-962B-9DF9D24927DA}.Release|Win32.ActiveCfg = Release|Any CPU
-		{6C40BFBD-4418-4DF3-962B-9DF9D24927DA}.Release|Win32.Build.0 = Release|Any CPU
-		{6C40BFBD-4418-4DF3-962B-9DF9D24927DA}.Release|x64.ActiveCfg = Release|Any CPU
-		{6C40BFBD-4418-4DF3-962B-9DF9D24927DA}.Release|x64.Build.0 = Release|Any CPU
-		{6C40BFBD-4418-4DF3-962B-9DF9D24927DA}.TestDebug|Win32.ActiveCfg = Debug|Any CPU
-		{6C40BFBD-4418-4DF3-962B-9DF9D24927DA}.TestDebug|Win32.Build.0 = Debug|Any CPU
-		{6C40BFBD-4418-4DF3-962B-9DF9D24927DA}.TestDebug|x64.ActiveCfg = Debug|Any CPU
-		{6C40BFBD-4418-4DF3-962B-9DF9D24927DA}.TestDebug|x64.Build.0 = Debug|Any CPU
-		{6C40BFBD-4418-4DF3-962B-9DF9D24927DA}.TestRelease|Win32.ActiveCfg = Release|Any CPU
-		{6C40BFBD-4418-4DF3-962B-9DF9D24927DA}.TestRelease|Win32.Build.0 = Release|Any CPU
-		{6C40BFBD-4418-4DF3-962B-9DF9D24927DA}.TestRelease|x64.ActiveCfg = Release|Any CPU
-		{6C40BFBD-4418-4DF3-962B-9DF9D24927DA}.TestRelease|x64.Build.0 = Release|Any CPU
 		{8882E9D2-7670-4906-98F5-60A147BF5ECA}.Debug|Win32.ActiveCfg = Debug|x86
 		{8882E9D2-7670-4906-98F5-60A147BF5ECA}.Debug|x64.ActiveCfg = Debug|x64
 		{8882E9D2-7670-4906-98F5-60A147BF5ECA}.Release|Win32.ActiveCfg = Release|x86
