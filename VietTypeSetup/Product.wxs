@@ -97,6 +97,10 @@ along with VietType.  If not, see <https://www.gnu.org/licenses/>.
         <File Id="Registrar.exe" Source="$(var.SolutionDir)\Win32\Release\Registrar.exe" Name="Registrar.exe" />
       </Component>
 
+      <Component Id="LICENSE">
+        <File Id="LICENSE" Source="$(var.SolutionDir)\LICENSE" Name="LICENSE" />
+      </Component>
+
       <?if $(var.Platform) = x64 ?>
       <Component Id="VietTypeATL64" Win64="yes">
         <File Id="VietTypeATL64.dll" Source="$(var.SolutionDir)\x64\Release\VietTypeATL64.dll" Name="VietTypeATL64.dll">

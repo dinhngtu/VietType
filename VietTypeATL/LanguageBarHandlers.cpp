@@ -1,3 +1,20 @@
+// Copyright (c) Dinh Ngoc Tu.
+// 
+// This file is part of VietType.
+// 
+// VietType is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// VietType is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with VietType.  If not, see <https://www.gnu.org/licenses/>.
+
 #include "LanguageBarHandlers.h"
 #include "EngineController.h"
 
@@ -81,9 +98,15 @@ HRESULT CopyTfMenu(ITfMenu *menu) {
 
 HRESULT OnMenuSelectAll(UINT id) {
     switch (id) {
-    case ID_TRAY_ABOUT:
-        MessageBox(NULL, L"VietType", L"VietType", MB_OK | MB_ICONINFORMATION);
+    case ID_TRAY_ABOUT: {
+        wchar_t const *text = nullptr;
+        if (!LoadString(VietType::Globals::dllInstance, IDS_LICENSENOTICE, reinterpret_cast<LPWSTR>(&text), 0)) {
+            WINERROR_RETURN_HRESULT(L"%s", L"LoadString failed");
+        }
+        assert(text);
+        MessageBox(NULL, text, VietType::Globals::TextServiceDescription.c_str(), MB_OK | MB_ICONINFORMATION);
         break;
+    }
     }
     return S_OK;
 }
