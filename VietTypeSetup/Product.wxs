@@ -18,10 +18,19 @@ You should have received a copy of the GNU General Public License
 along with VietType.  If not, see <https://www.gnu.org/licenses/>.
 -->
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-  <Product Id="*" Name="VietType" Language="1033" Version="1.0.0.0" Manufacturer="Dinh Ngoc Tu" UpgradeCode="e00ac838-881d-4301-aac5-0a723bb0b0ef">
+  <Product
+    Id="*"
+    Name="VietType"
+    Language="!(bind.fileLanguage.VietTypeATL32.dll)"
+    Version="!(bind.fileVersion.VietTypeATL32.dll)"
+    Manufacturer="Dinh Ngoc Tu"
+    UpgradeCode="e00ac838-881d-4301-aac5-0a723bb0b0ef">
+    
     <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
 
-    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <MajorUpgrade
+      DowngradeErrorMessage="A newer version of [ProductName] is already installed."
+      Schedule="afterInstallInitialize" />
     <MediaTemplate EmbedCab="yes" />
 
     <Feature Id="ProductFeature" Title="VietTypeSetup" Level="1">
@@ -31,9 +40,7 @@ along with VietType.  If not, see <https://www.gnu.org/licenses/>.
     <UIRef Id="WixUI_Minimal" />
     <WixVariable Id="WixUILicenseRtf" Value="$(var.SolutionDir)\LICENSE.rtf" />
 
-    <Condition Message="VietType is only compatible with Windows 8 and newer.">
-      <![CDATA[Installed OR (VersionNT >= 602)]]>
-    </Condition>
+    <Condition Message="VietType is only compatible with Windows 8 and newer.">Installed OR (VersionNT >= 602)</Condition>
 
     <?if $(var.Platform) = x86 ?>
     <Condition Message="32-bit setup can only run on a 32-bit OS.">Installed OR (NOT VersionNT64)</Condition>
