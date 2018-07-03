@@ -71,6 +71,8 @@ template <typename... Args>
 void _winerrorprint(const wchar_t *func, int line, DWORD err, const wchar_t *fmt, Args... args) {
     wchar_t errmessage[256];
     auto chars = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, err, 0, errmessage, 256, NULL);
+    assert(chars >= 0 && chars < 256);
+    errmessage[chars] = 0;
 
     wchar_t buf[2048];
     StringCchPrintf(buf, 2048, fmt, func, line, err, errmessage, args...);

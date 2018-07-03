@@ -66,7 +66,7 @@ extern "C" __declspec(dllexport) HRESULT __cdecl RegisterProfiles() {
         static_cast<LONG>(VietType::Globals::TextServiceDescription.length()),
         dllPath, // icon file path
         dllPathLength, // icon file name path
-        -IDI_IMELOGO, // icon index has to be negative for some reason
+        static_cast<ULONG>(-IDI_IMELOGO), // icon index has to be negative for some reason
         NULL, // hklSubstitute
         0,
         TRUE,

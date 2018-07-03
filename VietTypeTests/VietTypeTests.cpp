@@ -115,27 +115,21 @@ void main3() {
     TelexEngine tx(c);
     
     tx.Reset();
-    tx.PushChar(L'c');
-    auto x = tx.Peek();
-    tx.PushChar(L'h');
-    x = tx.Peek();
-    tx.PushChar(L'u');
-    x = tx.Peek();
-    tx.PushChar(L'a');
-    x = tx.Peek();
-    tx.PushChar(L'a');
-    x = tx.Peek();
+    tx.PushChar(L'd');
+    tx.PushChar(L'd');
+    tx.PushChar(L'o');
+    tx.PushChar(L'o');
     tx.PushChar(L'n');
-    x = tx.Peek();
-    tx.PushChar(L'r');
-    //x = tx.Peek();
+    tx.PushChar(L'g');
+    tx.PushChar(L'f');
+    tx.Backspace();
     tx.Commit();
-    x = tx.Retrieve();
+    auto x = tx.Retrieve();
     DPRINT(L"%s", x.c_str());
 }
 
 int main() {
-    main2();
+    main3();
 
     return 0;
 }
