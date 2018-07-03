@@ -74,23 +74,31 @@ public:
 private:
     struct TelexConfig _config;
 
-    TELEX_STATES _state;
+    TELEX_STATES _state = TELEX_STATES::VALID;
 
     std::wstring _keyBuffer;
     std::wstring _c1;
     std::wstring _v;
     std::wstring _c2;
-    TONES _t;
+    TONES _t = TONES::Z;
     // don't use vector<bool> since that's special
     /// <summary>
-    /// do not use when invalid
+    /// only use when valid
     /// 1 = uppercase, 0 = lowercase
     /// </summary>
     std::vector<int> _cases;
+    /// <summary>
+    /// only use when valid
+    /// for each character in the _keyBuffer, record which output character it's responsible for
+    /// fx. 'đuống' (dduoongs) _respos = 0C12V34T (T = tone, C = transition _c1, V = transition _v)
+    /// </summary>
+    std::vector<int> _respos;
+    int _respos_current = 0;
 
 private:
     using map_iterator = genmap<std::wstring, VINFO>::const_iterator;
     bool FindTable(_Out_ map_iterator *it) const;
+    bool GetTonePos(bool predict, _Out_ Telex::VINFO *vinfo) const;
 
 private:
     DISALLOW_COPY_AND_ASSIGN(TelexEngine);

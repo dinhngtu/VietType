@@ -46,6 +46,29 @@ genmap<std::wstring, std::wstring> const transitions = {
     {L"\xf4o", L"oo"},
 };
 
+genmap<std::wstring, int> const respos = {
+    {L"\xe2", 0},
+    {L"\xea", 0},
+    {L"i\xea", 1},
+    {L"\xf4", 0},
+    {L"u\xe2", 1},
+    {L"u\xf4", 1},
+    {L"\x1b0\x1a1", 0}, // keep transition for uwow
+    {L"\x1b0\x1a1i", 0},
+    {L"\x1b0\x1a1u", 0},
+    {L"uy\xea", 2},
+    {L"y\xea", 1},
+    {L"\x111", 0},
+    // relaxed transformations
+    {L"i\xeau", 1},
+    {L"y\xeau", 1},
+    {L"\xe2u", 0},
+    {L"\xe2y", 0},
+    {L"\xeau", 0},
+    {L"u\xf4i", 1},
+    {L"u\xe2y", 1},
+};
+
 genmap<std::wstring, std::wstring> const transitions_w = {
     {L"a", L"\x103"},
     {L"o", L"\x1a1"},
@@ -56,6 +79,17 @@ genmap<std::wstring, std::wstring> const transitions_w = {
     {L"uo", L"u\x1a1"},
     {L"uoi", L"\x1b0\x1a1i"},
     {L"\x1b0o", L"\x1b0\x1a1"},
+};
+
+genmap<std::wstring, int> const respos_w = {
+    {L"\x103", 0},
+    {L"\x1a1", 0},
+    {L"o\x103", 1},
+    {L"\x1a1i", 0},
+    {L"\x1b0", 0},
+    {L"\x1b0i", 0},
+    {L"u\x1a1", 0},
+    {L"\x1b0\x1a1i", 0},
 };
 
 genmap<std::wstring, std::wstring> const transitions_v_c2 = {

@@ -56,9 +56,14 @@ using genset = std::unordered_set<T>;
 /// ensure that c1 or v only shrinks by 1 character or stays a constant length with this transition.
 /// </summary>
 extern genmap<std::wstring, std::wstring> const transitions;
+extern genmap<std::wstring, int> const respos;
+
 extern genmap<std::wstring, std::wstring> const transitions_w;
+extern genmap<std::wstring, int> const respos_w;
+
 extern genmap<std::wstring, std::wstring> const transitions_v_c2;
 extern genmap<wchar_t, std::wstring> const transitions_tones;
+
 extern genset<std::wstring> const valid_c1;
 extern genmap<std::wstring, VINFO> const valid_v; // value: accent position
 extern genmap<std::wstring, VINFO> const valid_v_q; // value: accent position
