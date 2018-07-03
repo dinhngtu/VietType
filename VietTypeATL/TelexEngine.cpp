@@ -276,8 +276,7 @@ TelexStates TelexEngine::Backspace() {
     auto oldc1 = _c1;
     auto oldv = _v;
 
-    auto peek = Peek();
-    auto toDelete = static_cast<int>(peek.length()) - 1;
+    auto toDelete = static_cast<int>(_c1.size() + _v.size() + _c2.size()) - 1;
 
     Reset();
 
