@@ -42,7 +42,7 @@ namespace Telex {
 
 // COMMITTED|COMMITTED_INVALID -> VALID (Reset)
 
-enum class TELEX_STATES {
+enum class TelexStates {
     VALID, // valid word, can accept more chars but cannot get result
     INVALID, // invalid word but can still accept more chars
     COMMITTED, // valid, tones have been applied, cannot accept any more chars (must get result or Reset)
@@ -60,11 +60,11 @@ public:
     ~TelexEngine();
 
     void Reset();
-    TELEX_STATES PushChar(_In_ wchar_t c);
-    TELEX_STATES Backspace();
-    TELEX_STATES Commit();
-    TELEX_STATES ForceCommit();
-    TELEX_STATES Cancel();
+    TelexStates PushChar(_In_ wchar_t c);
+    TelexStates Backspace();
+    TelexStates Commit();
+    TelexStates ForceCommit();
+    TelexStates Cancel();
 
     std::wstring Retrieve() const;
     std::wstring RetrieveInvalid() const;
@@ -74,7 +74,7 @@ public:
 private:
     struct TelexConfig _config;
 
-    TELEX_STATES _state = TELEX_STATES::VALID;
+    TelexStates _state = TelexStates::VALID;
 
     std::wstring _keyBuffer;
     std::wstring _c1;

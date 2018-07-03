@@ -81,7 +81,7 @@ TelexEngine::~TelexEngine() {
 
 void TelexEngine::Reset() {
     DBG_DPRINT(L"%s", L"resetting engine");
-    _state = TELEX_STATES::VALID;
+    _state = TelexStates::VALID;
     _keyBuffer.clear();
     _c1.clear();
     _v.clear();
@@ -93,7 +93,7 @@ void TelexEngine::Reset() {
 }
 
 // remember to push into _cases when adding a new character
-TELEX_STATES TelexEngine::PushChar(_In_ wchar_t corig) {
+TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
     wchar_t c;
     auto ccase = FindLower(corig, &c);
 
@@ -101,8 +101,8 @@ TELEX_STATES TelexEngine::PushChar(_In_ wchar_t corig) {
 
     _keyBuffer.push_back(corig);
 
-    if (_state == TELEX_STATES::INVALID || cat == CHR_CATEGORIES::UNCATEGORIZED) {
-        _state = TELEX_STATES::INVALID;
+    if (_state == TelexStates::INVALID || cat == CHR_CATEGORIES::UNCATEGORIZED) {
+        _state = TelexStates::INVALID;
 
     } else if (!_c1.size() && !_v.size() && (IS(cat, CONSO_C1) || IS(cat, CONSO_CONTINUE))) {
         _c1.push_back(c);
@@ -159,12 +159,12 @@ TELEX_STATES TelexEngine::PushChar(_In_ wchar_t corig) {
             if (_c2.size()) {
                 // in case there exists no transition when _c2 is already typed
                 // fx. 'cace'
-                _state = TELEX_STATES::INVALID;
+                _state = TelexStates::INVALID;
             }
             // invalidate if same char entered twice in a row
             if (_keyBuffer.size() > 1 && c == _keyBuffer.rbegin()[1]) {
                 _keyBuffer.pop_back();
-                _state = TELEX_STATES::INVALID;
+                _state = TelexStates::INVALID;
             }
         }
 
@@ -184,7 +184,7 @@ TELEX_STATES TelexEngine::PushChar(_In_ wchar_t corig) {
             if (c == _keyBuffer.rbegin()[1]) {
                 _keyBuffer.pop_back();
             }
-            _state = TELEX_STATES::INVALID;
+            _state = TelexStates::INVALID;
         }
         // 'w' always keeps V size constant, don't push case
 
@@ -206,7 +206,7 @@ TELEX_STATES TelexEngine::PushChar(_In_ wchar_t corig) {
             if (c == _keyBuffer.rbegin()[1]) {
                 _keyBuffer.pop_back();
             }
-            _state = TELEX_STATES::INVALID;
+            _state = TelexStates::INVALID;
         }
 
     } else if (_v.size() && !_c2.size() && IS(cat, CONSO_C2)) {
@@ -238,37 +238,37 @@ TELEX_STATES TelexEngine::PushChar(_In_ wchar_t corig) {
             if (c == _keyBuffer.rbegin()[1]) {
                 _keyBuffer.pop_back();
             }
-            _state = TELEX_STATES::INVALID;
+            _state = TelexStates::INVALID;
         }
 
     } else if (cat == CHR_CATEGORIES::SHORTHANDS) {
         // not implemented
-        _state = TELEX_STATES::INVALID;
+        _state = TelexStates::INVALID;
 
     } else {
-        _state = TELEX_STATES::INVALID;
+        _state = TelexStates::INVALID;
     }
 
     return _state;
 }
 
-TELEX_STATES TelexEngine::Backspace() {
+TelexStates TelexEngine::Backspace() {
     auto buf = _keyBuffer;
 
-    if (_state == TELEX_STATES::INVALID) {
+    if (_state == TelexStates::INVALID) {
         Reset();
         if (buf.size()) {
             buf.pop_back();
         }
         if (buf.size()) {
-            _state = TELEX_STATES::INVALID;
+            _state = TelexStates::INVALID;
         }
         for (auto c : buf) {
             PushChar(c);
         }
         return _state;
-    } else if (_state != TELEX_STATES::VALID) {
-        return TELEX_STATES::TXERROR;
+    } else if (_state != TelexStates::VALID) {
+        return TelexStates::TXERROR;
     }
 
     assert(_keyBuffer.size() == _respos.size());
@@ -303,12 +303,12 @@ TELEX_STATES TelexEngine::Backspace() {
             // pass
         } else if (rp[i] == RESPOS_TRANSITION_V) {
             auto rp_it = respos.find(oldv);
-            if (rp_it != respos.end() && (oldc1.size() + rp_it->second) < toDelete) {
+            if (rp_it != respos.end() && (static_cast<int>(oldc1.size()) + rp_it->second) < toDelete) {
                 PushChar(buf[i]);
             }
         } else if (rp[i] == RESPOS_TRANSITION_W) {
             auto rpw_it = respos_w.find(oldv);
-            if (rpw_it != respos_w.end() && (oldc1.size() + rpw_it->second) < toDelete) {
+            if (rpw_it != respos_w.end() && (static_cast<int>(oldc1.size()) + rpw_it->second) < toDelete) {
                 PushChar(buf[i]);
             }
         } else if (rp[i] == RESPOS_TONE) {
@@ -325,31 +325,31 @@ TELEX_STATES TelexEngine::Backspace() {
     return _state;
 }
 
-TELEX_STATES TelexEngine::Commit() {
-    if (_state == TELEX_STATES::COMMITTED || _state == TELEX_STATES::COMMITTED_INVALID) {
+TelexStates TelexEngine::Commit() {
+    if (_state == TelexStates::COMMITTED || _state == TelexStates::COMMITTED_INVALID) {
         return _state;
     }
 
-    if (_state == TELEX_STATES::INVALID) {
-        _state = TELEX_STATES::COMMITTED_INVALID;
+    if (_state == TelexStates::INVALID) {
+        _state = TelexStates::COMMITTED_INVALID;
         return _state;
     }
 
     // validate c1
     auto c1_it = valid_c1.find(_c1);
     if (c1_it == valid_c1.end()) {
-        _state = TELEX_STATES::COMMITTED_INVALID;
+        _state = TelexStates::COMMITTED_INVALID;
         return _state;
     }
 
     // validate c2
     auto c2_it = valid_c2.find(_c2);
     if (c2_it == valid_c2.end()) {
-        _state = TELEX_STATES::COMMITTED_INVALID;
+        _state = TelexStates::COMMITTED_INVALID;
         return _state;
     }
     if (c2_it->second && !(_t == TONES::S || _t == TONES::J)) {
-        _state = TELEX_STATES::COMMITTED_INVALID;
+        _state = TelexStates::COMMITTED_INVALID;
         return _state;
     }
 
@@ -357,7 +357,7 @@ TELEX_STATES TelexEngine::Commit() {
     VINFO vinfo;
     auto found = GetTonePos(false, &vinfo);
     if (!found) {
-        _state = TELEX_STATES::COMMITTED_INVALID;
+        _state = TelexStates::COMMITTED_INVALID;
         return _state;
     }
 
@@ -369,48 +369,48 @@ TELEX_STATES TelexEngine::Commit() {
         _v.push_back(L'i');
         vinfo.tonepos = 0;
     } else if (vinfo.c2mode == C2MODE::MUSTC2 && !_c2.size()) {
-        _state = TELEX_STATES::COMMITTED_INVALID;
+        _state = TelexStates::COMMITTED_INVALID;
         return _state;
     } else if (vinfo.c2mode == C2MODE::NOC2 && _c2.size()) {
-        _state = TELEX_STATES::COMMITTED_INVALID;
+        _state = TelexStates::COMMITTED_INVALID;
         return _state;
     }
 
     _v[vinfo.tonepos] = TranslateTone(_v[vinfo.tonepos], _t);
 
-    _state = TELEX_STATES::COMMITTED;
+    _state = TelexStates::COMMITTED;
     return _state;
 }
 
-TELEX_STATES TelexEngine::ForceCommit() {
-    if (_state == TELEX_STATES::COMMITTED || _state == TELEX_STATES::COMMITTED_INVALID) {
+TelexStates TelexEngine::ForceCommit() {
+    if (_state == TelexStates::COMMITTED || _state == TelexStates::COMMITTED_INVALID) {
         return _state;
     }
 
-    if (_state == TELEX_STATES::INVALID) {
-        _state = TELEX_STATES::COMMITTED_INVALID;
+    if (_state == TelexStates::INVALID) {
+        _state = TelexStates::COMMITTED_INVALID;
         return _state;
     }
 
     VINFO vinfo;
     auto found = GetTonePos(false, &vinfo);
     if (!found) {
-        _state = TELEX_STATES::COMMITTED_INVALID;
+        _state = TelexStates::COMMITTED_INVALID;
         return _state;
     }
     _v[vinfo.tonepos] = TranslateTone(_v[vinfo.tonepos], _t);
 
-    _state = TELEX_STATES::COMMITTED;
+    _state = TelexStates::COMMITTED;
     return _state;
 }
 
-TELEX_STATES TelexEngine::Cancel() {
-    _state = TELEX_STATES::COMMITTED_INVALID;
+TelexStates TelexEngine::Cancel() {
+    _state = TelexStates::COMMITTED_INVALID;
     return _state;
 }
 
 std::wstring TelexEngine::Retrieve() const {
-    if (_state == TELEX_STATES::INVALID || _state == TELEX_STATES::COMMITTED_INVALID) {
+    if (_state == TelexStates::INVALID || _state == TelexStates::COMMITTED_INVALID) {
         DBG_DPRINT(L"invalid retrieve call state %d", _state);
         return std::wstring();
     }

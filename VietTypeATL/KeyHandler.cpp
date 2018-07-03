@@ -82,7 +82,7 @@ HRESULT VietType::KeyHandlerEditSession::ComposeKey(TfEditCookie ec) {
     HRESULT hr;
 
     switch (Telex::PushKey(_engine->Engine(), _wParam, _lParam, _keyState)) {
-    case Telex::TELEX_STATES::VALID: {
+    case Telex::TelexStates::VALID: {
         if (_engine->Count()) {
             auto str = _engine->Peek();
             hr = _compositionManager->EnsureCompositionText(_context, ec, &str[0], static_cast<LONG>(str.length()));
@@ -99,7 +99,7 @@ HRESULT VietType::KeyHandlerEditSession::ComposeKey(TfEditCookie ec) {
         break;
     }
 
-    case Telex::TELEX_STATES::INVALID: {
+    case Telex::TelexStates::INVALID: {
         assert(_engine->Count() > 0);
         auto str = _engine->RetrieveInvalid();
         hr = _compositionManager->EnsureCompositionText(_context, ec, &str[0], static_cast<LONG>(str.length()));
@@ -124,7 +124,7 @@ HRESULT VietType::KeyHandlerEditSession::Commit(TfEditCookie ec) {
     }
 
     switch (_engine->Commit()) {
-    case Telex::TELEX_STATES::COMMITTED: {
+    case Telex::TelexStates::COMMITTED: {
         assert(_engine->Count() > 0);
         auto str = _engine->Retrieve();
         hr = _compositionManager->SetCompositionText(ec, &str[0], static_cast<LONG>(str.length()));
@@ -132,7 +132,7 @@ HRESULT VietType::KeyHandlerEditSession::Commit(TfEditCookie ec) {
         break;
     }
 
-    case Telex::TELEX_STATES::COMMITTED_INVALID: {
+    case Telex::TelexStates::COMMITTED_INVALID: {
         assert(_engine->Count() > 0);
         auto str = _engine->RetrieveInvalid();
         hr = _compositionManager->SetCompositionText(ec, &str[0], static_cast<LONG>(str.length()));

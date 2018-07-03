@@ -30,11 +30,11 @@ public:
     Telex::TelexEngine const& Engine() const;
 
     void Reset();
-    Telex::TELEX_STATES PushChar(_In_ wchar_t c);
-    Telex::TELEX_STATES Backspace();
-    Telex::TELEX_STATES Commit();
-    Telex::TELEX_STATES ForceCommit();
-    Telex::TELEX_STATES Cancel();
+    Telex::TelexStates PushChar(_In_ wchar_t c);
+    Telex::TelexStates Backspace();
+    Telex::TelexStates Commit();
+    Telex::TelexStates ForceCommit();
+    Telex::TelexStates Cancel();
 
     std::wstring Retrieve() const;
     std::wstring RetrieveInvalid() const;

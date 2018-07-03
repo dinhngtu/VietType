@@ -54,17 +54,17 @@ bool VietType::Telex::IsKeyEaten(bool isComposing, _In_ WPARAM wParam, _In_ LPAR
     return false;
 }
 
-VietType::Telex::TELEX_STATES VietType::Telex::PushKey(_In_ VietType::Telex::TelexEngine& engine, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_ BYTE const *keyState) {
+VietType::Telex::TelexStates VietType::Telex::PushKey(_In_ VietType::Telex::TelexEngine& engine, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_ BYTE const *keyState) {
     if (IsTranslatableKey(wParam, lParam)) {
         WCHAR c = 0;
         if (ToUnicode((UINT)wParam, (lParam >> 16) & 0xff, keyState, &c, 1, 0) != 1) {
             assert(0);
-            return VietType::Telex::TELEX_STATES::TXERROR;
+            return VietType::Telex::TelexStates::TXERROR;
         }
         return engine.PushChar(c);
     } else if (wParam == VK_BACK) {
         return engine.Backspace();
     } else {
-        return VietType::Telex::TELEX_STATES::TXERROR;
+        return VietType::Telex::TelexStates::TXERROR;
     }
 }

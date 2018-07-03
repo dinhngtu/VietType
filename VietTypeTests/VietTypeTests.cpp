@@ -42,31 +42,31 @@ void main1() {
     c.oa_uy_tone1 = true;
     TelexEngine tx(c);
 
-    if (tx.PushChar(L'n') != TELEX_STATES::VALID) {
+    if (tx.PushChar(L'n') != TelexStates::VALID) {
         throw std::exception("push_char error");
     }
-    if (tx.PushChar(L'g') != TELEX_STATES::VALID) {
+    if (tx.PushChar(L'g') != TelexStates::VALID) {
         throw std::exception("push_char error");
     }
-    if (tx.PushChar(L'u') != TELEX_STATES::VALID) {
+    if (tx.PushChar(L'u') != TelexStates::VALID) {
         throw std::exception("push_char error");
     }
-    if (tx.PushChar(L'y') != TELEX_STATES::VALID) {
+    if (tx.PushChar(L'y') != TelexStates::VALID) {
         throw std::exception("push_char error");
     }
-    if (tx.PushChar(L'e') != TELEX_STATES::VALID) {
+    if (tx.PushChar(L'e') != TelexStates::VALID) {
         throw std::exception("push_char error");
     }
-    if (tx.PushChar(L'e') != TELEX_STATES::VALID) {
+    if (tx.PushChar(L'e') != TelexStates::VALID) {
         throw std::exception("push_char error");
     }
-    if (tx.PushChar(L'n') != TELEX_STATES::VALID) {
+    if (tx.PushChar(L'n') != TelexStates::VALID) {
         throw std::exception("push_char error");
     }
-    if (tx.PushChar(L'x') != TELEX_STATES::VALID) {
+    if (tx.PushChar(L'x') != TelexStates::VALID) {
         throw std::exception("push_char error");
     }
-    if (tx.Commit() != TELEX_STATES::COMMITTED) {
+    if (tx.Commit() != TelexStates::COMMITTED) {
         throw std::exception("push_char error");
     }
     auto r = tx.Retrieve();

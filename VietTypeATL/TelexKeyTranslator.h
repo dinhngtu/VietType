@@ -25,7 +25,7 @@ namespace Telex {
 
 bool IsEditKey(WPARAM wParam, LPARAM lParam, BYTE const * keyState);
 bool IsKeyEaten(bool isComposing, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_ BYTE const *keyState);
-TELEX_STATES PushKey(_In_ TelexEngine& engine, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_ BYTE const *keyState);
+TelexStates PushKey(_In_ TelexEngine& engine, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_ BYTE const *keyState);
 
 }
 }

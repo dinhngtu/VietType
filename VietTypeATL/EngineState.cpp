@@ -33,23 +33,23 @@ void VietType::EngineState::Reset() {
     _engine.Reset();
 }
 
-VietType::Telex::TELEX_STATES VietType::EngineState::PushChar(wchar_t c) {
+VietType::Telex::TelexStates VietType::EngineState::PushChar(wchar_t c) {
     return _engine.PushChar(c);
 }
 
-VietType::Telex::TELEX_STATES VietType::EngineState::Backspace() {
+VietType::Telex::TelexStates VietType::EngineState::Backspace() {
     return _engine.Backspace();
 }
 
-VietType::Telex::TELEX_STATES VietType::EngineState::Commit() {
+VietType::Telex::TelexStates VietType::EngineState::Commit() {
     return _engine.Commit();
 }
 
-VietType::Telex::TELEX_STATES VietType::EngineState::ForceCommit() {
+VietType::Telex::TelexStates VietType::EngineState::ForceCommit() {
     return _engine.ForceCommit();
 }
 
-VietType::Telex::TELEX_STATES VietType::EngineState::Cancel() {
+VietType::Telex::TelexStates VietType::EngineState::Cancel() {
     return _engine.Cancel();
 }
 
