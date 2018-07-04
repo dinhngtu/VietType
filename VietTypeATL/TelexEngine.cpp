@@ -133,7 +133,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
             _cases.push_back(ccase);
         }
 
-    } else if (!_v.size() && !_c2.size() && IS(cat, CONSO_C1)) {
+    } else if (!_v.size() && !_c2.size() && _c1 != L"gi" && IS(cat, CONSO_C1)) {
         _c1.push_back(c);
         _cases.push_back(ccase);
         _respos.push_back(_respos_current++);
@@ -209,7 +209,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
             _state = TelexStates::INVALID;
         }
 
-    } else if (_v.size() && !_c2.size() && IS(cat, CONSO_C2)) {
+    } else if (((_c1 == L"gi" && !_v.size()) || _v.size()) && !_c2.size() && IS(cat, CONSO_C2)) {
         // word-ending consonants (cnpt)
         auto it = transitions_v_c2.find(_v);
         if (it != transitions_v_c2.end()) {
