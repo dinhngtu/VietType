@@ -155,15 +155,15 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
         } else {
             // if there is no transition, there must be a new character -> must push case
             _cases.push_back(ccase);
+            // invalidate if same char entered twice in a row in order to undo transition
+            if (_keyBuffer.size() > 1 && c == _keyBuffer.rbegin()[1] && _respos.back() == RESPOS_TRANSITION_V) {
+                _keyBuffer.pop_back();
+                _state = TelexStates::INVALID;
+            }
             _respos.push_back(_respos_current++);
             if (_c2.size()) {
                 // in case there exists no transition when _c2 is already typed
                 // fx. 'cace'
-                _state = TelexStates::INVALID;
-            }
-            // invalidate if same char entered twice in a row
-            if (_keyBuffer.size() > 1 && c == _keyBuffer.rbegin()[1]) {
-                _keyBuffer.pop_back();
                 _state = TelexStates::INVALID;
             }
         }
