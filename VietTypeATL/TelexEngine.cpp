@@ -429,6 +429,10 @@ std::wstring TelexEngine::RetrieveInvalid() const {
 }
 
 std::wstring TelexEngine::Peek() const {
+    if (_state == TelexStates::INVALID) {
+        return RetrieveInvalid();
+    }
+
     std::wstring result(_c1);
     result.append(_v);
 
