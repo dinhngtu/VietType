@@ -12,11 +12,12 @@ static TelexConfig config{
     true,
 };
 
-void FeedWord(TelexEngine& e, wchar_t const *input) {
+TelexStates FeedWord(TelexEngine& e, wchar_t const *input) {
     e.Reset();
     for (auto c : std::wstring(input)) {
         e.PushChar(c);
     }
+    return e.GetState();
 }
 
 void TestValidWord(wchar_t const *expected, wchar_t const *input) {
@@ -25,8 +26,19 @@ void TestValidWord(wchar_t const *expected, wchar_t const *input) {
     for (auto c : std::wstring(input)) {
         AssertTelexStatesEqual(TelexStates::VALID, e.PushChar(c));
     }
+    Assert::AreEqual(expected, e.Peek().c_str());
     AssertTelexStatesEqual(TelexStates::COMMITTED, e.Commit());
     Assert::AreEqual(expected, e.Retrieve().c_str());
+}
+
+void TestInvalidWord(wchar_t const *expected, wchar_t const *input) {
+    TelexEngine e(config);
+    e.Reset();
+    for (auto c : std::wstring(input)) {
+        e.PushChar(c);
+    }
+    AssertTelexStatesEqual(TelexStates::COMMITTED_INVALID, e.Commit());
+    Assert::AreEqual(expected, e.RetrieveInvalid().c_str());
 }
 
 TEST_CLASS(TestTelex) {
@@ -137,16 +149,101 @@ public:
 
     // word typing tests
 
-    TEST_METHOD(TestTyping1) {
-        TestValidWord(L"\u0111\u1ED3ng", L"ddoongf");
+    TEST_METHOD(TestTypingDdoongf) {
+        TestValidWord(L"\x111\x1ed3ng", L"ddoongf");
     }
 
-    TEST_METHOD(TestTyping2) {
-        TestValidWord(L"\u1EA5n", L"aans");
+    TEST_METHOD(TestTypingAans) {
+        TestValidWord(L"\x1ea5n", L"aans");
     }
 
-    TEST_METHOD(TestTyping3) {
-        TestValidWord(L"\u0111\u00E1", L"dads");
+    TEST_METHOD(TestTypingDdas) {
+        TestValidWord(L"\x111\xe1", L"ddas");
+    }
+
+    TEST_METHOD(TestTypingNhuwonxg) {
+        TestValidWord(L"nh\x1b0\x1ee1ng", L"nhuwonxg");
+    }
+
+    TEST_METHOD(TestTypingNguiw) {
+        TestValidWord(L"ng\x1b0i", L"nguiw");
+    }
+
+    // test variations of 'gi'
+
+    TEST_METHOD(TestTypingGif) {
+        TestValidWord(L"g\xec", L"gif");
+    }
+
+    TEST_METHOD(TestTypingGinf) {
+        TestValidWord(L"g\xecn", L"ginf");
+    }
+
+    TEST_METHOD(TestTypingGiuowngf) {
+        TestValidWord(L"gi\x1b0\x1eddng", L"giuowngf");
+    }
+
+    TEST_METHOD(TestTypingGiowf) {
+        TestValidWord(L"gi\x1edd", L"giowf");
+    }
+
+    TEST_METHOD(TestTypingGiuwax) {
+        TestValidWord(L"gi\x1eef""a", L"giuwax");
+    }
+
+    // test 'aua' and similar transitions
+
+    TEST_METHOD(TestTypingLauar) {
+        TestValidWord(L"l\x1ea9u", L"lauar");
+    }
+
+    TEST_METHOD(TestTypingNguayar) {
+        TestValidWord(L"ngu\x1ea9y", L"nguayar");
+    }
+
+    // peek tests
+
+    TEST_METHOD(TestPeekDd) {
+        TelexEngine e(config);
+        FeedWord(e, L"dd");
+        Assert::AreEqual(L"\x111", e.Peek().c_str());
+    }
+
+    // used to cause a crash
+    TEST_METHOD(TestPeekZ) {
+        TelexEngine e(config);
+        FeedWord(e, L"z");
+        Assert::AreEqual(L"z", e.Peek().c_str());
+    }
+
+    // test peek key ordering
+
+    TEST_METHOD(TestPeekCace) {
+        TelexEngine e(config);
+        FeedWord(e, L"cace");
+        Assert::AreEqual(L"cace", e.Peek().c_str());
+    }
+
+    // double key tests
+
+    TEST_METHOD(TestDoubleKeyXuaaan) {
+        TestInvalidWord(L"xuaan", L"xuaaan");
+    }
+
+    TEST_METHOD(TestDoubleKeyIis) {
+        TestInvalidWord(L"iis", L"iis");
+    }
+
+    TEST_METHOD(TestDoubleKeyThooongf) {
+        TestValidWord(L"tho\xf2ng", L"thooongf");
+    }
+
+    TEST_METHOD(TestDoubleKeyThuongz) {
+        TestInvalidWord(L"thuongz", L"thuongz");
+    }
+
+    TEST_METHOD(TestDoubleKeySystem) {
+        TestInvalidWord(L"system", L"system");
     }
 
     // backspace tests
@@ -155,13 +252,13 @@ public:
         TelexEngine e(config);
         FeedWord(e, L"ddoongf");
         AssertTelexStatesEqual(TelexStates::VALID, e.Backspace());
-        Assert::AreEqual(L"\u0111\u1ED3n", e.Retrieve().c_str());
+        Assert::AreEqual(L"\x111\x1ed3n", e.Peek().c_str());
         AssertTelexStatesEqual(TelexStates::VALID, e.Backspace());
-        Assert::AreEqual(L"\u0111\u1ED3", e.Retrieve().c_str());
+        Assert::AreEqual(L"\x111\x1ed3", e.Peek().c_str());
         AssertTelexStatesEqual(TelexStates::VALID, e.Backspace());
-        Assert::AreEqual(L"\u0111", e.Retrieve().c_str());
+        Assert::AreEqual(L"\x111", e.Peek().c_str());
         AssertTelexStatesEqual(TelexStates::VALID, e.Backspace());
-        Assert::AreEqual(L"", e.Retrieve().c_str());
+        Assert::AreEqual(L"", e.Peek().c_str());
     }
 };
 
