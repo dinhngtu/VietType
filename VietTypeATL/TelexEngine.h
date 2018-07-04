@@ -66,6 +66,7 @@ public:
     TelexStates ForceCommit();
     TelexStates Cancel();
 
+    TelexStates GetState() const;
     std::wstring Retrieve() const;
     std::wstring RetrieveInvalid() const;
     std::wstring Peek() const;

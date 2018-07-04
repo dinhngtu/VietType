@@ -408,6 +408,10 @@ TelexStates TelexEngine::Cancel() {
     return _state;
 }
 
+TelexStates TelexEngine::GetState() const {
+    return _state;
+}
+
 std::wstring TelexEngine::Retrieve() const {
     if (_state == TelexStates::INVALID || _state == TelexStates::COMMITTED_INVALID) {
         DBG_DPRINT(L"invalid retrieve call state %d", _state);
