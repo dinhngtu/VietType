@@ -1,3 +1,20 @@
+// Copyright (c) Dinh Ngoc Tu.
+// 
+// This file is part of VietType.
+// 
+// VietType is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// VietType is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with VietType.  If not, see <https://www.gnu.org/licenses/>.
+
 #include "stdafx.h"
 #include "CppUnitTest.h"
 #include "Telex.h"
@@ -246,9 +263,19 @@ public:
         TestInvalidWord(L"system", L"system");
     }
 
+    // caps
+
+    TEST_METHOD(TestCapsXuOwngf) {
+        TestValidWord(L"X\x1b0\x1edcng", L"XuOwngf");
+    }
+
+    TEST_METHOD(TestCapsXuOnWfWx) {
+        TestInvalidWord(L"XuOnWfWx", L"XuOnWfWx");
+    }
+
     // backspace tests
 
-    TEST_METHOD(TestBackspace1) {
+    TEST_METHOD(TestBackspaceDdoongf) {
         TelexEngine e(config);
         FeedWord(e, L"ddoongf");
         AssertTelexStatesEqual(TelexStates::VALID, e.Backspace());
@@ -259,6 +286,14 @@ public:
         Assert::AreEqual(L"\x111", e.Peek().c_str());
         AssertTelexStatesEqual(TelexStates::VALID, e.Backspace());
         Assert::AreEqual(L"", e.Peek().c_str());
+    }
+
+    TEST_METHOD(TestBackspaceMooon) {
+        TelexEngine e(config);
+        FeedWord(e, L"leeen");
+        Assert::AreEqual(L"leen", e.Peek().c_str());
+        AssertTelexStatesEqual(TelexStates::INVALID, e.Backspace());
+        Assert::AreEqual(L"lee", e.Peek().c_str());
     }
 };
 
