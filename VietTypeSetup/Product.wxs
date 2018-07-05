@@ -62,10 +62,10 @@ along with VietType.  If not, see <https://www.gnu.org/licenses/>.
       <Custom Action="RegisterProfilesRollback" After="RegisterCategories">(NOT Installed) OR REINSTALL</Custom>
       <Custom Action="RegisterProfiles" After="RegisterProfilesRollback">(NOT Installed) OR REINSTALL</Custom>
 
-      <Custom Action="UnregisterProfilesRollback" After="InstallInitialize">Installed OR REINSTALL</Custom>
-      <Custom Action="UnregisterProfiles" After="UnregisterProfilesRollback">Installed OR REINSTALL</Custom>
-      <Custom Action="UnregisterCategoriesRollback" After="UnregisterProfiles">Installed OR REINSTALL</Custom>
-      <Custom Action="UnregisterCategories" After="UnregisterCategoriesRollback">Installed OR REINSTALL</Custom>
+      <Custom Action="UnregisterProfilesRollback" After="InstallInitialize">REMOVE OR REINSTALL</Custom>
+      <Custom Action="UnregisterProfiles" After="UnregisterProfilesRollback">REMOVE OR REINSTALL</Custom>
+      <Custom Action="UnregisterCategoriesRollback" After="UnregisterProfiles">REMOVE OR REINSTALL</Custom>
+      <Custom Action="UnregisterCategories" After="UnregisterCategoriesRollback">REMOVE OR REINSTALL</Custom>
     </InstallExecuteSequence>
   </Product>
 
