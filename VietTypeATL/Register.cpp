@@ -36,7 +36,7 @@ extern "C" __declspec(dllexport) HRESULT __cdecl RegisterProfiles() {
     HRESULT hr;
 
     if (!VietType::Globals::dllInstance) {
-        DPRINT(L"%s", L"VietType::Globals::dllInstance is invalid");
+        DBG_DPRINT(L"%s", L"VietType::Globals::dllInstance is invalid");
         return E_UNEXPECTED;
     }
 
@@ -52,7 +52,7 @@ extern "C" __declspec(dllexport) HRESULT __cdecl RegisterProfiles() {
         dllPathLength--;
     }
     dllPath[dllPathLength] = 0;
-    DPRINT(L"found text service DLL: %s", dllPath);
+    DBG_DPRINT(L"found text service DLL: %s", dllPath);
 
     SmartComPtr<ITfInputProcessorProfileMgr> profileMgr;
     hr = profileMgr.CoCreate(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER);

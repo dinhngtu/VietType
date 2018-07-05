@@ -108,7 +108,7 @@ HRESULT VietType::KeyHandlerEditSession::ComposeKey(TfEditCookie ec) {
     }
 
     default:
-        DPRINT(L"%s", L"PushKey returned unexpected value");
+        DBG_DPRINT(L"%s", L"PushKey returned unexpected value");
         assert(0);
         break;
     }
@@ -141,7 +141,7 @@ HRESULT VietType::KeyHandlerEditSession::Commit(TfEditCookie ec) {
     }
 
     default:
-        DPRINT(L"%s", L"Commit returned unexpected value");
+        DBG_DPRINT(L"%s", L"Commit returned unexpected value");
         assert(0);
         break;
     }
