@@ -334,6 +334,11 @@ TelexStates TelexEngine::Commit() {
         return _state;
     }
 
+    if (!_keyBuffer.size()) {
+        _state = TelexStates::COMMITTED;
+        return _state;
+    }
+
     // validate c1
     auto c1_it = valid_c1.find(_c1);
     if (c1_it == valid_c1.end()) {
@@ -388,6 +393,11 @@ TelexStates TelexEngine::ForceCommit() {
 
     if (_state == TelexStates::INVALID) {
         _state = TelexStates::COMMITTED_INVALID;
+        return _state;
+    }
+
+    if (!_keyBuffer.size()) {
+        _state = TelexStates::COMMITTED;
         return _state;
     }
 

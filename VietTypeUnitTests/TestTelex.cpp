@@ -146,21 +146,21 @@ public:
     TEST_METHOD(TestEmptyCommit) {
         TelexEngine e(config);
         e.Reset();
-        e.Commit();
+        AssertTelexStatesEqual(TelexStates::COMMITTED, e.Commit());
         Assert::AreEqual(L"", e.Retrieve().c_str());
     }
 
     TEST_METHOD(TestEmptyForceCommit) {
         TelexEngine e(config);
         e.Reset();
-        e.ForceCommit();
+        AssertTelexStatesEqual(TelexStates::COMMITTED, e.ForceCommit());
         Assert::AreEqual(L"", e.Retrieve().c_str());
     }
 
     TEST_METHOD(TestEmptyCancel) {
         TelexEngine e(config);
         e.Reset();
-        e.Cancel();
+        AssertTelexStatesEqual(TelexStates::COMMITTED_INVALID, e.Cancel());
         Assert::AreEqual(L"", e.RetrieveInvalid().c_str());
     }
 
