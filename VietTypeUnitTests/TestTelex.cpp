@@ -295,6 +295,26 @@ public:
         AssertTelexStatesEqual(TelexStates::INVALID, e.Backspace());
         Assert::AreEqual(L"lee", e.Peek().c_str());
     }
+
+    // test backconversions
+
+    TEST_METHOD(TestBackconversionDdoongf) {
+        TelexEngine e(config);
+        AssertTelexStatesEqual(TelexStates::VALID, e.Backconvert(L"\x111\x1ed3ng"));
+        Assert::AreEqual(L"\x111\x1ed3ng", e.Peek().c_str());
+    }
+
+    TEST_METHOD(TestBackconversionSystem) {
+        TelexEngine e(config);
+        AssertTelexStatesEqual(TelexStates::INVALID, e.Backconvert(L"system"));
+        Assert::AreEqual(L"system", e.Peek().c_str());
+    }
+
+    TEST_METHOD(TestBackconversionThees) {
+        TelexEngine e(config);
+        AssertTelexStatesEqual(TelexStates::VALID, e.Backconvert(L"TH\x1ebe"));
+        Assert::AreEqual(L"TH\x1ebe", e.Peek().c_str());
+    }
 };
 
 }

@@ -82,9 +82,6 @@
     <ClCompile Include="Register.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="EngineState.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="EngineController.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -92,6 +89,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="LanguageBarHandlers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SurroundingWordFinder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VirtualDocument.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -165,9 +168,6 @@
     <ClInclude Include="KeyHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EngineState.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="EngineController.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -175,6 +175,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="LanguageBarHandlers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SurroundingWordFinder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VirtualDocument.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

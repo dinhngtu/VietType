@@ -26,8 +26,7 @@ extern HINSTANCE dllInstance;
 
 extern const CLSID CLSID_TextService;
 
-extern const GUID GUID_KeyEventSink_PreservedKey_Toggle;
-extern const GUID GUID_KeyEventSink_Compartment_Toggle;
+extern const GUID GUID_SettingsCompartment_Toggle;
 
 extern const GUID GUID_Profile;
 

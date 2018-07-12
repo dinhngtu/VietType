@@ -20,8 +20,6 @@
 #include "Common.h"
 #include "SinkAdvisor.h"
 
-using namespace ATL;
-
 namespace VietType {
 
 class CompositionManager;
@@ -55,6 +53,7 @@ private:
     SinkAdvisor<ITfThreadMgrEventSink> _threadMgrEventSinkAdvisor;
     SmartComObjPtr<CompositionManager> _compMgr;
     SmartComObjPtr<EngineController> _controller;
+    SmartComPtr<ITfDocumentMgr> _docMgrFocus;
 
 private:
     DISALLOW_COPY_AND_ASSIGN(ThreadMgrEventSink);

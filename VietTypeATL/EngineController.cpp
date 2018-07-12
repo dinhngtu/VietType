@@ -93,7 +93,7 @@ VietType::EngineController::~EngineController() {
 }
 
 HRESULT VietType::EngineController::OnChange(REFGUID rguid) {
-    if (IsEqualGUID(rguid, Globals::GUID_KeyEventSink_Compartment_Toggle)) {
+    if (IsEqualGUID(rguid, Globals::GUID_SettingsCompartment_Toggle)) {
         UpdateStates();
     }
 
@@ -101,7 +101,7 @@ HRESULT VietType::EngineController::OnChange(REFGUID rguid) {
 }
 
 HRESULT VietType::EngineController::Initialize(
-    std::shared_ptr<EngineState> const & engine,
+    std::shared_ptr<Telex::TelexEngine> const& engine,
     ITfThreadMgr * threadMgr,
     TfClientId clientid) {
 
@@ -116,7 +116,7 @@ HRESULT VietType::EngineController::Initialize(
     hr = threadMgr->GetGlobalCompartment(compartmentMgr.GetAddress());
     if (SUCCEEDED(hr)) {
 
-        hr = compartmentMgr->GetCompartment(Globals::GUID_KeyEventSink_Compartment_Toggle, _compartment.GetAddress());
+        hr = compartmentMgr->GetCompartment(Globals::GUID_SettingsCompartment_Toggle, _compartment.GetAddress());
         if (SUCCEEDED(hr)) {
 
             SmartComPtr<ITfSource> compartmentSource(_compartment);
@@ -153,15 +153,15 @@ HRESULT VietType::EngineController::Uninitialize() {
     return S_OK;
 }
 
-VietType::EngineState & VietType::EngineController::GetEngine() {
+VietType::Telex::TelexEngine& VietType::EngineController::GetEngine() {
     return *_engine;
 }
 
-VietType::EngineState const & VietType::EngineController::GetEngine() const {
+VietType::Telex::TelexEngine const& VietType::EngineController::GetEngine() const {
     return *_engine;
 }
 
-std::shared_ptr<VietType::EngineState> const & VietType::EngineController::GetEngineShared() {
+std::shared_ptr<VietType::Telex::TelexEngine> const& VietType::EngineController::GetEngineShared() {
     return _engine;
 }
 
@@ -194,7 +194,7 @@ HRESULT VietType::EngineController::ToggleUserEnabled() {
 }
 
 int VietType::EngineController::IsEnabled() const {
-    return _engine->Enabled();
+    return _enabled;
 }
 
 VietType::BlockedKind VietType::EngineController::GetBlocked() const {
@@ -233,12 +233,12 @@ HRESULT VietType::EngineController::UpdateStates() {
         hr = CompartmentReadEnabled(&enabled);
         HRESULT_CHECK_RETURN(hr, L"%s", L"CompartmentReadEnabled failed");
         DBG_DPRINT(L"block = %d, enabled = %d", static_cast<int>(_blocked), enabled);
-        _engine->Enabled(enabled);
+        _enabled = static_cast<bool>(enabled);
         break;
     }
     case BlockedKind::BLOCKED:
         DBG_DPRINT(L"%s", L"blocked");
-        _engine->Enabled(false);
+        _enabled = false;
         break;
     }
 

@@ -18,7 +18,6 @@
 #pragma once
 
 #include "Common.h"
-#include "EngineState.h"
 
 namespace VietType {
 

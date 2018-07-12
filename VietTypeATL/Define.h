@@ -51,7 +51,7 @@ void _dprint(const wchar_t *func, int line, const wchar_t *fmt, Args... args) {
 }
 
 // print formatted string to debugger output
-#define DPRINT(fmt, ...) _dprint(__FUNCTIONW__, __LINE__, L"%s:%d: " fmt, __VA_ARGS__)
+#define DPRINT(fmt, ...) _dprint(__FUNCTIONW__, __LINE__, L"%s:%d: " fmt "\n", __VA_ARGS__)
 // check if HRESULT is successful; if not, print error information to debugger output and return from calling function
 #define HRESULT_CHECK_RETURN(hr, fmt, ...) if (FAILED(hr)) { DPRINT(L"HRESULT error %lx: " fmt, hr, __VA_ARGS__); return hr; }
 
@@ -80,6 +80,6 @@ void _winerrorprint(const wchar_t *func, int line, DWORD err, const wchar_t *fmt
 }
 
 // format win32 error and print formatted string to debugger output
-#define WINERROR_PRINT(err, fmt, ...) _winerrorprint(__FUNCTIONW__, __LINE__, err, L"%s:%d: WINERROR %lx (%s): " fmt, __VA_ARGS__)
+#define WINERROR_PRINT(err, fmt, ...) _winerrorprint(__FUNCTIONW__, __LINE__, err, L"%s:%d: WINERROR %lx (%s): " fmt "\n", __VA_ARGS__)
 // format win32 error, print formatted string to debugger output, and return from calling function with error converted to HRESULT
 #define WINERROR_RETURN_HRESULT(fmt, ...) do { auto err = GetLastError(); WINERROR_PRINT(err, fmt, __VA_ARGS__); return HRESULT_FROM_WIN32(err); } while (0)

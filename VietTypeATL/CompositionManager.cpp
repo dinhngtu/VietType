@@ -75,6 +75,57 @@ bool VietType::CompositionManager::IsComposing() const {
     return (bool)_composition;
 }
 
+SmartComPtr<ITfComposition> const & VietType::CompositionManager::GetComposition() const {
+    return _composition;
+}
+
+HRESULT VietType::CompositionManager::GetRange(ITfRange ** range) {
+    if (!IsComposing()) {
+        return E_FAIL;
+    }
+    return _composition->GetRange(range);
+}
+
+HRESULT VietType::CompositionManager::StartCompositionNow(TfEditCookie ec, ITfContext * context) {
+    HRESULT hr;
+
+    SmartComPtr<ITfCompositionSink> compositionSink(this);
+    if (!compositionSink) {
+        return E_NOINTERFACE;
+    }
+
+    SmartComPtr<ITfInsertAtSelection> insertAtSelection(context);
+    if (!insertAtSelection) {
+        return E_NOINTERFACE;
+    }
+
+    SmartComPtr<ITfRange> insertRange;
+    hr = insertAtSelection->InsertTextAtSelection(ec, TF_IAS_QUERYONLY, NULL, 0, insertRange.GetAddress());
+    HRESULT_CHECK_RETURN(hr, L"%s", L"insertAtSelection->InsertTextAtSelection failed");
+
+    SmartComPtr<ITfContextComposition> contextComposition(context);
+    if (!contextComposition) {
+        return E_NOINTERFACE;
+    }
+
+    ITfComposition *composition;
+    hr = contextComposition->StartComposition(ec, insertRange, compositionSink, &composition);
+    if (SUCCEEDED(hr)) {
+        _composition = composition;
+
+        TF_SELECTION sel;
+        sel.range = insertRange;
+        sel.style.ase = TF_AE_NONE;
+        sel.style.fInterimChar = FALSE;
+        hr = context->SetSelection(ec, 1, &sel);
+        DBG_HRESULT_CHECK(hr, L"%s", L"context->SetSelection failed");
+
+        _context = context;
+    } else HRESULT_CHECK_RETURN(hr, L"%s", L"contextComposition->StartComposition failed");
+
+    return S_OK;
+}
+
 HRESULT VietType::CompositionManager::EmptyCompositionText(TfEditCookie ec) {
     HRESULT hr;
 
@@ -160,43 +211,7 @@ HRESULT VietType::CompositionManager::EnsureCompositionText(ITfContext *context,
 }
 
 HRESULT VietType::CompositionManager::_StartComposition(TfEditCookie ec, CompositionManager *instance, ITfContext *context) {
-    HRESULT hr;
-
-    SmartComPtr<ITfCompositionSink> compositionSink(instance);
-    if (!compositionSink) {
-        return E_NOINTERFACE;
-    }
-
-    SmartComPtr<ITfInsertAtSelection> insertAtSelection(context);
-    if (!insertAtSelection) {
-        return E_NOINTERFACE;
-    }
-
-    SmartComPtr<ITfRange> insertRange;
-    hr = insertAtSelection->InsertTextAtSelection(ec, TF_IAS_QUERYONLY, NULL, 0, insertRange.GetAddress());
-    HRESULT_CHECK_RETURN(hr, L"%s", L"insertAtSelection->InsertTextAtSelection failed");
-
-    SmartComPtr<ITfContextComposition> contextComposition(context);
-    if (!contextComposition) {
-        return E_NOINTERFACE;
-    }
-
-    ITfComposition *composition;
-    hr = contextComposition->StartComposition(ec, insertRange, compositionSink, &composition);
-    if (SUCCEEDED(hr)) {
-        instance->_composition = composition;
-
-        TF_SELECTION sel;
-        sel.range = insertRange;
-        sel.style.ase = TF_AE_NONE;
-        sel.style.fInterimChar = FALSE;
-        hr = context->SetSelection(ec, 1, &sel);
-        DBG_HRESULT_CHECK(hr, L"%s", L"context->SetSelection failed");
-
-        instance->_context = context;
-    } else HRESULT_CHECK_RETURN(hr, L"%s", L"contextComposition->StartComposition failed");
-
-    return S_OK;
+    return instance->StartCompositionNow(ec, context);
 }
 
 HRESULT VietType::CompositionManager::_EndComposition(TfEditCookie ec, CompositionManager *instance, ITfContext *context) {

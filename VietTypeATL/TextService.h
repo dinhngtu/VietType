@@ -24,7 +24,7 @@
 #include "ThreadMgrEventSink.h"
 #include "KeyEventSink.h"
 #include "CompositionManager.h"
-#include "EngineState.h"
+#include "Telex.h"
 #include "EngineController.h"
 
 #if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)
@@ -63,7 +63,7 @@ private:
     TfClientId _clientId = TF_CLIENTID_NULL;
     DWORD _activateFlags = 0;
 
-    std::shared_ptr<EngineState> _engine;
+    std::shared_ptr<Telex::TelexEngine> _engine;
 
     SmartComObjPtr<ThreadMgrEventSink> _threadMgrEventSink;
     SmartComObjPtr<KeyEventSink> _keyEventSink;

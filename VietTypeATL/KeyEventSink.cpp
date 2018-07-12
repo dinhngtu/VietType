@@ -25,8 +25,16 @@
 #include "KeyEventSink.h"
 #include "Telex.h"
 #include "KeyHandler.h"
+#include "ThreadMgrEventSink.h"
+#include "SurroundingWordFinder.h"
 
+// {8CC27CF8-93D2-416C-B1A3-66827F54244A}
+static const GUID GUID_KeyEventSink_PreservedKey_Toggle = { 0x8cc27cf8, 0x93d2, 0x416c, { 0xb1, 0xa3, 0x66, 0x82, 0x7f, 0x54, 0x24, 0x4a } };
 static const TF_PRESERVEDKEY PK_Toggle = { VK_OEM_3, TF_MOD_ALT }; // Alt-`
+
+// {FAC88DBE-E799-474B-9A8C-1449CAA38348}
+static const GUID GUID_KeyEventSink_PreservedKey_EditBack = { 0xfac88dbe, 0xe799, 0x474b, { 0x9a, 0x8c, 0x14, 0x49, 0xca, 0xa3, 0x83, 0x48 } };
+static const TF_PRESERVEDKEY PK_EditBack = { VK_LEFT, TF_MOD_ALT };
 
 VietType::KeyEventSink::KeyEventSink() {
 }
@@ -58,6 +66,19 @@ STDMETHODIMP VietType::KeyEventSink::OnSetFocus(BOOL fForeground) {
     if (FAILED(hr)) {
         return S_OK;
     }
+
+    TF_STATUS st;
+    hr = context->GetStatus(&st);
+    if (SUCCEEDED(hr)) {
+        DBG_DPRINT(
+            L"ThreadMgrEventSink::OnSetFocus d=%c%c%c s=%c%c%c",
+            (st.dwDynamicFlags & TF_SD_LOADING) ? L'L' : L'_',
+            (st.dwDynamicFlags & TF_SD_READONLY) ? L'R' : L'_',
+            (st.dwDynamicFlags & TS_SD_UIINTEGRATIONENABLE) ? L'U' : L'_',
+            (st.dwStaticFlags & TF_SS_DISJOINTSEL) ? L'D' : L'_',
+            (st.dwStaticFlags & TF_SS_REGIONS) ? L'R' : L'_',
+            (st.dwStaticFlags & TF_SS_TRANSITORY) ? L'T' : L'_');
+    } else DBG_HRESULT_CHECK(hr, L"%s", L"context->GetStatus failed");
 
     _controller->RequestEditBlocked(_compositionManager, context);
 
@@ -134,13 +155,22 @@ STDMETHODIMP VietType::KeyEventSink::OnKeyUp(ITfContext * pic, WPARAM wParam, LP
 STDMETHODIMP VietType::KeyEventSink::OnPreservedKey(ITfContext * pic, REFGUID rguid, BOOL * pfEaten) {
     HRESULT hr;
 
-    if (IsEqualGUID(Globals::GUID_KeyEventSink_PreservedKey_Toggle, rguid)) {
+    if (IsEqualGUID(GUID_KeyEventSink_PreservedKey_Toggle, rguid)) {
         *pfEaten = TRUE;
         _controller->GetEngine().Reset();
         hr = _compositionManager->EndComposition();
         DBG_HRESULT_CHECK(hr, L"%s", L"_compositionManager->EndComposition failed");
         hr = _controller->ToggleUserEnabled();
         DBG_HRESULT_CHECK(hr, L"%s", L"_engine->ToggleEnabled failed");
+
+    } else if (IsEqualGUID(GUID_KeyEventSink_PreservedKey_EditBack, rguid)) {
+        *pfEaten = TRUE;
+        hr = CompositionManager::RequestEditSession(
+            VietType::EditSurroundingWord,
+            _compositionManager,
+            pic,
+            static_cast<EngineController *>(_controller));
+        HRESULT_CHECK_RETURN(hr, L"%s", L"CompositionManager::RequestEditSession failed");
     }
 
     return S_OK;
@@ -166,7 +196,10 @@ HRESULT VietType::KeyEventSink::Initialize(
     hr = _keystrokeMgr->AdviseKeyEventSink(_clientid, this, TRUE);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_keystrokeMgr->AdviseKeyEventSink failed");
 
-    hr = _keystrokeMgr->PreserveKey(_clientid, Globals::GUID_KeyEventSink_PreservedKey_Toggle, &PK_Toggle, NULL, 0);
+    hr = _keystrokeMgr->PreserveKey(_clientid, GUID_KeyEventSink_PreservedKey_EditBack, &PK_EditBack, NULL, 0);
+    DBG_HRESULT_CHECK(hr, L"%s", L"_keystrokeMgr->PreserveKey failed");
+
+    hr = _keystrokeMgr->PreserveKey(_clientid, GUID_KeyEventSink_PreservedKey_Toggle, &PK_Toggle, NULL, 0);
     // probably not fatal
     DBG_HRESULT_CHECK(hr, L"%s", L"_keystrokeMgr->PreserveKey failed");
 
@@ -176,7 +209,10 @@ HRESULT VietType::KeyEventSink::Initialize(
 HRESULT VietType::KeyEventSink::Uninitialize() {
     HRESULT hr;
 
-    hr = _keystrokeMgr->UnpreserveKey(Globals::GUID_KeyEventSink_PreservedKey_Toggle, &PK_Toggle);
+    hr = _keystrokeMgr->UnpreserveKey(GUID_KeyEventSink_PreservedKey_Toggle, &PK_Toggle);
+    DBG_HRESULT_CHECK(hr, L"%s", L"_keystrokeMgr->UnpreserveKey failed");
+
+    hr = _keystrokeMgr->UnpreserveKey(GUID_KeyEventSink_PreservedKey_EditBack, &PK_EditBack);
     DBG_HRESULT_CHECK(hr, L"%s", L"_keystrokeMgr->UnpreserveKey failed");
 
     hr = _keystrokeMgr->UnadviseKeyEventSink(_clientid);
@@ -196,7 +232,7 @@ HRESULT VietType::KeyEventSink::CallKeyEdit(ITfContext *context, WPARAM wParam, 
     SmartComObjPtr<KeyHandlerEditSession> keyHandlerEditSession;
     hr = keyHandlerEditSession.CreateInstance();
     HRESULT_CHECK_RETURN(hr, L"%s", L"_keyHandlerEditSession.CreateInstance failed");
-    keyHandlerEditSession->Initialize(_compositionManager, context, wParam, lParam, _keyState, _controller->GetEngineShared());
+    keyHandlerEditSession->Initialize(_compositionManager, context, wParam, lParam, _keyState, _controller);
     hr = _compositionManager->RequestEditSession(keyHandlerEditSession, context);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_compositionManager->RequestEditSession failed");
 

@@ -71,6 +71,7 @@ extern genmap<std::wstring, VINFO> const valid_v_qu; // value: accent position
 extern genmap<std::wstring, VINFO> const valid_v_gi; // value: accent position
 extern genmap<std::wstring, bool> const valid_c2;
 extern genmap<std::wstring, VINFO> const valid_v_oa_uy;
+extern genmap<wchar_t, std::wstring> const backconversions;
 
 extern genmap<wchar_t, wchar_t> const touppermap;
 extern genmap<wchar_t, wchar_t> const tolowermap;

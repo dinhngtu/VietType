@@ -19,7 +19,7 @@
 
 #include "Common.h"
 #include "SinkAdvisor.h"
-#include "EngineState.h"
+#include "Telex.h"
 
 namespace VietType {
 
@@ -54,14 +54,14 @@ public:
     virtual STDMETHODIMP OnChange(REFGUID rguid) override;
 
     HRESULT Initialize(
-        std::shared_ptr<EngineState> const & engine,
+        std::shared_ptr<Telex::TelexEngine> const& engine,
         ITfThreadMgr * threadMgr,
         TfClientId clientid);
     HRESULT Uninitialize();
 
-    EngineState& GetEngine();
-    EngineState const& GetEngine() const;
-    std::shared_ptr<EngineState> const& GetEngineShared();
+    Telex::TelexEngine& GetEngine();
+    Telex::TelexEngine const& GetEngine() const;
+    std::shared_ptr<Telex::TelexEngine> const& GetEngineShared();
 
     HRESULT IsUserEnabled(int *penabled);
     HRESULT WriteUserEnabled(int enabled);
@@ -83,7 +83,7 @@ private:
     HRESULT UninitLanguageBar();
 
 private:
-    std::shared_ptr<EngineState> _engine;
+    std::shared_ptr<Telex::TelexEngine> _engine;
     SmartComPtr<ITfLangBarItemMgr> _langBarItemMgr;
 
     TfClientId _clientid;
@@ -95,6 +95,7 @@ private:
     std::unique_ptr<IndicatorButton> _indicatorButton;
     std::unique_ptr<LangBarButton> _langBarButton;
 
+    bool _enabled = true;
     BlockedKind _blocked = BlockedKind::FREE;
     bool _editBlockedPending = false;
 

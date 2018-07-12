@@ -18,10 +18,11 @@
 #pragma once
 
 #include "Common.h"
-#include "CompositionManager.h"
-#include "EngineState.h"
 
 namespace VietType {
+
+class CompositionManager;
+class EngineController;
 
 class KeyHandlerEditSession :
     public CComObjectRootEx<CComSingleThreadModel>,
@@ -45,7 +46,7 @@ public:
         WPARAM wParam,
         LPARAM lParam,
         BYTE const *keyState,
-        std::shared_ptr<EngineState> const& engine);
+        SmartComObjPtr<EngineController> const& controller);
 
 private:
     HRESULT ComposeKey(TfEditCookie ec);
@@ -57,7 +58,7 @@ private:
     WPARAM _wParam;
     LPARAM _lParam;
     BYTE const *_keyState;
-    std::shared_ptr<EngineState> _engine;
+    SmartComObjPtr<EngineController> _controller;
 
 private:
     DISALLOW_COPY_AND_ASSIGN(KeyHandlerEditSession);

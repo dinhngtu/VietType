@@ -43,7 +43,13 @@ STDMETHODIMP VietType::ThreadMgrEventSink::OnUninitDocumentMgr(ITfDocumentMgr * 
 STDMETHODIMP VietType::ThreadMgrEventSink::OnSetFocus(ITfDocumentMgr * pdimFocus, ITfDocumentMgr * pdimPrevFocus) {
     HRESULT hr;
 
-    if (!pdimFocus || _controller->IsEditBlockedPending()) {
+    if (!pdimFocus) {
+        return S_OK;
+    }
+
+    _docMgrFocus = pdimFocus;
+
+    if (_controller->IsEditBlockedPending()) {
         return S_OK;
     }
 
@@ -54,6 +60,19 @@ STDMETHODIMP VietType::ThreadMgrEventSink::OnSetFocus(ITfDocumentMgr * pdimFocus
     if (!context) {
         return S_OK;
     }
+
+    TF_STATUS st;
+    hr = context->GetStatus(&st);
+    if (SUCCEEDED(hr)) {
+        DBG_DPRINT(
+            L"ThreadMgrEventSink::OnSetFocus d=%c%c%c s=%c%c%c",
+            (st.dwDynamicFlags & TF_SD_LOADING) ? L'L' : L'_',
+            (st.dwDynamicFlags & TF_SD_READONLY) ? L'R' : L'_',
+            (st.dwDynamicFlags & TS_SD_UIINTEGRATIONENABLE) ? L'U' : L'_',
+            (st.dwStaticFlags & TF_SS_DISJOINTSEL) ? L'D' : L'_',
+            (st.dwStaticFlags & TF_SS_REGIONS) ? L'R' : L'_',
+            (st.dwStaticFlags & TF_SS_TRANSITORY) ? L'T' : L'_');
+    } else DBG_HRESULT_CHECK(hr, L"%s", L"context->GetStatus failed");
 
     hr = _controller->RequestEditBlocked(_compMgr, context);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_controller->RequestEditBlocked failed");
@@ -94,6 +113,8 @@ HRESULT VietType::ThreadMgrEventSink::Uninitialize() {
 
     _controller.Release();
     _compMgr.Release();
+
+    _docMgrFocus.Release();
 
     return hr;
 }

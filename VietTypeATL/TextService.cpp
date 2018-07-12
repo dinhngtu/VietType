@@ -48,7 +48,7 @@ STDMETHODIMP VietType::TextService::ActivateEx(ITfThreadMgr * ptim, TfClientId t
 
     Telex::TelexConfig engineconfig;
     engineconfig.oa_uy_tone1 = true;
-    _engine = std::make_shared<EngineState>(engineconfig);
+    _engine = std::make_shared<Telex::TelexEngine>(engineconfig);
 
     hr = _compositionManager.CreateInstance();
     HRESULT_CHECK_RETURN(hr, L"%s", L"_compositionManager.CreateInstance failed");

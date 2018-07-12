@@ -47,6 +47,12 @@ public:
     HRESULT EndComposition();
     bool IsComposing() const;
 
+    // for use in edit sessions
+    SmartComPtr<ITfComposition> const& GetComposition() const;
+    // for use in edit sessions only
+    HRESULT GetRange(ITfRange **range);
+
+    HRESULT StartCompositionNow(TfEditCookie ec, ITfContext *context);
     HRESULT EmptyCompositionText(TfEditCookie ec);
     HRESULT MoveCaretToEnd(TfEditCookie ec);
     HRESULT EndCompositionNow(TfEditCookie ec);
@@ -75,6 +81,31 @@ public:
         HRESULT_CHECK_RETURN(hr, L"%s", L"context->RequestEditSession failed");
 
         return S_OK;
+    }
+
+    template <typename... Args>
+    static HRESULT RequestEditSessionEx(
+        HRESULT(*callback)(TfEditCookie ec, CompositionManager *compositionManager, ITfContext *context, Args... args),
+        _In_ CompositionManager *compositionManager,
+        // required to call RequestEditSession
+        _In_ ITfContext *context,
+        _In_ DWORD flags,
+        _Out_ HRESULT *hrSession,
+        Args... args) {
+
+        assert(compositionManager->_clientid != TF_CLIENTID_NULL);
+        assert(context);
+        HRESULT hr;
+
+        SmartComObjPtr<EditSession<CompositionManager *, ITfContext *, Args...>> session;
+        hr = session.CreateInstance();
+        HRESULT_CHECK_RETURN(hr, L"%s", L"es.CreateInstance failed");
+
+        session->Initialize(callback, compositionManager, context, args...);
+        hr = context->RequestEditSession(compositionManager->_clientid, session, flags, &hrSession);
+        HRESULT_CHECK_RETURN(hr, L"%s", L"context->RequestEditSession failed");
+
+        return hr;
     }
 
 private:

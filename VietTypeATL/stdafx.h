@@ -25,6 +25,8 @@
 #define STRICT
 #endif
 
+#define NOMINMAX
+
 #include "targetver.h"
 
 #define _ATL_APARTMENT_THREADED
@@ -46,6 +48,10 @@
 #include <memory>
 #include <cassert>
 #include <vector>
+#include <unordered_set>
+#include <array>
+#include <algorithm>
+#include <iterator>
 
 #include <strsafe.h>
 #include <msctf.h>

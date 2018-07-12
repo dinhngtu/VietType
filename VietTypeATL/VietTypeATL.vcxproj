@@ -481,7 +481,6 @@
       </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="EngineController.cpp" />
-    <ClCompile Include="EngineState.cpp" />
     <ClCompile Include="Globals.cpp" />
     <ClCompile Include="KeyEventSink.cpp" />
     <ClCompile Include="KeyHandler.cpp" />
@@ -499,6 +498,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TestRelease|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="SurroundingWordFinder.cpp" />
     <ClCompile Include="TelexEngine.cpp" />
     <ClCompile Include="TelexCaseMap.cpp" />
     <ClCompile Include="TelexData.cpp" />
@@ -534,6 +534,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TestRelease|x64'">
       </PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="VirtualDocument.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common.h" />
@@ -542,7 +543,6 @@
     <ClInclude Include="dllmain.h" />
     <ClInclude Include="EditSession.h" />
     <ClInclude Include="EngineController.h" />
-    <ClInclude Include="EngineState.h" />
     <ClInclude Include="Export.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="KeyEventSink.h" />
@@ -553,6 +553,7 @@
     <ClInclude Include="SinkAdvisor.h" />
     <ClInclude Include="SmartComPtr.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="SurroundingWordFinder.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Telex.h" />
     <ClInclude Include="TelexEngine.h" />
@@ -563,6 +564,7 @@
     <ClInclude Include="TextService.h" />
     <ClInclude Include="ThreadMgrEventSink.h" />
     <ClInclude Include="VietTypeATL_i.h" />
+    <ClInclude Include="VirtualDocument.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="VietTypeATL.rc" />

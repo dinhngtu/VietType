@@ -418,6 +418,37 @@ TelexStates TelexEngine::Cancel() {
     return _state;
 }
 
+TelexStates TelexEngine::Backconvert(std::wstring const& s) {
+    for (auto c : s) {
+        if (c >= L'a' && c <= L'z') {
+            PushChar(c);
+        } else if (c >= L'A' && c <= L'Z') {
+            PushChar(c);
+        } else {
+            genmap<wchar_t, std::wstring>::const_iterator it;
+            auto cup = tolowermap.find(c);
+            if (cup != tolowermap.end()) {
+                it = backconversions.find(cup->second);
+            } else {
+                it = backconversions.find(c);
+            }
+            if (it != backconversions.end()) {
+                if (cup != tolowermap.end()) {
+                    // subtract 32 for upper
+                    for (auto backc : it->second) {
+                        PushChar(backc - 32);
+                    }
+                } else {
+                    for (auto backc : it->second) {
+                        PushChar(backc);
+                    }
+                }
+            }
+        }
+    }
+    return _state;
+}
+
 TelexStates TelexEngine::GetState() const {
     return _state;
 }

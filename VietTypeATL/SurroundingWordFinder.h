@@ -18,39 +18,16 @@
 #pragma once
 
 #include "Common.h"
-#include "Telex.h"
 
 namespace VietType {
 
-class EngineState {
-public:
-    explicit EngineState(Telex::TelexConfig const& config);
+class CompositionManager;
+class EngineController;
 
-    Telex::TelexEngine& Engine();
-    Telex::TelexEngine const& Engine() const;
-
-    void Reset();
-    Telex::TelexStates PushChar(_In_ wchar_t c);
-    Telex::TelexStates Backspace();
-    Telex::TelexStates Commit();
-    Telex::TelexStates ForceCommit();
-    Telex::TelexStates Cancel();
-
-    std::wstring Retrieve() const;
-    std::wstring RetrieveInvalid() const;
-    std::wstring Peek() const;
-    std::wstring::size_type Count() const;
-
-    bool Enabled() const;
-    void Enabled(bool value);
-    bool ToggleEnabled();
-
-private:
-    bool _enabled = true;
-    Telex::TelexEngine _engine;
-
-private:
-    DISALLOW_COPY_AND_ASSIGN(EngineState);
-};
+HRESULT EditSurroundingWord(
+    _In_ TfEditCookie ec,
+    _In_ VietType::CompositionManager *compositionManager,
+    _In_ ITfContext *context,
+    _In_ VietType::EngineController *controller);
 
 }
