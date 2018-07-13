@@ -29,7 +29,7 @@ VietType::KeyHandlerEditSession::~KeyHandlerEditSession() {
 
 STDMETHODIMP VietType::KeyHandlerEditSession::DoEditSession(TfEditCookie ec) {
     assert(_compositionManager);
-    DBG_DPRINT(L"%s", L"entering key handler session");
+    DBG_DPRINT(L"ec = %ld", ec);
 
     HRESULT hr;
 
@@ -41,6 +41,7 @@ STDMETHODIMP VietType::KeyHandlerEditSession::DoEditSession(TfEditCookie ec) {
     if (_wParam == 0) {
         Commit(ec);
     } else if (Telex::IsEditKey(_wParam, _lParam, _keyState)) {
+        DBG_DPRINT(L"%d not edit key, not eating", _wParam);
         // uneaten, ends composition
         _controller->GetEngine().Reset();
         return _compositionManager->EndCompositionNow(ec);
@@ -50,9 +51,8 @@ STDMETHODIMP VietType::KeyHandlerEditSession::DoEditSession(TfEditCookie ec) {
         hr = _compositionManager->EmptyCompositionText(ec);
         DBG_HRESULT_CHECK(hr, L"%s", L"_compositionManager->EmptyCompositionText failed");
         return _compositionManager->EndCompositionNow(ec);
-    //} else if (_wParam == VK_BACK && !_compositionManager->IsComposing()) {
-        //hr = VietType::EditSurroundingWord(ec, _compositionManager, _context, _controller);
-        //HRESULT_CHECK_RETURN(hr, L"%s", L"CompositionManager::RequestEditSession failed");
+    } else if (_wParam == VK_BACK && !_compositionManager->IsComposing()) {
+        //_controller->SetBackconvert();
     } else if (Telex::IsKeyEaten(_compositionManager->IsComposing(), _wParam, _lParam, _keyState)) {
         // eaten, updates composition
         ComposeKey(ec);
@@ -86,6 +86,8 @@ void VietType::KeyHandlerEditSession::Initialize(
 
 HRESULT VietType::KeyHandlerEditSession::ComposeKey(TfEditCookie ec) {
     HRESULT hr;
+
+    DBG_DPRINT(L"%s", L"");
 
     switch (Telex::PushKey(_controller->GetEngine(), _wParam, _lParam, _keyState)) {
     case Telex::TelexStates::VALID: {
@@ -124,6 +126,8 @@ HRESULT VietType::KeyHandlerEditSession::ComposeKey(TfEditCookie ec) {
 
 HRESULT VietType::KeyHandlerEditSession::Commit(TfEditCookie ec) {
     HRESULT hr;
+
+    DBG_DPRINT(L"%s", L"");
 
     if (!_compositionManager->IsComposing()) {
         goto exit;

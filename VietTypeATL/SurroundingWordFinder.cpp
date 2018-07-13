@@ -124,6 +124,10 @@ HRESULT VietType::EditSurroundingWord(
 
     HRESULT hr;
 
+    DBG_DPRINT(L"ec = %ld", ec);
+
+    controller->ResetBackconvert();
+
     if (compositionManager->IsComposing()) {
         return S_OK;
     }
@@ -177,6 +181,8 @@ HRESULT VietType::EditSurroundingWord(
             break;
         }
     }
+
+    DBG_DPRINT(L"wordlen = %ld", wordlen);
 
     if (wordlen < 1 || (static_cast<ULONG>(wordlen) < retrieved && !IsSeparatorCharacter(buf[retrieved - wordlen - 1]))) {
         // no word, or word is not bordered by separator character

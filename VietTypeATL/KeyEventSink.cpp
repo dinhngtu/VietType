@@ -27,6 +27,7 @@
 #include "KeyHandler.h"
 #include "ThreadMgrEventSink.h"
 #include "SurroundingWordFinder.h"
+#include "EditSessions.h"
 
 // {8CC27CF8-93D2-416C-B1A3-66827F54244A}
 static const GUID GUID_KeyEventSink_PreservedKey_Toggle = { 0x8cc27cf8, 0x93d2, 0x416c, { 0xb1, 0xa3, 0x66, 0x82, 0x7f, 0x54, 0x24, 0x4a } };
@@ -80,7 +81,11 @@ STDMETHODIMP VietType::KeyEventSink::OnSetFocus(BOOL fForeground) {
             (st.dwStaticFlags & TF_SS_TRANSITORY) ? L'T' : L'_');
     } else DBG_HRESULT_CHECK(hr, L"%s", L"context->GetStatus failed");
 
-    _controller->RequestEditBlocked(_compositionManager, context);
+    if (_controller->IsEditBlockedPending()) {
+        hr = CompositionManager::RequestEditSession(VietType::EditBlocked, _compositionManager, context, static_cast<EngineController *>(_controller));
+        DBG_HRESULT_CHECK(hr, L"%s", L"CompositionManager::RequestEditSession failed");
+        _controller->ResetBlocked(hr);
+    }
 
     return S_OK;
 }
@@ -100,7 +105,6 @@ STDMETHODIMP VietType::KeyEventSink::OnTestKeyDown(ITfContext * pic, WPARAM wPar
 
     // break off the composition early at OnTestKeyDown on an uneaten key
     if (!*pfEaten && _compositionManager->IsComposing()) {
-        DBG_DPRINT(L"calling key edit wParam = %lx", wParam);
         hr = CallKeyEdit(pic, wParam, lParam, _keyState);
         HRESULT_CHECK_RETURN(hr, L"%s", L"CallKeyEdit failed");
     }

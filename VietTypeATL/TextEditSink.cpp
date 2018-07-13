@@ -16,6 +16,9 @@
 // along with VietType.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "TextEditSink.h"
+#include "CompositionManager.h"
+#include "EngineController.h"
+#include "SurroundingWordFinder.h"
 
 VietType::TextEditSink::TextEditSink() {
 }
@@ -24,18 +27,37 @@ VietType::TextEditSink::~TextEditSink() {
 }
 
 STDMETHODIMP VietType::TextEditSink::OnEndEdit(ITfContext * pic, TfEditCookie ecReadOnly, ITfEditRecord * pEditRecord) {
+    DBG_DPRINT(L"%s", L"");
+
     if (pEditRecord == nullptr) {
         return E_INVALIDARG;
+    }
+
+    if (!_compMgr->IsComposing() && _controller->IsBackconvertPending()) {
+        DBG_DPRINT(L"%s", L"launching backconvert edit session");
+        HRESULT hr;
+        HRESULT hrSession;
+        hr = CompositionManager::RequestEditSessionEx(
+            VietType::EditSurroundingWord,
+            _compMgr,
+            pic,
+            TF_ES_ASYNCDONTCARE | TF_ES_READWRITE,
+            &hrSession,
+            static_cast<EngineController *>(_controller));
+        HRESULT_CHECK_RETURN(hr, L"%s", L"CompositionManager::RequestEditSession failed");
     }
 
     return S_OK;
 }
 
-HRESULT VietType::TextEditSink::Initialize(ITfDocumentMgr *documentMgr) {
+HRESULT VietType::TextEditSink::Initialize(ITfDocumentMgr *documentMgr, SmartComObjPtr<CompositionManager> const& compMgr, SmartComObjPtr<EngineController> const& controller) {
     HRESULT hr;
 
-    // we don't care about unadvise result
-    _textEditSinkAdvisor.Unadvise();
+    _compMgr = compMgr;
+    _controller = controller;
+
+    hr = _textEditSinkAdvisor.Unadvise();
+    DBG_HRESULT_CHECK(hr, L"%s", L"_textEditSinkAdvisor.Unadvise failed");
 
     if (!documentMgr) {
         // caller just wanted to clear the previous sink
@@ -43,9 +65,7 @@ HRESULT VietType::TextEditSink::Initialize(ITfDocumentMgr *documentMgr) {
     }
 
     hr = documentMgr->GetTop(_editContext.GetAddress());
-    if (FAILED(hr)) {
-        return hr;
-    }
+    HRESULT_CHECK_RETURN(hr, L"%s", L"documentMgr->GetTop failed");
 
     if (!_editContext) {
         // empty document, no sink possible
@@ -58,6 +78,7 @@ HRESULT VietType::TextEditSink::Initialize(ITfDocumentMgr *documentMgr) {
     }
 
     hr = _textEditSinkAdvisor.Advise(source, this);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_textEditSinkAdvisor.Advise failed");
 
     return S_OK;
 }
@@ -69,6 +90,9 @@ HRESULT VietType::TextEditSink::Uninitialize() {
     DBG_HRESULT_CHECK(hr, L"%s", L"_textEditSinkAdvisor.Unadvise failed");
 
     _editContext.Release();
+
+    _controller.Release();
+    _compMgr.Release();
 
     return S_OK;
 }

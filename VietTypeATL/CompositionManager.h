@@ -102,7 +102,7 @@ public:
         HRESULT_CHECK_RETURN(hr, L"%s", L"es.CreateInstance failed");
 
         session->Initialize(callback, compositionManager, context, args...);
-        hr = context->RequestEditSession(compositionManager->_clientid, session, flags, &hrSession);
+        hr = context->RequestEditSession(compositionManager->_clientid, session, flags, hrSession);
         HRESULT_CHECK_RETURN(hr, L"%s", L"context->RequestEditSession failed");
 
         return hr;

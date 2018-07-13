@@ -34,8 +34,10 @@ VietType::CompositionManager::~CompositionManager() {
 STDMETHODIMP VietType::CompositionManager::OnCompositionTerminated(TfEditCookie ecWrite, ITfComposition * pComposition) {
     HRESULT hr;
 
-    hr = EndComposition();
-    DBG_HRESULT_CHECK(hr, L"%s", L"EndComposition failed");
+    DBG_DPRINT(L"ecWrite = %ld", ecWrite);
+
+    hr = EndCompositionNow(ecWrite);
+    DBG_HRESULT_CHECK(hr, L"%s", L"EndCompositionNow failed");
 
     return S_OK;
 }

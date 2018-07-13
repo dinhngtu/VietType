@@ -480,6 +480,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TestRelease|x64'">
       </PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="EditSessions.cpp" />
     <ClCompile Include="EngineController.cpp" />
     <ClCompile Include="Globals.cpp" />
     <ClCompile Include="KeyEventSink.cpp" />
@@ -542,6 +543,7 @@
     <ClInclude Include="Define.h" />
     <ClInclude Include="dllmain.h" />
     <ClInclude Include="EditSession.h" />
+    <ClInclude Include="EditSessions.h" />
     <ClInclude Include="EngineController.h" />
     <ClInclude Include="Export.h" />
     <ClInclude Include="Globals.h" />

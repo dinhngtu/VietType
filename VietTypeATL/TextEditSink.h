@@ -22,6 +22,9 @@
 
 namespace VietType {
 
+class CompositionManager;
+class EngineController;
+
 class TextEditSink :
     public CComObjectRootEx<CComSingleThreadModel>,
     public ITfTextEditSink {
@@ -39,10 +42,12 @@ public:
     // Inherited via ITfTextEditSink
     virtual STDMETHODIMP OnEndEdit(ITfContext * pic, TfEditCookie ecReadOnly, ITfEditRecord * pEditRecord) override;
 
-    HRESULT Initialize(ITfDocumentMgr *documentMgr);
+    HRESULT Initialize(ITfDocumentMgr *documentMgr, SmartComObjPtr<CompositionManager> const& compMgr, SmartComObjPtr<EngineController> const& controller);
     HRESULT Uninitialize();
 
 private:
+    SmartComObjPtr<CompositionManager> _compMgr;
+    SmartComObjPtr<EngineController> _controller;
     SinkAdvisor<ITfTextEditSink> _textEditSinkAdvisor;
     SmartComPtr<ITfContext> _editContext;
 

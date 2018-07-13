@@ -70,8 +70,12 @@ public:
     int IsEnabled() const;
     BlockedKind GetBlocked() const;
     void SetBlocked(BlockedKind blocked);
-    HRESULT RequestEditBlocked(CompositionManager *compMgr, ITfContext *context);
+    bool ResetBlocked(HRESULT result);
     bool IsEditBlockedPending() const;
+
+    void SetBackconvert();
+    void ResetBackconvert();
+    bool IsBackconvertPending() const;
 
     // update engine and langbar enabled state to match enabled/blocked value
     HRESULT UpdateStates();
@@ -98,6 +102,7 @@ private:
     bool _enabled = true;
     BlockedKind _blocked = BlockedKind::FREE;
     bool _editBlockedPending = false;
+    bool _backconvertPending = false;
 
 private:
     DISALLOW_COPY_AND_ASSIGN(EngineController);

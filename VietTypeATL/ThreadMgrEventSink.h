@@ -24,6 +24,7 @@ namespace VietType {
 
 class CompositionManager;
 class EngineController;
+class TextEditSink;
 
 class ThreadMgrEventSink :
     public CComObjectRootEx<CComSingleThreadModel>,
@@ -51,6 +52,7 @@ public:
 
 private:
     SinkAdvisor<ITfThreadMgrEventSink> _threadMgrEventSinkAdvisor;
+    SmartComObjPtr<TextEditSink> _textEditSink;
     SmartComObjPtr<CompositionManager> _compMgr;
     SmartComObjPtr<EngineController> _controller;
     SmartComPtr<ITfDocumentMgr> _docMgrFocus;

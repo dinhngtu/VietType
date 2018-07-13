@@ -18,71 +18,10 @@
 #include "EngineController.h"
 #include "LanguageBarHandlers.h"
 #include "CompositionManager.h"
+#include "EditSessions.h"
 
 // {CCA3D390-EF1A-4DE4-B2FF-B6BC76D68C3B}
 const GUID VietType::GUID_LanguageBarButton_Item = { 0xcca3d390, 0xef1a, 0x4de4, { 0xb2, 0xff, 0xb6, 0xbc, 0x76, 0xd6, 0x8c, 0x3b } };
-
-HRESULT EditBlocked(
-    TfEditCookie ec,
-    VietType::CompositionManager *compositionManager,
-    ITfContext *context,
-    VietType::EngineController *controller,
-    bool *editBlockedPending) {
-
-    HRESULT hr;
-    VietType::BlockedKind blocked;
-
-    SmartComPtr<ITfReadOnlyProperty> prop;
-    hr = context->GetAppProperty(VietType::Globals::GUID_PROP_INPUTSCOPE, prop.GetAddress());
-    HRESULT_CHECK_RETURN(hr, L"%s", L"context->GetAppProperty failed");
-
-    TF_SELECTION sel;
-    ULONG fetched;
-    context->GetSelection(ec, TF_DEFAULT_SELECTION, 1, &sel, &fetched);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"context->GetSelection failed");
-
-    VARIANT var;
-    hr = prop->GetValue(ec, sel.range, &var);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"prop->GetValue failed");
-
-    if (var.vt != VT_UNKNOWN) {
-        DBG_DPRINT(L"bad variant type %d", static_cast<int>(var.vt));
-        return E_NOINTERFACE;
-    }
-
-    SmartComPtr<ITfInputScope> iis(var.punkVal);
-    if (!iis) {
-        DBG_DPRINT(L"QI on ITfInputScope failed");
-        return E_NOINTERFACE;
-    }
-
-    CComHeapPtr<InputScope> pscopes;
-    UINT scount;
-    hr = iis->GetInputScopes(&pscopes, &scount);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"iis->GetInputScopes failed");
-
-    InputScope *scopes = pscopes;
-    for (UINT i = 0; i < scount; i++) {
-        switch (scopes[i]) {
-        case IS_EMAIL_SMTPEMAILADDRESS:
-        case IS_EMAIL_USERNAME:
-        case IS_LOGINNAME:
-        case IS_PASSWORD:
-            blocked = VietType::BlockedKind::BLOCKED;
-            goto commit;
-        //case IS_URL:
-            //blocked = VietType::BlockedKind::ADVISED;
-            //goto commit;
-        }
-    }
-    blocked = VietType::BlockedKind::FREE;
-
-commit:
-    DBG_DPRINT(L"setting blocked %d", blocked);
-    controller->SetBlocked(blocked);
-    *editBlockedPending = false;
-    return S_OK;
-}
 
 VietType::EngineController::EngineController() {
     _indicatorButton = std::make_unique<IndicatorButton>(this);
@@ -206,21 +145,25 @@ void VietType::EngineController::SetBlocked(VietType::BlockedKind blocked) {
     UpdateStates();
 }
 
-HRESULT VietType::EngineController::RequestEditBlocked(CompositionManager *compMgr, ITfContext *context) {
-    if (_editBlockedPending) {
-        return S_OK;
-    } else {
-        _editBlockedPending = true;
-        HRESULT hr = CompositionManager::RequestEditSession(&EditBlocked, compMgr, context, this, &_editBlockedPending);
-        if (FAILED(hr)) {
-            _editBlockedPending = false;
-        }
-        return hr;
-    }
+bool VietType::EngineController::ResetBlocked(HRESULT result) {
+    _editBlockedPending = SUCCEEDED(result);
+    return _editBlockedPending;
 }
 
 bool VietType::EngineController::IsEditBlockedPending() const {
     return _editBlockedPending;
+}
+
+void VietType::EngineController::SetBackconvert() {
+    _backconvertPending = true;
+}
+
+void VietType::EngineController::ResetBackconvert() {
+    _backconvertPending = false;
+}
+
+bool VietType::EngineController::IsBackconvertPending() const {
+    return _backconvertPending;
 }
 
 HRESULT VietType::EngineController::UpdateStates() {
