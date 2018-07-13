@@ -265,6 +265,12 @@ public:
 
     // caps
 
+    TEST_METHOD(TestCapsPeekD) {
+        TelexEngine e(config);
+        e.PushChar(L'D');
+        Assert::AreEqual(L"D", e.Peek().c_str());
+    }
+
     TEST_METHOD(TestCapsXuOwngf) {
         TestValidWord(L"X\x1b0\x1edcng", L"XuOwngf");
     }
