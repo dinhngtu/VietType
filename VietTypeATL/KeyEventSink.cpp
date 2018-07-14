@@ -73,7 +73,7 @@ STDMETHODIMP VietType::KeyEventSink::OnSetFocus(BOOL fForeground) {
     hr = context->GetStatus(&st);
     if (SUCCEEDED(hr)) {
         DBG_DPRINT(
-            L"ThreadMgrEventSink::OnSetFocus d=%c%c%c s=%c%c%c",
+            L"d=%c%c%c s=%c%c%c",
             (st.dwDynamicFlags & TF_SD_LOADING) ? L'L' : L'_',
             (st.dwDynamicFlags & TF_SD_READONLY) ? L'R' : L'_',
             (st.dwDynamicFlags & TS_SD_UIINTEGRATIONENABLE) ? L'U' : L'_',
