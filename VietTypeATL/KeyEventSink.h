@@ -19,10 +19,11 @@
 
 #include "Common.h"
 #include "SinkAdvisor.h"
-#include "CompositionManager.h"
-#include "EngineController.h"
 
 namespace VietType {
+
+class CompositionManager;
+class EngineController;
 
 class KeyEventSink :
     public CComObjectRootEx<CComSingleThreadModel>,

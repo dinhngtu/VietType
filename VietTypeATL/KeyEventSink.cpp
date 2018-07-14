@@ -25,9 +25,10 @@
 #include "KeyEventSink.h"
 #include "Telex.h"
 #include "KeyHandler.h"
-#include "ThreadMgrEventSink.h"
 #include "SurroundingWordFinder.h"
 #include "EditSessions.h"
+#include "CompositionManager.h"
+#include "EngineController.h"
 
 // {8CC27CF8-93D2-416C-B1A3-66827F54244A}
 static const GUID GUID_KeyEventSink_PreservedKey_Toggle = { 0x8cc27cf8, 0x93d2, 0x416c, { 0xb1, 0xa3, 0x66, 0x82, 0x7f, 0x54, 0x24, 0x4a } };
