@@ -154,18 +154,6 @@ bool VietType::EngineController::IsEditBlockedPending() const {
     return _editBlockedPending;
 }
 
-void VietType::EngineController::SetBackconvert() {
-    _backconvertPending = true;
-}
-
-void VietType::EngineController::ResetBackconvert() {
-    _backconvertPending = false;
-}
-
-bool VietType::EngineController::IsBackconvertPending() const {
-    return _backconvertPending;
-}
-
 HRESULT VietType::EngineController::UpdateStates() {
     HRESULT hr;
 

@@ -50,8 +50,6 @@ STDMETHODIMP VietType::ThreadMgrEventSink::OnSetFocus(ITfDocumentMgr * pdimFocus
     }
 
     _docMgrFocus = pdimFocus;
-    hr = _textEditSink->Initialize(pdimFocus, _compMgr, _controller);
-    DBG_HRESULT_CHECK(hr, L"%s", L"_textEditSink->Initialize failed");
 
     if (_controller->IsEditBlockedPending()) {
         return S_OK;
@@ -103,11 +101,6 @@ HRESULT VietType::ThreadMgrEventSink::Initialize(
 
     HRESULT hr;
 
-    // create text edit sink before advising thread manager event sink
-    // since text edit sink is used in thread manager event sink handler
-    hr = _textEditSink.CreateInstance();
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_textEditSink.CreateInstance failed");
-
     _compMgr = compMgr;
     _controller = controller;
 
@@ -117,8 +110,6 @@ HRESULT VietType::ThreadMgrEventSink::Initialize(
     SmartComPtr<ITfDocumentMgr> documentMgr;
     hr = threadMgr->GetFocus(documentMgr.GetAddress());
     HRESULT_CHECK_RETURN(hr, L"%s", L"threadMgr->GetFocus failed");
-    hr = _textEditSink->Initialize(documentMgr, _compMgr, _controller);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_textEditSink->Initialize failed");
 
     return hr;
 }
@@ -131,12 +122,6 @@ HRESULT VietType::ThreadMgrEventSink::Uninitialize() {
 
     _controller.Release();
     _compMgr.Release();
-
-    if (_textEditSink) {
-        hr = _textEditSink->Uninitialize();
-        DBG_HRESULT_CHECK(hr, L"%s", L"_textEditSink->Uninitialize failed");
-        _textEditSink.Release();
-    }
 
     _docMgrFocus.Release();
 

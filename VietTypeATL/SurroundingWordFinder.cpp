@@ -20,7 +20,7 @@
 #include "EngineController.h"
 #include "VirtualDocument.h"
 
-long const SWF_MAXCHARS = 8; // "nghiêng" + 1 for the padding
+long const SWF_MAXCHARS = 9; // "nghiêng" + 1 for the padding + 1 for max ignore
 
 std::unordered_set<wchar_t> const vietnamesechars_notaz = {
      L'\xe0', L'\xc0',
@@ -120,13 +120,12 @@ HRESULT VietType::EditSurroundingWord(
     _In_ TfEditCookie ec,
     _In_ VietType::CompositionManager *compositionManager,
     _In_ ITfContext *context,
-    _In_ VietType::EngineController *controller) {
+    _In_ VietType::EngineController *controller,
+    _In_ int ignore) {
 
     HRESULT hr;
 
     DBG_DPRINT(L"ec = %ld", ec);
-
-    controller->ResetBackconvert();
 
     if (compositionManager->IsComposing()) {
         return S_OK;
@@ -172,7 +171,7 @@ HRESULT VietType::EditSurroundingWord(
 
     LONG wordlen = 0;
     // start from retrieved - 2 to ignore a character, therefore emulating the backspace
-    for (int i = retrieved - 1; i >= 0; i--) {
+    for (int i = retrieved - 1 - ignore; i >= 0; i--) {
         if (IsVietnameseCharacter(buf[i])) {
             // allowed char, can continue
             wordlen++;
@@ -184,7 +183,7 @@ HRESULT VietType::EditSurroundingWord(
 
     DBG_DPRINT(L"wordlen = %ld", wordlen);
 
-    if (wordlen < 1 || (static_cast<ULONG>(wordlen) < retrieved && !IsSeparatorCharacter(buf[retrieved - wordlen - 1]))) {
+    if (wordlen < 1 || (static_cast<ULONG>(wordlen) < retrieved && !IsSeparatorCharacter(buf[retrieved - wordlen - 1 - ignore]))) {
         // no word, or word is not bordered by separator character
         hr = compositionManager->EndCompositionNow(ec);
         HRESULT_CHECK_RETURN(hr, L"%s", L"compositionManager->EndCompositionNow failed");
@@ -192,31 +191,25 @@ HRESULT VietType::EditSurroundingWord(
     }
 
     // move composition to the word we found
-
-    SmartComPtr<ITfRange> rangeWord;
-    hr = range->Clone(rangeWord.GetAddress());
-    HRESULT_CHECK_RETURN(hr, L"%s", L"range->Clone failed");
-
-    hr = rangeWord->ShiftStart(ec, -wordlen, &shifted, &haltcond);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"rangeWord->ShiftStart failed");
-    hr = composition->ShiftStart(ec, rangeWord);
+    hr = range->ShiftStart(ec, -wordlen - ignore, &shifted, &haltcond);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"range->ShiftStart failed");
+    hr = composition->ShiftStart(ec, range);
     HRESULT_CHECK_RETURN(hr, L"%s", L"composition->ShiftStart failed");
 
+    if (ignore) {
+        hr = range->ShiftEnd(ec, -ignore, &shifted, &haltcond);
+        HRESULT_CHECK_RETURN(hr, L"%s", L"range->ShiftEnd failed");
+        hr = composition->ShiftEnd(ec, range);
+        HRESULT_CHECK_RETURN(hr, L"%s", L"composition->ShiftEnd failed");
+    }
+
     // move selection to end
-
-    hr = rangeWord->Collapse(ec, TF_ANCHOR_END);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"rangeWord->Collapse failed");
-
-    TF_SELECTION sel;
-    sel.range = rangeWord;
-    sel.style.ase = TF_AE_NONE;
-    sel.style.fInterimChar = FALSE;
-    hr = context->SetSelection(ec, 1, &sel);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"context->SetSelection failed");
+    hr = compositionManager->MoveCaretToEnd(ec);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"compositionManager->MoveCaretToEnd failed");
 
     // reinitialize engine with text
     controller->GetEngine().Reset();
-    controller->GetEngine().Backconvert(std::wstring(&buf[retrieved - wordlen], wordlen));
+    controller->GetEngine().Backconvert(std::wstring(&buf[retrieved - wordlen - ignore], wordlen));
 
     if (controller->GetEngine().GetState() != Telex::TelexStates::VALID) {
         // if found a bad word, force-terminate the composition

@@ -101,7 +101,16 @@ STDMETHODIMP VietType::KeyEventSink::OnTestKeyDown(ITfContext * pic, WPARAM wPar
     if (!GetKeyboardState(_keyState)) {
         WINERROR_RETURN_HRESULT(L"%s", L"GetKeyboardState failed");
     }
-    *pfEaten = Telex::IsKeyEaten(_compositionManager->IsComposing(), wParam, lParam, _keyState);
+
+    TF_STATUS st;
+    hr = pic->GetStatus(&st);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"pic->GetStatus failed");
+    *pfEaten = Telex::IsKeyEaten(
+        _compositionManager->IsComposing(),
+        static_cast<bool>(st.dwStaticFlags & TF_SS_TRANSITORY),
+        wParam,
+        lParam,
+        _keyState);
 
     // break off the composition early at OnTestKeyDown on an uneaten key
     if (!*pfEaten && _compositionManager->IsComposing()) {
@@ -113,6 +122,8 @@ STDMETHODIMP VietType::KeyEventSink::OnTestKeyDown(ITfContext * pic, WPARAM wPar
 }
 
 STDMETHODIMP VietType::KeyEventSink::OnTestKeyUp(ITfContext * pic, WPARAM wParam, LPARAM lParam, BOOL * pfEaten) {
+    HRESULT hr;
+
     if (!_controller->IsEnabled()) {
         *pfEaten = FALSE;
         return S_OK;
@@ -123,7 +134,16 @@ STDMETHODIMP VietType::KeyEventSink::OnTestKeyUp(ITfContext * pic, WPARAM wParam
         if (!GetKeyboardState(_keyState)) {
             WINERROR_RETURN_HRESULT(L"%s", L"GetKeyboardState failed");
         }
-        *pfEaten = Telex::IsKeyEaten(_compositionManager->IsComposing(), wParam, lParam, _keyState);
+
+        TF_STATUS st;
+        hr = pic->GetStatus(&st);
+        HRESULT_CHECK_RETURN(hr, L"%s", L"pic->GetStatus failed");
+        *pfEaten = Telex::IsKeyEaten(
+            _compositionManager->IsComposing(),
+            static_cast<bool>(st.dwStaticFlags & TF_SS_TRANSITORY),
+            wParam,
+            lParam,
+            _keyState);
     } else {
         *pfEaten = FALSE;
     }
@@ -142,7 +162,16 @@ STDMETHODIMP VietType::KeyEventSink::OnKeyDown(ITfContext * pic, WPARAM wParam, 
     if (!GetKeyboardState(_keyState)) {
         WINERROR_RETURN_HRESULT(L"%s", L"GetKeyboardState failed");
     }
-    *pfEaten = Telex::IsKeyEaten(_compositionManager->IsComposing(), wParam, lParam, _keyState);
+    
+    TF_STATUS st;
+    hr = pic->GetStatus(&st);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"pic->GetStatus failed");
+    *pfEaten = Telex::IsKeyEaten(
+        _compositionManager->IsComposing(),
+        static_cast<bool>(st.dwStaticFlags & TF_SS_TRANSITORY),
+        wParam,
+        lParam,
+        _keyState);
 
     DBG_DPRINT(L"OnKeyDown wParam = %lx %s", wParam, *pfEaten ? L"eaten" : L"not eaten");
 
@@ -173,7 +202,8 @@ STDMETHODIMP VietType::KeyEventSink::OnPreservedKey(ITfContext * pic, REFGUID rg
             VietType::EditSurroundingWord,
             _compositionManager,
             pic,
-            static_cast<EngineController *>(_controller));
+            static_cast<EngineController *>(_controller),
+            0);
         HRESULT_CHECK_RETURN(hr, L"%s", L"CompositionManager::RequestEditSession failed");
     }
 

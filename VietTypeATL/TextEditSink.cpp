@@ -33,20 +33,6 @@ STDMETHODIMP VietType::TextEditSink::OnEndEdit(ITfContext * pic, TfEditCookie ec
         return E_INVALIDARG;
     }
 
-    if (!_compMgr->IsComposing() && _controller->IsBackconvertPending()) {
-        DBG_DPRINT(L"%s", L"launching backconvert edit session");
-        HRESULT hr;
-        HRESULT hrSession;
-        hr = CompositionManager::RequestEditSessionEx(
-            VietType::EditSurroundingWord,
-            _compMgr,
-            pic,
-            TF_ES_ASYNCDONTCARE | TF_ES_READWRITE,
-            &hrSession,
-            static_cast<EngineController *>(_controller));
-        HRESULT_CHECK_RETURN(hr, L"%s", L"CompositionManager::RequestEditSession failed");
-    }
-
     return S_OK;
 }
 

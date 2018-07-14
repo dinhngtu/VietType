@@ -73,10 +73,6 @@ public:
     bool ResetBlocked(HRESULT result);
     bool IsEditBlockedPending() const;
 
-    void SetBackconvert();
-    void ResetBackconvert();
-    bool IsBackconvertPending() const;
-
     // update engine and langbar enabled state to match enabled/blocked value
     HRESULT UpdateStates();
 
