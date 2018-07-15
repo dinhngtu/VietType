@@ -37,46 +37,7 @@
 
 using namespace VietType::Telex;
 
-void main1() {
-    TelexConfig c;
-    c.oa_uy_tone1 = true;
-    TelexEngine tx(c);
-
-    if (tx.PushChar(L'n') != TelexStates::VALID) {
-        throw std::exception("push_char error");
-    }
-    if (tx.PushChar(L'g') != TelexStates::VALID) {
-        throw std::exception("push_char error");
-    }
-    if (tx.PushChar(L'u') != TelexStates::VALID) {
-        throw std::exception("push_char error");
-    }
-    if (tx.PushChar(L'y') != TelexStates::VALID) {
-        throw std::exception("push_char error");
-    }
-    if (tx.PushChar(L'e') != TelexStates::VALID) {
-        throw std::exception("push_char error");
-    }
-    if (tx.PushChar(L'e') != TelexStates::VALID) {
-        throw std::exception("push_char error");
-    }
-    if (tx.PushChar(L'n') != TelexStates::VALID) {
-        throw std::exception("push_char error");
-    }
-    if (tx.PushChar(L'x') != TelexStates::VALID) {
-        throw std::exception("push_char error");
-    }
-    if (tx.Commit() != TelexStates::COMMITTED) {
-        throw std::exception("push_char error");
-    }
-    auto r = tx.Retrieve();
-    std::wstring str(r.begin(), r.end());
-    if (str != L"nguy\x1ec5n") {
-        throw std::exception("retrieve bad string");
-    }
-}
-
-void main2() {
+void benchmark() {
     TelexConfig c;
     c.oa_uy_tone1 = true;
     TelexEngine tx(c);
@@ -89,15 +50,17 @@ void main2() {
         tx.Peek();
         tx.PushChar(L'G');
         tx.Peek();
-        tx.PushChar(L'U');
+        tx.PushChar(L'h');
         tx.Peek();
-        tx.PushChar(L'y');
+        tx.PushChar(L'i');
         tx.Peek();
         tx.PushChar(L'E');
         tx.Peek();
         tx.PushChar(L'e');
         tx.Peek();
         tx.PushChar(L'n');
+        tx.Peek();
+        tx.PushChar(L'G');
         tx.Peek();
         tx.PushChar(L'X');
         tx.Peek();
@@ -109,27 +72,8 @@ void main2() {
     std::wcout << L"total len = " << len << std::endl;
 }
 
-void main3() {
-    TelexConfig c;
-    c.oa_uy_tone1 = true;
-    TelexEngine tx(c);
-    
-    tx.Reset();
-    tx.PushChar(L'd');
-    tx.PushChar(L'd');
-    tx.PushChar(L'o');
-    tx.PushChar(L'o');
-    tx.PushChar(L'n');
-    tx.PushChar(L'g');
-    tx.PushChar(L'f');
-    tx.Backspace();
-    tx.Commit();
-    auto x = tx.Retrieve();
-    DPRINT(L"%s", x.c_str());
-}
-
 int main() {
-    main3();
+    benchmark();
 
     return 0;
 }

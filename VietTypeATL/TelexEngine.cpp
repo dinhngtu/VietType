@@ -32,6 +32,16 @@ enum RESPOS_TRANSITIONS {
 };
 
 static wchar_t ToUpper(wchar_t c) {
+    // prechecking for these character ranges gives a sizable boost in performance
+    if (c >= L'A' && c <= L'Z') {
+        return c;
+    }
+    if (c >= L'a' && c <= L'z') {
+        return c & ~32;
+    }
+    if (c >= L'\x1ea0' && c <= L'\x1ef9') {
+        return c & ~1;
+    }
     auto it = touppermap.find(c);
     if (it != touppermap.end()) {
         return it->second;
@@ -40,7 +50,39 @@ static wchar_t ToUpper(wchar_t c) {
     }
 }
 
+static wchar_t ToLower(wchar_t c) {
+    if (c >= L'a' && c <= L'z') {
+        return c;
+    }
+    if (c >= L'A' && c <= L'Z') {
+        return c | 32;
+    }
+    if (c >= L'\x1ea0' && c <= L'\x1ef9') {
+        return c | 1;
+    }
+    auto it = tolowermap.find(c);
+    if (it != tolowermap.end()) {
+        return it->second;
+    } else {
+        return c;
+    }
+}
+
+// return 1 if c is upper, 0 if c is lower
 static int FindLower(wchar_t c, wchar_t *out) {
+    if (c >= L'a' && c <= L'z') {
+        *out = c;
+        return 0;
+    }
+    if (c >= L'A' && c <= L'Z') {
+        *out = c | 32;
+        return 1;
+    }
+    if (c >= L'\x1ea0' && c <= L'\x1ef9') {
+        int ret = !(c & 1);
+        *out = c | 1;
+        return ret;
+    }
     auto it = tolowermap.find(c);
     if (it != tolowermap.end()) {
         *out = it->second;
@@ -425,23 +467,16 @@ TelexStates TelexEngine::Backconvert(std::wstring const& s) {
         } else if (c >= L'A' && c <= L'Z') {
             PushChar(c);
         } else {
-            genmap<wchar_t, std::wstring>::const_iterator it;
-            auto cup = tolowermap.find(c);
-            if (cup != tolowermap.end()) {
-                it = backconversions.find(cup->second);
+            auto clow = ToLower(c);
+            auto it = backconversions.find(clow);
+            if (c != clow) {
+                // c is upper
+                for (auto backc : it->second) {
+                    PushChar(ToUpper(backc));
+                }
             } else {
-                it = backconversions.find(c);
-            }
-            if (it != backconversions.end()) {
-                if (cup != tolowermap.end()) {
-                    // subtract 32 for upper
-                    for (auto backc : it->second) {
-                        PushChar(backc - 32);
-                    }
-                } else {
-                    for (auto backc : it->second) {
-                        PushChar(backc);
-                    }
+                for (auto backc : it->second) {
+                    PushChar(backc);
                 }
             }
         }
