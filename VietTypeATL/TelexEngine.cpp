@@ -480,6 +480,7 @@ std::wstring TelexEngine::Peek() const {
     VINFO vinfo;
     auto found = GetTonePos(true, &vinfo);
     if (!found) {
+        result.append(_c2);
         ApplyCases(result, _cases);
         return result;
     }

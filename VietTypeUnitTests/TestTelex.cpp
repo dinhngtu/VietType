@@ -241,6 +241,13 @@ public:
         Assert::AreEqual(L"cace", e.Peek().c_str());
     }
 
+    // peek shouldn't crash if tone position is not found
+    TEST_METHOD(TestPeekNhaeng) {
+        TelexEngine e(config);
+        FeedWord(e, L"nhaeng");
+        Assert::AreEqual(L"nhaeng", e.Peek().c_str());
+    }
+
     // double key tests
 
     TEST_METHOD(TestDoubleKeyXuaaan) {
