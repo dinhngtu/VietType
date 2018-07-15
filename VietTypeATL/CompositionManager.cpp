@@ -147,9 +147,10 @@ HRESULT VietType::CompositionManager::EmptyCompositionText(TfEditCookie ec) {
 
     SmartComPtr<ITfRange> range;
     hr = _composition->GetRange(range.GetAddress());
-    if (SUCCEEDED(hr)) {
-        range->SetText(ec, 0, NULL, 0);
-    } else HRESULT_CHECK_RETURN(hr, L"%s", L"composition->GetRange failed");
+    HRESULT_CHECK_RETURN(hr, L"%s", L"composition->GetRange failed");
+    
+    hr = range->SetText(ec, 0, NULL, 0);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"range->SetText failed");
 
     return S_OK;
 }
@@ -213,10 +214,13 @@ HRESULT VietType::CompositionManager::SetCompositionText(TfEditCookie ec, WCHAR 
         SmartComPtr<ITfRange> range;
         hr = _composition->GetRange(range.GetAddress());
         HRESULT_CHECK_RETURN(hr, L"%s", L"_composition->GetRange failed");
+
         hr = range->SetText(ec, TF_ST_CORRECTION, str, length);
         HRESULT_CHECK_RETURN(hr, L"%s", L"range->SetText failed");
+
         hr = SetRangeDisplayAttribute(ec, _context, range, _composingAttribute);
         HRESULT_CHECK_RETURN(hr, L"%s", L"SetRangeDisplayAttribute failed");
+
         hr = MoveCaretToEnd(ec);
         DBG_HRESULT_CHECK(hr, L"%s", L"MoveCaretToEnd failed");
     }
