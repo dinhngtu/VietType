@@ -38,11 +38,11 @@ public:
 
 public:
     // Inherited via ITfDisplayAttributeInfo
-    virtual HRESULT GetGUID(GUID * pguid) override;
-    virtual HRESULT GetDescription(BSTR * pbstrDesc) override;
-    virtual HRESULT GetAttributeInfo(TF_DISPLAYATTRIBUTE * pda) override;
-    virtual HRESULT SetAttributeInfo(const TF_DISPLAYATTRIBUTE * pda) override;
-    virtual HRESULT Reset(void) override;
+    virtual STDMETHODIMP GetGUID(GUID * pguid) override;
+    virtual STDMETHODIMP GetDescription(BSTR * pbstrDesc) override;
+    virtual STDMETHODIMP GetAttributeInfo(TF_DISPLAYATTRIBUTE * pda) override;
+    virtual STDMETHODIMP SetAttributeInfo(const TF_DISPLAYATTRIBUTE * pda) override;
+    virtual STDMETHODIMP Reset(void) override;
 
 public:
     void Initialize(GUID const& guid, std::wstring description, TF_DISPLAYATTRIBUTE attr);

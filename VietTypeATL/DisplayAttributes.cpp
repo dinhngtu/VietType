@@ -37,27 +37,27 @@ VietType::DisplayAttributeInfo::DisplayAttributeInfo() {
 VietType::DisplayAttributeInfo::~DisplayAttributeInfo() {
 }
 
-HRESULT VietType::DisplayAttributeInfo::GetGUID(GUID * pguid) {
+STDMETHODIMP VietType::DisplayAttributeInfo::GetGUID(GUID * pguid) {
     *pguid = _guid;
     return S_OK;
 }
 
-HRESULT VietType::DisplayAttributeInfo::GetDescription(BSTR * pbstrDesc) {
+STDMETHODIMP VietType::DisplayAttributeInfo::GetDescription(BSTR * pbstrDesc) {
     *pbstrDesc = SysAllocString(_description.c_str());
     return *pbstrDesc ? S_OK : E_OUTOFMEMORY;
 }
 
-HRESULT VietType::DisplayAttributeInfo::GetAttributeInfo(TF_DISPLAYATTRIBUTE * pda) {
+STDMETHODIMP VietType::DisplayAttributeInfo::GetAttributeInfo(TF_DISPLAYATTRIBUTE * pda) {
     *pda = _attr;
     return S_OK;
 }
 
-HRESULT VietType::DisplayAttributeInfo::SetAttributeInfo(const TF_DISPLAYATTRIBUTE * pda) {
+STDMETHODIMP VietType::DisplayAttributeInfo::SetAttributeInfo(const TF_DISPLAYATTRIBUTE * pda) {
     _attr = *pda;
     return S_OK;
 }
 
-HRESULT VietType::DisplayAttributeInfo::Reset(void) {
+STDMETHODIMP VietType::DisplayAttributeInfo::Reset(void) {
     _attr = _attrOrig;
     return S_OK;
 }
