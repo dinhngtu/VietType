@@ -60,6 +60,7 @@ public:
     HRESULT SetCompositionText(TfEditCookie ec, WCHAR const *str, LONG length);
     HRESULT EnsureCompositionText(TfEditCookie ec, ITfContext *context, WCHAR const *str, LONG length);
     HRESULT SetRangeDisplayAttribute(TfEditCookie ec, ITfContext *context, ITfRange *range, ITfDisplayAttributeInfo *attr);
+    HRESULT ClearRangeDisplayAttribute(TfEditCookie ec, ITfContext *context, ITfRange *range);
 
     template <typename... Args>
     static HRESULT RequestEditSession(

@@ -186,6 +186,13 @@ HRESULT VietType::CompositionManager::EndCompositionNow(TfEditCookie ec) {
     DBG_DPRINT(L"%s", L"ending composition");
 
     if (_composition) {
+        SmartComPtr<ITfRange> range;
+        hr = _composition->GetRange(range.GetAddress());
+        HRESULT_CHECK_RETURN(hr, L"%s", L"_composition->GetRange failed");
+
+        hr = ClearRangeDisplayAttribute(ec, _context, range);
+        HRESULT_CHECK_RETURN(hr, L"%s", L"ClearRangeDisplayAttribute failed");
+
         hr = MoveCaretToEnd(ec);
         DBG_HRESULT_CHECK(hr, L"%s", L"MoveCaretToEnd failed");
 
@@ -258,6 +265,19 @@ HRESULT VietType::CompositionManager::SetRangeDisplayAttribute(TfEditCookie ec, 
 
     hr = prop->SetValue(ec, range, &v);
     HRESULT_CHECK_RETURN(hr, L"%s", L"prop->SetValue failed");
+
+    return S_OK;
+}
+
+HRESULT VietType::CompositionManager::ClearRangeDisplayAttribute(TfEditCookie ec, ITfContext * context, ITfRange * range) {
+    HRESULT hr;
+
+    SmartComPtr<ITfProperty> prop;
+    hr = context->GetProperty(GUID_PROP_ATTRIBUTE, prop.GetAddress());
+    HRESULT_CHECK_RETURN(hr, L"%s", L"context->GetProperty failed");
+
+    hr = prop->Clear(ec, range);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"prop->Clear failed");
 
     return S_OK;
 }
