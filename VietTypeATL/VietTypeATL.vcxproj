@@ -454,6 +454,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CompositionManager.cpp" />
+    <ClCompile Include="DisplayAttributes.cpp" />
     <ClCompile Include="dllmain.cpp">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='TestDebug|Win32'">false</CompileAsManaged>
@@ -482,6 +483,7 @@
     </ClCompile>
     <ClCompile Include="EditSessions.cpp" />
     <ClCompile Include="EngineController.cpp" />
+    <ClCompile Include="EnumDisplayAttributeInfo.cpp" />
     <ClCompile Include="Globals.cpp" />
     <ClCompile Include="KeyEventSink.cpp" />
     <ClCompile Include="KeyHandler.cpp" />
@@ -541,10 +543,12 @@
     <ClInclude Include="Common.h" />
     <ClInclude Include="CompositionManager.h" />
     <ClInclude Include="Define.h" />
+    <ClInclude Include="DisplayAttributes.h" />
     <ClInclude Include="dllmain.h" />
     <ClInclude Include="EditSession.h" />
     <ClInclude Include="EditSessions.h" />
     <ClInclude Include="EngineController.h" />
+    <ClInclude Include="EnumDisplayAttributeInfo.h" />
     <ClInclude Include="Export.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="KeyEventSink.h" />

@@ -26,6 +26,40 @@
 
 #include "stdafx.h"
 #include "TextService.h"
+#include "EnumDisplayAttributeInfo.h"
+#include "DisplayAttributes.h"
+
+static SmartComObjPtr<VietType::EnumDisplayAttributeInfo> CreateAttributeStore() {
+    HRESULT hr;
+
+    SmartComObjPtr<VietType::EnumDisplayAttributeInfo> ret;
+    hr = ret.CreateInstance();
+    if (FAILED(hr)) {
+        DBG_HRESULT_CHECK(hr, L"%s", L"ret.CreateInstance failed");
+        ret = nullptr;
+        return ret;
+    }
+
+    SmartComObjPtr<VietType::DisplayAttributeInfo> attr1;
+    hr = attr1.CreateInstance();
+    if (FAILED(hr)) {
+        DBG_HRESULT_CHECK(hr, L"%s", L"attr1.CreateInstance failed");
+        ret = nullptr;
+        return ret;
+    }
+
+    attr1->Initialize(
+        std::get<0>(VietType::ComposingAttributeData),
+        std::get<1>(VietType::ComposingAttributeData),
+        std::get<2>(VietType::ComposingAttributeData));
+    SmartComPtr<ITfDisplayAttributeInfo> info1(static_cast<ITfDisplayAttributeInfo *>(attr1));
+    assert(info1);
+    ret->AddAttribute(info1);
+
+    return ret;
+}
+
+static SmartComObjPtr<VietType::EnumDisplayAttributeInfo> attributeStore = CreateAttributeStore();
 
 VietType::TextService::TextService() {
 }
@@ -52,7 +86,7 @@ STDMETHODIMP VietType::TextService::ActivateEx(ITfThreadMgr * ptim, TfClientId t
 
     hr = _compositionManager.CreateInstance();
     HRESULT_CHECK_RETURN(hr, L"%s", L"_compositionManager.CreateInstance failed");
-    _compositionManager->Initialize(tid);
+    _compositionManager->Initialize(tid, attributeStore->GetAttribute(0), static_cast<bool>(dwFlags & TF_TMAE_COMLESS));
 
     hr = _engineController.CreateInstance();
     HRESULT_CHECK_RETURN(hr, L"%s", L"_engineController.CreateInstance failed");
@@ -95,7 +129,21 @@ STDMETHODIMP VietType::TextService::Deactivate(void) {
     DBG_HRESULT_CHECK(hr, L"%s", L"_engineController->Uninitialize failed");
     _engineController.Release();
 
+    _compositionManager->Uninitialize();
     _compositionManager.Release();
 
     return S_OK;
+}
+
+STDMETHODIMP VietType::TextService::EnumDisplayAttributeInfo(IEnumTfDisplayAttributeInfo ** ppEnum) {
+    if (!attributeStore) {
+        return E_FAIL;
+    }
+    *ppEnum = attributeStore;
+    (*ppEnum)->AddRef();
+    return S_OK;
+}
+
+STDMETHODIMP VietType::TextService::GetDisplayAttributeInfo(REFGUID guid, ITfDisplayAttributeInfo ** ppInfo) {
+    return attributeStore->FindAttributeByGuid(guid, ppInfo);
 }

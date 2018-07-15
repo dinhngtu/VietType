@@ -30,6 +30,7 @@ static std::vector<GUID> SupportedCategories = {
     GUID_TFCAT_TIPCAP_COMLESS, // Google says this is required for WoW apps
     GUID_TFCAT_TIPCAP_IMMERSIVESUPPORT, // store apps?
     GUID_TFCAT_TIPCAP_SYSTRAYSUPPORT, // systray on win8+?
+    GUID_TFCAT_DISPLAYATTRIBUTEPROVIDER, // display attributes for composition
 };
 
 extern "C" __declspec(dllexport) HRESULT __cdecl RegisterProfiles() {

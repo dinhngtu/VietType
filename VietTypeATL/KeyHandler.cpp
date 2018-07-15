@@ -91,7 +91,7 @@ HRESULT VietType::KeyHandlerEditSession::ComposeKey(TfEditCookie ec) {
     case Telex::TelexStates::VALID: {
         if (_controller->GetEngine().Count()) {
             auto str = _controller->GetEngine().Peek();
-            hr = _compositionManager->EnsureCompositionText(_context, ec, &str[0], static_cast<LONG>(str.length()));
+            hr = _compositionManager->EnsureCompositionText(ec, _context, &str[0], static_cast<LONG>(str.length()));
             DBG_HRESULT_CHECK(hr, L"%s", L"_compositionManager->EnsureCompositionText failed");
         } else {
             // backspace returns VALID on an empty buffer
@@ -108,7 +108,7 @@ HRESULT VietType::KeyHandlerEditSession::ComposeKey(TfEditCookie ec) {
     case Telex::TelexStates::INVALID: {
         assert(_controller->GetEngine().Count() > 0);
         auto str = _controller->GetEngine().RetrieveInvalid();
-        hr = _compositionManager->EnsureCompositionText(_context, ec, &str[0], static_cast<LONG>(str.length()));
+        hr = _compositionManager->EnsureCompositionText(ec, _context, &str[0], static_cast<LONG>(str.length()));
         DBG_HRESULT_CHECK(hr, L"%s", L"_compositionManager->EnsureCompositionText failed");
         break;
     }

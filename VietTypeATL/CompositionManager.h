@@ -38,7 +38,8 @@ public:
     // Inherited via ITfCompositionSink
     virtual STDMETHODIMP OnCompositionTerminated(TfEditCookie ecWrite, ITfComposition * pComposition) override;
 
-    void Initialize(TfClientId clientid);
+    HRESULT Initialize(TfClientId clientid, SmartComPtr<ITfDisplayAttributeInfo> const& composingAttribute, bool comless);
+    void Uninitialize();
 
     // this uses the saved context, only use when there is an active composition
     HRESULT RequestEditSession(ITfEditSession *session);
@@ -57,7 +58,8 @@ public:
     HRESULT MoveCaretToEnd(TfEditCookie ec);
     HRESULT EndCompositionNow(TfEditCookie ec);
     HRESULT SetCompositionText(TfEditCookie ec, WCHAR const *str, LONG length);
-    HRESULT EnsureCompositionText(ITfContext *context, TfEditCookie ec, WCHAR const *str, LONG length);
+    HRESULT EnsureCompositionText(TfEditCookie ec, ITfContext *context, WCHAR const *str, LONG length);
+    HRESULT SetRangeDisplayAttribute(TfEditCookie ec, ITfContext *context, ITfRange *range, ITfDisplayAttributeInfo *attr);
 
     template <typename... Args>
     static HRESULT RequestEditSession(
@@ -122,6 +124,8 @@ private:
     TfClientId _clientid = TF_CLIENTID_NULL;
     SmartComPtr<ITfContext> _context;
     SmartComPtr<ITfComposition> _composition;
+    SmartComPtr<ITfCategoryMgr> _categoryMgr;
+    SmartComPtr<ITfDisplayAttributeInfo> _composingAttribute;
 
 private:
     DISALLOW_COPY_AND_ASSIGN(CompositionManager);

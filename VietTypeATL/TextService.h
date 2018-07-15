@@ -38,7 +38,8 @@ namespace VietType {
 class ATL_NO_VTABLE TextService :
     public CComObjectRootEx<CComSingleThreadModel>,
     public CComCoClass<TextService, &VietType::Globals::CLSID_TextService>,
-    public ITfTextInputProcessorEx {
+    public ITfTextInputProcessorEx,
+    public ITfDisplayAttributeProvider {
 public:
     TextService();
     ~TextService();
@@ -49,6 +50,7 @@ public:
     BEGIN_COM_MAP(TextService)
         COM_INTERFACE_ENTRY(ITfTextInputProcessor)
         COM_INTERFACE_ENTRY(ITfTextInputProcessorEx)
+        COM_INTERFACE_ENTRY(ITfDisplayAttributeProvider)
     END_COM_MAP()
     DECLARE_PROTECT_FINAL_CONSTRUCT()
 
@@ -57,6 +59,10 @@ public:
     virtual STDMETHODIMP Activate(ITfThreadMgr * ptim, TfClientId tid) override;
     virtual STDMETHODIMP Deactivate(void) override;
     virtual STDMETHODIMP ActivateEx(ITfThreadMgr * ptim, TfClientId tid, DWORD dwFlags) override;
+
+    // Inherited via ITfDisplayAttributeProvider
+    virtual STDMETHODIMP EnumDisplayAttributeInfo(IEnumTfDisplayAttributeInfo ** ppEnum) override;
+    virtual STDMETHODIMP GetDisplayAttributeInfo(REFGUID guid, ITfDisplayAttributeInfo ** ppInfo) override;
 
 private:
     SmartComPtr<ITfThreadMgr> _threadMgr;

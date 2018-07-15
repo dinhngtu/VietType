@@ -42,8 +42,22 @@ STDMETHODIMP VietType::CompositionManager::OnCompositionTerminated(TfEditCookie 
     return S_OK;
 }
 
-void VietType::CompositionManager::Initialize(TfClientId clientid) {
+HRESULT VietType::CompositionManager::Initialize(TfClientId clientid, SmartComPtr<ITfDisplayAttributeInfo> const& composingAttribute, bool comless) {
+    HRESULT hr;
+
     _clientid = clientid;
+    _composingAttribute = composingAttribute;
+
+    if (!comless) {
+        hr = CoCreateInstance(CLSID_TF_CategoryMgr, NULL, CLSCTX_INPROC_SERVER, IID_ITfCategoryMgr, reinterpret_cast<void **>(_categoryMgr.GetAddress()));
+    }
+
+    return S_OK;
+}
+
+void VietType::CompositionManager::Uninitialize() {
+    _categoryMgr.Release();
+    _composingAttribute.Release();
 }
 
 
@@ -194,6 +208,8 @@ HRESULT VietType::CompositionManager::SetCompositionText(TfEditCookie ec, WCHAR 
         HRESULT_CHECK_RETURN(hr, L"%s", L"_composition->GetRange failed");
         hr = range->SetText(ec, TF_ST_CORRECTION, str, length);
         HRESULT_CHECK_RETURN(hr, L"%s", L"range->SetText failed");
+        hr = SetRangeDisplayAttribute(ec, _context, range, _composingAttribute);
+        HRESULT_CHECK_RETURN(hr, L"%s", L"SetRangeDisplayAttribute failed");
         hr = MoveCaretToEnd(ec);
         DBG_HRESULT_CHECK(hr, L"%s", L"MoveCaretToEnd failed");
     }
@@ -201,7 +217,7 @@ HRESULT VietType::CompositionManager::SetCompositionText(TfEditCookie ec, WCHAR 
     return S_OK;
 }
 
-HRESULT VietType::CompositionManager::EnsureCompositionText(ITfContext *context, TfEditCookie ec, WCHAR const * str, LONG length) {
+HRESULT VietType::CompositionManager::EnsureCompositionText(TfEditCookie ec, ITfContext *context, WCHAR const * str, LONG length) {
     HRESULT hr;
 
     if (!_composition) {
@@ -210,6 +226,40 @@ HRESULT VietType::CompositionManager::EnsureCompositionText(ITfContext *context,
     }
 
     return SetCompositionText(ec, str, length);
+}
+
+HRESULT VietType::CompositionManager::SetRangeDisplayAttribute(TfEditCookie ec, ITfContext *context, ITfRange * range, ITfDisplayAttributeInfo * attr) {
+    HRESULT hr;
+
+    if (!_categoryMgr) {
+        return E_FAIL;
+    }
+
+    GUID guid;
+    hr = attr->GetGUID(&guid);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"attr->GetGUID failed");
+
+    TfGuidAtom atom = TF_INVALID_GUIDATOM;
+    hr = _categoryMgr->RegisterGUID(guid, &atom);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_categoryMgr->RegisterGUID failed");
+
+    if (atom == TF_INVALID_GUIDATOM) {
+        return E_FAIL;
+    }
+
+    SmartComPtr<ITfProperty> prop;
+    hr = context->GetProperty(GUID_PROP_ATTRIBUTE, prop.GetAddress());
+    HRESULT_CHECK_RETURN(hr, L"%s", L"context->GetProperty failed");
+
+    VARIANT v;
+    VariantInit(&v);
+    v.vt = VT_I4;
+    v.lVal = atom;
+
+    hr = prop->SetValue(ec, range, &v);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"prop->SetValue failed");
+
+    return S_OK;
 }
 
 HRESULT VietType::CompositionManager::_StartComposition(TfEditCookie ec, CompositionManager *instance, ITfContext *context) {

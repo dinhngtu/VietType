@@ -100,6 +100,12 @@
     <ClCompile Include="EditSessions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DisplayAttributes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EnumDisplayAttributeInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -187,6 +193,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EditSessions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DisplayAttributes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EnumDisplayAttributeInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

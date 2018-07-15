@@ -187,11 +187,8 @@ HRESULT VietType::EngineController::CompartmentReadEnabled(int * pEnabled) {
     VARIANT v;
     hr = _compartment->GetValue(&v);
     if (hr == S_FALSE) {
-        v.vt = VT_I4;
-        v.lVal = 1;
-        hr = _compartment->SetValue(_clientid, &v);
-        *pEnabled = v.lVal;
-        DBG_HRESULT_CHECK(hr, L"%s", L"_compartment->SetValue failed");
+        hr = CompartmentWriteEnabled(1);
+        DBG_HRESULT_CHECK(hr, L"%s", L"CompartmentWriteEnabled failed");
     } else if (hr == S_OK) {
         if (v.vt != VT_I4) {
             return E_FAIL;
@@ -206,6 +203,7 @@ HRESULT VietType::EngineController::CompartmentWriteEnabled(int enabled) {
     HRESULT hr;
 
     VARIANT v;
+    VariantInit(&v);
     v.vt = VT_I4;
     v.lVal = enabled;
     hr = _compartment->SetValue(_clientid, &v);
