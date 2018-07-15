@@ -27,7 +27,6 @@ genmap<std::wstring, std::wstring> const transitions = {
     {L"oo", L"\xf4"},
     {L"uaa", L"u\xe2"},
     {L"uoo", L"u\xf4"},
-    {L"\x1b0o", L"\x1b0\x1a1"},
     //{ L"u\x1a1" , L"\x1b0\x1a1" }, // transition in v_c2 only
     {L"u\x1a1i", L"\x1b0\x1a1i"},
     {L"u\x1a1u", L"\x1b0\x1a1u"},
@@ -94,6 +93,7 @@ genmap<std::wstring, int> const respos_w = {
 
 genmap<std::wstring, std::wstring> const transitions_v_c2 = {
     {L"u\x1a1", L"\x1b0\x1a1"},
+    {L"\x1b0o", L"\x1b0\x1a1"},
 };
 
 genmap<wchar_t, std::wstring> const transitions_tones = {

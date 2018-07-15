@@ -186,6 +186,10 @@ public:
         TestValidWord(L"ng\x1b0i", L"nguiw");
     }
 
+    TEST_METHOD(TestTypingNhuwowngx) {
+        TestValidWord(L"nh\x1b0\x1ee1ng", L"nhuwowngx");
+    }
+
     // test variations of 'gi'
 
     TEST_METHOD(TestTypingGif) {
@@ -268,6 +272,10 @@ public:
 
     TEST_METHOD(TestDoubleKeySystem) {
         TestInvalidWord(L"system", L"system");
+    }
+
+    TEST_METHOD(TestNhuwox) {
+        TestInvalidWord(L"nhuwox", L"nhuwox");
     }
 
     // caps
