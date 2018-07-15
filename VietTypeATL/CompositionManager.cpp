@@ -243,7 +243,7 @@ HRESULT VietType::CompositionManager::SetRangeDisplayAttribute(TfEditCookie ec, 
     HRESULT hr;
 
     if (!_categoryMgr) {
-        return E_FAIL;
+        return S_OK;
     }
 
     GUID guid;
