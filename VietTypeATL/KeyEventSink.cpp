@@ -103,12 +103,8 @@ STDMETHODIMP VietType::KeyEventSink::OnTestKeyDown(ITfContext * pic, WPARAM wPar
         WINERROR_RETURN_HRESULT(L"%s", L"GetKeyboardState failed");
     }
 
-    TF_STATUS st;
-    hr = pic->GetStatus(&st);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"pic->GetStatus failed");
     *pfEaten = Telex::IsKeyEaten(
         _compositionManager->IsComposing(),
-        static_cast<bool>(st.dwStaticFlags & TF_SS_TRANSITORY),
         wParam,
         lParam,
         _keyState);
@@ -123,8 +119,6 @@ STDMETHODIMP VietType::KeyEventSink::OnTestKeyDown(ITfContext * pic, WPARAM wPar
 }
 
 STDMETHODIMP VietType::KeyEventSink::OnTestKeyUp(ITfContext * pic, WPARAM wParam, LPARAM lParam, BOOL * pfEaten) {
-    HRESULT hr;
-
     if (!_controller->IsEnabled()) {
         *pfEaten = FALSE;
         return S_OK;
@@ -136,12 +130,8 @@ STDMETHODIMP VietType::KeyEventSink::OnTestKeyUp(ITfContext * pic, WPARAM wParam
             WINERROR_RETURN_HRESULT(L"%s", L"GetKeyboardState failed");
         }
 
-        TF_STATUS st;
-        hr = pic->GetStatus(&st);
-        HRESULT_CHECK_RETURN(hr, L"%s", L"pic->GetStatus failed");
         *pfEaten = Telex::IsKeyEaten(
             _compositionManager->IsComposing(),
-            static_cast<bool>(st.dwStaticFlags & TF_SS_TRANSITORY),
             wParam,
             lParam,
             _keyState);
@@ -164,12 +154,8 @@ STDMETHODIMP VietType::KeyEventSink::OnKeyDown(ITfContext * pic, WPARAM wParam, 
         WINERROR_RETURN_HRESULT(L"%s", L"GetKeyboardState failed");
     }
     
-    TF_STATUS st;
-    hr = pic->GetStatus(&st);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"pic->GetStatus failed");
     *pfEaten = Telex::IsKeyEaten(
         _compositionManager->IsComposing(),
-        static_cast<bool>(st.dwStaticFlags & TF_SS_TRANSITORY),
         wParam,
         lParam,
         _keyState);
@@ -231,9 +217,6 @@ HRESULT VietType::KeyEventSink::Initialize(
     hr = _keystrokeMgr->AdviseKeyEventSink(_clientid, this, TRUE);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_keystrokeMgr->AdviseKeyEventSink failed");
 
-    hr = _keystrokeMgr->PreserveKey(_clientid, GUID_KeyEventSink_PreservedKey_EditBack, &PK_EditBack, NULL, 0);
-    DBG_HRESULT_CHECK(hr, L"%s", L"_keystrokeMgr->PreserveKey failed");
-
     hr = _keystrokeMgr->PreserveKey(_clientid, GUID_KeyEventSink_PreservedKey_Toggle, &PK_Toggle, NULL, 0);
     // probably not fatal
     DBG_HRESULT_CHECK(hr, L"%s", L"_keystrokeMgr->PreserveKey failed");
@@ -245,9 +228,6 @@ HRESULT VietType::KeyEventSink::Uninitialize() {
     HRESULT hr;
 
     hr = _keystrokeMgr->UnpreserveKey(GUID_KeyEventSink_PreservedKey_Toggle, &PK_Toggle);
-    DBG_HRESULT_CHECK(hr, L"%s", L"_keystrokeMgr->UnpreserveKey failed");
-
-    hr = _keystrokeMgr->UnpreserveKey(GUID_KeyEventSink_PreservedKey_EditBack, &PK_EditBack);
     DBG_HRESULT_CHECK(hr, L"%s", L"_keystrokeMgr->UnpreserveKey failed");
 
     hr = _keystrokeMgr->UnadviseKeyEventSink(_clientid);

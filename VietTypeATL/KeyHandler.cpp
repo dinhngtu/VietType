@@ -51,18 +51,7 @@ STDMETHODIMP VietType::KeyHandlerEditSession::DoEditSession(TfEditCookie ec) {
         hr = _compositionManager->EmptyCompositionText(ec);
         DBG_HRESULT_CHECK(hr, L"%s", L"_compositionManager->EmptyCompositionText failed");
         return _compositionManager->EndCompositionNow(ec);
-    } else if (_wParam == VK_BACK && !_compositionManager->IsComposing()) {
-        // NOTE: backconvert disabled
-        /*
-        hr = CompositionManager::RequestEditSession(
-            VietType::EditSurroundingWord,
-            _compositionManager,
-            _context,
-            static_cast<EngineController *>(_controller),
-            1);
-        HRESULT_CHECK_RETURN(hr, L"%s", L"CompositionManager::RequestEditSession failed");
-        */
-    } else if (Telex::IsKeyEaten(_compositionManager->IsComposing(), true, _wParam, _lParam, _keyState)) {
+    } else if (Telex::IsKeyEaten(_compositionManager->IsComposing(), _wParam, _lParam, _keyState)) {
         // eaten, updates composition
         ComposeKey(ec);
     } else if (_wParam == VK_SHIFT) {
