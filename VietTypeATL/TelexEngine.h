@@ -21,11 +21,6 @@
 #include "TelexData.h"
 #include "TelexUtil.h"
 
-// A word of warning:
-// This class only deals with characters that can be represented by wchar_t.
-// For example, German character input (where upper('ß') = 'SS') is not supported,
-// nor are CJK languages supported.
-
 namespace VietType {
 namespace Telex {
 // State transition is as follows:
