@@ -25,7 +25,7 @@ along with VietType.  If not, see <https://www.gnu.org/licenses/>.
     UpgradeCode="1139ce87-c648-4d3c-8f2a-61ab9d04c396">
     
     <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
-      <bal:WixStandardBootstrapperApplication LicenseFile="$(var.SolutionDir)\LICENSE.rtf" />
+      <bal:WixStandardBootstrapperApplication LicenseFile="$(var.SolutionDir)\LICENSE.rtf" SuppressOptionsUI="yes" />
     </BootstrapperApplicationRef>
 
     <Chain>
