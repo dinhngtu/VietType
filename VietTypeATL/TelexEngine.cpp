@@ -219,8 +219,8 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
                 if (it2 != transitions_v_c2.end()) {
                     _v = it2->second;
                 }
-                _respos.push_back(RESPOS_TRANSITION_W);
             }
+            _respos.push_back(RESPOS_TRANSITION_W);
         } else {
             // pop back only if same char entered twice in a row
             if (c == _keyBuffer.rbegin()[1]) {

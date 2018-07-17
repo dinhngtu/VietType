@@ -88,8 +88,9 @@ genmap<std::wstring, int> const respos_w = {
     {L"\x1a1i", 0},
     {L"\x1b0", 0},
     {L"\x1b0i", 0},
-    {L"u\x1a1", 0},
-    {L"\x1b0\x1a1i", 0},
+    {L"u\x1a1", 1},
+    {L"\x1b0\x1a1", 1},
+    {L"\x1b0\x1a1i", 1},
 };
 
 genmap<std::wstring, std::wstring> const transitions_v_c2 = {

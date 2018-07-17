@@ -56,9 +56,11 @@ using genset = std::unordered_set<T>;
 /// ensure that c1 or v only shrinks by 1 character or stays a constant length with this transition.
 /// </summary>
 extern genmap<std::wstring, std::wstring> const transitions;
+// which character in _v that is responsible for RESPOS_TRANSITION_V; deleting this character will remove the RESPOS_TRANSITION_V key
 extern genmap<std::wstring, int> const respos;
 
 extern genmap<std::wstring, std::wstring> const transitions_w;
+// which character in _v that is responsible for RESPOS_TRANSITION_W
 extern genmap<std::wstring, int> const respos_w;
 
 extern genmap<std::wstring, std::wstring> const transitions_v_c2;

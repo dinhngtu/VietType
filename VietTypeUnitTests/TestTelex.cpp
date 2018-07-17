@@ -321,6 +321,18 @@ public:
         Assert::AreEqual(L"lee", e.Peek().c_str());
     }
 
+    TEST_METHOD(TestBackspaceHuowng) {
+        TelexEngine e(config);
+        FeedWord(e, L"huowng");
+        Assert::AreEqual(L"h\x1b0\x1a1ng", e.Peek().c_str());
+        AssertTelexStatesEqual(TelexStates::VALID, e.Backspace());
+        Assert::AreEqual(L"h\x1b0\x1a1n", e.Peek().c_str());
+        AssertTelexStatesEqual(TelexStates::VALID, e.Backspace());
+        Assert::AreEqual(L"hu\x1a1", e.Peek().c_str());
+        AssertTelexStatesEqual(TelexStates::VALID, e.Backspace());
+        Assert::AreEqual(L"hu", e.Peek().c_str());
+    }
+
     // test backconversions
 
     TEST_METHOD(TestBackconversionDdoongf) {
