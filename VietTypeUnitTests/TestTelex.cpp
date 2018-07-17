@@ -256,6 +256,13 @@ public:
         Assert::AreEqual(L"nhaeng", e.Peek().c_str());
     }
 
+    // peek key ordering with tones
+    TEST_METHOD(TestPeekCafe) {
+        TelexEngine e(config);
+        FeedWord(e, L"cafe");
+        Assert::AreEqual(L"cafe", e.Peek().c_str());
+    }
+
     // double key tests
 
     TEST_METHOD(TestDoubleKeyXuaaan) {

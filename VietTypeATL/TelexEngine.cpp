@@ -515,12 +515,16 @@ std::wstring TelexEngine::Peek() const {
     VINFO vinfo;
     auto found = GetTonePos(true, &vinfo);
     if (!found) {
-        result.append(_c2);
-        ApplyCases(result, _cases);
-        return result;
+        if (_t == TONES::Z) {
+            result.append(_c2);
+            ApplyCases(result, _cases);
+            return result;
+        } else {
+            return RetrieveInvalid();
+        }
     }
 
-    // fixup 'gi'
+    // fixup 'gi' then apply tone
     if (vinfo.tonepos < 0 && _c1 == L"gi" && !_v.size()) {
         vinfo.tonepos = (int)_c1.size() - 1;
         wchar_t vatpos = TranslateTone(_c1[vinfo.tonepos], _t);
