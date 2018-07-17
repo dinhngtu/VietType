@@ -190,6 +190,10 @@ public:
         TestValidWord(L"nh\x1b0\x1ee1ng", L"nhuwowngx");
     }
 
+    TEST_METHOD(TestTypingThoio) {
+        TestValidWord(L"th\xf4i", L"thoio");
+    }
+
     // test variations of 'gi'
 
     TEST_METHOD(TestTypingGif) {

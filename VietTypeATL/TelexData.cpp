@@ -34,6 +34,7 @@ genmap<std::wstring, std::wstring> const transitions = {
     {L"yee", L"y\xea"},
     {L"dd", L"\x111"},
     // relaxed transformations
+    {L"oio", L"\xf4i"},
     {L"ieue", L"i\xeau"},
     {L"yeue", L"y\xeau"},
     {L"aua", L"\xe2u"},
