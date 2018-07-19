@@ -32,7 +32,14 @@ VietType::EngineController::~EngineController() {
 }
 
 HRESULT VietType::EngineController::OnChange(REFGUID rguid) {
+    HRESULT hr;
+
     if (IsEqualGUID(rguid, Globals::GUID_SettingsCompartment_Toggle)) {
+        UpdateStates();
+    } else if (IsEqualGUID(rguid, GUID_COMPARTMENT_KEYBOARD_OPENCLOSE)) {
+        long openclose;
+        hr = _openCloseCompartment->GetValue(&openclose);
+        _blocked = openclose ? _blocked : BlockedKind::BLOCKED;
         UpdateStates();
     }
 
@@ -50,24 +57,38 @@ HRESULT VietType::EngineController::Initialize(
     _langBarItemMgr = threadMgr;
     _clientid = clientid;
 
-    // deadly but not quite fatal
-    SmartComPtr<ITfCompartmentMgr> compartmentMgr;
-    hr = threadMgr->GetGlobalCompartment(compartmentMgr.GetAddress());
-    if (SUCCEEDED(hr)) {
+    // init settings compartment & listener
 
-        hr = compartmentMgr->GetCompartment(Globals::GUID_SettingsCompartment_Toggle, _compartment.GetAddress());
-        if (SUCCEEDED(hr)) {
+    hr = _settingsCompartment.CreateInstance();
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_settingsCompartment.CreateInstance failed");
 
-            SmartComPtr<ITfSource> compartmentSource(_compartment);
-            if (!compartmentSource) {
-                return E_FAIL;
-            }
-            hr = _compartmentEventSink.Advise(compartmentSource, this);
-            DBG_HRESULT_CHECK(hr, L"%s", L"_compartmentEventSink.Advise failed");
+    // GUID_SettingsCompartment_Toggle is global
+    hr = _settingsCompartment->Initialize(threadMgr, clientid, Globals::GUID_SettingsCompartment_Toggle, true);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_settingsCompartment->Initialize failed");
 
-        } else DBG_HRESULT_CHECK(hr, L"%s", L"compartmentMgr->GetCompartment failed");
+    SmartComPtr<ITfSource> settingsSource;
+    hr = _settingsCompartment->GetCompartmentSource(settingsSource.GetAddress());
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_settingsCompartment->GetCompartmentSource failed");
 
-    } else DBG_HRESULT_CHECK(hr, L"%s", L"threadMgr->GetGlobalCompartment failed");
+    hr = _settingsCompartmentEventSink.Advise(settingsSource, this);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_settingsCompartmentEventSink.Advise failed");
+
+    // init GUID_COMPARTMENT_KEYBOARD_OPENCLOSE listener
+
+    hr = _openCloseCompartment.CreateInstance();
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_openCloseCompartment.CreateInstance failed");
+
+    hr = _openCloseCompartment->Initialize(threadMgr, clientid, GUID_COMPARTMENT_HANDWRITING_OPENCLOSE);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_openCloseCompartment->Initialize failed");
+
+    SmartComPtr<ITfSource> openCloseSource;
+    hr = _openCloseCompartment->GetCompartmentSource(openCloseSource.GetAddress());
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_openCloseCompartment->GetCompartmentSource failed");
+
+    hr = _openCloseCompartmentEventSink.Advise(openCloseSource, this);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_openCloseCompartmentEventSink.Advise failed");
+
+    // langbar
 
     hr = InitLanguageBar();
     HRESULT_CHECK_RETURN(hr, L"%s", L"InitLanguageBar failed");
@@ -81,10 +102,14 @@ HRESULT VietType::EngineController::Uninitialize() {
     hr = UninitLanguageBar();
     DBG_HRESULT_CHECK(hr, L"%s", L"UninitLanguageBar failed");
 
-    hr = _compartmentEventSink.Unadvise();
+    hr = _settingsCompartmentEventSink.Unadvise();
     DBG_HRESULT_CHECK(hr, L"%s", L"_compartmentEventSink.Unadvise failed");
 
-    _compartment.Release();
+    _openCloseCompartment->Uninitialize();
+    _openCloseCompartment.Release();
+
+    _settingsCompartment->Uninitialize();
+    _settingsCompartment.Release();
 
     _langBarItemMgr.Release();
     _engine.reset();
@@ -104,11 +129,11 @@ std::shared_ptr<VietType::Telex::TelexEngine> const& VietType::EngineController:
     return _engine;
 }
 
-HRESULT VietType::EngineController::IsUserEnabled(int *penabled) {
+HRESULT VietType::EngineController::IsUserEnabled(long *penabled) {
     return CompartmentReadEnabled(penabled);
 }
 
-HRESULT VietType::EngineController::WriteUserEnabled(int enabled) {
+HRESULT VietType::EngineController::WriteUserEnabled(long enabled) {
     HRESULT hr;
 
     if (_blocked == BlockedKind::BLOCKED) {
@@ -126,13 +151,13 @@ HRESULT VietType::EngineController::WriteUserEnabled(int enabled) {
 
 HRESULT VietType::EngineController::ToggleUserEnabled() {
     HRESULT hr;
-    int enabled;
+    long enabled;
     hr = CompartmentReadEnabled(&enabled);
     HRESULT_CHECK_RETURN(hr, L"%s", L"CompartmentReadEnabled failed");
     return WriteUserEnabled(!enabled);
 }
 
-int VietType::EngineController::IsEnabled() const {
+long VietType::EngineController::IsEnabled() const {
     return _enabled;
 }
 
@@ -145,13 +170,17 @@ void VietType::EngineController::SetBlocked(VietType::BlockedKind blocked) {
     UpdateStates();
 }
 
-bool VietType::EngineController::ResetBlocked(HRESULT result) {
-    _editBlockedPending = SUCCEEDED(result);
+bool VietType::EngineController::SetEditBlockedPending(HRESULT result) {
+    _editBlockedPending = (result == S_OK);
     return _editBlockedPending;
 }
 
 bool VietType::EngineController::IsEditBlockedPending() const {
     return _editBlockedPending;
+}
+
+HRESULT VietType::EngineController::GetOpenClose(long * openclose) {
+    return _openCloseCompartment->GetValue(openclose);
 }
 
 HRESULT VietType::EngineController::UpdateStates() {
@@ -160,10 +189,10 @@ HRESULT VietType::EngineController::UpdateStates() {
     switch (_blocked) {
     case BlockedKind::FREE:
     case BlockedKind::ADVISED: {
-        int enabled;
+        long enabled;
         hr = CompartmentReadEnabled(&enabled);
         HRESULT_CHECK_RETURN(hr, L"%s", L"CompartmentReadEnabled failed");
-        DBG_DPRINT(L"block = %d, enabled = %d", static_cast<int>(_blocked), enabled);
+        DBG_DPRINT(L"block = %d, enabled = %ld", static_cast<int>(_blocked), enabled);
         _enabled = static_cast<bool>(enabled);
         break;
     }
@@ -181,35 +210,21 @@ HRESULT VietType::EngineController::UpdateStates() {
     return S_OK;
 }
 
-HRESULT VietType::EngineController::CompartmentReadEnabled(int * pEnabled) {
+HRESULT VietType::EngineController::CompartmentReadEnabled(long * pEnabled) {
     HRESULT hr;
 
-    VARIANT v;
-    hr = _compartment->GetValue(&v);
+    hr = _settingsCompartment->GetValue(pEnabled);
     if (hr == S_FALSE) {
         hr = CompartmentWriteEnabled(1);
-        DBG_HRESULT_CHECK(hr, L"%s", L"CompartmentWriteEnabled failed");
-    } else if (hr == S_OK) {
-        if (v.vt != VT_I4) {
-            return E_FAIL;
-        }
-        *pEnabled = v.lVal;
+        HRESULT_CHECK_RETURN(hr, L"%s", L"CompartmentWriteEnabled failed");
+        *pEnabled = 1;
     }
 
     return hr;
 }
 
-HRESULT VietType::EngineController::CompartmentWriteEnabled(int enabled) {
-    HRESULT hr;
-
-    VARIANT v;
-    VariantInit(&v);
-    v.vt = VT_I4;
-    v.lVal = enabled;
-    hr = _compartment->SetValue(_clientid, &v);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_compartment->SetValue failed");
-
-    return S_OK;
+HRESULT VietType::EngineController::CompartmentWriteEnabled(long enabled) {
+    return _settingsCompartment->SetValue(enabled);
 }
 
 HRESULT VietType::EngineController::InitLanguageBar() {

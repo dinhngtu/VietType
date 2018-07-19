@@ -453,6 +453,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Compartment.cpp" />
     <ClCompile Include="CompositionManager.cpp" />
     <ClCompile Include="DisplayAttributes.cpp" />
     <ClCompile Include="dllmain.cpp">
@@ -541,6 +542,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common.h" />
+    <ClInclude Include="Compartment.h" />
     <ClInclude Include="CompositionManager.h" />
     <ClInclude Include="Define.h" />
     <ClInclude Include="DisplayAttributes.h" />

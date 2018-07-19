@@ -76,10 +76,11 @@ STDMETHODIMP VietType::ThreadMgrEventSink::OnSetFocus(ITfDocumentMgr * pdimFocus
             (st.dwStaticFlags & TF_SS_TRANSITORY) ? L'T' : L'_');
     } else DBG_HRESULT_CHECK(hr, L"%s", L"context->GetStatus failed");
 
-    if (_controller->IsEditBlockedPending()) {
+    if (!_controller->IsEditBlockedPending()) {
+        _controller->SetEditBlockedPending(S_OK);
         hr = CompositionManager::RequestEditSession(VietType::EditBlocked, _compMgr, context, static_cast<EngineController *>(_controller));
         DBG_HRESULT_CHECK(hr, L"%s", L"CompositionManager::RequestEditSession failed");
-        _controller->ResetBlocked(hr);
+        _controller->SetEditBlockedPending(hr);
     }
 
     return S_OK;

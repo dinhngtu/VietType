@@ -20,6 +20,7 @@
 #include "Common.h"
 #include "SinkAdvisor.h"
 #include "Telex.h"
+#include "Compartment.h"
 
 namespace VietType {
 
@@ -63,22 +64,24 @@ public:
     Telex::TelexEngine const& GetEngine() const;
     std::shared_ptr<Telex::TelexEngine> const& GetEngineShared();
 
-    HRESULT IsUserEnabled(int *penabled);
-    HRESULT WriteUserEnabled(int enabled);
+    HRESULT IsUserEnabled(long *penabled);
+    HRESULT WriteUserEnabled(long enabled);
     HRESULT ToggleUserEnabled();
 
-    int IsEnabled() const;
+    long IsEnabled() const;
     BlockedKind GetBlocked() const;
     void SetBlocked(BlockedKind blocked);
-    bool ResetBlocked(HRESULT result);
+    bool SetEditBlockedPending(HRESULT result);
     bool IsEditBlockedPending() const;
+
+    HRESULT GetOpenClose(long *openclose);
 
     // update engine and langbar enabled state to match enabled/blocked value
     HRESULT UpdateStates();
 
 private:
-    HRESULT CompartmentReadEnabled(int *pEnabled);
-    HRESULT CompartmentWriteEnabled(int enabled);
+    HRESULT CompartmentReadEnabled(long *pEnabled);
+    HRESULT CompartmentWriteEnabled(long enabled);
     HRESULT InitLanguageBar();
     HRESULT UninitLanguageBar();
 
@@ -88,8 +91,11 @@ private:
 
     TfClientId _clientid;
 
-    SmartComPtr<ITfCompartment> _compartment;
-    SinkAdvisor<ITfCompartmentEventSink> _compartmentEventSink;
+    SmartComObjPtr<Compartment> _settingsCompartment;
+    SinkAdvisor<ITfCompartmentEventSink> _settingsCompartmentEventSink;
+
+    SmartComObjPtr<Compartment> _openCloseCompartment;
+    SinkAdvisor<ITfCompartmentEventSink> _openCloseCompartmentEventSink;
 
     // unique_ptr is not necessary but used just to break include cycle
     std::unique_ptr<IndicatorButton> _indicatorButton;

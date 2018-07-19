@@ -52,6 +52,7 @@ public:
     SmartComPtr<ITfComposition> const& GetComposition() const;
     // for use in edit sessions only
     HRESULT GetRange(ITfRange **range);
+    TfClientId GetClientId() const;
 
     HRESULT StartCompositionNow(TfEditCookie ec, ITfContext *context);
     HRESULT EmptyCompositionText(TfEditCookie ec);

@@ -17,6 +17,8 @@
 
 #include "EditSessions.h"
 #include "EngineController.h"
+#include "Compartment.h"
+#include "CompositionManager.h"
 
 HRESULT VietType::EditBlocked(
     TfEditCookie ec,
@@ -28,6 +30,60 @@ HRESULT VietType::EditBlocked(
     VietType::BlockedKind blocked;
 
     DBG_DPRINT(L"ec = %ld", ec);
+
+    controller->SetEditBlockedPending(S_FALSE);
+
+    // check GUID_COMPARTMENT_KEYBOARD_OPENCLOSE from EngineController
+
+    long openclose;
+    hr = controller->GetOpenClose(&openclose);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"controller->GetOpenClose failed");
+
+    if (hr == S_OK && openclose) {
+        blocked = VietType::BlockedKind::BLOCKED;
+        controller->SetBlocked(blocked);
+        return S_OK;
+    }
+
+    // check if context is contextEmpty
+
+    SmartComObjPtr<Compartment> compEmpty;
+    hr = compEmpty.CreateInstance();
+    HRESULT_CHECK_RETURN(hr, L"%s", L"compEmpty.CreateInstance failed");
+
+    hr = compEmpty->Initialize(context, compositionManager->GetClientId(), GUID_COMPARTMENT_EMPTYCONTEXT);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"compEmpty->Initialize failed");
+
+    long contextEmpty;
+    hr = compEmpty->GetValue(&contextEmpty);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"compDisabled->GetValue failed");
+
+    if (hr == S_OK && contextEmpty) {
+        blocked = VietType::BlockedKind::BLOCKED;
+        controller->SetBlocked(blocked);
+        return S_OK;
+    }
+
+    // check GUID_COMPARTMENT_KEYBOARD_DISABLED
+
+    SmartComObjPtr<Compartment> compDisabled;
+    hr = compDisabled.CreateInstance();
+    HRESULT_CHECK_RETURN(hr, L"%s", L"compDisabled.CreateInstance failed");
+
+    hr = compDisabled->Initialize(context, compositionManager->GetClientId(), GUID_COMPARTMENT_KEYBOARD_DISABLED);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"compDisabled->Initialize failed");
+
+    long contextDisabled;
+    hr = compDisabled->GetValue(&contextDisabled);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"compDisabled->GetValue failed");
+
+    if (hr == S_OK && contextDisabled) {
+        blocked = VietType::BlockedKind::BLOCKED;
+        controller->SetBlocked(blocked);
+        return S_OK;
+    }
+
+    // check input scopes
 
     SmartComPtr<ITfReadOnlyProperty> prop;
     hr = context->GetAppProperty(VietType::Globals::GUID_PROP_INPUTSCOPE, prop.GetAddress());
@@ -77,6 +133,5 @@ HRESULT VietType::EditBlocked(
 commit:
     DBG_DPRINT(L"setting blocked %d", blocked);
     controller->SetBlocked(blocked);
-    //*editBlockedPending = false;
     return S_OK;
 }

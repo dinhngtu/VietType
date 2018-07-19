@@ -102,6 +102,10 @@ HRESULT VietType::CompositionManager::GetRange(ITfRange ** range) {
     return _composition->GetRange(range);
 }
 
+TfClientId VietType::CompositionManager::GetClientId() const {
+    return _clientid;
+}
+
 HRESULT VietType::CompositionManager::StartCompositionNow(TfEditCookie ec, ITfContext * context) {
     HRESULT hr;
 
