@@ -60,6 +60,7 @@ STDMETHODIMP VietType::KeyEventSink::OnSetFocus(BOOL fForeground) {
     }
 
     if (!docMgr) {
+        _controller->SetBlocked(BlockedKind::BLOCKED);
         return S_OK;
     }
 
