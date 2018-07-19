@@ -27,7 +27,6 @@ HRESULT VietType::EditBlocked(
     VietType::EngineController *controller) {
 
     HRESULT hr;
-    VietType::BlockedKind blocked;
 
     DBG_DPRINT(L"ec = %ld", ec);
 
@@ -40,8 +39,7 @@ HRESULT VietType::EditBlocked(
     HRESULT_CHECK_RETURN(hr, L"%s", L"controller->GetOpenClose failed");
 
     if (hr == S_OK && openclose) {
-        blocked = VietType::BlockedKind::BLOCKED;
-        controller->SetBlocked(blocked);
+        controller->SetBlocked(VietType::BlockedKind::BLOCKED);
         return S_OK;
     }
 
@@ -59,8 +57,7 @@ HRESULT VietType::EditBlocked(
     HRESULT_CHECK_RETURN(hr, L"%s", L"compDisabled->GetValue failed");
 
     if (hr == S_OK && contextEmpty) {
-        blocked = VietType::BlockedKind::BLOCKED;
-        controller->SetBlocked(blocked);
+        controller->SetBlocked(VietType::BlockedKind::BLOCKED);
         return S_OK;
     }
 
@@ -78,8 +75,7 @@ HRESULT VietType::EditBlocked(
     HRESULT_CHECK_RETURN(hr, L"%s", L"compDisabled->GetValue failed");
 
     if (hr == S_OK && contextDisabled) {
-        blocked = VietType::BlockedKind::BLOCKED;
-        controller->SetBlocked(blocked);
+        controller->SetBlocked(VietType::BlockedKind::BLOCKED);
         return S_OK;
     }
 
@@ -91,7 +87,7 @@ HRESULT VietType::EditBlocked(
 
     TF_SELECTION sel;
     ULONG fetched;
-    context->GetSelection(ec, TF_DEFAULT_SELECTION, 1, &sel, &fetched);
+    hr = context->GetSelection(ec, TF_DEFAULT_SELECTION, 1, &sel, &fetched);
     HRESULT_CHECK_RETURN(hr, L"%s", L"context->GetSelection failed");
 
     VARIANT var;
@@ -100,6 +96,7 @@ HRESULT VietType::EditBlocked(
 
     if (var.vt != VT_UNKNOWN) {
         DBG_DPRINT(L"bad variant type %d", static_cast<int>(var.vt));
+        controller->SetBlocked(VietType::BlockedKind::FREE);
         return E_NOINTERFACE;
     }
 
@@ -114,6 +111,7 @@ HRESULT VietType::EditBlocked(
     hr = iis->GetInputScopes(&pscopes, &scount);
     HRESULT_CHECK_RETURN(hr, L"%s", L"iis->GetInputScopes failed");
 
+    VietType::BlockedKind blocked;
     InputScope *scopes = pscopes;
     for (UINT i = 0; i < scount; i++) {
         switch (scopes[i]) {
