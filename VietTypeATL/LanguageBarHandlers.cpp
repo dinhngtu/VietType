@@ -179,7 +179,9 @@ HRESULT VietType::IndicatorButton::OnMenuSelect(UINT id) {
 HRESULT VietType::IndicatorButton::GetIcon(HICON * hicon) {
     // Windows docs is a liar, icons are mandatory
     assert(Globals::dllInstance);
-    if (_controller->IsEnabled()) {
+    if (_controller->GetBlocked() == BlockedKind::BLOCKED) {
+        *hicon = static_cast<HICON>(LoadImage(Globals::dllInstance, MAKEINTRESOURCE(IDI_ICONX), IMAGE_ICON, 16, 16, 0));
+    } else if (_controller->IsEnabled()) {
         *hicon = static_cast<HICON>(LoadImage(Globals::dllInstance, MAKEINTRESOURCE(IDI_ICONV), IMAGE_ICON, 16, 16, 0));
     } else {
         *hicon = static_cast<HICON>(LoadImage(Globals::dllInstance, MAKEINTRESOURCE(IDI_ICONE), IMAGE_ICON, 16, 16, 0));
@@ -235,7 +237,9 @@ HRESULT VietType::LangBarButton::OnMenuSelect(UINT id) {
 HRESULT VietType::LangBarButton::GetIcon(HICON * hicon) {
     // Windows docs is a liar, icons are mandatory
     assert(Globals::dllInstance);
-    if (_controller->IsEnabled()) {
+    if (_controller->GetBlocked() == BlockedKind::BLOCKED) {
+        *hicon = static_cast<HICON>(LoadImage(Globals::dllInstance, MAKEINTRESOURCE(IDI_ICONX), IMAGE_ICON, 16, 16, 0));
+    } else if (_controller->IsEnabled()) {
         *hicon = static_cast<HICON>(LoadImage(Globals::dllInstance, MAKEINTRESOURCE(IDI_ICONV), IMAGE_ICON, 16, 16, 0));
     } else {
         *hicon = static_cast<HICON>(LoadImage(Globals::dllInstance, MAKEINTRESOURCE(IDI_ICONE), IMAGE_ICON, 16, 16, 0));
