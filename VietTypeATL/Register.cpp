@@ -53,35 +53,55 @@ extern "C" __declspec(dllexport) HRESULT __cdecl RegisterProfiles() {
     dllPath[dllPathLength] = 0;
     DBG_DPRINT(L"found text service DLL: %s", dllPath);
 
-    SmartComPtr<ITfInputProcessorProfileMgr> profileMgr;
-    hr = profileMgr.CoCreate(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"profileMgr.CoCreate failed");
+    SmartComPtr<ITfInputProcessorProfiles> profiles;
+    hr = profiles.CoCreate(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"profiles.CoCreate failed");
 
-    hr = profileMgr->RegisterProfile(
+    hr = profiles->Register(VietType::Globals::CLSID_TextService);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"profiles->Register failed");
+
+    hr = profiles->AddLanguageProfile(
         VietType::Globals::CLSID_TextService,
         MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
         VietType::Globals::GUID_Profile,
         VietType::Globals::TextServiceDescription.c_str(),
         static_cast<LONG>(VietType::Globals::TextServiceDescription.length()),
-        dllPath, // icon file path
-        dllPathLength, // icon file name path
-        static_cast<ULONG>(-IDI_IMELOGO), // icon index has to be negative for some reason
-        NULL, // hklSubstitute
-        0,
-        TRUE,
-        0);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"profileMgr->RegisterProfile failed");
+        dllPath,
+        dllPathLength,
+        static_cast<ULONG>(-IDI_IMELOGO));
+    HRESULT_CHECK_RETURN(hr, L"%s", L"profiles->AddLanguageProfile failed");
 
-    // call ActivateProfile to make IME global (#11)
+    // set language profile display name
 
-    hr = profileMgr->ActivateProfile(
-        TF_PROFILETYPE_INPUTPROCESSOR,
-        MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
+    SmartComPtr<ITfInputProcessorProfilesEx> profilesEx;
+    hr = profiles->QueryInterface<ITfInputProcessorProfilesEx>(profilesEx.GetAddress());
+    HRESULT_CHECK_RETURN(hr, L"%s", L"profiles->QueryInterface failed");
+
+    hr = profilesEx->SetLanguageProfileDisplayName(
         VietType::Globals::CLSID_TextService,
+        MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
         VietType::Globals::GUID_Profile,
-        NULL,
-        TF_IPPMF_FORPROCESS | TF_IPPMF_FORSESSION | TF_IPPMF_ENABLEPROFILE);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"profileMgr->ActivateProfile failed");
+        dllPath,
+        dllPathLength,
+        IDS_VIETTYPE_DESCRIPTION);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"profilesEx->SetLanguageProfileDisplayName failed");
+
+    // enable & activate profile
+
+    hr = profiles->EnableLanguageProfile(
+        VietType::Globals::CLSID_TextService,
+        MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
+        VietType::Globals::GUID_Profile,
+        TRUE);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"profiles->EnableLanguageProfile failed");
+
+    hr = profiles->ChangeCurrentLanguage(MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US));
+    HRESULT_CHECK_RETURN(hr, L"%s", L"profiles->ChangeCurrentLanguage failed");
+
+    hr = profiles->ActivateLanguageProfile(
+        VietType::Globals::CLSID_TextService,
+        MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
+        VietType::Globals::GUID_Profile);
 
     return S_OK;
 }
@@ -92,15 +112,6 @@ extern "C" __declspec(dllexport) HRESULT __cdecl UnregisterProfiles() {
     SmartComPtr<ITfInputProcessorProfileMgr> profileMgr;
     hr = profileMgr.CoCreate(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER);
     HRESULT_CHECK_RETURN(hr, L"%s", L"profileMgr.CoCreate failed");
-
-    hr = profileMgr->DeactivateProfile(
-        TF_PROFILETYPE_INPUTPROCESSOR,
-        MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
-        VietType::Globals::CLSID_TextService,
-        VietType::Globals::GUID_Profile,
-        NULL,
-        TF_IPPMF_FORPROCESS | TF_IPPMF_FORSESSION | TF_IPPMF_DISABLEPROFILE);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"profileMgr->DeactivateProfile failed");
 
     hr = profileMgr->UnregisterProfile(
         VietType::Globals::CLSID_TextService,
