@@ -44,10 +44,8 @@ extern "C" __declspec(dllexport) HRESULT __cdecl RegisterProfiles() {
     WCHAR dllPath[MAX_PATH] = { 0 };
 
     auto dllPathLength = GetModuleFileName(VietType::Globals::dllInstance, dllPath, MAX_PATH);
-    auto err = GetLastError();
-    if (err != ERROR_SUCCESS) {
-        WINERROR_PRINT(err, L"%s", L"GetModuleFileName failed");
-        return HRESULT_FROM_WIN32(err);
+    if (dllPathLength == 0) {
+        WINERROR_RETURN_HRESULT(L"%s", L"GetModuleFileName failed");
     }
     if (dllPathLength >= MAX_PATH) {
         dllPathLength--;
@@ -73,6 +71,8 @@ extern "C" __declspec(dllexport) HRESULT __cdecl RegisterProfiles() {
         TRUE,
         0);
     HRESULT_CHECK_RETURN(hr, L"%s", L"profileMgr->RegisterProfile failed");
+
+    // call ActivateProfile to make IME global (#11)
 
     hr = profileMgr->ActivateProfile(
         TF_PROFILETYPE_INPUTPROCESSOR,
