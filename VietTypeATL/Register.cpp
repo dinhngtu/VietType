@@ -93,6 +93,15 @@ extern "C" __declspec(dllexport) HRESULT __cdecl UnregisterProfiles() {
     hr = profileMgr.CoCreate(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER);
     HRESULT_CHECK_RETURN(hr, L"%s", L"profileMgr.CoCreate failed");
 
+    hr = profileMgr->DeactivateProfile(
+        TF_PROFILETYPE_INPUTPROCESSOR,
+        MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
+        VietType::Globals::CLSID_TextService,
+        VietType::Globals::GUID_Profile,
+        NULL,
+        TF_IPPMF_FORPROCESS | TF_IPPMF_FORSESSION | TF_IPPMF_DISABLEPROFILE);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"profileMgr->DeactivateProfile failed");
+
     hr = profileMgr->UnregisterProfile(
         VietType::Globals::CLSID_TextService,
         MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
