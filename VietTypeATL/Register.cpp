@@ -102,6 +102,7 @@ extern "C" __declspec(dllexport) HRESULT __cdecl RegisterProfiles() {
         VietType::Globals::CLSID_TextService,
         VietType::Globals::TextServiceLangId,
         VietType::Globals::GUID_Profile);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"profiles->ActivateLanguageProfile failed");
 
     return S_OK;
 }
