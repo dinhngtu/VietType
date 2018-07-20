@@ -110,16 +110,18 @@ extern "C" __declspec(dllexport) HRESULT __cdecl RegisterProfiles() {
 extern "C" __declspec(dllexport) HRESULT __cdecl UnregisterProfiles() {
     HRESULT hr;
 
-    SmartComPtr<ITfInputProcessorProfileMgr> profileMgr;
-    hr = profileMgr.CoCreate(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"profileMgr.CoCreate failed");
+    SmartComPtr<ITfInputProcessorProfiles> profiles;
+    hr = profiles.CoCreate(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"profiles.CoCreate failed");
 
-    hr = profileMgr->UnregisterProfile(
+    hr = profiles->RemoveLanguageProfile(
         VietType::Globals::CLSID_TextService,
         VietType::Globals::TextServiceLangId,
-        VietType::Globals::GUID_Profile,
-        TF_URP_ALLPROFILES);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"profileMgr->UnregisterProfile failed");
+        VietType::Globals::GUID_Profile);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"profiles->RemoveLanguageProfile failed");
+
+    hr = profiles->Unregister(VietType::Globals::CLSID_TextService);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"profiles->Unregister failed");
 
     return S_OK;
 }
