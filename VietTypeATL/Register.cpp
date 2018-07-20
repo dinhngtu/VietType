@@ -122,10 +122,10 @@ extern "C" __declspec(dllexport) HRESULT __cdecl RegisterCategories() {
 
     for (auto const& cat : SupportedCategories) {
         DBG_DPRINT(
-            L"unregistering %08lx-%04hx-%04hx-%02hhx%02hhx-%02hhx%02hhx%02hhx%02hhx%02hhx%02hhx",
+            L"registering %08lx-%04hx-%04hx-%02hhx%02hhx-%02hhx%02hhx%02hhx%02hhx%02hhx%02hhx",
             cat.Data1, cat.Data2, cat.Data3, cat.Data4[0], cat.Data4[1], cat.Data4[2], cat.Data4[3], cat.Data4[4], cat.Data4[5], cat.Data4[6], cat.Data4[7]);
         hr = categoryMgr->RegisterCategory(VietType::Globals::CLSID_TextService, cat, VietType::Globals::CLSID_TextService);
-        DBG_HRESULT_CHECK(hr, L"%s", L"categoryMgr->RegisterCategory failed");
+        HRESULT_CHECK_RETURN(hr, L"%s", L"categoryMgr->RegisterCategory failed");
     }
 
     return S_OK;
@@ -152,7 +152,7 @@ extern "C" __declspec(dllexport) HRESULT __cdecl UnregisterCategories() {
                 L"unregistering %08lx-%04hx-%04hx-%02hhx%02hhx-%02hhx%02hhx%02hhx%02hhx%02hhx%02hhx",
                 cat.Data1, cat.Data2, cat.Data3, cat.Data4[0], cat.Data4[1], cat.Data4[2], cat.Data4[3], cat.Data4[4], cat.Data4[5], cat.Data4[6], cat.Data4[7]);
             hr = categoryMgr->UnregisterCategory(VietType::Globals::CLSID_TextService, cat, VietType::Globals::CLSID_TextService);
-            DBG_HRESULT_CHECK(hr, L"%s", L"categoryMgr->UnregisterCategory failed");
+            HRESULT_CHECK_RETURN(hr, L"%s", L"categoryMgr->UnregisterCategory failed");
         } else {
             break;
         }
