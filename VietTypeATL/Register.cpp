@@ -74,6 +74,15 @@ extern "C" __declspec(dllexport) HRESULT __cdecl RegisterProfiles() {
         0);
     HRESULT_CHECK_RETURN(hr, L"%s", L"profileMgr->RegisterProfile failed");
 
+    hr = profileMgr->ActivateProfile(
+        TF_PROFILETYPE_INPUTPROCESSOR,
+        MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
+        VietType::Globals::CLSID_TextService,
+        VietType::Globals::GUID_Profile,
+        NULL,
+        TF_IPPMF_FORPROCESS | TF_IPPMF_FORSESSION | TF_IPPMF_ENABLEPROFILE);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"profileMgr->ActivateProfile failed");
+
     return S_OK;
 }
 
