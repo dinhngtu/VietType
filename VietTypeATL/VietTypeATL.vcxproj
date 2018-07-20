@@ -511,6 +511,7 @@
     <ClCompile Include="TextEditSink.cpp" />
     <ClCompile Include="TextService.cpp" />
     <ClCompile Include="ThreadMgrEventSink.cpp" />
+    <ClCompile Include="Utilities.cpp" />
     <ClCompile Include="VietTypeATL.cpp" />
     <ClCompile Include="VietTypeATL_i.c">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
@@ -571,6 +572,7 @@
     <ClInclude Include="TextEditSink.h" />
     <ClInclude Include="TextService.h" />
     <ClInclude Include="ThreadMgrEventSink.h" />
+    <ClInclude Include="Utilities.h" />
     <ClInclude Include="VietTypeATL_i.h" />
     <ClInclude Include="VirtualDocument.h" />
   </ItemGroup>

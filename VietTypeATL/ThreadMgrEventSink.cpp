@@ -27,6 +27,7 @@
 #include "EngineController.h"
 #include "TextEditSink.h"
 #include "EditSessions.h"
+#include "Utilities.h"
 
 VietType::ThreadMgrEventSink::ThreadMgrEventSink() {
 }
@@ -63,6 +64,15 @@ STDMETHODIMP VietType::ThreadMgrEventSink::OnSetFocus(ITfDocumentMgr * pdimFocus
     HRESULT_CHECK_RETURN(hr, L"%s", L"pdimFocus->GetTop failed");
 
     if (!context) {
+        _controller->SetBlocked(BlockedKind::BLOCKED);
+        return S_OK;
+    }
+
+    bool isempty;
+    hr = VietType::IsContextEmpty(context, _compMgr->GetClientId(), &isempty);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"VietType::IsContextEmpty failed");
+    if (isempty) {
+        _controller->SetBlocked(BlockedKind::BLOCKED);
         return S_OK;
     }
 

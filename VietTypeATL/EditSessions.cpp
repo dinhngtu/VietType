@@ -44,25 +44,6 @@ HRESULT VietType::EditBlocked(
         return S_OK;
     }
 
-    // check if context is contextEmpty
-
-    SmartComObjPtr<Compartment> compEmpty;
-    hr = compEmpty.CreateInstance();
-    HRESULT_CHECK_RETURN(hr, L"%s", L"compEmpty.CreateInstance failed");
-
-    hr = compEmpty->Initialize(context, compositionManager->GetClientId(), GUID_COMPARTMENT_EMPTYCONTEXT);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"compEmpty->Initialize failed");
-
-    long contextEmpty;
-    hr = compEmpty->GetValue(&contextEmpty);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"compDisabled->GetValue failed");
-
-    if (hr == S_OK && contextEmpty) {
-        DBG_DPRINT(L"%s", L"blocked: context empty");
-        controller->SetBlocked(VietType::BlockedKind::BLOCKED);
-        return S_OK;
-    }
-
     // check GUID_COMPARTMENT_KEYBOARD_DISABLED
 
     SmartComObjPtr<Compartment> compDisabled;
