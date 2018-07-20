@@ -92,10 +92,18 @@ along with VietType.  If not, see <https://www.gnu.org/licenses/>.
           <Class Id="{C0DD01A1-0DEB-454B-8B42-D22CED1B4B23}" Context="InprocServer32" Description="VietType" ThreadingModel="apartment" />
         </File>
       </Component>
-      
+
+      <?if $(var.Platform) = x86 ?>
       <Component Id="Registrar">
         <File Id="Registrar.exe" Source="$(var.SolutionDir)\Win32\Release\Registrar.exe" Name="Registrar.exe" />
       </Component>
+      <?elseif $(var.Platform) = x64 ?>
+      <Component Id="Registrar">
+        <File Id="Registrar.exe" Source="$(var.SolutionDir)\x64\Release\Registrar.exe" Name="Registrar.exe" />
+      </Component>
+      <?else ?>
+      <?error Unknown architecture ?>
+      <?endif ?>
 
       <Component Id="LICENSE">
         <File Id="LICENSE" Source="$(var.SolutionDir)\LICENSE" Name="LICENSE" />
@@ -112,6 +120,7 @@ along with VietType.  If not, see <https://www.gnu.org/licenses/>.
   </Fragment>
 
   <Fragment>
+    <?if $(var.Platform) = x86 ?>
     <CustomAction Id="RegisterCategories" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="deferred" />
     <CustomAction Id="RegisterCategoriesRollback" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="rollback" />
     <CustomAction Id="UnregisterCategories" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="deferred" />
@@ -121,5 +130,20 @@ along with VietType.  If not, see <https://www.gnu.org/licenses/>.
     <CustomAction Id="RegisterProfilesRollback" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="rollback" />
     <CustomAction Id="UnregisterProfiles" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="deferred" />
     <CustomAction Id="UnregisterProfilesRollback" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="rollback" />
+    
+    <?elseif $(var.Platform) = x64 ?>
+    <CustomAction Id="RegisterCategories" BinaryKey="WixCA" DllEntry="WixQuietExec64" Impersonate="no" Execute="deferred" />
+    <CustomAction Id="RegisterCategoriesRollback" BinaryKey="WixCA" DllEntry="WixQuietExec64" Impersonate="no" Execute="rollback" />
+    <CustomAction Id="UnregisterCategories" BinaryKey="WixCA" DllEntry="WixQuietExec64" Impersonate="no" Execute="deferred" />
+    <CustomAction Id="UnregisterCategoriesRollback" BinaryKey="WixCA" DllEntry="WixQuietExec64" Impersonate="no" Execute="rollback" />
+
+    <CustomAction Id="RegisterProfiles" BinaryKey="WixCA" DllEntry="WixQuietExec64" Impersonate="no" Execute="deferred" />
+    <CustomAction Id="RegisterProfilesRollback" BinaryKey="WixCA" DllEntry="WixQuietExec64" Impersonate="no" Execute="rollback" />
+    <CustomAction Id="UnregisterProfiles" BinaryKey="WixCA" DllEntry="WixQuietExec64" Impersonate="no" Execute="deferred" />
+    <CustomAction Id="UnregisterProfilesRollback" BinaryKey="WixCA" DllEntry="WixQuietExec64" Impersonate="no" Execute="rollback" />
+    
+    <?else ?>
+    <?error Unknown architecture ?>
+    <?endif ?>
   </Fragment>
 </Wix>
