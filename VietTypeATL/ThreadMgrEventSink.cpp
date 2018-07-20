@@ -45,6 +45,8 @@ STDMETHODIMP VietType::ThreadMgrEventSink::OnUninitDocumentMgr(ITfDocumentMgr * 
 STDMETHODIMP VietType::ThreadMgrEventSink::OnSetFocus(ITfDocumentMgr * pdimFocus, ITfDocumentMgr * pdimPrevFocus) {
     HRESULT hr;
 
+    DBG_DPRINT(L"pdimFocus = %p", pdimFocus);
+
     if (!pdimFocus) {
         _controller->SetBlocked(BlockedKind::BLOCKED);
         return S_OK;
