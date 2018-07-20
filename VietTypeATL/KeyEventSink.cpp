@@ -85,7 +85,11 @@ STDMETHODIMP VietType::KeyEventSink::OnSetFocus(BOOL fForeground) {
 
     if (!_controller->IsEditBlockedPending()) {
         _controller->SetEditBlockedPending(S_OK);
-        hr = CompositionManager::RequestEditSession(VietType::EditBlocked, _compositionManager, context, static_cast<EngineController *>(_controller));
+        hr = CompositionManager::RequestEditSession(
+            VietType::EditBlocked,
+            _compositionManager,
+            context,
+            static_cast<EngineController *>(_controller));
         DBG_HRESULT_CHECK(hr, L"%s", L"CompositionManager::RequestEditSession failed");
         _controller->SetEditBlockedPending(hr);
     }

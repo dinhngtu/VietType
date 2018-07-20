@@ -59,7 +59,7 @@ STDMETHODIMP VietType::ThreadMgrEventSink::OnSetFocus(ITfDocumentMgr * pdimFocus
     }
 
     SmartComPtr<ITfContext> context;
-    hr = pdimFocus->GetTop(context.GetAddress());
+    hr = _docMgrFocus->GetTop(context.GetAddress());
     HRESULT_CHECK_RETURN(hr, L"%s", L"pdimFocus->GetTop failed");
 
     if (!context) {
@@ -81,7 +81,11 @@ STDMETHODIMP VietType::ThreadMgrEventSink::OnSetFocus(ITfDocumentMgr * pdimFocus
 
     if (!_controller->IsEditBlockedPending()) {
         _controller->SetEditBlockedPending(S_OK);
-        hr = CompositionManager::RequestEditSession(VietType::EditBlocked, _compMgr, context, static_cast<EngineController *>(_controller));
+        hr = CompositionManager::RequestEditSession(
+            VietType::EditBlocked,
+            _compMgr,
+            context,
+            static_cast<EngineController *>(_controller));
         DBG_HRESULT_CHECK(hr, L"%s", L"CompositionManager::RequestEditSession failed");
         _controller->SetEditBlockedPending(hr);
     }
