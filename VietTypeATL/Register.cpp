@@ -62,7 +62,7 @@ extern "C" __declspec(dllexport) HRESULT __cdecl RegisterProfiles() {
 
     hr = profiles->AddLanguageProfile(
         VietType::Globals::CLSID_TextService,
-        MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
+        VietType::Globals::TextServiceLangId,
         VietType::Globals::GUID_Profile,
         VietType::Globals::TextServiceDescription.c_str(),
         static_cast<LONG>(VietType::Globals::TextServiceDescription.length()),
@@ -79,7 +79,7 @@ extern "C" __declspec(dllexport) HRESULT __cdecl RegisterProfiles() {
 
     hr = profilesEx->SetLanguageProfileDisplayName(
         VietType::Globals::CLSID_TextService,
-        MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
+        VietType::Globals::TextServiceLangId,
         VietType::Globals::GUID_Profile,
         dllPath,
         dllPathLength,
@@ -90,17 +90,17 @@ extern "C" __declspec(dllexport) HRESULT __cdecl RegisterProfiles() {
 
     hr = profiles->EnableLanguageProfile(
         VietType::Globals::CLSID_TextService,
-        MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
+        VietType::Globals::TextServiceLangId,
         VietType::Globals::GUID_Profile,
         TRUE);
     HRESULT_CHECK_RETURN(hr, L"%s", L"profiles->EnableLanguageProfile failed");
 
-    hr = profiles->ChangeCurrentLanguage(MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US));
+    hr = profiles->ChangeCurrentLanguage(VietType::Globals::TextServiceLangId);
     HRESULT_CHECK_RETURN(hr, L"%s", L"profiles->ChangeCurrentLanguage failed");
 
     hr = profiles->ActivateLanguageProfile(
         VietType::Globals::CLSID_TextService,
-        MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
+        VietType::Globals::TextServiceLangId,
         VietType::Globals::GUID_Profile);
 
     return S_OK;
@@ -115,7 +115,7 @@ extern "C" __declspec(dllexport) HRESULT __cdecl UnregisterProfiles() {
 
     hr = profileMgr->UnregisterProfile(
         VietType::Globals::CLSID_TextService,
-        MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
+        VietType::Globals::TextServiceLangId,
         VietType::Globals::GUID_Profile,
         TF_URP_ALLPROFILES);
     HRESULT_CHECK_RETURN(hr, L"%s", L"profileMgr->UnregisterProfile failed");

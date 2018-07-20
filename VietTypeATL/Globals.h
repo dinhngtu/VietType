@@ -35,5 +35,7 @@ extern const GUID GUID_PROP_INPUTSCOPE;
 
 extern const std::wstring TextServiceDescription;
 
+extern const LANGID TextServiceLangId;
+
 }
 }
