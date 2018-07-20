@@ -71,8 +71,10 @@ public:
     long IsEnabled() const;
     BlockedKind GetBlocked() const;
     void SetBlocked(BlockedKind blocked);
+    void SetEditBlockedPending();
     bool SetEditBlockedPending(HRESULT result);
     bool IsEditBlockedPending() const;
+    bool ResetEditBlockedPending();
 
     HRESULT GetOpenClose(long *openclose);
 

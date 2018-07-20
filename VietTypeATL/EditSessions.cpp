@@ -30,7 +30,7 @@ HRESULT VietType::EditBlocked(
 
     DBG_DPRINT(L"ec = %ld", ec);
 
-    controller->SetEditBlockedPending(S_FALSE);
+    controller->ResetEditBlockedPending();
 
     // check GUID_COMPARTMENT_KEYBOARD_OPENCLOSE from EngineController
 
@@ -39,6 +39,7 @@ HRESULT VietType::EditBlocked(
     HRESULT_CHECK_RETURN(hr, L"%s", L"controller->GetOpenClose failed");
 
     if (hr == S_OK && openclose) {
+        DBG_DPRINT(L"%s", L"blocked: openclose");
         controller->SetBlocked(VietType::BlockedKind::BLOCKED);
         return S_OK;
     }
@@ -57,6 +58,7 @@ HRESULT VietType::EditBlocked(
     HRESULT_CHECK_RETURN(hr, L"%s", L"compDisabled->GetValue failed");
 
     if (hr == S_OK && contextEmpty) {
+        DBG_DPRINT(L"%s", L"blocked: context empty");
         controller->SetBlocked(VietType::BlockedKind::BLOCKED);
         return S_OK;
     }
@@ -75,7 +77,20 @@ HRESULT VietType::EditBlocked(
     HRESULT_CHECK_RETURN(hr, L"%s", L"compDisabled->GetValue failed");
 
     if (hr == S_OK && contextDisabled) {
+        DBG_DPRINT(L"%s", L"blocked: context disabled");
         controller->SetBlocked(VietType::BlockedKind::BLOCKED);
+        return S_OK;
+    }
+
+    // check transitory context
+
+    TF_STATUS st;
+    hr = context->GetStatus(&st);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"context->GetStatus failed");
+    if (st.dwStaticFlags & TF_SS_TRANSITORY) {
+        // transitory context doesn't seem to support input scopes, free right away
+        DBG_DPRINT(L"%s", L"free: transitory context");
+        controller->SetBlocked(VietType::BlockedKind::FREE);
         return S_OK;
     }
 

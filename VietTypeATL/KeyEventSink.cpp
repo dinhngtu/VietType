@@ -46,7 +46,8 @@ VietType::KeyEventSink::~KeyEventSink() {
 
 STDMETHODIMP VietType::KeyEventSink::OnSetFocus(BOOL fForeground) {
     HRESULT hr;
-    DBG_DPRINT(L"KeyEventSink::OnSetFocus %d", fForeground);
+
+    DBG_DPRINT(L"foreground %d, pending %d", fForeground, _controller->IsEditBlockedPending());
 
     if (!fForeground || _controller->IsEditBlockedPending()) {
         return S_OK;
@@ -84,14 +85,17 @@ STDMETHODIMP VietType::KeyEventSink::OnSetFocus(BOOL fForeground) {
     } else DBG_HRESULT_CHECK(hr, L"%s", L"context->GetStatus failed");
 
     if (!_controller->IsEditBlockedPending()) {
-        _controller->SetEditBlockedPending(S_OK);
+        _controller->SetEditBlockedPending();
         hr = CompositionManager::RequestEditSession(
             VietType::EditBlocked,
             _compositionManager,
             context,
             static_cast<EngineController *>(_controller));
-        DBG_HRESULT_CHECK(hr, L"%s", L"CompositionManager::RequestEditSession failed");
-        _controller->SetEditBlockedPending(hr);
+        _controller->ResetEditBlockedPending();
+        if (FAILED(hr)) {
+            DBG_HRESULT_CHECK(hr, L"%s", L"CompositionManager::RequestEditSession failed");
+            _controller->SetBlocked(BlockedKind::FREE);
+        }
     }
 
     return S_OK;

@@ -170,13 +170,23 @@ void VietType::EngineController::SetBlocked(VietType::BlockedKind blocked) {
     UpdateStates();
 }
 
+void VietType::EngineController::SetEditBlockedPending() {
+    _editBlockedPending = true;
+}
+
 bool VietType::EngineController::SetEditBlockedPending(HRESULT result) {
-    _editBlockedPending = (result == S_OK);
+    _editBlockedPending = _editBlockedPending && FAILED(result);
     return _editBlockedPending;
 }
 
 bool VietType::EngineController::IsEditBlockedPending() const {
     return _editBlockedPending;
+}
+
+bool VietType::EngineController::ResetEditBlockedPending() {
+    bool pending = _editBlockedPending;
+    _editBlockedPending = false;
+    return pending;
 }
 
 HRESULT VietType::EngineController::GetOpenClose(long * openclose) {

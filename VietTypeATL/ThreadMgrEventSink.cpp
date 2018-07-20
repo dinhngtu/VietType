@@ -45,7 +45,7 @@ STDMETHODIMP VietType::ThreadMgrEventSink::OnUninitDocumentMgr(ITfDocumentMgr * 
 STDMETHODIMP VietType::ThreadMgrEventSink::OnSetFocus(ITfDocumentMgr * pdimFocus, ITfDocumentMgr * pdimPrevFocus) {
     HRESULT hr;
 
-    DBG_DPRINT(L"pdimFocus = %p", pdimFocus);
+    DBG_DPRINT(L"pdimFocus = %p, pending = %d", pdimFocus, _controller->IsEditBlockedPending());
 
     if (!pdimFocus) {
         _controller->SetBlocked(BlockedKind::BLOCKED);
@@ -80,14 +80,17 @@ STDMETHODIMP VietType::ThreadMgrEventSink::OnSetFocus(ITfDocumentMgr * pdimFocus
     } else DBG_HRESULT_CHECK(hr, L"%s", L"context->GetStatus failed");
 
     if (!_controller->IsEditBlockedPending()) {
-        _controller->SetEditBlockedPending(S_OK);
+        _controller->SetEditBlockedPending();
         hr = CompositionManager::RequestEditSession(
             VietType::EditBlocked,
             _compMgr,
             context,
             static_cast<EngineController *>(_controller));
-        DBG_HRESULT_CHECK(hr, L"%s", L"CompositionManager::RequestEditSession failed");
-        _controller->SetEditBlockedPending(hr);
+        _controller->ResetEditBlockedPending();
+        if (FAILED(hr)) {
+            DBG_HRESULT_CHECK(hr, L"%s", L"CompositionManager::RequestEditSession failed");
+            _controller->SetBlocked(BlockedKind::FREE);
+        }
     }
 
     return S_OK;
