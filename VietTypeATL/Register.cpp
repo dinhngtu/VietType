@@ -114,6 +114,13 @@ extern "C" __declspec(dllexport) HRESULT __cdecl UnregisterProfiles() {
     hr = profiles.CoCreate(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER);
     HRESULT_CHECK_RETURN(hr, L"%s", L"profiles.CoCreate failed");
 
+    hr = profiles->EnableLanguageProfile(
+        VietType::Globals::CLSID_TextService,
+        VietType::Globals::TextServiceLangId,
+        VietType::Globals::GUID_Profile,
+        FALSE);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"profiles->EnableLanguageProfile failed");
+
     hr = profiles->RemoveLanguageProfile(
         VietType::Globals::CLSID_TextService,
         VietType::Globals::TextServiceLangId,
