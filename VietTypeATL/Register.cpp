@@ -71,21 +71,6 @@ extern "C" __declspec(dllexport) HRESULT __cdecl RegisterProfiles() {
         static_cast<ULONG>(-IDI_IMELOGO));
     HRESULT_CHECK_RETURN(hr, L"%s", L"profiles->AddLanguageProfile failed");
 
-    // set language profile display name
-
-    SmartComPtr<ITfInputProcessorProfilesEx> profilesEx;
-    hr = profiles->QueryInterface<ITfInputProcessorProfilesEx>(profilesEx.GetAddress());
-    HRESULT_CHECK_RETURN(hr, L"%s", L"profiles->QueryInterface failed");
-
-    hr = profilesEx->SetLanguageProfileDisplayName(
-        VietType::Globals::CLSID_TextService,
-        VietType::Globals::TextServiceLangId,
-        VietType::Globals::GUID_Profile,
-        dllPath,
-        dllPathLength,
-        IDS_VIETTYPE_DESCRIPTION);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"profilesEx->SetLanguageProfileDisplayName failed");
-
     // enable & activate profile
 
     hr = profiles->EnableLanguageProfile(
