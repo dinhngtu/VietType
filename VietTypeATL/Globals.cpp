@@ -36,4 +36,6 @@ const GUID VietType::Globals::GUID_PROP_INPUTSCOPE = { 0x1713dd5a, 0x68e7, 0x4a5
 
 const std::wstring VietType::Globals::TextServiceDescription = L"VietType";
 
+// with MAKELANGID(LANG_JAPANESE, SUBLANG_JAPANESE_JAPAN), the TIP configuration UI works correctly
+// without having to call SetLanguageProfileDisplayName
 const LANGID VietType::Globals::TextServiceLangId = MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US);
