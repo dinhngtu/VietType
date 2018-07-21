@@ -23,22 +23,22 @@ void PrintProfileInfo(TF_INPUTPROCESSORPROFILE const *p) {
     }
     wprintf(L"0x%04x:\n", static_cast<int>(p->langid));
 
-    wprintf(L"clsid %s guidProfile %s\n", CppStringFromIID(p->clsid).c_str(), CppStringFromIID(p->guidProfile).c_str());
+    wprintf(L"clsid: %s, guidProfile: %s\n", CppStringFromIID(p->clsid).c_str(), CppStringFromIID(p->guidProfile).c_str());
 
     std::wstring catid = CppStringFromIID(p->catid);
     if (IsEqualGUID(p->catid, GUID_TFCAT_TIP_KEYBOARD)) {
-        wprintf(L"catid %s (GUID_TFCAT_TIP_KEYBOARD)\n", catid.c_str());
+        wprintf(L"catid: %s (GUID_TFCAT_TIP_KEYBOARD)\n", catid.c_str());
     } else if (IsEqualGUID(p->catid, GUID_TFCAT_TIP_SPEECH)) {
-        wprintf(L"catid %s (GUID_TFCAT_TIP_SPEECH)\n", catid.c_str());
+        wprintf(L"catid: %s (GUID_TFCAT_TIP_SPEECH)\n", catid.c_str());
     } else if (IsEqualGUID(p->catid, GUID_TFCAT_TIP_HANDWRITING)) {
-        wprintf(L"catid %s (GUID_TFCAT_TIP_HANDWRITING)\n", catid.c_str());
+        wprintf(L"catid: %s (GUID_TFCAT_TIP_HANDWRITING)\n", catid.c_str());
     } else if (IsEqualGUID(p->catid, GUID_TFCAT_CATEGORY_OF_TIP)) {
-        wprintf(L"catid %s (GUID_TFCAT_CATEGORY_OF_TIP)\n", catid.c_str());
+        wprintf(L"catid: %s (GUID_TFCAT_CATEGORY_OF_TIP)\n", catid.c_str());
     } else {
-        wprintf(L"catid %s (unknown category)\n", catid.c_str());
+        wprintf(L"catid: %s (unknown category)\n", catid.c_str());
     }
 
-    wprintf(L"hkl %p\n", p->hkl);
+    wprintf(L"hkl: %p\n", p->hkl);
 
     std::wstring capabilities;
     if (p->dwCaps & TF_IPP_CAPS_DISABLEONTRANSITORY) {
@@ -64,7 +64,7 @@ void PrintProfileInfo(TF_INPUTPROCESSORPROFILE const *p) {
     }
     wprintf(L"capabilities: %s\n", capabilities.c_str());
 
-    wprintf(L"hklSubstitute %p\n", p->hklSubstitute);
+    wprintf(L"hklSubstitute: %p\n", p->hklSubstitute);
 
     std::wstring flags;
     if (p->dwFlags & TF_IPP_FLAG_ACTIVE) {
@@ -116,6 +116,13 @@ HRESULT EnumDefaultKeyboardLanguageProfiles() {
     hr = profiles.CoCreate(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER);
     CHECK(hr, L"%s", L"profiles.CoCreate");
 
+    LANGID curlangid;
+    hr = profiles->GetCurrentLanguage(&curlangid);
+    CHECK(hr, L"%s", L"profiles->GetCurrentLanguage");
+    wprintf(L"Current language: 0x%04x\n", curlangid);
+
+    wprintf(L"Default keyboard language profiles:\n");
+
     CComHeapPtr<LANGID> langids;
     ULONG numlangids;
     hr = profiles->GetLanguageList(&langids, &numlangids);
@@ -131,7 +138,7 @@ HRESULT EnumDefaultKeyboardLanguageProfiles() {
         if (hr == S_FALSE) {
             wprintf(L"no default\n");
         } else {
-            wprintf(L"clsid %s guidProfile %s\n", CppStringFromIID(clsid).c_str(), CppStringFromIID(guidProfile).c_str());
+            wprintf(L"clsid %s, guidProfile %s\n", CppStringFromIID(clsid).c_str(), CppStringFromIID(guidProfile).c_str());
         }
     }
 
@@ -149,7 +156,6 @@ int main() {
     hr = EnumProfileMgr();
     CHECK(hr, L"%s", L"EnumProfileMgr");
 
-    wprintf(L"Default keyboard language profiles:\n");
     hr = EnumDefaultKeyboardLanguageProfiles();
     CHECK(hr, L"%s", L"EnumDefaultKeyboardLanguageProfiles");
 
