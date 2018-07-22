@@ -23,6 +23,7 @@
 namespace VietType {
 
 class EngineController;
+class LanguageBarButton;
 
 class RefreshableButton : public ILanguageBarCallbacks {
 public:

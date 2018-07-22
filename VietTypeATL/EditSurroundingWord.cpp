@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with VietType.  If not, see <https://www.gnu.org/licenses/>.
 
-#include "SurroundingWordFinder.h"
+#include "EditSessions.h"
 #include "CompositionManager.h"
 #include "EngineController.h"
 #include "VirtualDocument.h"
@@ -116,7 +116,7 @@ bool IsSeparatorCharacter(wchar_t c) {
     return false;
 }
 
-HRESULT VietType::EditSurroundingWord(
+HRESULT VietType::EditSessions::EditSurroundingWord(
     _In_ TfEditCookie ec,
     _In_ VietType::CompositionManager *compositionManager,
     _In_ ITfContext *context,

@@ -482,7 +482,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TestRelease|x64'">
       </PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="EditSessions.cpp" />
+    <ClCompile Include="EditBlocked.cpp" />
     <ClCompile Include="EngineController.cpp" />
     <ClCompile Include="EnumDisplayAttributeInfo.cpp" />
     <ClCompile Include="Globals.cpp" />
@@ -501,7 +501,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TestRelease|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="SurroundingWordFinder.cpp" />
+    <ClCompile Include="EditSurroundingWord.cpp" />
     <ClCompile Include="TelexEngine.cpp" />
     <ClCompile Include="TelexCaseMap.cpp" />
     <ClCompile Include="TelexData.cpp" />
@@ -561,7 +561,6 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SinkAdvisor.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="SurroundingWordFinder.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Telex.h" />
     <ClInclude Include="TelexEngine.h" />

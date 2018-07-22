@@ -18,7 +18,6 @@
 #include "TextEditSink.h"
 #include "CompositionManager.h"
 #include "EngineController.h"
-#include "SurroundingWordFinder.h"
 
 VietType::TextEditSink::TextEditSink() {
 }

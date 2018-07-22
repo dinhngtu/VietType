@@ -92,7 +92,7 @@ STDMETHODIMP VietType::ThreadMgrEventSink::OnSetFocus(ITfDocumentMgr * pdimFocus
     if (!_controller->IsEditBlockedPending()) {
         _controller->SetEditBlockedPending();
         hr = CompositionManager::RequestEditSession(
-            VietType::EditBlocked,
+            VietType::EditSessions::EditBlocked,
             _compMgr,
             context,
             static_cast<EngineController *>(_controller));

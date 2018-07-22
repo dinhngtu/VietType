@@ -20,7 +20,7 @@
 #include "Compartment.h"
 #include "CompositionManager.h"
 
-HRESULT VietType::EditBlocked(
+HRESULT VietType::EditSessions::EditBlocked(
     TfEditCookie ec,
     VietType::CompositionManager *compositionManager,
     ITfContext *context,

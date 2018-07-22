@@ -24,10 +24,23 @@ namespace VietType {
 class CompositionManager;
 class EngineController;
 
-HRESULT EditBlocked(
-    TfEditCookie ec,
-    CompositionManager *compositionManager,
-    ITfContext *context,
-    EngineController *controller);
+class EditSessions {
+public:
+    static HRESULT EditBlocked(
+        TfEditCookie ec,
+        CompositionManager *compositionManager,
+        ITfContext *context,
+        EngineController *controller);
+
+    static HRESULT EditSurroundingWord(
+        _In_ TfEditCookie ec,
+        _In_ VietType::CompositionManager *compositionManager,
+        _In_ ITfContext *context,
+        _In_ VietType::EngineController *controller,
+        _In_ int ignore);
+
+private:
+    DISALLOW_IMPLICIT_CONSTRUCTORS(EditSessions);
+};
 
 }

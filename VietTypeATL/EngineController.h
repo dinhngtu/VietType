@@ -20,7 +20,6 @@
 #include "Common.h"
 #include "SinkAdvisor.h"
 #include "Telex.h"
-#include "Compartment.h"
 
 namespace VietType {
 
@@ -28,6 +27,7 @@ class IndicatorButton;
 class LangBarButton;
 class CompositionManager;
 class EngineController;
+class Compartment;
 
 enum class BlockedKind {
     // don't change enable setting

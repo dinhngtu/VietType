@@ -25,7 +25,6 @@
 #include "KeyEventSink.h"
 #include "Telex.h"
 #include "KeyHandler.h"
-#include "SurroundingWordFinder.h"
 #include "EditSessions.h"
 #include "CompositionManager.h"
 #include "EngineController.h"
@@ -96,7 +95,7 @@ STDMETHODIMP VietType::KeyEventSink::OnSetFocus(BOOL fForeground) {
     if (!_controller->IsEditBlockedPending()) {
         _controller->SetEditBlockedPending();
         hr = CompositionManager::RequestEditSession(
-            VietType::EditBlocked,
+            VietType::EditSessions::EditBlocked,
             _compositionManager,
             context,
             static_cast<EngineController *>(_controller));
@@ -205,7 +204,7 @@ STDMETHODIMP VietType::KeyEventSink::OnPreservedKey(ITfContext * pic, REFGUID rg
     } else if (IsEqualGUID(GUID_KeyEventSink_PreservedKey_EditBack, rguid)) {
         *pfEaten = TRUE;
         hr = CompositionManager::RequestEditSession(
-            VietType::EditSurroundingWord,
+            VietType::EditSessions::EditSurroundingWord,
             _compositionManager,
             pic,
             static_cast<EngineController *>(_controller),

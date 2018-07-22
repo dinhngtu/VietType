@@ -28,6 +28,11 @@
 #include "TextService.h"
 #include "EnumDisplayAttributeInfo.h"
 #include "DisplayAttributes.h"
+#include "ThreadMgrEventSink.h"
+#include "KeyEventSink.h"
+#include "CompositionManager.h"
+#include "Telex.h"
+#include "EngineController.h"
 
 static CComPtr<VietType::EnumDisplayAttributeInfo> CreateAttributeStore() {
     HRESULT hr;

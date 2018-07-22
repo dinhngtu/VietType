@@ -19,7 +19,6 @@
 #include "Telex.h"
 #include "CompositionManager.h"
 #include "EngineController.h"
-#include "SurroundingWordFinder.h"
 
 VietType::KeyHandlerEditSession::KeyHandlerEditSession() {
 }

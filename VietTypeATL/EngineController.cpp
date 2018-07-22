@@ -19,6 +19,7 @@
 #include "LanguageBarHandlers.h"
 #include "CompositionManager.h"
 #include "EditSessions.h"
+#include "Compartment.h"
 
 // {CCA3D390-EF1A-4DE4-B2FF-B6BC76D68C3B}
 const GUID VietType::GUID_LanguageBarButton_Item = { 0xcca3d390, 0xef1a, 0x4de4, { 0xb2, 0xff, 0xb6, 0xbc, 0x76, 0xd6, 0x8c, 0x3b } };
