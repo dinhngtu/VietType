@@ -49,7 +49,8 @@ HRESULT VietType::CompositionManager::Initialize(TfClientId clientid, CComPtr<IT
     _composingAttribute = composingAttribute;
 
     if (!comless) {
-        hr = CoCreateInstance(CLSID_TF_CategoryMgr, NULL, CLSCTX_INPROC_SERVER, IID_ITfCategoryMgr, reinterpret_cast<void **>(&_categoryMgr));
+        hr = _categoryMgr.CoCreateInstance(CLSID_TF_CategoryMgr, NULL, CLSCTX_INPROC_SERVER);
+        HRESULT_CHECK_RETURN(hr, L"%s", L"_categoryMgr.CoCreateInstance failed");
     }
 
     return S_OK;

@@ -122,9 +122,8 @@ extern "C" __declspec(dllexport) HRESULT __cdecl RegisterCategories() {
     HRESULT hr;
 
     CComPtr<ITfCategoryMgr> categoryMgr;
-    // categoryMgr.CoCreate uses IID_IUnknown then does a QI, while we want to use IID_ITfCategoryMgr directly
-    hr = CoCreateInstance(CLSID_TF_CategoryMgr, NULL, CLSCTX_INPROC_SERVER, IID_ITfCategoryMgr, reinterpret_cast<void **>(&categoryMgr));
-    HRESULT_CHECK_RETURN(hr, L"%s", L"categoryMgr.CoCreate failed");
+    hr = categoryMgr.CoCreateInstance(CLSID_TF_CategoryMgr, NULL, CLSCTX_INPROC_SERVER);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"categoryMgr.CoCreateInstance failed");
 
     for (auto const& cat : SupportedCategories) {
         DBG_DPRINT(
@@ -141,9 +140,8 @@ extern "C" __declspec(dllexport) HRESULT __cdecl UnregisterCategories() {
     HRESULT hr;
 
     CComPtr<ITfCategoryMgr> categoryMgr;
-    // categoryMgr.CoCreate uses IID_IUnknown then does a QI, while we want to use IID_ITfCategoryMgr directly
-    hr = CoCreateInstance(CLSID_TF_CategoryMgr, NULL, CLSCTX_INPROC_SERVER, IID_ITfCategoryMgr, reinterpret_cast<void **>(&categoryMgr));
-    HRESULT_CHECK_RETURN(hr, L"%s", L"categoryMgr.CoCreate failed");
+    hr = categoryMgr.CoCreateInstance(CLSID_TF_CategoryMgr, NULL, CLSCTX_INPROC_SERVER);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"categoryMgr.CoCreateInstance failed");
 
     CComPtr<IEnumGUID> registeredCategories;
     hr = categoryMgr->EnumCategoriesInItem(VietType::Globals::CLSID_TextService, &registeredCategories);
