@@ -60,10 +60,10 @@ public:
     explicit IndicatorButton(_In_ EngineController* ec);
 
     // Inherited via ILanguageBarCallbacks
-    virtual HRESULT OnClick(_In_ TfLBIClick click, _In_ POINT pt, _In_ const RECT* area) override;
-    virtual HRESULT InitMenu(_In_ ITfMenu* menu) override;
+    virtual HRESULT OnClick(_In_ TfLBIClick click, _In_ POINT pt, __RPC__in const RECT* area) override;
+    virtual HRESULT InitMenu(__RPC__in_opt ITfMenu* menu) override;
     virtual HRESULT OnMenuSelect(_In_ UINT id) override;
-    virtual HRESULT GetIcon(_Outptr_ HICON* hicon) override;
+    virtual HRESULT GetIcon(__RPC__deref_out_opt HICON* hicon) override;
     virtual DWORD GetStatus() override;
     virtual std::wstring GetText() override;
 
@@ -79,10 +79,10 @@ public:
     explicit LangBarButton(_In_ EngineController* ec);
 
     // Inherited via ILanguageBarCallbacks
-    virtual HRESULT OnClick(_In_ TfLBIClick click, _In_ POINT pt, _In_ const RECT* area) override;
-    virtual HRESULT InitMenu(_In_ ITfMenu* menu) override;
+    virtual HRESULT OnClick(_In_ TfLBIClick click, _In_ POINT pt, __RPC__in const RECT* area) override;
+    virtual HRESULT InitMenu(__RPC__in_opt ITfMenu* menu) override;
     virtual HRESULT OnMenuSelect(_In_ UINT id) override;
-    virtual HRESULT GetIcon(_Outptr_ HICON* hicon) override;
+    virtual HRESULT GetIcon(__RPC__deref_out_opt HICON* hicon) override;
     virtual DWORD GetStatus() override;
     virtual std::wstring GetText() override;
 

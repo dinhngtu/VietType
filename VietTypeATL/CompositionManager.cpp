@@ -31,7 +31,7 @@ VietType::CompositionManager::~CompositionManager() {
 }
 
 
-STDMETHODIMP VietType::CompositionManager::OnCompositionTerminated(_In_ TfEditCookie ecWrite, _In_opt_ ITfComposition* pComposition) {
+STDMETHODIMP VietType::CompositionManager::OnCompositionTerminated(_In_ TfEditCookie ecWrite, __RPC__in_opt ITfComposition* pComposition) {
     HRESULT hr;
 
     DBG_DPRINT(L"ecWrite = %ld", ecWrite);

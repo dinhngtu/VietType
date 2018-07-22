@@ -35,15 +35,15 @@ VietType::ThreadMgrEventSink::ThreadMgrEventSink() noexcept {
 VietType::ThreadMgrEventSink::~ThreadMgrEventSink() {
 }
 
-STDMETHODIMP VietType::ThreadMgrEventSink::OnInitDocumentMgr(ITfDocumentMgr * pdim) {
+STDMETHODIMP VietType::ThreadMgrEventSink::OnInitDocumentMgr(__RPC__in_opt ITfDocumentMgr* pdim) {
     return E_NOTIMPL;
 }
 
-STDMETHODIMP VietType::ThreadMgrEventSink::OnUninitDocumentMgr(ITfDocumentMgr * pdim) {
+STDMETHODIMP VietType::ThreadMgrEventSink::OnUninitDocumentMgr(__RPC__in_opt ITfDocumentMgr* pdim) {
     return E_NOTIMPL;
 }
 
-STDMETHODIMP VietType::ThreadMgrEventSink::OnSetFocus(ITfDocumentMgr * pdimFocus, ITfDocumentMgr * pdimPrevFocus) {
+STDMETHODIMP VietType::ThreadMgrEventSink::OnSetFocus(__RPC__in_opt ITfDocumentMgr* pdimFocus, __RPC__in_opt ITfDocumentMgr* pdimPrevFocus) {
     HRESULT hr;
 
     DBG_DPRINT(L"pdimFocus = %p, pending = %d", pdimFocus, _controller->IsEditBlockedPending());
@@ -106,19 +106,19 @@ STDMETHODIMP VietType::ThreadMgrEventSink::OnSetFocus(ITfDocumentMgr * pdimFocus
     return S_OK;
 }
 
-STDMETHODIMP VietType::ThreadMgrEventSink::OnPushContext(ITfContext * pic) {
+STDMETHODIMP VietType::ThreadMgrEventSink::OnPushContext(__RPC__in_opt ITfContext* pic) {
     return E_NOTIMPL;
 }
 
-STDMETHODIMP VietType::ThreadMgrEventSink::OnPopContext(ITfContext * pic) {
+STDMETHODIMP VietType::ThreadMgrEventSink::OnPopContext(__RPC__in_opt ITfContext* pic) {
     return E_NOTIMPL;
 }
 
-HRESULT VietType::ThreadMgrEventSink::Initialize(
-    ITfThreadMgr *threadMgr,
-    TfClientId tid,
-    CompositionManager* compMgr,
-    EngineController* controller) {
+_Check_return_ HRESULT VietType::ThreadMgrEventSink::Initialize(
+    _In_ ITfThreadMgr* threadMgr,
+    _In_ TfClientId tid,
+    _In_ VietType::CompositionManager* compMgr,
+    _In_ VietType::EngineController* controller) {
 
     HRESULT hr;
 

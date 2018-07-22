@@ -141,7 +141,7 @@ STDMETHODIMP VietType::TextService::Deactivate(void) {
     return S_OK;
 }
 
-STDMETHODIMP VietType::TextService::EnumDisplayAttributeInfo(_Outptr_ IEnumTfDisplayAttributeInfo** ppEnum) {
+STDMETHODIMP VietType::TextService::EnumDisplayAttributeInfo(__RPC__deref_out_opt IEnumTfDisplayAttributeInfo** ppEnum) {
     if (!attributeStore) {
         return E_FAIL;
     }
@@ -150,6 +150,6 @@ STDMETHODIMP VietType::TextService::EnumDisplayAttributeInfo(_Outptr_ IEnumTfDis
     return S_OK;
 }
 
-STDMETHODIMP VietType::TextService::GetDisplayAttributeInfo(_In_ REFGUID guid, _Outptr_ ITfDisplayAttributeInfo** ppInfo) {
+STDMETHODIMP VietType::TextService::GetDisplayAttributeInfo(__RPC__in REFGUID guid, __RPC__deref_out_opt ITfDisplayAttributeInfo** ppInfo) {
     return attributeStore->FindAttributeByGuid(guid, ppInfo);
 }

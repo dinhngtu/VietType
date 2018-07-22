@@ -30,7 +30,7 @@ VietType::EnumDisplayAttributeInfo::EnumDisplayAttributeInfo() noexcept {
 VietType::EnumDisplayAttributeInfo::~EnumDisplayAttributeInfo() {
 }
 
-STDMETHODIMP VietType::EnumDisplayAttributeInfo::Clone(_Outptr_ IEnumTfDisplayAttributeInfo** ppEnum) {
+STDMETHODIMP VietType::EnumDisplayAttributeInfo::Clone(__RPC__deref_out_opt IEnumTfDisplayAttributeInfo** ppEnum) {
     HRESULT hr;
     *ppEnum = nullptr;
 
@@ -44,7 +44,7 @@ STDMETHODIMP VietType::EnumDisplayAttributeInfo::Clone(_Outptr_ IEnumTfDisplayAt
     return S_OK;
 }
 
-STDMETHODIMP VietType::EnumDisplayAttributeInfo::Next(_In_ ULONG ulCount, _Out_writes_to_(ulCount, *pcFetched) ITfDisplayAttributeInfo** rgInfo, _Out_opt_ ULONG* pcFetched) {
+STDMETHODIMP VietType::EnumDisplayAttributeInfo::Next(_In_ ULONG ulCount, __RPC__out_ecount_part(ulCount, *pcFetched) ITfDisplayAttributeInfo** rgInfo, __RPC__out ULONG* pcFetched) {
     ULONG i;
     for (i = 0; i < ulCount; i++) {
         if (_index >= _items.size()) {

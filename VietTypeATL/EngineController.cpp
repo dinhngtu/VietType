@@ -32,7 +32,7 @@ VietType::EngineController::EngineController() noexcept {
 VietType::EngineController::~EngineController() {
 }
 
-STDMETHODIMP VietType::EngineController::OnChange(_In_ REFGUID rguid) {
+STDMETHODIMP VietType::EngineController::OnChange(__RPC__in REFGUID rguid) {
     HRESULT hr;
 
     if (IsEqualGUID(rguid, Globals::GUID_SettingsCompartment_Toggle)) {

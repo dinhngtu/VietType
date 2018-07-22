@@ -40,7 +40,7 @@ public:
 
 public:
     // Inherited via ITfTextEditSink
-    virtual STDMETHODIMP OnEndEdit(_In_ ITfContext* pic, _In_ TfEditCookie ecReadOnly, _In_ ITfEditRecord* pEditRecord) override;
+    virtual STDMETHODIMP OnEndEdit(__RPC__in_opt ITfContext* pic, _In_ TfEditCookie ecReadOnly, __RPC__in_opt ITfEditRecord* pEditRecord) override;
 
     _Check_return_ HRESULT Initialize(_In_ ITfDocumentMgr* documentMgr, _In_ CompositionManager* compMgr, _In_ EngineController* controller);
     HRESULT Uninitialize();

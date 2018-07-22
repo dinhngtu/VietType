@@ -38,10 +38,10 @@ public:
 
 public:
     // Inherited via ITfDisplayAttributeInfo
-    virtual STDMETHODIMP GetGUID(_Out_ GUID* pguid) override;
-    virtual STDMETHODIMP GetDescription(_Outptr_ BSTR* pbstrDesc) override;
-    virtual STDMETHODIMP GetAttributeInfo(_Out_ TF_DISPLAYATTRIBUTE* pda) override;
-    virtual STDMETHODIMP SetAttributeInfo(_In_ const TF_DISPLAYATTRIBUTE* pda) override;
+    virtual STDMETHODIMP GetGUID(__RPC__out GUID* pguid) override;
+    virtual STDMETHODIMP GetDescription(__RPC__deref_out_opt BSTR* pbstrDesc) override;
+    virtual STDMETHODIMP GetAttributeInfo(__RPC__out TF_DISPLAYATTRIBUTE* pda) override;
+    virtual STDMETHODIMP SetAttributeInfo(__RPC__in const TF_DISPLAYATTRIBUTE* pda) override;
     virtual STDMETHODIMP Reset(void) override;
 
 public:

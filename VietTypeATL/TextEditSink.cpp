@@ -25,7 +25,7 @@ VietType::TextEditSink::TextEditSink() noexcept {
 VietType::TextEditSink::~TextEditSink() {
 }
 
-STDMETHODIMP VietType::TextEditSink::OnEndEdit(_In_ ITfContext* pic, _In_ TfEditCookie ecReadOnly, _In_ ITfEditRecord* pEditRecord) {
+STDMETHODIMP VietType::TextEditSink::OnEndEdit(__RPC__in_opt ITfContext* pic, _In_ TfEditCookie ecReadOnly, __RPC__in_opt ITfEditRecord* pEditRecord) {
     DBG_DPRINT(L"%s", L"");
 
     return S_OK;

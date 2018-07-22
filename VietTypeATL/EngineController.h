@@ -52,7 +52,7 @@ public:
     DECLARE_PROTECT_FINAL_CONSTRUCT()
 
     // Inherited via ITfCompartmentEventSink
-    virtual STDMETHODIMP OnChange(_In_ REFGUID rguid) override;
+    virtual STDMETHODIMP OnChange(__RPC__in REFGUID rguid) override;
 
     _Check_return_ HRESULT Initialize(
         _In_ const std::shared_ptr<Telex::TelexEngine>& engine,

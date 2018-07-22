@@ -40,22 +40,22 @@ VietType::DisplayAttributeInfo::DisplayAttributeInfo() noexcept {
 VietType::DisplayAttributeInfo::~DisplayAttributeInfo() {
 }
 
-STDMETHODIMP VietType::DisplayAttributeInfo::GetGUID(_Out_ GUID* pguid) {
+STDMETHODIMP VietType::DisplayAttributeInfo::GetGUID(__RPC__out GUID* pguid) {
     *pguid = _guid;
     return S_OK;
 }
 
-STDMETHODIMP VietType::DisplayAttributeInfo::GetDescription(_Outptr_ BSTR* pbstrDesc) {
+STDMETHODIMP VietType::DisplayAttributeInfo::GetDescription(__RPC__deref_out_opt BSTR* pbstrDesc) {
     *pbstrDesc = SysAllocString(_description.c_str());
     return *pbstrDesc ? S_OK : E_OUTOFMEMORY;
 }
 
-STDMETHODIMP VietType::DisplayAttributeInfo::GetAttributeInfo(_Out_ TF_DISPLAYATTRIBUTE* pda) {
+STDMETHODIMP VietType::DisplayAttributeInfo::GetAttributeInfo(__RPC__out TF_DISPLAYATTRIBUTE* pda) {
     *pda = _attr;
     return S_OK;
 }
 
-STDMETHODIMP VietType::DisplayAttributeInfo::SetAttributeInfo(_In_ const TF_DISPLAYATTRIBUTE* pda) {
+STDMETHODIMP VietType::DisplayAttributeInfo::SetAttributeInfo(__RPC__in const TF_DISPLAYATTRIBUTE* pda) {
     _attr = *pda;
     return S_OK;
 }

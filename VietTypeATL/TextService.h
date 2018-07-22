@@ -65,8 +65,8 @@ public:
     virtual STDMETHODIMP ActivateEx(_In_ ITfThreadMgr* ptim, _In_ TfClientId tid, _In_ DWORD dwFlags) override;
 
     // Inherited via ITfDisplayAttributeProvider
-    virtual STDMETHODIMP EnumDisplayAttributeInfo(_Outptr_ IEnumTfDisplayAttributeInfo** ppEnum) override;
-    virtual STDMETHODIMP GetDisplayAttributeInfo(_In_ REFGUID guid, _Outptr_ ITfDisplayAttributeInfo** ppInfo) override;
+    virtual STDMETHODIMP EnumDisplayAttributeInfo(__RPC__deref_out_opt IEnumTfDisplayAttributeInfo** ppEnum) override;
+    virtual STDMETHODIMP GetDisplayAttributeInfo(__RPC__in REFGUID guid, __RPC__deref_out_opt ITfDisplayAttributeInfo** ppInfo) override;
 
 private:
     CComPtr<ITfThreadMgr> _threadMgr;

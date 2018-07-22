@@ -111,7 +111,7 @@ HRESULT OnMenuSelectAll(_In_ UINT id) {
     case 0:
         return S_OK;
     case ID_TRAY_ABOUT: {
-        const WCHAR* text = nullptr;
+        LPCWSTR text = nullptr;
         // LoadString will return a read-only pointer to the loaded resource string, no need to free
         if (!LoadString(VietType::Globals::dllInstance, IDS_LICENSENOTICE, reinterpret_cast<LPWSTR>(&text), 0)) {
             WINERROR_RETURN_HRESULT(L"%s", L"LoadString failed");
@@ -173,7 +173,7 @@ void VietType::RefreshableButton::Uninitialize() {
 VietType::IndicatorButton::IndicatorButton(_In_ EngineController* ec) : RefreshableButton(ec) {
 }
 
-HRESULT VietType::IndicatorButton::OnClick(_In_ TfLBIClick click, _In_ POINT pt, _In_ const RECT* area) {
+HRESULT VietType::IndicatorButton::OnClick(_In_ TfLBIClick click, _In_ POINT pt, __RPC__in const RECT* area) {
     if (click == TF_LBI_CLK_LEFT) {
         return _controller->ToggleUserEnabled();
     } else if (click == TF_LBI_CLK_RIGHT) {
@@ -185,7 +185,10 @@ HRESULT VietType::IndicatorButton::OnClick(_In_ TfLBIClick click, _In_ POINT pt,
     return S_OK;
 }
 
-HRESULT VietType::IndicatorButton::InitMenu(_In_ ITfMenu* menu) {
+HRESULT VietType::IndicatorButton::InitMenu(__RPC__in_opt ITfMenu* menu) {
+    if (!menu) {
+        return E_INVALIDARG;
+    }
     CopyTfMenu(menu);
     return S_OK;
 }
@@ -194,7 +197,7 @@ HRESULT VietType::IndicatorButton::OnMenuSelect(_In_ UINT id) {
     return OnMenuSelectAll(id);
 }
 
-HRESULT VietType::IndicatorButton::GetIcon(_Outptr_ HICON* hicon) {
+HRESULT VietType::IndicatorButton::GetIcon(__RPC__deref_out_opt HICON* hicon) {
     // Windows docs is a liar, icons are mandatory
     assert(Globals::dllInstance);
     if (_controller->GetBlocked() == BlockedKind::BLOCKED) {
@@ -231,7 +234,7 @@ std::wstring VietType::IndicatorButton::GetText() {
 VietType::LangBarButton::LangBarButton(_In_ EngineController* ec) : RefreshableButton(ec) {
 }
 
-HRESULT VietType::LangBarButton::OnClick(_In_ TfLBIClick click, _In_ POINT pt, _In_ const RECT* area) {
+HRESULT VietType::LangBarButton::OnClick(_In_ TfLBIClick click, _In_ POINT pt, __RPC__in const RECT* area) {
     if (click == TF_LBI_CLK_LEFT) {
         return _controller->ToggleUserEnabled();
     } else if (click == TF_LBI_CLK_RIGHT) {
@@ -243,7 +246,10 @@ HRESULT VietType::LangBarButton::OnClick(_In_ TfLBIClick click, _In_ POINT pt, _
     return S_OK;
 }
 
-HRESULT VietType::LangBarButton::InitMenu(_In_ ITfMenu* menu) {
+HRESULT VietType::LangBarButton::InitMenu(__RPC__in_opt ITfMenu* menu) {
+    if (!menu) {
+        return E_INVALIDARG;
+    }
     CopyTfMenu(menu);
     return S_OK;
 }
@@ -252,7 +258,7 @@ HRESULT VietType::LangBarButton::OnMenuSelect(_In_ UINT id) {
     return OnMenuSelectAll(id);
 }
 
-HRESULT VietType::LangBarButton::GetIcon(_Outptr_ HICON* hicon) {
+HRESULT VietType::LangBarButton::GetIcon(__RPC__deref_out_opt HICON* hicon) {
     // Windows docs is a liar, icons are mandatory
     assert(Globals::dllInstance);
     if (_controller->GetBlocked() == BlockedKind::BLOCKED) {

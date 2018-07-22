@@ -37,8 +37,8 @@ public:
     DECLARE_PROTECT_FINAL_CONSTRUCT()
 
 public:
-    virtual STDMETHODIMP Clone(_Outptr_ IEnumTfDisplayAttributeInfo** ppEnum) override;
-    virtual STDMETHODIMP Next(_In_ ULONG ulCount, _Out_writes_to_(ulCount, *pcFetched) ITfDisplayAttributeInfo** rgInfo, _Out_opt_ ULONG* pcFetched) override;
+    virtual STDMETHODIMP Clone(__RPC__deref_out_opt IEnumTfDisplayAttributeInfo** ppEnum) override;
+    virtual STDMETHODIMP Next(_In_ ULONG ulCount, __RPC__out_ecount_part(ulCount, *pcFetched) ITfDisplayAttributeInfo** rgInfo, __RPC__out ULONG* pcFetched) override;
     virtual STDMETHODIMP Reset(void) override;
     virtual STDMETHODIMP Skip(_In_ ULONG ulCount) override;
 

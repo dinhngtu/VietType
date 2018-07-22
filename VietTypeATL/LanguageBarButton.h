@@ -25,10 +25,10 @@ extern const GUID GUID_LanguageBarButton_Item;
 
 class ILanguageBarCallbacks {
 public:
-    virtual HRESULT OnClick(_In_ TfLBIClick click, _In_ POINT pt, _In_ const RECT* area) = 0;
-    virtual HRESULT InitMenu(_In_ ITfMenu* menu) = 0;
+    virtual HRESULT OnClick(_In_ TfLBIClick click, _In_ POINT pt, __RPC__in const RECT* prcArea) = 0;
+    virtual HRESULT InitMenu(__RPC__in_opt ITfMenu* menu) = 0;
     virtual HRESULT OnMenuSelect(_In_ UINT id) = 0;
-    virtual HRESULT GetIcon(_Outptr_ HICON* hicon) = 0;
+    virtual HRESULT GetIcon(__RPC__deref_out_opt HICON* hicon) = 0;
     virtual DWORD GetStatus() = 0;
     virtual std::wstring GetText() = 0;
 };
@@ -50,19 +50,19 @@ public:
     DECLARE_PROTECT_FINAL_CONSTRUCT()
 
     // Inherited via ITfSource
-    virtual STDMETHODIMP AdviseSink(_In_ REFIID riid, _In_ IUnknown* punk, _Out_ DWORD* pdwCookie) override;
+    virtual STDMETHODIMP AdviseSink(__RPC__in REFIID riid, __RPC__in_opt IUnknown* punk, __RPC__out DWORD* pdwCookie) override;
     virtual STDMETHODIMP UnadviseSink(_In_ DWORD dwCookie) override;
 
     // Inherited via ITfLangBarItemButton
-    virtual STDMETHODIMP GetInfo(_Out_ TF_LANGBARITEMINFO* pInfo) override;
-    virtual STDMETHODIMP GetStatus(_Out_ DWORD* pdwStatus) override;
+    virtual STDMETHODIMP GetInfo(__RPC__out TF_LANGBARITEMINFO* pInfo) override;
+    virtual STDMETHODIMP GetStatus(__RPC__out DWORD* pdwStatus) override;
     virtual STDMETHODIMP Show(_In_ BOOL fShow) override;
-    virtual STDMETHODIMP GetTooltipString(_Outptr_ BSTR* pbstrToolTip) override;
-    virtual STDMETHODIMP OnClick(_In_ TfLBIClick click, _In_ POINT pt, _In_ const RECT* prcArea) override;
-    virtual STDMETHODIMP InitMenu(_In_ ITfMenu* pMenu) override;
+    virtual STDMETHODIMP GetTooltipString(__RPC__deref_out_opt BSTR* pbstrToolTip) override;
+    virtual STDMETHODIMP OnClick(_In_ TfLBIClick click, _In_ POINT pt, __RPC__in const RECT* prcArea) override;
+    virtual STDMETHODIMP InitMenu(__RPC__in_opt ITfMenu* pMenu) override;
     virtual STDMETHODIMP OnMenuSelect(_In_ UINT wID) override;
-    virtual STDMETHODIMP GetIcon(_Outptr_ HICON* phIcon) override;
-    virtual STDMETHODIMP GetText(_Outptr_ BSTR* pbstrText) override;
+    virtual STDMETHODIMP GetIcon(__RPC__deref_out_opt HICON* phIcon) override;
+    virtual STDMETHODIMP GetText(__RPC__deref_out_opt BSTR* pbstrText) override;
 
     _Check_return_ HRESULT Initialize(
         _In_ const GUID& guidItem,
