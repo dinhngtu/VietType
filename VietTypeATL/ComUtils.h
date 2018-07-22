@@ -20,7 +20,7 @@
 #include <atlbase.h>
 
 template <typename T>
-HRESULT CreateInstance2(T** ppout) {
+_Check_return_ HRESULT CreateInstance2(_Outptr_ T** ppout) {
     ATL::CComObject<T>* p;
     HRESULT hr = ATL::CComObject<T>::CreateInstance(&p);
     if (SUCCEEDED(hr)) {
@@ -31,6 +31,6 @@ HRESULT CreateInstance2(T** ppout) {
 }
 
 template <typename TFrom, typename TTo>
-HRESULT QueryInterface2(TFrom* from, TTo** to) {
+_Check_return_ HRESULT QueryInterface2(_In_ TFrom* from, _Outptr_ TTo** to) {
     return from->QueryInterface(__uuidof(TTo), reinterpret_cast<void**>(to));
 }

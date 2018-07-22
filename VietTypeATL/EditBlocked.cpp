@@ -21,10 +21,10 @@
 #include "CompositionManager.h"
 
 HRESULT VietType::EditSessions::EditBlocked(
-    TfEditCookie ec,
-    VietType::CompositionManager* compositionManager,
-    ITfContext* context,
-    VietType::EngineController* controller) {
+    _In_ TfEditCookie ec,
+    _In_ VietType::CompositionManager* compositionManager,
+    _In_ ITfContext* context,
+    _In_ VietType::EngineController* controller) {
 
     HRESULT hr;
 

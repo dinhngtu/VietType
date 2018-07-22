@@ -32,13 +32,13 @@ public:
     DECLARE_PROTECT_FINAL_CONSTRUCT()
 
 public:
-    ITfCompartment* GetCompartment();
-    HRESULT GetCompartmentSource(ITfSource** ppSource);
+    _Ret_valid_ ITfCompartment* GetCompartment();
+    _Check_return_ HRESULT GetCompartmentSource(_Outptr_ ITfSource** ppSource);
 
-    HRESULT GetValue(long* val);
-    HRESULT SetValue(long val);
+    _Check_return_ _Success_(return == S_OK) HRESULT GetValue(_Out_ long* val);
+    HRESULT SetValue(_In_ long val);
 
-    HRESULT Initialize(IUnknown* punk, TfClientId clientid, const GUID& guidCompartment, bool global = false);
+    _Check_return_ HRESULT Initialize(_In_ IUnknown* punk, _In_ TfClientId clientid, _In_ const GUID& guidCompartment, _In_ bool global = false);
     HRESULT Uninitialize();
 
 private:

@@ -25,17 +25,13 @@ VietType::TextEditSink::TextEditSink() noexcept {
 VietType::TextEditSink::~TextEditSink() {
 }
 
-STDMETHODIMP VietType::TextEditSink::OnEndEdit(ITfContext* pic, TfEditCookie ecReadOnly, ITfEditRecord* pEditRecord) {
+STDMETHODIMP VietType::TextEditSink::OnEndEdit(_In_ ITfContext* pic, _In_ TfEditCookie ecReadOnly, _In_ ITfEditRecord* pEditRecord) {
     DBG_DPRINT(L"%s", L"");
-
-    if (pEditRecord == nullptr) {
-        return E_INVALIDARG;
-    }
 
     return S_OK;
 }
 
-HRESULT VietType::TextEditSink::Initialize(ITfDocumentMgr* documentMgr, CompositionManager* compMgr, EngineController* controller) {
+_Check_return_ HRESULT VietType::TextEditSink::Initialize(_In_ ITfDocumentMgr* documentMgr, _In_ CompositionManager* compMgr, _In_ EngineController* controller) {
     HRESULT hr;
 
     _compMgr = compMgr;

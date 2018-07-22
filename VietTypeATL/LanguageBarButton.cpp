@@ -25,7 +25,7 @@ VietType::LanguageBarButton::LanguageBarButton() noexcept {
 VietType::LanguageBarButton::~LanguageBarButton() {
 }
 
-STDMETHODIMP VietType::LanguageBarButton::AdviseSink(REFIID riid, IUnknown* punk, DWORD* pdwCookie) {
+STDMETHODIMP VietType::LanguageBarButton::AdviseSink(_In_ REFIID riid, _In_ IUnknown* punk, _Out_ DWORD* pdwCookie) {
     HRESULT hr;
 
     if (!IsEqualIID(riid, IID_ITfLangBarItemSink)) {
@@ -48,7 +48,7 @@ STDMETHODIMP VietType::LanguageBarButton::AdviseSink(REFIID riid, IUnknown* punk
     return S_OK;
 }
 
-STDMETHODIMP VietType::LanguageBarButton::UnadviseSink(DWORD dwCookie) {
+STDMETHODIMP VietType::LanguageBarButton::UnadviseSink(_In_ DWORD dwCookie) {
     if (dwCookie != LanguageBarButtonCookie || !_itemSink) {
         return CONNECT_E_NOCONNECTION;
     }
@@ -57,7 +57,7 @@ STDMETHODIMP VietType::LanguageBarButton::UnadviseSink(DWORD dwCookie) {
     return S_OK;
 }
 
-STDMETHODIMP VietType::LanguageBarButton::GetInfo(TF_LANGBARITEMINFO* pInfo) {
+STDMETHODIMP VietType::LanguageBarButton::GetInfo(_Out_ TF_LANGBARITEMINFO* pInfo) {
     if (!pInfo) {
         return E_INVALIDARG;
     }
@@ -71,20 +71,20 @@ STDMETHODIMP VietType::LanguageBarButton::GetInfo(TF_LANGBARITEMINFO* pInfo) {
     return S_OK;
 }
 
-STDMETHODIMP VietType::LanguageBarButton::GetStatus(DWORD* pdwStatus) {
+STDMETHODIMP VietType::LanguageBarButton::GetStatus(_Out_ DWORD* pdwStatus) {
     *pdwStatus = _callbacks->GetStatus();
     return S_OK;
 }
 
-STDMETHODIMP VietType::LanguageBarButton::Show(BOOL fShow) {
+STDMETHODIMP VietType::LanguageBarButton::Show(_In_ BOOL fShow) {
     return E_NOTIMPL;
 }
 
-STDMETHODIMP VietType::LanguageBarButton::GetTooltipString(BSTR* pbstrToolTip) {
+STDMETHODIMP VietType::LanguageBarButton::GetTooltipString(_Outptr_ BSTR* pbstrToolTip) {
     return E_NOTIMPL;
 }
 
-STDMETHODIMP VietType::LanguageBarButton::OnClick(TfLBIClick click, POINT pt, const RECT* prcArea) {
+STDMETHODIMP VietType::LanguageBarButton::OnClick(_In_ TfLBIClick click, _In_ POINT pt, _In_ const RECT* prcArea) {
     if (_callbacks) {
         return _callbacks->OnClick(click, pt, prcArea);
     } else {
@@ -92,7 +92,7 @@ STDMETHODIMP VietType::LanguageBarButton::OnClick(TfLBIClick click, POINT pt, co
     }
 }
 
-STDMETHODIMP VietType::LanguageBarButton::InitMenu(ITfMenu* pMenu) {
+STDMETHODIMP VietType::LanguageBarButton::InitMenu(_In_ ITfMenu* pMenu) {
     if (_callbacks) {
         return _callbacks->InitMenu(pMenu);
     } else {
@@ -100,7 +100,7 @@ STDMETHODIMP VietType::LanguageBarButton::InitMenu(ITfMenu* pMenu) {
     }
 }
 
-STDMETHODIMP VietType::LanguageBarButton::OnMenuSelect(UINT wID) {
+STDMETHODIMP VietType::LanguageBarButton::OnMenuSelect(_In_ UINT wID) {
     if (_callbacks) {
         return _callbacks->OnMenuSelect(wID);
     } else {
@@ -108,7 +108,7 @@ STDMETHODIMP VietType::LanguageBarButton::OnMenuSelect(UINT wID) {
     }
 }
 
-STDMETHODIMP VietType::LanguageBarButton::GetIcon(HICON* phIcon) {
+STDMETHODIMP VietType::LanguageBarButton::GetIcon(_Outptr_ HICON* phIcon) {
     if (_callbacks) {
         return _callbacks->GetIcon(phIcon);
     } else {
@@ -116,12 +116,17 @@ STDMETHODIMP VietType::LanguageBarButton::GetIcon(HICON* phIcon) {
     }
 }
 
-STDMETHODIMP VietType::LanguageBarButton::GetText(BSTR* pbstrText) {
+STDMETHODIMP VietType::LanguageBarButton::GetText(_Outptr_ BSTR* pbstrText) {
     *pbstrText = SysAllocString(_callbacks->GetText().c_str());
     return *pbstrText ? S_OK : E_OUTOFMEMORY;
 }
 
-HRESULT VietType::LanguageBarButton::Initialize(const GUID& guidItem, DWORD style, ULONG sort, const std::wstring& description, ILanguageBarCallbacks* callbacks) {
+_Check_return_ HRESULT VietType::LanguageBarButton::Initialize(
+    _In_ const GUID& guidItem,
+    _In_ DWORD style,
+    _In_ ULONG sort,
+    _In_ const std::wstring& description,
+    _In_ ILanguageBarCallbacks* callbacks) {
     _guidItem = guidItem;
     _style = style;
     _sort = sort;
@@ -130,7 +135,7 @@ HRESULT VietType::LanguageBarButton::Initialize(const GUID& guidItem, DWORD styl
     return S_OK;
 }
 
-HRESULT VietType::LanguageBarButton::NotifyUpdate(DWORD flags) {
+HRESULT VietType::LanguageBarButton::NotifyUpdate(_In_ DWORD flags) {
     if (_itemSink) {
         HRESULT hr = _itemSink->OnUpdate(flags);
         HRESULT_CHECK_RETURN(hr, L"%s", L"_itemSink->OnUpdate failed");

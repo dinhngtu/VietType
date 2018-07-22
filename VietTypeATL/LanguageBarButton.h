@@ -25,10 +25,10 @@ extern const GUID GUID_LanguageBarButton_Item;
 
 class ILanguageBarCallbacks {
 public:
-    virtual HRESULT OnClick(TfLBIClick click, POINT pt, const RECT* area) = 0;
-    virtual HRESULT InitMenu(ITfMenu* menu) = 0;
-    virtual HRESULT OnMenuSelect(UINT id) = 0;
-    virtual HRESULT GetIcon(HICON* hicon) = 0;
+    virtual HRESULT OnClick(_In_ TfLBIClick click, _In_ POINT pt, _In_ const RECT* area) = 0;
+    virtual HRESULT InitMenu(_In_ ITfMenu* menu) = 0;
+    virtual HRESULT OnMenuSelect(_In_ UINT id) = 0;
+    virtual HRESULT GetIcon(_Outptr_ HICON* hicon) = 0;
     virtual DWORD GetStatus() = 0;
     virtual std::wstring GetText() = 0;
 };
@@ -50,27 +50,27 @@ public:
     DECLARE_PROTECT_FINAL_CONSTRUCT()
 
     // Inherited via ITfSource
-    virtual STDMETHODIMP AdviseSink(REFIID riid, IUnknown* punk, DWORD* pdwCookie) override;
-    virtual STDMETHODIMP UnadviseSink(DWORD dwCookie) override;
+    virtual STDMETHODIMP AdviseSink(_In_ REFIID riid, _In_ IUnknown* punk, _Out_ DWORD* pdwCookie) override;
+    virtual STDMETHODIMP UnadviseSink(_In_ DWORD dwCookie) override;
 
     // Inherited via ITfLangBarItemButton
-    virtual STDMETHODIMP GetInfo(TF_LANGBARITEMINFO* pInfo) override;
-    virtual STDMETHODIMP GetStatus(DWORD* pdwStatus) override;
-    virtual STDMETHODIMP Show(BOOL fShow) override;
-    virtual STDMETHODIMP GetTooltipString(BSTR* pbstrToolTip) override;
-    virtual STDMETHODIMP OnClick(TfLBIClick click, POINT pt, const RECT* prcArea) override;
-    virtual STDMETHODIMP InitMenu(ITfMenu* pMenu) override;
-    virtual STDMETHODIMP OnMenuSelect(UINT wID) override;
-    virtual STDMETHODIMP GetIcon(HICON* phIcon) override;
-    virtual STDMETHODIMP GetText(BSTR* pbstrText) override;
+    virtual STDMETHODIMP GetInfo(_Out_ TF_LANGBARITEMINFO* pInfo) override;
+    virtual STDMETHODIMP GetStatus(_Out_ DWORD* pdwStatus) override;
+    virtual STDMETHODIMP Show(_In_ BOOL fShow) override;
+    virtual STDMETHODIMP GetTooltipString(_Outptr_ BSTR* pbstrToolTip) override;
+    virtual STDMETHODIMP OnClick(_In_ TfLBIClick click, _In_ POINT pt, _In_ const RECT* prcArea) override;
+    virtual STDMETHODIMP InitMenu(_In_ ITfMenu* pMenu) override;
+    virtual STDMETHODIMP OnMenuSelect(_In_ UINT wID) override;
+    virtual STDMETHODIMP GetIcon(_Outptr_ HICON* phIcon) override;
+    virtual STDMETHODIMP GetText(_Outptr_ BSTR* pbstrText) override;
 
-    HRESULT Initialize(
-        const GUID& guidItem,
-        DWORD style,
-        ULONG sort,
-        const std::wstring& description,
-        ILanguageBarCallbacks* callbacks);
-    HRESULT NotifyUpdate(DWORD flags);
+    _Check_return_ HRESULT Initialize(
+        _In_ const GUID& guidItem,
+        _In_ DWORD style,
+        _In_ ULONG sort,
+        _In_ const std::wstring& description,
+        _In_ ILanguageBarCallbacks* callbacks);
+    HRESULT NotifyUpdate(_In_ DWORD flags);
     void Uninitialize();
 
 private:

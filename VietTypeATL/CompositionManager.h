@@ -36,39 +36,39 @@ public:
     DECLARE_PROTECT_FINAL_CONSTRUCT()
 
     // Inherited via ITfCompositionSink
-    virtual STDMETHODIMP OnCompositionTerminated(TfEditCookie ecWrite, ITfComposition* pComposition) override;
+    virtual STDMETHODIMP OnCompositionTerminated(_In_ TfEditCookie ecWrite, _In_opt_ ITfComposition* pComposition) override;
 
-    HRESULT Initialize(TfClientId clientid, ITfDisplayAttributeInfo* composingAttribute, bool comless);
+    _Check_return_ HRESULT Initialize(_In_ TfClientId clientid, _In_ ITfDisplayAttributeInfo* composingAttribute, _In_ bool comless);
     void Uninitialize();
 
     // this uses the saved context, only use when there is an active composition
-    HRESULT RequestEditSession(ITfEditSession* session);
-    HRESULT RequestEditSession(ITfEditSession* session, ITfContext* context);
-    HRESULT StartComposition(ITfContext* pContext);
+    HRESULT RequestEditSession(_In_ ITfEditSession* session);
+    HRESULT RequestEditSession(_In_ ITfEditSession* session, _In_ ITfContext* context);
+    HRESULT StartComposition(_In_ ITfContext* pContext);
     HRESULT EndComposition();
     bool IsComposing() const;
 
     // for use in edit sessions
-    ITfComposition* GetComposition() const;
+    _Ret_maybenull_ ITfComposition* GetComposition() const;
     // for use in edit sessions only
-    HRESULT GetRange(ITfRange** range);
+    _Check_return_ HRESULT GetRange(_Outptr_ ITfRange** range);
     TfClientId GetClientId() const;
 
-    HRESULT StartCompositionNow(TfEditCookie ec, ITfContext* context);
-    HRESULT EmptyCompositionText(TfEditCookie ec);
-    HRESULT MoveCaretToEnd(TfEditCookie ec);
-    HRESULT EndCompositionNow(TfEditCookie ec);
-    HRESULT SetCompositionText(TfEditCookie ec, const WCHAR* str, LONG length);
-    HRESULT EnsureCompositionText(TfEditCookie ec, ITfContext* context, const WCHAR* str, LONG length);
-    HRESULT SetRangeDisplayAttribute(TfEditCookie ec, ITfContext* context, ITfRange* range, ITfDisplayAttributeInfo* attr);
-    HRESULT ClearRangeDisplayAttribute(TfEditCookie ec, ITfContext* context, ITfRange* range);
+    HRESULT StartCompositionNow(_In_ TfEditCookie ec, _In_ ITfContext* context);
+    HRESULT EmptyCompositionText(_In_ TfEditCookie ec);
+    HRESULT MoveCaretToEnd(_In_ TfEditCookie ec);
+    HRESULT EndCompositionNow(_In_ TfEditCookie ec);
+    HRESULT SetCompositionText(_In_ TfEditCookie ec, _In_z_ LPCWSTR str, _In_ LONG length);
+    HRESULT EnsureCompositionText(_In_ TfEditCookie ec, _In_ ITfContext* context, _In_z_ LPCWSTR str, _In_ LONG length);
+    HRESULT SetRangeDisplayAttribute(_In_ TfEditCookie ec, _In_ ITfContext* context, _In_ ITfRange* range, _In_ ITfDisplayAttributeInfo* attr);
+    HRESULT ClearRangeDisplayAttribute(_In_ TfEditCookie ec, _In_ ITfContext* context, _In_ ITfRange* range);
 
     template <typename... Args>
     static HRESULT RequestEditSession(
-        HRESULT(*callback)(TfEditCookie ec, CompositionManager* compositionManager, ITfContext* context, Args... args),
-        CompositionManager* compositionManager,
+        _In_ HRESULT(*callback)(TfEditCookie ec, CompositionManager* compositionManager, ITfContext* context, Args... args),
+        _In_ CompositionManager* compositionManager,
         // required to call RequestEditSession
-        ITfContext* context,
+        _In_ ITfContext* context,
         Args... args) {
 
         assert(compositionManager->_clientid != TF_CLIENTID_NULL);
@@ -88,8 +88,8 @@ public:
     }
 
     template <typename... Args>
-    static HRESULT RequestEditSessionEx(
-        HRESULT(*callback)(TfEditCookie ec, CompositionManager* compositionManager, ITfContext* context, Args... args),
+    static _Check_return_ HRESULT RequestEditSessionEx(
+        _In_ HRESULT(*callback)(TfEditCookie ec, CompositionManager* compositionManager, ITfContext* context, Args... args),
         _In_ CompositionManager* compositionManager,
         // required to call RequestEditSession
         _In_ ITfContext* context,
@@ -114,13 +114,13 @@ public:
 
 private:
     static HRESULT _StartComposition(
-        /* EditSession */ TfEditCookie ec,
-        /* RequestEditSession */ CompositionManager* instance,
-        /* RequestEditSession */ ITfContext* context);
+        /* EditSession */ _In_ TfEditCookie ec,
+        /* RequestEditSession */ _In_ CompositionManager* instance,
+        /* RequestEditSession */ _In_ ITfContext* context);
     static HRESULT _EndComposition(
-        /* EditSession */ TfEditCookie ec,
-        /* RequestEditSession */ CompositionManager* instance,
-        /* RequestEditSession */ ITfContext* context);
+        /* EditSession */ _In_ TfEditCookie ec,
+        /* RequestEditSession */ _In_ CompositionManager* instance,
+        /* RequestEditSession */ _In_ ITfContext* context);
 
 private:
     TfClientId _clientid = TF_CLIENTID_NULL;

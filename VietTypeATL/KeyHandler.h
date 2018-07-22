@@ -38,19 +38,19 @@ public:
     DECLARE_PROTECT_FINAL_CONSTRUCT()
 
     // Inherited via ITfEditSession
-    virtual STDMETHODIMP DoEditSession(TfEditCookie ec) override;
+    virtual STDMETHODIMP DoEditSession(_In_ TfEditCookie ec) override;
 
     void Initialize(
-        CompositionManager* compositionManager,
-        ITfContext* context,
-        WPARAM wParam,
-        LPARAM lParam,
-        BYTE const* keyState,
-        EngineController* controller);
+        _In_ CompositionManager* compositionManager,
+        _In_ ITfContext* context,
+        _In_ WPARAM wParam,
+        _In_ LPARAM lParam,
+        _In_reads_(256) const BYTE* keyState,
+        _In_ EngineController* controller);
 
 private:
-    HRESULT ComposeKey(TfEditCookie ec);
-    HRESULT Commit(TfEditCookie ec);
+    HRESULT ComposeKey(_In_ TfEditCookie ec);
+    HRESULT Commit(_In_ TfEditCookie ec);
 
 private:
     CComPtr<CompositionManager> _compositionManager;

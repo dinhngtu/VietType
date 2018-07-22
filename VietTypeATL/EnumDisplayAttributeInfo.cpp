@@ -30,7 +30,7 @@ VietType::EnumDisplayAttributeInfo::EnumDisplayAttributeInfo() noexcept {
 VietType::EnumDisplayAttributeInfo::~EnumDisplayAttributeInfo() {
 }
 
-STDMETHODIMP VietType::EnumDisplayAttributeInfo::Clone(IEnumTfDisplayAttributeInfo** ppEnum) {
+STDMETHODIMP VietType::EnumDisplayAttributeInfo::Clone(_Outptr_ IEnumTfDisplayAttributeInfo** ppEnum) {
     HRESULT hr;
     *ppEnum = nullptr;
 
@@ -44,22 +44,20 @@ STDMETHODIMP VietType::EnumDisplayAttributeInfo::Clone(IEnumTfDisplayAttributeIn
     return S_OK;
 }
 
-STDMETHODIMP VietType::EnumDisplayAttributeInfo::Next(ULONG ulCount, ITfDisplayAttributeInfo** rgInfo, ULONG* pcFetched) {
-    auto index_old = _index;
-    for (ULONG i = 0; i < ulCount; i++) {
+STDMETHODIMP VietType::EnumDisplayAttributeInfo::Next(_In_ ULONG ulCount, _Out_writes_to_(ulCount, *pcFetched) ITfDisplayAttributeInfo** rgInfo, _Out_opt_ ULONG* pcFetched) {
+    ULONG i;
+    for (i = 0; i < ulCount; i++) {
         if (_index >= _items.size()) {
             break;
         }
-        *rgInfo = _items.at(_index);
+        rgInfo[i] = _items.at(_index);
         (*rgInfo)->AddRef();
-        rgInfo++;
         _index++;
     }
-    auto fetched = _index - index_old;
     if (pcFetched) {
-        *pcFetched = static_cast<ULONG>(fetched);
+        *pcFetched = static_cast<ULONG>(i);
     }
-    return (fetched == ulCount) ? S_OK : S_FALSE;
+    return (i == ulCount) ? S_OK : S_FALSE;
 }
 
 STDMETHODIMP VietType::EnumDisplayAttributeInfo::Reset(void) {
@@ -67,25 +65,25 @@ STDMETHODIMP VietType::EnumDisplayAttributeInfo::Reset(void) {
     return S_OK;
 }
 
-STDMETHODIMP VietType::EnumDisplayAttributeInfo::Skip(ULONG ulCount) {
+STDMETHODIMP VietType::EnumDisplayAttributeInfo::Skip(_In_ ULONG ulCount) {
     _index += ulCount;
     return (_index < _items.size()) ? S_OK : S_FALSE;
 }
 
-void VietType::EnumDisplayAttributeInfo::Initialize(const info_vector_type& items, info_vector_type::size_type index) {
+void VietType::EnumDisplayAttributeInfo::Initialize(_In_ const info_vector_type& items, _In_ info_vector_type::size_type index) {
     _items = items;
     _index = index;
 }
 
-void VietType::EnumDisplayAttributeInfo::AddAttribute(ITfDisplayAttributeInfo* item) {
+void VietType::EnumDisplayAttributeInfo::AddAttribute(_In_ ITfDisplayAttributeInfo* item) {
     _items.push_back(item);
 }
 
-ITfDisplayAttributeInfo* VietType::EnumDisplayAttributeInfo::GetAttribute(info_vector_type::size_type index) {
+_Ret_valid_ ITfDisplayAttributeInfo* VietType::EnumDisplayAttributeInfo::GetAttribute(_In_ info_vector_type::size_type index) {
     return _items.at(index);
 }
 
-HRESULT VietType::EnumDisplayAttributeInfo::FindAttributeByGuid(const GUID& guid, ITfDisplayAttributeInfo** info) {
+_Check_return_ HRESULT VietType::EnumDisplayAttributeInfo::FindAttributeByGuid(_In_ const GUID& guid, _Outptr_ ITfDisplayAttributeInfo** info) {
     HRESULT hr;
     *info = nullptr;
 

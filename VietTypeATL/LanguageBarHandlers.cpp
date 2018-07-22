@@ -41,7 +41,7 @@ int PopMenu(POINT pt, const RECT* area) {
     return itemId;
 }
 
-HRESULT CopyTfMenu(ITfMenu* menu) {
+HRESULT CopyTfMenu(_In_ ITfMenu* menu) {
     HRESULT hr;
 
     HMENU menuSource = GetMenu();
@@ -106,7 +106,7 @@ HRESULT CopyTfMenu(ITfMenu* menu) {
     return S_OK;
 }
 
-HRESULT OnMenuSelectAll(UINT id) {
+HRESULT OnMenuSelectAll(_In_ UINT id) {
     switch (id) {
     case 0:
         return S_OK;
@@ -128,11 +128,16 @@ HRESULT OnMenuSelectAll(UINT id) {
 // RefreshableButton
 ////////////////////////////////////////////////////////////////////////////////
 
-VietType::RefreshableButton::RefreshableButton(EngineController* ec) {
+VietType::RefreshableButton::RefreshableButton(_In_ EngineController* ec) {
     _controller = ec;
 }
 
-HRESULT VietType::RefreshableButton::Initialize(ITfLangBarItemMgr* langBarItemMgr, const GUID& guidItem, DWORD style, ULONG sort, const std::wstring& description) {
+_Check_return_ HRESULT VietType::RefreshableButton::Initialize(
+    _In_ ITfLangBarItemMgr* langBarItemMgr,
+    _In_ const GUID& guidItem,
+    _In_ DWORD style,
+    _In_ ULONG sort,
+    _In_ const std::wstring& description) {
     HRESULT hr;
 
     _langBarItemMgr = langBarItemMgr;
@@ -165,10 +170,10 @@ void VietType::RefreshableButton::Uninitialize() {
 // IndicatorButton
 ////////////////////////////////////////////////////////////////////////////////
 
-VietType::IndicatorButton::IndicatorButton(EngineController* ec) : RefreshableButton(ec) {
+VietType::IndicatorButton::IndicatorButton(_In_ EngineController* ec) : RefreshableButton(ec) {
 }
 
-HRESULT VietType::IndicatorButton::OnClick(TfLBIClick click, POINT pt, const RECT* area) {
+HRESULT VietType::IndicatorButton::OnClick(_In_ TfLBIClick click, _In_ POINT pt, _In_ const RECT* area) {
     if (click == TF_LBI_CLK_LEFT) {
         return _controller->ToggleUserEnabled();
     } else if (click == TF_LBI_CLK_RIGHT) {
@@ -180,16 +185,16 @@ HRESULT VietType::IndicatorButton::OnClick(TfLBIClick click, POINT pt, const REC
     return S_OK;
 }
 
-HRESULT VietType::IndicatorButton::InitMenu(ITfMenu* menu) {
+HRESULT VietType::IndicatorButton::InitMenu(_In_ ITfMenu* menu) {
     CopyTfMenu(menu);
     return S_OK;
 }
 
-HRESULT VietType::IndicatorButton::OnMenuSelect(UINT id) {
+HRESULT VietType::IndicatorButton::OnMenuSelect(_In_ UINT id) {
     return OnMenuSelectAll(id);
 }
 
-HRESULT VietType::IndicatorButton::GetIcon(HICON* hicon) {
+HRESULT VietType::IndicatorButton::GetIcon(_Outptr_ HICON* hicon) {
     // Windows docs is a liar, icons are mandatory
     assert(Globals::dllInstance);
     if (_controller->GetBlocked() == BlockedKind::BLOCKED) {
@@ -223,10 +228,10 @@ std::wstring VietType::IndicatorButton::GetText() {
 // LangBarButton
 ////////////////////////////////////////////////////////////////////////////////
 
-VietType::LangBarButton::LangBarButton(EngineController* ec) : RefreshableButton(ec) {
+VietType::LangBarButton::LangBarButton(_In_ EngineController* ec) : RefreshableButton(ec) {
 }
 
-HRESULT VietType::LangBarButton::OnClick(TfLBIClick click, POINT pt, const RECT* area) {
+HRESULT VietType::LangBarButton::OnClick(_In_ TfLBIClick click, _In_ POINT pt, _In_ const RECT* area) {
     if (click == TF_LBI_CLK_LEFT) {
         return _controller->ToggleUserEnabled();
     } else if (click == TF_LBI_CLK_RIGHT) {
@@ -238,16 +243,16 @@ HRESULT VietType::LangBarButton::OnClick(TfLBIClick click, POINT pt, const RECT*
     return S_OK;
 }
 
-HRESULT VietType::LangBarButton::InitMenu(ITfMenu* menu) {
+HRESULT VietType::LangBarButton::InitMenu(_In_ ITfMenu* menu) {
     CopyTfMenu(menu);
     return S_OK;
 }
 
-HRESULT VietType::LangBarButton::OnMenuSelect(UINT id) {
+HRESULT VietType::LangBarButton::OnMenuSelect(_In_ UINT id) {
     return OnMenuSelectAll(id);
 }
 
-HRESULT VietType::LangBarButton::GetIcon(HICON* hicon) {
+HRESULT VietType::LangBarButton::GetIcon(_Outptr_ HICON* hicon) {
     // Windows docs is a liar, icons are mandatory
     assert(Globals::dllInstance);
     if (_controller->GetBlocked() == BlockedKind::BLOCKED) {

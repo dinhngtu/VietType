@@ -26,7 +26,7 @@ VietType::KeyHandlerEditSession::KeyHandlerEditSession() noexcept {
 VietType::KeyHandlerEditSession::~KeyHandlerEditSession() {
 }
 
-STDMETHODIMP VietType::KeyHandlerEditSession::DoEditSession(TfEditCookie ec) {
+STDMETHODIMP VietType::KeyHandlerEditSession::DoEditSession(_In_ TfEditCookie ec) {
     assert(_compositionManager);
     DBG_DPRINT(L"ec = %ld", ec);
 
@@ -64,12 +64,12 @@ STDMETHODIMP VietType::KeyHandlerEditSession::DoEditSession(TfEditCookie ec) {
 }
 
 void VietType::KeyHandlerEditSession::Initialize(
-    CompositionManager* compositionManager,
-    ITfContext* context,
-    WPARAM wParam,
-    LPARAM lParam,
-    BYTE const* keyState,
-    EngineController* controller) {
+    _In_ CompositionManager* compositionManager,
+    _In_ ITfContext* context,
+    _In_ WPARAM wParam,
+    _In_ LPARAM lParam,
+    _In_reads_(256) const BYTE* keyState,
+    _In_ EngineController* controller) {
 
     // since edit sessions are asynchronous, we can't know when the reference to the edit session will die
     // therefore, we don't explicitly uninit the class, leaving it to the destructor when the refcount runs out
@@ -81,7 +81,7 @@ void VietType::KeyHandlerEditSession::Initialize(
     _controller = controller;
 }
 
-HRESULT VietType::KeyHandlerEditSession::ComposeKey(TfEditCookie ec) {
+HRESULT VietType::KeyHandlerEditSession::ComposeKey(_In_ TfEditCookie ec) {
     HRESULT hr;
 
     DBG_DPRINT(L"%s", L"");
@@ -121,7 +121,7 @@ HRESULT VietType::KeyHandlerEditSession::ComposeKey(TfEditCookie ec) {
     return S_OK;
 }
 
-HRESULT VietType::KeyHandlerEditSession::Commit(TfEditCookie ec) {
+HRESULT VietType::KeyHandlerEditSession::Commit(_In_ TfEditCookie ec) {
     HRESULT hr;
 
     DBG_DPRINT(L"%s", L"");

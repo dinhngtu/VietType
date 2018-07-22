@@ -40,22 +40,22 @@ VietType::DisplayAttributeInfo::DisplayAttributeInfo() noexcept {
 VietType::DisplayAttributeInfo::~DisplayAttributeInfo() {
 }
 
-STDMETHODIMP VietType::DisplayAttributeInfo::GetGUID(GUID* pguid) {
+STDMETHODIMP VietType::DisplayAttributeInfo::GetGUID(_Out_ GUID* pguid) {
     *pguid = _guid;
     return S_OK;
 }
 
-STDMETHODIMP VietType::DisplayAttributeInfo::GetDescription(BSTR* pbstrDesc) {
+STDMETHODIMP VietType::DisplayAttributeInfo::GetDescription(_Outptr_ BSTR* pbstrDesc) {
     *pbstrDesc = SysAllocString(_description.c_str());
     return *pbstrDesc ? S_OK : E_OUTOFMEMORY;
 }
 
-STDMETHODIMP VietType::DisplayAttributeInfo::GetAttributeInfo(TF_DISPLAYATTRIBUTE* pda) {
+STDMETHODIMP VietType::DisplayAttributeInfo::GetAttributeInfo(_Out_ TF_DISPLAYATTRIBUTE* pda) {
     *pda = _attr;
     return S_OK;
 }
 
-STDMETHODIMP VietType::DisplayAttributeInfo::SetAttributeInfo(const TF_DISPLAYATTRIBUTE* pda) {
+STDMETHODIMP VietType::DisplayAttributeInfo::SetAttributeInfo(_In_ const TF_DISPLAYATTRIBUTE* pda) {
     _attr = *pda;
     return S_OK;
 }
@@ -65,7 +65,7 @@ STDMETHODIMP VietType::DisplayAttributeInfo::Reset(void) {
     return S_OK;
 }
 
-void VietType::DisplayAttributeInfo::Initialize(const GUID& guid, std::wstring description, TF_DISPLAYATTRIBUTE attr) {
+void VietType::DisplayAttributeInfo::Initialize(_In_ const GUID& guid, _In_ std::wstring description, _In_ TF_DISPLAYATTRIBUTE attr) {
     _guid = guid;
     _description = description;
     _attr = attr;

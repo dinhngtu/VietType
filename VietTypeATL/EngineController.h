@@ -52,38 +52,38 @@ public:
     DECLARE_PROTECT_FINAL_CONSTRUCT()
 
     // Inherited via ITfCompartmentEventSink
-    virtual STDMETHODIMP OnChange(REFGUID rguid) override;
+    virtual STDMETHODIMP OnChange(_In_ REFGUID rguid) override;
 
-    HRESULT Initialize(
-        const std::shared_ptr<Telex::TelexEngine>& engine,
-        ITfThreadMgr* threadMgr,
-        TfClientId clientid);
+    _Check_return_ HRESULT Initialize(
+        _In_ const std::shared_ptr<Telex::TelexEngine>& engine,
+        _In_ ITfThreadMgr* threadMgr,
+        _In_ TfClientId clientid);
     HRESULT Uninitialize();
 
     Telex::TelexEngine& GetEngine();
     const Telex::TelexEngine& GetEngine() const;
 
-    HRESULT IsUserEnabled(long* penabled);
-    HRESULT WriteUserEnabled(long enabled);
+    _Check_return_ HRESULT IsUserEnabled(_Out_ long* penabled);
+    HRESULT WriteUserEnabled(_In_ long enabled);
     HRESULT ToggleUserEnabled();
 
     long IsEnabled() const;
     BlockedKind GetBlocked() const;
-    void SetBlocked(BlockedKind blocked);
+    void SetBlocked(_In_ BlockedKind blocked);
     void SetEditBlockedPending();
-    bool SetEditBlockedPending(HRESULT result);
+    bool SetEditBlockedPending(_In_ HRESULT result);
     bool IsEditBlockedPending() const;
     bool ResetEditBlockedPending();
 
-    HRESULT GetOpenClose(long* openclose);
+    _Check_return_ HRESULT GetOpenClose(_Out_ long* openclose);
 
     // update engine and langbar enabled state to match enabled/blocked value
     HRESULT UpdateStates();
 
 private:
-    HRESULT CompartmentReadEnabled(long* pEnabled);
-    HRESULT CompartmentWriteEnabled(long enabled);
-    HRESULT InitLanguageBar();
+    _Check_return_ HRESULT CompartmentReadEnabled(_Out_ long* pEnabled);
+    HRESULT CompartmentWriteEnabled(_In_ long enabled);
+    _Check_return_ HRESULT InitLanguageBar();
     HRESULT UninitLanguageBar();
 
 private:

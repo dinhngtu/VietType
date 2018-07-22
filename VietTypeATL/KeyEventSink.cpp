@@ -44,7 +44,7 @@ VietType::KeyEventSink::KeyEventSink() noexcept {
 VietType::KeyEventSink::~KeyEventSink() {
 }
 
-STDMETHODIMP VietType::KeyEventSink::OnSetFocus(BOOL fForeground) {
+STDMETHODIMP VietType::KeyEventSink::OnSetFocus(_In_ BOOL fForeground) {
     HRESULT hr;
 
     DBG_DPRINT(L"foreground %d, pending %d", fForeground, _controller->IsEditBlockedPending());
@@ -109,7 +109,7 @@ STDMETHODIMP VietType::KeyEventSink::OnSetFocus(BOOL fForeground) {
     return S_OK;
 }
 
-STDMETHODIMP VietType::KeyEventSink::OnTestKeyDown(ITfContext* pic, WPARAM wParam, LPARAM lParam, BOOL* pfEaten) {
+STDMETHODIMP VietType::KeyEventSink::OnTestKeyDown(_In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten) {
     HRESULT hr;
 
     if (!_controller->IsEnabled()) {
@@ -136,7 +136,7 @@ STDMETHODIMP VietType::KeyEventSink::OnTestKeyDown(ITfContext* pic, WPARAM wPara
     return S_OK;
 }
 
-STDMETHODIMP VietType::KeyEventSink::OnTestKeyUp(ITfContext* pic, WPARAM wParam, LPARAM lParam, BOOL* pfEaten) {
+STDMETHODIMP VietType::KeyEventSink::OnTestKeyUp(_In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten) {
     if (!_controller->IsEnabled()) {
         *pfEaten = FALSE;
         return S_OK;
@@ -160,7 +160,7 @@ STDMETHODIMP VietType::KeyEventSink::OnTestKeyUp(ITfContext* pic, WPARAM wParam,
     return S_OK;
 }
 
-STDMETHODIMP VietType::KeyEventSink::OnKeyDown(ITfContext* pic, WPARAM wParam, LPARAM lParam, BOOL* pfEaten) {
+STDMETHODIMP VietType::KeyEventSink::OnKeyDown(_In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten) {
     HRESULT hr;
 
     if (!_controller->IsEnabled()) {
@@ -186,11 +186,11 @@ STDMETHODIMP VietType::KeyEventSink::OnKeyDown(ITfContext* pic, WPARAM wParam, L
     return S_OK;
 }
 
-STDMETHODIMP VietType::KeyEventSink::OnKeyUp(ITfContext* pic, WPARAM wParam, LPARAM lParam, BOOL* pfEaten) {
+STDMETHODIMP VietType::KeyEventSink::OnKeyUp(_In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten) {
     return OnTestKeyUp(pic, wParam, lParam, pfEaten);
 }
 
-STDMETHODIMP VietType::KeyEventSink::OnPreservedKey(ITfContext* pic, REFGUID rguid, BOOL* pfEaten) {
+STDMETHODIMP VietType::KeyEventSink::OnPreservedKey(_In_ ITfContext* pic, _In_ REFGUID rguid, _Out_ BOOL* pfEaten) {
     HRESULT hr;
 
     if (IsEqualGUID(GUID_KeyEventSink_PreservedKey_Toggle, rguid)) {
@@ -210,16 +210,18 @@ STDMETHODIMP VietType::KeyEventSink::OnPreservedKey(ITfContext* pic, REFGUID rgu
             static_cast<EngineController*>(_controller),
             0);
         HRESULT_CHECK_RETURN(hr, L"%s", L"CompositionManager::RequestEditSession failed");
+    } else {
+        *pfEaten = FALSE;
     }
 
     return S_OK;
 }
 
-HRESULT VietType::KeyEventSink::Initialize(
-    ITfThreadMgr* threadMgr,
-    TfClientId clientid,
-    CompositionManager* compositionManager,
-    EngineController* engine) {
+_Check_return_ HRESULT VietType::KeyEventSink::Initialize(
+    _In_ ITfThreadMgr* threadMgr,
+    _In_ TfClientId clientid,
+    _In_ CompositionManager* compositionManager,
+    _In_ EngineController* engine) {
 
     HRESULT hr;
 
@@ -258,7 +260,7 @@ HRESULT VietType::KeyEventSink::Uninitialize() {
     return S_OK;
 }
 
-HRESULT VietType::KeyEventSink::CallKeyEdit(ITfContext* context, WPARAM wParam, LPARAM lParam, BYTE const* keyState) {
+HRESULT VietType::KeyEventSink::CallKeyEdit(_In_ ITfContext* context, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_reads_(256) const BYTE* keyState) {
     HRESULT hr;
 
     CComPtr<KeyHandlerEditSession> keyHandlerEditSession;

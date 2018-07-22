@@ -34,7 +34,7 @@ public:
         return cookie_ != TF_INVALID_COOKIE;
     }
 
-    HRESULT Advise(IUnknown* source, SinkInterface* sink) {
+    HRESULT Advise(_In_ IUnknown* source, _In_ SinkInterface* sink) {
         HRESULT hr;
 
         if (!source || !sink) return E_INVALIDARG;
@@ -87,7 +87,7 @@ public:
         return client_id_ != TF_CLIENTID_NULL;
     }
 
-    HRESULT Advise(IUnknown* source, TfClientId client_id, SinkInterface* sink) {
+    HRESULT Advise(_In_ IUnknown* source, _In_ TfClientId client_id, _In_ SinkInterface* sink) {
         HRESULT hr;
 
         if (!source || !client_id || !sink)

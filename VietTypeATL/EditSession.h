@@ -40,12 +40,12 @@ public:
     DECLARE_PROTECT_FINAL_CONSTRUCT()
 
     // Inherited via ITfEditSession
-    virtual STDMETHODIMP DoEditSession(TfEditCookie ec) {
+    virtual STDMETHODIMP DoEditSession(_In_ TfEditCookie ec) {
         auto args_ec = std::tuple_cat(std::make_tuple(ec), _args);
         return std::apply(_callback, args_ec);
     }
 
-    void Initialize(funtype callback, Args... args) {
+    void Initialize(_In_ funtype callback, Args... args) {
         _callback = callback;
         _args = std::make_tuple(args...);
     }

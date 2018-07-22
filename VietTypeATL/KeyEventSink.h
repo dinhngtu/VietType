@@ -39,22 +39,22 @@ public:
     DECLARE_PROTECT_FINAL_CONSTRUCT()
 
     // Inherited via ITfKeyEventSink
-    virtual STDMETHODIMP OnSetFocus(BOOL fForeground) override;
-    virtual STDMETHODIMP OnTestKeyDown(ITfContext* pic, WPARAM wParam, LPARAM lParam, BOOL* pfEaten) override;
-    virtual STDMETHODIMP OnTestKeyUp(ITfContext* pic, WPARAM wParam, LPARAM lParam, BOOL* pfEaten) override;
-    virtual STDMETHODIMP OnKeyDown(ITfContext* pic, WPARAM wParam, LPARAM lParam, BOOL* pfEaten) override;
-    virtual STDMETHODIMP OnKeyUp(ITfContext* pic, WPARAM wParam, LPARAM lParam, BOOL* pfEaten) override;
-    virtual STDMETHODIMP OnPreservedKey(ITfContext* pic, REFGUID rguid, BOOL* pfEaten) override;
+    virtual STDMETHODIMP OnSetFocus(_In_ BOOL fForeground) override;
+    virtual STDMETHODIMP OnTestKeyDown(_In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten) override;
+    virtual STDMETHODIMP OnTestKeyUp(_In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten) override;
+    virtual STDMETHODIMP OnKeyDown(_In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten) override;
+    virtual STDMETHODIMP OnKeyUp(_In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten) override;
+    virtual STDMETHODIMP OnPreservedKey(_In_ ITfContext* pic, _In_ REFGUID rguid, _Out_ BOOL* pfEaten) override;
 
-    HRESULT Initialize(
-        ITfThreadMgr* threadMgr,
-        TfClientId clientid,
-        CompositionManager* compositionManager,
-        EngineController* controller);
+    _Check_return_ HRESULT Initialize(
+        _In_ ITfThreadMgr* threadMgr,
+        _In_ TfClientId clientid,
+        _In_ CompositionManager* compositionManager,
+        _In_ EngineController* controller);
     HRESULT Uninitialize();
 
 private:
-    HRESULT CallKeyEdit(ITfContext* context, WPARAM wParam, LPARAM lParam, BYTE const* keyState);
+    HRESULT CallKeyEdit(_In_ ITfContext* context, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_reads_(256) const BYTE* keyState);
 
 private:
     TfClientId _clientid = TF_CLIENTID_NULL;

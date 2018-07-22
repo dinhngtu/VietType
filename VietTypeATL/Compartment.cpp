@@ -30,15 +30,15 @@ VietType::Compartment::Compartment() noexcept {
 VietType::Compartment::~Compartment() {
 }
 
-ITfCompartment* VietType::Compartment::GetCompartment() {
+_Ret_valid_ ITfCompartment* VietType::Compartment::GetCompartment() {
     return _compartment;
 }
 
-HRESULT VietType::Compartment::GetCompartmentSource(ITfSource** ppSource) {
+_Check_return_ HRESULT VietType::Compartment::GetCompartmentSource(_Outptr_ ITfSource** ppSource) {
     return _compartment->QueryInterface(ppSource);
 }
 
-HRESULT VietType::Compartment::GetValue(long* val) {
+_Check_return_ _Success_(return == S_OK) HRESULT VietType::Compartment::GetValue(_Out_ long* val) {
     HRESULT hr;
 
     VARIANT v;
@@ -52,10 +52,10 @@ HRESULT VietType::Compartment::GetValue(long* val) {
         *val = v.lVal;
     }
 
-    return S_OK;
+    return hr;
 }
 
-HRESULT VietType::Compartment::SetValue(long val) {
+HRESULT VietType::Compartment::SetValue(_In_ long val) {
     HRESULT hr;
 
     VARIANT v;
@@ -68,7 +68,7 @@ HRESULT VietType::Compartment::SetValue(long val) {
     return S_OK;
 }
 
-HRESULT VietType::Compartment::Initialize(IUnknown* punk, TfClientId clientid, const GUID& guidCompartment, bool global) {
+_Check_return_ HRESULT VietType::Compartment::Initialize(_In_ IUnknown* punk, _In_ TfClientId clientid, _In_ const GUID& guidCompartment, _In_ bool global) {
     HRESULT hr;
 
     CComPtr<ITfCompartmentMgr> compartmentMgr;
