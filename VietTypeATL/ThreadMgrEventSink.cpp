@@ -117,8 +117,8 @@ STDMETHODIMP VietType::ThreadMgrEventSink::OnPopContext(ITfContext * pic) {
 HRESULT VietType::ThreadMgrEventSink::Initialize(
     ITfThreadMgr *threadMgr,
     TfClientId tid,
-    CComPtr<CompositionManager> const& compMgr,
-    CComPtr<EngineController> const& controller) {
+    CompositionManager* compMgr,
+    EngineController* controller) {
 
     HRESULT hr;
 

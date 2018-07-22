@@ -47,7 +47,7 @@ public:
     virtual STDMETHODIMP OnPushContext(ITfContext * pic) override;
     virtual STDMETHODIMP OnPopContext(ITfContext * pic) override;
 
-    HRESULT Initialize(ITfThreadMgr *threadMgr, TfClientId tid, CComPtr<CompositionManager> const& compMgr, CComPtr<EngineController> const& controller);
+    HRESULT Initialize(ITfThreadMgr *threadMgr, TfClientId tid, CompositionManager* compMgr, EngineController* controller);
     HRESULT Uninitialize();
 
 private:

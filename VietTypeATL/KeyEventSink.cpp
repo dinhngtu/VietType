@@ -219,8 +219,8 @@ STDMETHODIMP VietType::KeyEventSink::OnPreservedKey(ITfContext * pic, REFGUID rg
 HRESULT VietType::KeyEventSink::Initialize(
     ITfThreadMgr * threadMgr,
     TfClientId clientid,
-    CComPtr<CompositionManager> const& compositionManager,
-    CComPtr<EngineController> const& engine) {
+    CompositionManager* compositionManager,
+    EngineController* engine) {
 
     HRESULT hr;
 

@@ -38,7 +38,7 @@ public:
     // Inherited via ITfCompositionSink
     virtual STDMETHODIMP OnCompositionTerminated(TfEditCookie ecWrite, ITfComposition * pComposition) override;
 
-    HRESULT Initialize(TfClientId clientid, CComPtr<ITfDisplayAttributeInfo> const& composingAttribute, bool comless);
+    HRESULT Initialize(TfClientId clientid, ITfDisplayAttributeInfo *composingAttribute, bool comless);
     void Uninitialize();
 
     // this uses the saved context, only use when there is an active composition
@@ -49,7 +49,7 @@ public:
     bool IsComposing() const;
 
     // for use in edit sessions
-    CComPtr<ITfComposition> const& GetComposition() const;
+    ITfComposition* GetComposition() const;
     // for use in edit sessions only
     HRESULT GetRange(ITfRange **range);
     TfClientId GetClientId() const;

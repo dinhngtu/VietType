@@ -77,11 +77,11 @@ void VietType::EnumDisplayAttributeInfo::Initialize(info_vector_type const & ite
     _index = index;
 }
 
-void VietType::EnumDisplayAttributeInfo::AddAttribute(CComPtr<ITfDisplayAttributeInfo> const & item) {
+void VietType::EnumDisplayAttributeInfo::AddAttribute(ITfDisplayAttributeInfo* item) {
     _items.push_back(item);
 }
 
-CComPtr<ITfDisplayAttributeInfo> const & VietType::EnumDisplayAttributeInfo::GetAttribute(info_vector_type::size_type index) {
+ITfDisplayAttributeInfo* VietType::EnumDisplayAttributeInfo::GetAttribute(info_vector_type::size_type index) {
     return _items.at(index);
 }
 

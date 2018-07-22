@@ -41,12 +41,12 @@ public:
     virtual STDMETHODIMP DoEditSession(TfEditCookie ec) override;
 
     void Initialize(
-        CComPtr<CompositionManager> const& compositionManager,
+        CompositionManager* compositionManager,
         ITfContext *context,
         WPARAM wParam,
         LPARAM lParam,
         BYTE const *keyState,
-        CComPtr<EngineController> const& controller);
+        EngineController* controller);
 
 private:
     HRESULT ComposeKey(TfEditCookie ec);

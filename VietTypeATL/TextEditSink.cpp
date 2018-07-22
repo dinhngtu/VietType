@@ -36,7 +36,7 @@ STDMETHODIMP VietType::TextEditSink::OnEndEdit(ITfContext * pic, TfEditCookie ec
     return S_OK;
 }
 
-HRESULT VietType::TextEditSink::Initialize(ITfDocumentMgr *documentMgr, CComPtr<CompositionManager> const& compMgr, CComPtr<EngineController> const& controller) {
+HRESULT VietType::TextEditSink::Initialize(ITfDocumentMgr *documentMgr, CompositionManager* compMgr, EngineController* controller) {
     HRESULT hr;
 
     _compMgr = compMgr;

@@ -62,7 +62,6 @@ public:
 
     Telex::TelexEngine& GetEngine();
     Telex::TelexEngine const& GetEngine() const;
-    std::shared_ptr<Telex::TelexEngine> const& GetEngineShared();
 
     HRESULT IsUserEnabled(long *penabled);
     HRESULT WriteUserEnabled(long enabled);

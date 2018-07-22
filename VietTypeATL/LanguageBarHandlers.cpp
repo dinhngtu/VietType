@@ -100,6 +100,7 @@ HRESULT OnMenuSelectAll(UINT id) {
     switch (id) {
     case ID_TRAY_ABOUT: {
         wchar_t const *text = nullptr;
+        // LoadString will return a read-only pointer to the loaded resource string, no need to free
         if (!LoadString(VietType::Globals::dllInstance, IDS_LICENSENOTICE, reinterpret_cast<LPWSTR>(&text), 0)) {
             WINERROR_RETURN_HRESULT(L"%s", L"LoadString failed");
         }

@@ -127,10 +127,6 @@ VietType::Telex::TelexEngine const& VietType::EngineController::GetEngine() cons
     return *_engine;
 }
 
-std::shared_ptr<VietType::Telex::TelexEngine> const& VietType::EngineController::GetEngineShared() {
-    return _engine;
-}
-
 HRESULT VietType::EngineController::IsUserEnabled(long *penabled) {
     return CompartmentReadEnabled(penabled);
 }

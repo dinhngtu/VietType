@@ -42,7 +42,7 @@ STDMETHODIMP VietType::CompositionManager::OnCompositionTerminated(TfEditCookie 
     return S_OK;
 }
 
-HRESULT VietType::CompositionManager::Initialize(TfClientId clientid, CComPtr<ITfDisplayAttributeInfo> const& composingAttribute, bool comless) {
+HRESULT VietType::CompositionManager::Initialize(TfClientId clientid, ITfDisplayAttributeInfo *composingAttribute, bool comless) {
     HRESULT hr;
 
     _clientid = clientid;
@@ -92,7 +92,7 @@ bool VietType::CompositionManager::IsComposing() const {
     return (bool)_composition;
 }
 
-CComPtr<ITfComposition> const & VietType::CompositionManager::GetComposition() const {
+ITfComposition* VietType::CompositionManager::GetComposition() const {
     return _composition;
 }
 

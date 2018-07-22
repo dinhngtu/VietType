@@ -49,8 +49,8 @@ public:
     HRESULT Initialize(
         ITfThreadMgr * threadMgr,
         TfClientId clientid,
-        CComPtr<CompositionManager> const& compositionManager,
-        CComPtr<EngineController> const& controller);
+        CompositionManager* compositionManager,
+        EngineController* controller);
     HRESULT Uninitialize();
 
 private:

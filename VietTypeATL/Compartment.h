@@ -32,7 +32,7 @@ public:
     DECLARE_PROTECT_FINAL_CONSTRUCT()
 
 public:
-    CComPtr<ITfCompartment> const& GetCompartment();
+    ITfCompartment* GetCompartment();
     HRESULT GetCompartmentSource(ITfSource **ppSource);
 
     HRESULT GetValue(long *val);

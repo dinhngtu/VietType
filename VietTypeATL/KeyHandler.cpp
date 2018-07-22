@@ -65,12 +65,12 @@ STDMETHODIMP VietType::KeyHandlerEditSession::DoEditSession(TfEditCookie ec) {
 }
 
 void VietType::KeyHandlerEditSession::Initialize(
-    const CComPtr<CompositionManager>& compositionManager,
+    CompositionManager* compositionManager,
     ITfContext *context,
     WPARAM wParam,
     LPARAM lParam,
     BYTE const * keyState,
-    CComPtr<EngineController> const& controller) {
+    EngineController* controller) {
 
     // since edit sessions are asynchronous, we can't know when the reference to the edit session will die
     // therefore, we don't explicitly uninit the class, leaving it to the destructor when the refcount runs out

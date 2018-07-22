@@ -45,8 +45,8 @@ public:
 public:
     void Initialize(info_vector_type const& items, info_vector_type::size_type index);
 
-    void AddAttribute(CComPtr<ITfDisplayAttributeInfo> const& item);
-    CComPtr<ITfDisplayAttributeInfo> const& GetAttribute(info_vector_type::size_type index);
+    void AddAttribute(ITfDisplayAttributeInfo* item);
+    ITfDisplayAttributeInfo* GetAttribute(info_vector_type::size_type index);
     HRESULT FindAttributeByGuid(GUID const& guid, ITfDisplayAttributeInfo **info);
 
 private:

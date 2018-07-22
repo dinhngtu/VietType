@@ -30,7 +30,7 @@ VietType::Compartment::Compartment() {
 VietType::Compartment::~Compartment() {
 }
 
-CComPtr<ITfCompartment> const & VietType::Compartment::GetCompartment() {
+ITfCompartment* VietType::Compartment::GetCompartment() {
     return _compartment;
 }
 
