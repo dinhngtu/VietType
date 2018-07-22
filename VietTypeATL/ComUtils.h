@@ -15,23 +15,22 @@
 // You should have received a copy of the GNU General Public License
 // along with VietType.  If not, see <https://www.gnu.org/licenses/>.
 
-#include "Utilities.h"
-#include "Compartment.h"
+#pragma once
 
-HRESULT VietType::IsContextEmpty(ITfContext * context, TfClientId clientid, bool * isempty) {
-    HRESULT hr;
+#include <atlbase.h>
 
-    CComPtr<Compartment> compEmpty;
-    hr = CreateInstance2(&compEmpty);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&compEmpty) failed");
-
-    hr = compEmpty->Initialize(context, clientid, GUID_COMPARTMENT_EMPTYCONTEXT);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"compEmpty->Initialize failed");
-
-    long contextEmpty;
-    hr = compEmpty->GetValue(&contextEmpty);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"compDisabled->GetValue failed");
-
-    *isempty = hr == S_OK && contextEmpty;
+template <typename T>
+HRESULT CreateInstance2(T **ppout) {
+    ATL::CComObject<T> *p;
+    HRESULT hr = ATL::CComObject<T>::CreateInstance(&p);
+    if (SUCCEEDED(hr)) {
+        p->AddRef();
+        *ppout = p;
+    }
     return hr;
+}
+
+template <typename TFrom, typename TTo>
+HRESULT QueryInterface2(TFrom *from, TTo **to) {
+    return from->QueryInterface(__uuidof(TTo), reinterpret_cast<void **>(to));
 }

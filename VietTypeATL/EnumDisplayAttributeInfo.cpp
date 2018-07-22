@@ -34,9 +34,9 @@ STDMETHODIMP VietType::EnumDisplayAttributeInfo::Clone(IEnumTfDisplayAttributeIn
     HRESULT hr;
     *ppEnum = nullptr;
 
-    SmartComObjPtr<EnumDisplayAttributeInfo> ret;
-    hr = ret.CreateInstance();
-    HRESULT_CHECK_RETURN(hr, L"%s", L"ret.CreateInstance failed");
+    CComPtr<EnumDisplayAttributeInfo> ret;
+    hr = CreateInstance2(&ret);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&ret) failed");
     ret->Initialize(_items, _index);
 
     *ppEnum = ret;
@@ -77,11 +77,11 @@ void VietType::EnumDisplayAttributeInfo::Initialize(info_vector_type const & ite
     _index = index;
 }
 
-void VietType::EnumDisplayAttributeInfo::AddAttribute(SmartComPtr<ITfDisplayAttributeInfo> const & item) {
+void VietType::EnumDisplayAttributeInfo::AddAttribute(CComPtr<ITfDisplayAttributeInfo> const & item) {
     _items.push_back(item);
 }
 
-SmartComPtr<ITfDisplayAttributeInfo> const & VietType::EnumDisplayAttributeInfo::GetAttribute(info_vector_type::size_type index) {
+CComPtr<ITfDisplayAttributeInfo> const & VietType::EnumDisplayAttributeInfo::GetAttribute(info_vector_type::size_type index) {
     return _items.at(index);
 }
 

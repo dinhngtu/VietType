@@ -54,8 +54,8 @@ STDMETHODIMP VietType::KeyEventSink::OnSetFocus(BOOL fForeground) {
         return S_OK;
     }
 
-    SmartComPtr<ITfDocumentMgr> docMgr;
-    hr = _threadMgr->GetFocus(docMgr.GetAddress());
+    CComPtr<ITfDocumentMgr> docMgr;
+    hr = _threadMgr->GetFocus(&docMgr);
     if (FAILED(hr)) {
         // we don't care about the error since there might be no focused document manager
         return S_OK;
@@ -66,8 +66,8 @@ STDMETHODIMP VietType::KeyEventSink::OnSetFocus(BOOL fForeground) {
         return S_OK;
     }
 
-    SmartComPtr<ITfContext> context;
-    hr = docMgr->GetTop(context.GetAddress());
+    CComPtr<ITfContext> context;
+    hr = docMgr->GetTop(&context);
     if (FAILED(hr)) {
         return S_OK;
     }
@@ -219,19 +219,18 @@ STDMETHODIMP VietType::KeyEventSink::OnPreservedKey(ITfContext * pic, REFGUID rg
 HRESULT VietType::KeyEventSink::Initialize(
     ITfThreadMgr * threadMgr,
     TfClientId clientid,
-    SmartComObjPtr<CompositionManager> const& compositionManager,
-    SmartComObjPtr<EngineController> const& engine) {
+    CComPtr<CompositionManager> const& compositionManager,
+    CComPtr<EngineController> const& engine) {
 
     HRESULT hr;
 
     _clientid = clientid;
-    _keystrokeMgr = threadMgr;
-    if (!_keystrokeMgr) {
-        return E_NOINTERFACE;
-    }
     _threadMgr = threadMgr;
     _compositionManager = compositionManager;
     _controller = engine;
+
+    hr = threadMgr->QueryInterface(&_keystrokeMgr);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"threadMgr->QueryInterface failed");
 
     hr = _keystrokeMgr->AdviseKeyEventSink(_clientid, this, TRUE);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_keystrokeMgr->AdviseKeyEventSink failed");
@@ -263,8 +262,8 @@ HRESULT VietType::KeyEventSink::Uninitialize() {
 HRESULT VietType::KeyEventSink::CallKeyEdit(ITfContext *context, WPARAM wParam, LPARAM lParam, BYTE const * keyState) {
     HRESULT hr;
 
-    SmartComObjPtr<KeyHandlerEditSession> keyHandlerEditSession;
-    hr = keyHandlerEditSession.CreateInstance();
+    CComPtr<KeyHandlerEditSession> keyHandlerEditSession;
+    hr = CreateInstance2(&keyHandlerEditSession);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_keyHandlerEditSession.CreateInstance failed");
     keyHandlerEditSession->Initialize(_compositionManager, context, wParam, lParam, _keyState, _controller);
     hr = _compositionManager->RequestEditSession(keyHandlerEditSession, context);

@@ -41,24 +41,24 @@ public:
     virtual STDMETHODIMP DoEditSession(TfEditCookie ec) override;
 
     void Initialize(
-        SmartComObjPtr<CompositionManager> const& compositionManager,
+        CComPtr<CompositionManager> const& compositionManager,
         ITfContext *context,
         WPARAM wParam,
         LPARAM lParam,
         BYTE const *keyState,
-        SmartComObjPtr<EngineController> const& controller);
+        CComPtr<EngineController> const& controller);
 
 private:
     HRESULT ComposeKey(TfEditCookie ec);
     HRESULT Commit(TfEditCookie ec);
 
 private:
-    SmartComObjPtr<CompositionManager> _compositionManager;
-    SmartComPtr<ITfContext> _context;
+    CComPtr<CompositionManager> _compositionManager;
+    CComPtr<ITfContext> _context;
     WPARAM _wParam;
     LPARAM _lParam;
     BYTE const *_keyState;
-    SmartComObjPtr<EngineController> _controller;
+    CComPtr<EngineController> _controller;
 
 private:
     DISALLOW_COPY_AND_ASSIGN(KeyHandlerEditSession);

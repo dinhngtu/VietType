@@ -84,12 +84,12 @@ void PrintProfileInfo(TF_INPUTPROCESSORPROFILE const *p) {
 HRESULT EnumProfileMgr() {
     HRESULT hr;
 
-    SmartComPtr<ITfInputProcessorProfileMgr> pm;
-    hr = pm.CoCreate(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER);
+    CComPtr<ITfInputProcessorProfileMgr> pm;
+    hr = pm.CoCreateInstance(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER);
     CHECK(hr, L"%s", L"pm.CoCreate");
 
-    SmartComPtr<IEnumTfInputProcessorProfiles> profiles;
-    hr = pm->EnumProfiles(0, profiles.GetAddress());
+    CComPtr<IEnumTfInputProcessorProfiles> profiles;
+    hr = pm->EnumProfiles(0, &profiles);
     CHECK(hr, L"%s", L"pm->EnumProfiles");
 
     TF_INPUTPROCESSORPROFILE p;
@@ -112,8 +112,8 @@ HRESULT EnumProfileMgr() {
 HRESULT EnumDefaultKeyboardLanguageProfiles() {
     HRESULT hr;
 
-    SmartComPtr<ITfInputProcessorProfiles> profiles;
-    hr = profiles.CoCreate(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER);
+    CComPtr<ITfInputProcessorProfiles> profiles;
+    hr = profiles.CoCreateInstance(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER);
     CHECK(hr, L"%s", L"profiles.CoCreate");
 
     LANGID curlangid;

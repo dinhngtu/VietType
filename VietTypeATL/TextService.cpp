@@ -29,21 +29,21 @@
 #include "EnumDisplayAttributeInfo.h"
 #include "DisplayAttributes.h"
 
-static SmartComObjPtr<VietType::EnumDisplayAttributeInfo> CreateAttributeStore() {
+static CComPtr<VietType::EnumDisplayAttributeInfo> CreateAttributeStore() {
     HRESULT hr;
 
-    SmartComObjPtr<VietType::EnumDisplayAttributeInfo> ret;
-    hr = ret.CreateInstance();
+    CComPtr<VietType::EnumDisplayAttributeInfo> ret;
+    hr = CreateInstance2(&ret);
     if (FAILED(hr)) {
-        DBG_HRESULT_CHECK(hr, L"%s", L"ret.CreateInstance failed");
+        DBG_HRESULT_CHECK(hr, L"%s", L"CreateInstance2(&ret) failed");
         ret = nullptr;
         return ret;
     }
 
-    SmartComObjPtr<VietType::DisplayAttributeInfo> attr1;
-    hr = attr1.CreateInstance();
+    CComPtr<VietType::DisplayAttributeInfo> attr1;
+    hr = CreateInstance2(&attr1);
     if (FAILED(hr)) {
-        DBG_HRESULT_CHECK(hr, L"%s", L"attr1.CreateInstance failed");
+        DBG_HRESULT_CHECK(hr, L"%s", L"CreateInstance2(&attr1) failed");
         ret = nullptr;
         return ret;
     }
@@ -52,14 +52,14 @@ static SmartComObjPtr<VietType::EnumDisplayAttributeInfo> CreateAttributeStore()
         std::get<0>(VietType::ComposingAttributeData),
         std::get<1>(VietType::ComposingAttributeData),
         std::get<2>(VietType::ComposingAttributeData));
-    SmartComPtr<ITfDisplayAttributeInfo> info1(static_cast<ITfDisplayAttributeInfo *>(attr1));
+    CComPtr<ITfDisplayAttributeInfo> info1(static_cast<ITfDisplayAttributeInfo *>(attr1));
     assert(info1);
     ret->AddAttribute(info1);
 
     return ret;
 }
 
-static SmartComObjPtr<VietType::EnumDisplayAttributeInfo> attributeStore = CreateAttributeStore();
+static CComPtr<VietType::EnumDisplayAttributeInfo> attributeStore = CreateAttributeStore();
 
 VietType::TextService::TextService() {
 }
@@ -84,12 +84,12 @@ STDMETHODIMP VietType::TextService::ActivateEx(ITfThreadMgr * ptim, TfClientId t
     engineconfig.oa_uy_tone1 = true;
     _engine = std::make_shared<Telex::TelexEngine>(engineconfig);
 
-    hr = _compositionManager.CreateInstance();
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_compositionManager.CreateInstance failed");
+    hr = CreateInstance2(&_compositionManager);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&_compositionManager) failed");
     _compositionManager->Initialize(tid, attributeStore->GetAttribute(0), static_cast<bool>(dwFlags & TF_TMAE_COMLESS));
 
-    hr = _engineController.CreateInstance();
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_engineController.CreateInstance failed");
+    hr = CreateInstance2(&_engineController);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&_engineController) failed");
     hr = _engineController->Initialize(_engine, ptim, tid);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_engineController->Initialize failed");
 
@@ -99,13 +99,13 @@ STDMETHODIMP VietType::TextService::ActivateEx(ITfThreadMgr * ptim, TfClientId t
     hr = _engineController->WriteUserEnabled(enabled);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_engineController->UpdateEnabled failed");
 
-    hr = _keyEventSink.CreateInstance();
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_keyEventSink.CreateInstance failed");
+    hr = CreateInstance2(&_keyEventSink);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&_keyEventSink) failed");
     hr = _keyEventSink->Initialize(ptim, tid, _compositionManager, _engineController);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_keyEventSink->Initialize failed");
 
-    hr = _threadMgrEventSink.CreateInstance();
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_threadMgrEventSink.CreateInstance failed");
+    hr = CreateInstance2(&_threadMgrEventSink);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&_threadMgrEventSink) failed");
     hr = _threadMgrEventSink->Initialize(ptim, tid, _compositionManager, _engineController);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_threadMgrEventSink->Initialize failed");
 

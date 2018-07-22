@@ -30,12 +30,12 @@ VietType::Compartment::Compartment() {
 VietType::Compartment::~Compartment() {
 }
 
-SmartComPtr<ITfCompartment> const & VietType::Compartment::GetCompartment() {
+CComPtr<ITfCompartment> const & VietType::Compartment::GetCompartment() {
     return _compartment;
 }
 
 HRESULT VietType::Compartment::GetCompartmentSource(ITfSource ** ppSource) {
-    return _compartment->QueryInterface<ITfSource>(ppSource);
+    return _compartment->QueryInterface(ppSource);
 }
 
 HRESULT VietType::Compartment::GetValue(long *val) {
@@ -71,21 +71,21 @@ HRESULT VietType::Compartment::SetValue(long val) {
 HRESULT VietType::Compartment::Initialize(IUnknown * punk, TfClientId clientid, GUID const & guidCompartment, bool global) {
     HRESULT hr;
 
-    SmartComPtr<ITfCompartmentMgr> compartmentMgr;
+    CComPtr<ITfCompartmentMgr> compartmentMgr;
 
     if (global) {
-        SmartComPtr<ITfThreadMgr> threadMgr;
-        hr = punk->QueryInterface<ITfThreadMgr>(threadMgr.GetAddress());
+        CComPtr<ITfThreadMgr> threadMgr;
+        hr = punk->QueryInterface(&threadMgr);
         HRESULT_CHECK_RETURN(hr, L"%s", L"punk->QueryInterface failed");
 
-        hr = threadMgr->GetGlobalCompartment(compartmentMgr.GetAddress());
+        hr = threadMgr->GetGlobalCompartment(&compartmentMgr);
         HRESULT_CHECK_RETURN(hr, L"%s", L"threadMgr->GetGlobalCompartment failed");
     } else {
-        hr = punk->QueryInterface<ITfCompartmentMgr>(compartmentMgr.GetAddress());
+        hr = punk->QueryInterface(&compartmentMgr);
         HRESULT_CHECK_RETURN(hr, L"%s", L"punk->QueryInterface failed");
     }
 
-    hr = compartmentMgr->GetCompartment(guidCompartment, _compartment.GetAddress());
+    hr = compartmentMgr->GetCompartment(guidCompartment, &_compartment);
     HRESULT_CHECK_RETURN(hr, L"%s", L"compartmentMgr->GetCompartment failed");
 
     _clientid = clientid;

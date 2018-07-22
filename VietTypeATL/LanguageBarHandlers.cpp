@@ -124,8 +124,8 @@ HRESULT VietType::RefreshableButton::Initialize(ITfLangBarItemMgr *langBarItemMg
 
     _langBarItemMgr = langBarItemMgr;
 
-    hr = _button.CreateInstance();
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_button.CreateInstance failed");
+    hr = CreateInstance2(&_button);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&_button) failed");
     hr = _button->Initialize(
         guidItem,
         style,

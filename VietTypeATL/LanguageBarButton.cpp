@@ -37,7 +37,7 @@ STDMETHODIMP VietType::LanguageBarButton::AdviseSink(REFIID riid, IUnknown * pun
         return CONNECT_E_ADVISELIMIT;
     }
 
-    hr = punk->QueryInterface<ITfLangBarItemSink>(_itemSink.GetAddress());
+    hr = punk->QueryInterface(&_itemSink);
     if (FAILED(hr)) {
         _itemSink.Detach();
         return E_NOINTERFACE;

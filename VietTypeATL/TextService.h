@@ -65,18 +65,18 @@ public:
     virtual STDMETHODIMP GetDisplayAttributeInfo(REFGUID guid, ITfDisplayAttributeInfo ** ppInfo) override;
 
 private:
-    SmartComPtr<ITfThreadMgr> _threadMgr;
+    CComPtr<ITfThreadMgr> _threadMgr;
     TfClientId _clientId = TF_CLIENTID_NULL;
     DWORD _activateFlags = 0;
 
     std::shared_ptr<Telex::TelexEngine> _engine;
 
-    SmartComObjPtr<ThreadMgrEventSink> _threadMgrEventSink;
-    SmartComObjPtr<KeyEventSink> _keyEventSink;
+    CComPtr<ThreadMgrEventSink> _threadMgrEventSink;
+    CComPtr<KeyEventSink> _keyEventSink;
 
-    SmartComObjPtr<CompositionManager> _compositionManager;
+    CComPtr<CompositionManager> _compositionManager;
 
-    SmartComObjPtr<EngineController> _engineController;
+    CComPtr<EngineController> _engineController;
 
 private:
     DISALLOW_COPY_AND_ASSIGN(TextService);

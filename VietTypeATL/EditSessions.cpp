@@ -46,9 +46,9 @@ HRESULT VietType::EditBlocked(
 
     // check GUID_COMPARTMENT_KEYBOARD_DISABLED
 
-    SmartComObjPtr<Compartment> compDisabled;
-    hr = compDisabled.CreateInstance();
-    HRESULT_CHECK_RETURN(hr, L"%s", L"compDisabled.CreateInstance failed");
+    CComPtr<Compartment> compDisabled;
+    hr = CreateInstance2(&compDisabled);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&compDisabled) failed");
 
     hr = compDisabled->Initialize(context, compositionManager->GetClientId(), GUID_COMPARTMENT_KEYBOARD_DISABLED);
     HRESULT_CHECK_RETURN(hr, L"%s", L"compDisabled->Initialize failed");
@@ -77,8 +77,8 @@ HRESULT VietType::EditBlocked(
 
     // check input scopes
 
-    SmartComPtr<ITfReadOnlyProperty> prop;
-    hr = context->GetAppProperty(VietType::Globals::GUID_PROP_INPUTSCOPE, prop.GetAddress());
+    CComPtr<ITfReadOnlyProperty> prop;
+    hr = context->GetAppProperty(VietType::Globals::GUID_PROP_INPUTSCOPE, &prop);
     HRESULT_CHECK_RETURN(hr, L"%s", L"context->GetAppProperty failed");
 
     TF_SELECTION sel;
@@ -96,11 +96,9 @@ HRESULT VietType::EditBlocked(
         return E_NOINTERFACE;
     }
 
-    SmartComPtr<ITfInputScope> iis(var.punkVal);
-    if (!iis) {
-        DBG_DPRINT(L"QI on ITfInputScope failed");
-        return E_NOINTERFACE;
-    }
+    CComPtr<ITfInputScope> iis;
+    hr = var.punkVal->QueryInterface(&iis);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"var.punkVal->QueryInterface failed");
 
     CComHeapPtr<InputScope> pscopes;
     UINT scount;

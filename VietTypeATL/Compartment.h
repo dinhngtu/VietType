@@ -32,7 +32,7 @@ public:
     DECLARE_PROTECT_FINAL_CONSTRUCT()
 
 public:
-    SmartComPtr<ITfCompartment> const& GetCompartment();
+    CComPtr<ITfCompartment> const& GetCompartment();
     HRESULT GetCompartmentSource(ITfSource **ppSource);
 
     HRESULT GetValue(long *val);
@@ -42,7 +42,7 @@ public:
     HRESULT Uninitialize();
 
 private:
-    SmartComPtr<ITfCompartment> _compartment;
+    CComPtr<ITfCompartment> _compartment;
     TfClientId _clientid;
 
 private:

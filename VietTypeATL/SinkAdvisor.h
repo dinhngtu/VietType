@@ -1,5 +1,6 @@
 /*
 Copyright 2014 Google Inc.
+Modifications: Copyright (c) Dinh Ngoc Tu.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -34,13 +35,18 @@ public:
     }
 
     HRESULT Advise(IUnknown* source, SinkInterface* sink) {
+        HRESULT hr;
+
         if (!source || !sink) return E_INVALIDARG;
         if (IsAdvised()) return E_UNEXPECTED;
 
-        SmartComPtr<ITfSource> src(source);
-        if (!src) return E_NOINTERFACE;
+        CComPtr<ITfSource> src;
+        hr = source->QueryInterface(&src);
+        if (FAILED(hr)) {
+            return hr;
+        }
 
-        HRESULT hr = src->AdviseSink(__uuidof(SinkInterface),
+        hr = src->AdviseSink(__uuidof(SinkInterface),
             sink,
             &cookie_);
         if (FAILED(hr)) {
@@ -62,7 +68,7 @@ public:
 
 private:
     DWORD cookie_;
-    SmartComPtr<ITfSource> source_;
+    CComPtr<ITfSource> source_;
     DISALLOW_COPY_AND_ASSIGN(SinkAdvisor);
 };
 
@@ -82,15 +88,19 @@ public:
     }
 
     HRESULT Advise(IUnknown* source, TfClientId client_id, SinkInterface *sink) {
+        HRESULT hr;
+
         if (!source || !client_id || !sink)
             return E_INVALIDARG;
         if (IsAdvised()) return E_UNEXPECTED;
 
-        SmartComPtr<ITfSourceSingle> src(source);
-        if (!src)
-            return E_NOINTERFACE;
+        CComPtr<ITfSourceSingle> src;
+        hr = source->QueryInterface(&src);
+        if (FAILED(hr)) {
+            return hr;
+        }
 
-        HRESULT hr = src->AdviseSingleSink(
+        hr = src->AdviseSingleSink(
             client_id, __uuidof(SinkInterface), sink);
         if (FAILED(hr)) return hr;
 
@@ -110,7 +120,7 @@ public:
     }
 
 private:
-    SmartComPtr<ITfSourceSingle> source_;
+    CComPtr<ITfSourceSingle> source_;
     TfClientId client_id_;
     DISALLOW_COPY_AND_ASSIGN(SingleSinkAdvisor);
 };

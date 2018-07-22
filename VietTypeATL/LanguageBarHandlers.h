@@ -44,9 +44,9 @@ public:
 
 protected:
     EngineController *_controller;
-    SmartComObjPtr<LanguageBarButton> _button;
+    CComPtr<LanguageBarButton> _button;
 
-    SmartComPtr<ITfLangBarItemMgr> _langBarItemMgr;
+    CComPtr<ITfLangBarItemMgr> _langBarItemMgr;
 
 private:
     DISALLOW_COPY_AND_ASSIGN(RefreshableButton);

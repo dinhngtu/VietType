@@ -38,7 +38,7 @@ public:
     // Inherited via ITfCompositionSink
     virtual STDMETHODIMP OnCompositionTerminated(TfEditCookie ecWrite, ITfComposition * pComposition) override;
 
-    HRESULT Initialize(TfClientId clientid, SmartComPtr<ITfDisplayAttributeInfo> const& composingAttribute, bool comless);
+    HRESULT Initialize(TfClientId clientid, CComPtr<ITfDisplayAttributeInfo> const& composingAttribute, bool comless);
     void Uninitialize();
 
     // this uses the saved context, only use when there is an active composition
@@ -49,7 +49,7 @@ public:
     bool IsComposing() const;
 
     // for use in edit sessions
-    SmartComPtr<ITfComposition> const& GetComposition() const;
+    CComPtr<ITfComposition> const& GetComposition() const;
     // for use in edit sessions only
     HRESULT GetRange(ITfRange **range);
     TfClientId GetClientId() const;
@@ -75,9 +75,9 @@ public:
         assert(context);
         HRESULT hr;
 
-        SmartComObjPtr<EditSession<CompositionManager *, ITfContext *, Args...>> session;
-        hr = session.CreateInstance();
-        HRESULT_CHECK_RETURN(hr, L"%s", L"es.CreateInstance failed");
+        CComPtr<EditSession<CompositionManager *, ITfContext *, Args...>> session;
+        hr = CreateInstance2(&session);
+        HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&session) failed");
 
         session->Initialize(callback, compositionManager, context, args...);
         HRESULT hrSession;
@@ -101,9 +101,9 @@ public:
         assert(context);
         HRESULT hr;
 
-        SmartComObjPtr<EditSession<CompositionManager *, ITfContext *, Args...>> session;
-        hr = session.CreateInstance();
-        HRESULT_CHECK_RETURN(hr, L"%s", L"es.CreateInstance failed");
+        CComPtr<EditSession<CompositionManager *, ITfContext *, Args...>> session;
+        hr = CreateInstance2(&session);
+        HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&session) failed");
 
         session->Initialize(callback, compositionManager, context, args...);
         hr = context->RequestEditSession(compositionManager->_clientid, session, flags, hrSession);
@@ -124,10 +124,10 @@ private:
 
 private:
     TfClientId _clientid = TF_CLIENTID_NULL;
-    SmartComPtr<ITfContext> _context;
-    SmartComPtr<ITfComposition> _composition;
-    SmartComPtr<ITfCategoryMgr> _categoryMgr;
-    SmartComPtr<ITfDisplayAttributeInfo> _composingAttribute;
+    CComPtr<ITfContext> _context;
+    CComPtr<ITfComposition> _composition;
+    CComPtr<ITfCategoryMgr> _categoryMgr;
+    CComPtr<ITfDisplayAttributeInfo> _composingAttribute;
 
 private:
     DISALLOW_COPY_AND_ASSIGN(CompositionManager);

@@ -491,7 +491,6 @@
     <ClCompile Include="LanguageBarButton.cpp" />
     <ClCompile Include="LanguageBarHandlers.cpp" />
     <ClCompile Include="Register.cpp" />
-    <ClCompile Include="SmartComPtr.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TestDebug|Win32'">Create</PrecompiledHeader>
@@ -545,6 +544,7 @@
     <ClInclude Include="Common.h" />
     <ClInclude Include="Compartment.h" />
     <ClInclude Include="CompositionManager.h" />
+    <ClInclude Include="ComUtils.h" />
     <ClInclude Include="Define.h" />
     <ClInclude Include="DisplayAttributes.h" />
     <ClInclude Include="dllmain.h" />
@@ -560,7 +560,6 @@
     <ClInclude Include="LanguageBarHandlers.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SinkAdvisor.h" />
-    <ClInclude Include="SmartComPtr.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SurroundingWordFinder.h" />
     <ClInclude Include="targetver.h" />

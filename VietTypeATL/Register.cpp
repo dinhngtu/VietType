@@ -53,8 +53,8 @@ extern "C" __declspec(dllexport) HRESULT __cdecl RegisterProfiles() {
     dllPath[dllPathLength] = 0;
     DBG_DPRINT(L"found text service DLL: %s", dllPath);
 
-    SmartComPtr<ITfInputProcessorProfiles> profiles;
-    hr = profiles.CoCreate(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER);
+    CComPtr<ITfInputProcessorProfiles> profiles;
+    hr = profiles.CoCreateInstance(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER);
     HRESULT_CHECK_RETURN(hr, L"%s", L"profiles.CoCreate failed");
 
     hr = profiles->Register(VietType::Globals::CLSID_TextService);
@@ -95,8 +95,8 @@ extern "C" __declspec(dllexport) HRESULT __cdecl RegisterProfiles() {
 extern "C" __declspec(dllexport) HRESULT __cdecl UnregisterProfiles() {
     HRESULT hr;
 
-    SmartComPtr<ITfInputProcessorProfiles> profiles;
-    hr = profiles.CoCreate(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER);
+    CComPtr<ITfInputProcessorProfiles> profiles;
+    hr = profiles.CoCreateInstance(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER);
     HRESULT_CHECK_RETURN(hr, L"%s", L"profiles.CoCreate failed");
 
     hr = profiles->EnableLanguageProfile(
@@ -121,9 +121,9 @@ extern "C" __declspec(dllexport) HRESULT __cdecl UnregisterProfiles() {
 extern "C" __declspec(dllexport) HRESULT __cdecl RegisterCategories() {
     HRESULT hr;
 
-    SmartComPtr<ITfCategoryMgr> categoryMgr;
+    CComPtr<ITfCategoryMgr> categoryMgr;
     // categoryMgr.CoCreate uses IID_IUnknown then does a QI, while we want to use IID_ITfCategoryMgr directly
-    hr = CoCreateInstance(CLSID_TF_CategoryMgr, NULL, CLSCTX_INPROC_SERVER, IID_ITfCategoryMgr, reinterpret_cast<void **>(categoryMgr.GetAddress()));
+    hr = CoCreateInstance(CLSID_TF_CategoryMgr, NULL, CLSCTX_INPROC_SERVER, IID_ITfCategoryMgr, reinterpret_cast<void **>(&categoryMgr));
     HRESULT_CHECK_RETURN(hr, L"%s", L"categoryMgr.CoCreate failed");
 
     for (auto const& cat : SupportedCategories) {
@@ -140,13 +140,13 @@ extern "C" __declspec(dllexport) HRESULT __cdecl RegisterCategories() {
 extern "C" __declspec(dllexport) HRESULT __cdecl UnregisterCategories() {
     HRESULT hr;
 
-    SmartComPtr<ITfCategoryMgr> categoryMgr;
+    CComPtr<ITfCategoryMgr> categoryMgr;
     // categoryMgr.CoCreate uses IID_IUnknown then does a QI, while we want to use IID_ITfCategoryMgr directly
-    hr = CoCreateInstance(CLSID_TF_CategoryMgr, NULL, CLSCTX_INPROC_SERVER, IID_ITfCategoryMgr, reinterpret_cast<void **>(categoryMgr.GetAddress()));
+    hr = CoCreateInstance(CLSID_TF_CategoryMgr, NULL, CLSCTX_INPROC_SERVER, IID_ITfCategoryMgr, reinterpret_cast<void **>(&categoryMgr));
     HRESULT_CHECK_RETURN(hr, L"%s", L"categoryMgr.CoCreate failed");
 
-    SmartComPtr<IEnumGUID> registeredCategories;
-    hr = categoryMgr->EnumCategoriesInItem(VietType::Globals::CLSID_TextService, registeredCategories.GetAddress());
+    CComPtr<IEnumGUID> registeredCategories;
+    hr = categoryMgr->EnumCategoriesInItem(VietType::Globals::CLSID_TextService, &registeredCategories);
     HRESULT_CHECK_RETURN(hr, L"%s", L"categoryMgr->EnumCategoriesInItem failed");
 
     GUID cat = { 0 };

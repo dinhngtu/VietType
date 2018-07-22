@@ -3,8 +3,8 @@
 HRESULT VietType::VirtualDocument::GetVirtualDocumentMgr(ITfDocumentMgr * dim, ITfDocumentMgr ** pdim) {
     HRESULT hr;
 
-    SmartComPtr<ITfContext> context;
-    hr = dim->GetTop(context.GetAddress());
+    CComPtr<ITfContext> context;
+    hr = dim->GetTop(&context);
     HRESULT_CHECK_RETURN(hr, L"%s", L"pdimFocus->GetTop failed");
 
     if (!context) {
@@ -18,13 +18,12 @@ HRESULT VietType::VirtualDocument::GetVirtualDocumentMgr(ITfDocumentMgr * dim, I
     HRESULT_CHECK_RETURN(hr, L"%s", L"context->GetStatus failed");
 
     if (st.dwStaticFlags & TF_SS_TRANSITORY) {
-        SmartComPtr<ITfCompartmentMgr> tcMgr(dim);
-        if (!tcMgr) {
-            return E_NOINTERFACE;
-        }
+        CComPtr<ITfCompartmentMgr> tcMgr;
+        hr = dim->QueryInterface(&tcMgr);
+        HRESULT_CHECK_RETURN(hr, L"%s", L"dim->QueryInterface failed");
 
-        SmartComPtr<ITfCompartment> transitoryCompartment;
-        hr = tcMgr->GetCompartment(GUID_COMPARTMENT_TRANSITORYEXTENSION_PARENT, transitoryCompartment.GetAddress());
+        CComPtr<ITfCompartment> transitoryCompartment;
+        hr = tcMgr->GetCompartment(GUID_COMPARTMENT_TRANSITORYEXTENSION_PARENT, &transitoryCompartment);
         HRESULT_CHECK_RETURN(hr, L"%s", L"tcMgr->GetCompartment failed");
 
         VARIANT v;
@@ -35,7 +34,7 @@ HRESULT VietType::VirtualDocument::GetVirtualDocumentMgr(ITfDocumentMgr * dim, I
             return E_NOINTERFACE;
         }
 
-        hr = v.punkVal->QueryInterface<ITfDocumentMgr>(pdim);
+        hr = v.punkVal->QueryInterface(pdim);
         VariantClear(&v);
         return hr;
     } else {
@@ -48,16 +47,16 @@ HRESULT VietType::VirtualDocument::GetVirtualDocumentMgr(ITfDocumentMgr * dim, I
 HRESULT VietType::VirtualDocument::GetVirtualDocumentContext(ITfContext * context, ITfContext ** pContext) {
     HRESULT hr;
 
-    SmartComPtr<ITfDocumentMgr> dim;
-    hr = context->GetDocumentMgr(dim.GetAddress());
+    CComPtr<ITfDocumentMgr> dim;
+    hr = context->GetDocumentMgr(&dim);
     HRESULT_CHECK_RETURN(hr, L"%s", L"GetTransitoryParentDocumentMgr failed");
 
     if (!dim) {
         return E_NOINTERFACE;
     }
 
-    SmartComPtr<ITfDocumentMgr> pdim;
-    hr = GetVirtualDocumentMgr(dim, pdim.GetAddress());
+    CComPtr<ITfDocumentMgr> pdim;
+    hr = GetVirtualDocumentMgr(dim, &pdim);
     HRESULT_CHECK_RETURN(hr, L"%s", L"GetTransitoryParentDocumentMgr failed");
 
     return pdim->GetTop(pContext);

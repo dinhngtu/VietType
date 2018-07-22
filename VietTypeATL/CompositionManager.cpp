@@ -42,14 +42,14 @@ STDMETHODIMP VietType::CompositionManager::OnCompositionTerminated(TfEditCookie 
     return S_OK;
 }
 
-HRESULT VietType::CompositionManager::Initialize(TfClientId clientid, SmartComPtr<ITfDisplayAttributeInfo> const& composingAttribute, bool comless) {
+HRESULT VietType::CompositionManager::Initialize(TfClientId clientid, CComPtr<ITfDisplayAttributeInfo> const& composingAttribute, bool comless) {
     HRESULT hr;
 
     _clientid = clientid;
     _composingAttribute = composingAttribute;
 
     if (!comless) {
-        hr = CoCreateInstance(CLSID_TF_CategoryMgr, NULL, CLSCTX_INPROC_SERVER, IID_ITfCategoryMgr, reinterpret_cast<void **>(_categoryMgr.GetAddress()));
+        hr = CoCreateInstance(CLSID_TF_CategoryMgr, NULL, CLSCTX_INPROC_SERVER, IID_ITfCategoryMgr, reinterpret_cast<void **>(&_categoryMgr));
     }
 
     return S_OK;
@@ -91,7 +91,7 @@ bool VietType::CompositionManager::IsComposing() const {
     return (bool)_composition;
 }
 
-SmartComPtr<ITfComposition> const & VietType::CompositionManager::GetComposition() const {
+CComPtr<ITfComposition> const & VietType::CompositionManager::GetComposition() const {
     return _composition;
 }
 
@@ -109,24 +109,21 @@ TfClientId VietType::CompositionManager::GetClientId() const {
 HRESULT VietType::CompositionManager::StartCompositionNow(TfEditCookie ec, ITfContext * context) {
     HRESULT hr;
 
-    SmartComPtr<ITfCompositionSink> compositionSink(this);
-    if (!compositionSink) {
-        return E_NOINTERFACE;
-    }
+    CComPtr<ITfCompositionSink> compositionSink;
+    hr = QueryInterface2(this, &compositionSink);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"this->QueryInterface failed");
 
-    SmartComPtr<ITfInsertAtSelection> insertAtSelection(context);
-    if (!insertAtSelection) {
-        return E_NOINTERFACE;
-    }
+    CComPtr<ITfInsertAtSelection> insertAtSelection;
+    hr = context->QueryInterface(&insertAtSelection);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"context->QueryInterface failed");
 
-    SmartComPtr<ITfRange> insertRange;
-    hr = insertAtSelection->InsertTextAtSelection(ec, TF_IAS_QUERYONLY, NULL, 0, insertRange.GetAddress());
+    CComPtr<ITfRange> insertRange;
+    hr = insertAtSelection->InsertTextAtSelection(ec, TF_IAS_QUERYONLY, NULL, 0, &insertRange);
     HRESULT_CHECK_RETURN(hr, L"%s", L"insertAtSelection->InsertTextAtSelection failed");
 
-    SmartComPtr<ITfContextComposition> contextComposition(context);
-    if (!contextComposition) {
-        return E_NOINTERFACE;
-    }
+    CComPtr<ITfContextComposition> contextComposition;
+    hr = context->QueryInterface(&contextComposition);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"context->QueryInterface failed");
 
     ITfComposition *composition;
     hr = contextComposition->StartComposition(ec, insertRange, compositionSink, &composition);
@@ -149,8 +146,8 @@ HRESULT VietType::CompositionManager::StartCompositionNow(TfEditCookie ec, ITfCo
 HRESULT VietType::CompositionManager::EmptyCompositionText(TfEditCookie ec) {
     HRESULT hr;
 
-    SmartComPtr<ITfRange> range;
-    hr = _composition->GetRange(range.GetAddress());
+    CComPtr<ITfRange> range;
+    hr = _composition->GetRange(&range);
     HRESULT_CHECK_RETURN(hr, L"%s", L"composition->GetRange failed");
     
     hr = range->SetText(ec, 0, NULL, 0);
@@ -163,12 +160,12 @@ HRESULT VietType::CompositionManager::MoveCaretToEnd(TfEditCookie ec) {
     HRESULT hr;
 
     if (_composition) {
-        SmartComPtr<ITfRange> range;
-        hr = _composition->GetRange(range.GetAddress());
+        CComPtr<ITfRange> range;
+        hr = _composition->GetRange(&range);
         HRESULT_CHECK_RETURN(hr, L"%s", L"_composition->GetRange failed");
 
-        SmartComPtr<ITfRange> rangeClone;
-        hr = range->Clone(rangeClone.GetAddress());
+        CComPtr<ITfRange> rangeClone;
+        hr = range->Clone(&rangeClone);
         HRESULT_CHECK_RETURN(hr, L"%s", L"range->Clone failed");
 
         hr = rangeClone->Collapse(ec, TF_ANCHOR_END);
@@ -191,8 +188,8 @@ HRESULT VietType::CompositionManager::EndCompositionNow(TfEditCookie ec) {
     DBG_DPRINT(L"%s", L"ending composition");
 
     if (_composition) {
-        SmartComPtr<ITfRange> range;
-        hr = _composition->GetRange(range.GetAddress());
+        CComPtr<ITfRange> range;
+        hr = _composition->GetRange(&range);
         HRESULT_CHECK_RETURN(hr, L"%s", L"_composition->GetRange failed");
 
         hr = ClearRangeDisplayAttribute(ec, _context, range);
@@ -215,8 +212,8 @@ HRESULT VietType::CompositionManager::SetCompositionText(TfEditCookie ec, WCHAR 
     HRESULT hr;
 
     if (_composition) {
-        SmartComPtr<ITfRange> range;
-        hr = _composition->GetRange(range.GetAddress());
+        CComPtr<ITfRange> range;
+        hr = _composition->GetRange(&range);
         HRESULT_CHECK_RETURN(hr, L"%s", L"_composition->GetRange failed");
 
         hr = range->SetText(ec, TF_ST_CORRECTION, str, length);
@@ -262,8 +259,8 @@ HRESULT VietType::CompositionManager::SetRangeDisplayAttribute(TfEditCookie ec, 
         return E_FAIL;
     }
 
-    SmartComPtr<ITfProperty> prop;
-    hr = context->GetProperty(GUID_PROP_ATTRIBUTE, prop.GetAddress());
+    CComPtr<ITfProperty> prop;
+    hr = context->GetProperty(GUID_PROP_ATTRIBUTE, &prop);
     HRESULT_CHECK_RETURN(hr, L"%s", L"context->GetProperty failed");
 
     VARIANT v;
@@ -280,8 +277,8 @@ HRESULT VietType::CompositionManager::SetRangeDisplayAttribute(TfEditCookie ec, 
 HRESULT VietType::CompositionManager::ClearRangeDisplayAttribute(TfEditCookie ec, ITfContext * context, ITfRange * range) {
     HRESULT hr;
 
-    SmartComPtr<ITfProperty> prop;
-    hr = context->GetProperty(GUID_PROP_ATTRIBUTE, prop.GetAddress());
+    CComPtr<ITfProperty> prop;
+    hr = context->GetProperty(GUID_PROP_ATTRIBUTE, &prop);
     HRESULT_CHECK_RETURN(hr, L"%s", L"context->GetProperty failed");
 
     hr = prop->Clear(ec, range);

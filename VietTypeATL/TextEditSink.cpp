@@ -36,7 +36,7 @@ STDMETHODIMP VietType::TextEditSink::OnEndEdit(ITfContext * pic, TfEditCookie ec
     return S_OK;
 }
 
-HRESULT VietType::TextEditSink::Initialize(ITfDocumentMgr *documentMgr, SmartComObjPtr<CompositionManager> const& compMgr, SmartComObjPtr<EngineController> const& controller) {
+HRESULT VietType::TextEditSink::Initialize(ITfDocumentMgr *documentMgr, CComPtr<CompositionManager> const& compMgr, CComPtr<EngineController> const& controller) {
     HRESULT hr;
 
     _compMgr = compMgr;
@@ -50,7 +50,7 @@ HRESULT VietType::TextEditSink::Initialize(ITfDocumentMgr *documentMgr, SmartCom
         return S_OK;
     }
 
-    hr = documentMgr->GetTop(_editContext.GetAddress());
+    hr = documentMgr->GetTop(&_editContext);
     HRESULT_CHECK_RETURN(hr, L"%s", L"documentMgr->GetTop failed");
 
     if (!_editContext) {
@@ -58,10 +58,9 @@ HRESULT VietType::TextEditSink::Initialize(ITfDocumentMgr *documentMgr, SmartCom
         return S_OK;
     }
 
-    SmartComPtr<ITfSource> source(_editContext);
-    if (!source) {
-        return E_NOINTERFACE;
-    }
+    CComPtr<ITfSource> source;
+    hr = _editContext->QueryInterface(&source);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_editContext->QueryInterface failed");
 
     hr = _textEditSinkAdvisor.Advise(source, this);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_textEditSinkAdvisor.Advise failed");

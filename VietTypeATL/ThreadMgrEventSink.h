@@ -47,14 +47,14 @@ public:
     virtual STDMETHODIMP OnPushContext(ITfContext * pic) override;
     virtual STDMETHODIMP OnPopContext(ITfContext * pic) override;
 
-    HRESULT Initialize(ITfThreadMgr *threadMgr, TfClientId tid, SmartComObjPtr<CompositionManager> const& compMgr, SmartComObjPtr<EngineController> const& controller);
+    HRESULT Initialize(ITfThreadMgr *threadMgr, TfClientId tid, CComPtr<CompositionManager> const& compMgr, CComPtr<EngineController> const& controller);
     HRESULT Uninitialize();
 
 private:
     SinkAdvisor<ITfThreadMgrEventSink> _threadMgrEventSinkAdvisor;
-    SmartComObjPtr<CompositionManager> _compMgr;
-    SmartComObjPtr<EngineController> _controller;
-    SmartComPtr<ITfDocumentMgr> _docMgrFocus;
+    CComPtr<CompositionManager> _compMgr;
+    CComPtr<EngineController> _controller;
+    CComPtr<ITfDocumentMgr> _docMgrFocus;
 
 private:
     DISALLOW_COPY_AND_ASSIGN(ThreadMgrEventSink);

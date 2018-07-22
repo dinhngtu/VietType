@@ -42,14 +42,14 @@ public:
     // Inherited via ITfTextEditSink
     virtual STDMETHODIMP OnEndEdit(ITfContext * pic, TfEditCookie ecReadOnly, ITfEditRecord * pEditRecord) override;
 
-    HRESULT Initialize(ITfDocumentMgr *documentMgr, SmartComObjPtr<CompositionManager> const& compMgr, SmartComObjPtr<EngineController> const& controller);
+    HRESULT Initialize(ITfDocumentMgr *documentMgr, CComPtr<CompositionManager> const& compMgr, CComPtr<EngineController> const& controller);
     HRESULT Uninitialize();
 
 private:
-    SmartComObjPtr<CompositionManager> _compMgr;
-    SmartComObjPtr<EngineController> _controller;
+    CComPtr<CompositionManager> _compMgr;
+    CComPtr<EngineController> _controller;
     SinkAdvisor<ITfTextEditSink> _textEditSinkAdvisor;
-    SmartComPtr<ITfContext> _editContext;
+    CComPtr<ITfContext> _editContext;
 
 private:
     DISALLOW_COPY_AND_ASSIGN(TextEditSink);

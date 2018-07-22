@@ -80,7 +80,7 @@ private:
     std::wstring _description;
     ILanguageBarCallbacks *_callbacks;
 
-    SmartComPtr<ITfLangBarItemSink> _itemSink;
+    CComPtr<ITfLangBarItemSink> _itemSink;
 
 private:
     DISALLOW_COPY_AND_ASSIGN(LanguageBarButton);

@@ -133,23 +133,20 @@ HRESULT VietType::EditSurroundingWord(
     hr = compositionManager->StartCompositionNow(ec, context);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_compositionManager->StartComposition failed");
 
-    SmartComPtr<ITfContext> ppic;
-    hr = VirtualDocument::GetVirtualDocumentContext(context, ppic.GetAddress());
+    CComPtr<ITfContext> ppic;
+    hr = VirtualDocument::GetVirtualDocumentContext(context, &ppic);
     HRESULT_CHECK_RETURN(hr, L"%s", L"ThreadMgrEventSink::GetTransitoryParentContext failed");
 
-    SmartComPtr<ITfComposition> composition(compositionManager->GetComposition());
-    if (!composition) {
-        return E_NOINTERFACE;
-    }
+    CComPtr<ITfComposition> composition(compositionManager->GetComposition());
 
-    SmartComPtr<ITfRange> range;
-    hr = compositionManager->GetRange(range.GetAddress());
+    CComPtr<ITfRange> range;
+    hr = compositionManager->GetRange(&range);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_composition->GetRange failed");
 
     // shift current range backwards
 
-    SmartComPtr<ITfRange> rangeTest;
-    hr = range->Clone(rangeTest.GetAddress());
+    CComPtr<ITfRange> rangeTest;
+    hr = range->Clone(&rangeTest);
     HRESULT_CHECK_RETURN(hr, L"%s", L"range->Clone failed");
 
     TF_HALTCOND haltcond{

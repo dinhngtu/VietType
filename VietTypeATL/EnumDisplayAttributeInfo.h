@@ -25,7 +25,7 @@ class EnumDisplayAttributeInfo :
     public CComObjectRootEx<CComSingleThreadModel>,
     public IEnumTfDisplayAttributeInfo {
 public:
-    using info_vector_type = std::vector<SmartComPtr<ITfDisplayAttributeInfo>>;
+    using info_vector_type = std::vector<CComPtr<ITfDisplayAttributeInfo>>;
 
     EnumDisplayAttributeInfo();
     ~EnumDisplayAttributeInfo();
@@ -45,8 +45,8 @@ public:
 public:
     void Initialize(info_vector_type const& items, info_vector_type::size_type index);
 
-    void AddAttribute(SmartComPtr<ITfDisplayAttributeInfo> const& item);
-    SmartComPtr<ITfDisplayAttributeInfo> const& GetAttribute(info_vector_type::size_type index);
+    void AddAttribute(CComPtr<ITfDisplayAttributeInfo> const& item);
+    CComPtr<ITfDisplayAttributeInfo> const& GetAttribute(info_vector_type::size_type index);
     HRESULT FindAttributeByGuid(GUID const& guid, ITfDisplayAttributeInfo **info);
 
 private:

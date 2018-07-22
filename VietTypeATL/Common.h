@@ -24,6 +24,6 @@
 #include "Globals.h"
 #include "Export.h"
 #include "resource.h"
-#include "SmartComPtr.h"
+#include "ComUtils.h"
 
 using namespace ATL;

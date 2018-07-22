@@ -89,14 +89,14 @@ private:
 
 private:
     std::shared_ptr<Telex::TelexEngine> _engine;
-    SmartComPtr<ITfLangBarItemMgr> _langBarItemMgr;
+    CComPtr<ITfLangBarItemMgr> _langBarItemMgr;
 
     TfClientId _clientid;
 
-    SmartComObjPtr<Compartment> _settingsCompartment;
+    CComPtr<Compartment> _settingsCompartment;
     SinkAdvisor<ITfCompartmentEventSink> _settingsCompartmentEventSink;
 
-    SmartComObjPtr<Compartment> _openCloseCompartment;
+    CComPtr<Compartment> _openCloseCompartment;
     SinkAdvisor<ITfCompartmentEventSink> _openCloseCompartmentEventSink;
 
     // unique_ptr is not necessary but used just to break include cycle

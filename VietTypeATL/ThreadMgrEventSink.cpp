@@ -59,8 +59,8 @@ STDMETHODIMP VietType::ThreadMgrEventSink::OnSetFocus(ITfDocumentMgr * pdimFocus
         return S_OK;
     }
 
-    SmartComPtr<ITfContext> context;
-    hr = _docMgrFocus->GetTop(context.GetAddress());
+    CComPtr<ITfContext> context;
+    hr = _docMgrFocus->GetTop(&context);
     HRESULT_CHECK_RETURN(hr, L"%s", L"pdimFocus->GetTop failed");
 
     if (!context) {
@@ -117,8 +117,8 @@ STDMETHODIMP VietType::ThreadMgrEventSink::OnPopContext(ITfContext * pic) {
 HRESULT VietType::ThreadMgrEventSink::Initialize(
     ITfThreadMgr *threadMgr,
     TfClientId tid,
-    SmartComObjPtr<CompositionManager> const& compMgr,
-    SmartComObjPtr<EngineController> const& controller) {
+    CComPtr<CompositionManager> const& compMgr,
+    CComPtr<EngineController> const& controller) {
 
     HRESULT hr;
 
@@ -128,8 +128,8 @@ HRESULT VietType::ThreadMgrEventSink::Initialize(
     hr = _threadMgrEventSinkAdvisor.Advise(threadMgr, this);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_threadMgrEventSinkAdvisor.Advise failed");
 
-    SmartComPtr<ITfDocumentMgr> documentMgr;
-    hr = threadMgr->GetFocus(documentMgr.GetAddress());
+    CComPtr<ITfDocumentMgr> documentMgr;
+    hr = threadMgr->GetFocus(&documentMgr);
     HRESULT_CHECK_RETURN(hr, L"%s", L"threadMgr->GetFocus failed");
 
     return hr;

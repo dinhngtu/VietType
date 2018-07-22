@@ -54,20 +54,22 @@ HRESULT VietType::EngineController::Initialize(
     HRESULT hr;
 
     _engine = engine;
-    _langBarItemMgr = threadMgr;
     _clientid = clientid;
+
+    hr = threadMgr->QueryInterface(&_langBarItemMgr);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"threadMgr->QueryInterface failed");
 
     // init settings compartment & listener
 
-    hr = _settingsCompartment.CreateInstance();
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_settingsCompartment.CreateInstance failed");
+    hr = CreateInstance2(&_settingsCompartment);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&_settingsCompartment) failed");
 
     // GUID_SettingsCompartment_Toggle is global
     hr = _settingsCompartment->Initialize(threadMgr, clientid, Globals::GUID_SettingsCompartment_Toggle, true);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_settingsCompartment->Initialize failed");
 
-    SmartComPtr<ITfSource> settingsSource;
-    hr = _settingsCompartment->GetCompartmentSource(settingsSource.GetAddress());
+    CComPtr<ITfSource> settingsSource;
+    hr = _settingsCompartment->GetCompartmentSource(&settingsSource);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_settingsCompartment->GetCompartmentSource failed");
 
     hr = _settingsCompartmentEventSink.Advise(settingsSource, this);
@@ -75,14 +77,14 @@ HRESULT VietType::EngineController::Initialize(
 
     // init GUID_COMPARTMENT_KEYBOARD_OPENCLOSE listener
 
-    hr = _openCloseCompartment.CreateInstance();
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_openCloseCompartment.CreateInstance failed");
+    hr = CreateInstance2(&_openCloseCompartment);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&_openCloseCompartment) failed");
 
     hr = _openCloseCompartment->Initialize(threadMgr, clientid, GUID_COMPARTMENT_HANDWRITING_OPENCLOSE);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_openCloseCompartment->Initialize failed");
 
-    SmartComPtr<ITfSource> openCloseSource;
-    hr = _openCloseCompartment->GetCompartmentSource(openCloseSource.GetAddress());
+    CComPtr<ITfSource> openCloseSource;
+    hr = _openCloseCompartment->GetCompartmentSource(&openCloseSource);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_openCloseCompartment->GetCompartmentSource failed");
 
     hr = _openCloseCompartmentEventSink.Advise(openCloseSource, this);
