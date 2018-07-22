@@ -20,8 +20,8 @@
 #include <atlbase.h>
 
 template <typename T>
-HRESULT CreateInstance2(T **ppout) {
-    ATL::CComObject<T> *p;
+HRESULT CreateInstance2(T** ppout) {
+    ATL::CComObject<T>* p;
     HRESULT hr = ATL::CComObject<T>::CreateInstance(&p);
     if (SUCCEEDED(hr)) {
         p->AddRef();
@@ -31,6 +31,6 @@ HRESULT CreateInstance2(T **ppout) {
 }
 
 template <typename TFrom, typename TTo>
-HRESULT QueryInterface2(TFrom *from, TTo **to) {
-    return from->QueryInterface(__uuidof(TTo), reinterpret_cast<void **>(to));
+HRESULT QueryInterface2(TFrom* from, TTo** to) {
+    return from->QueryInterface(__uuidof(TTo), reinterpret_cast<void**>(to));
 }

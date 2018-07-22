@@ -20,7 +20,7 @@
 namespace VietType {
 namespace Telex {
 
-genmap<wchar_t, wchar_t> const touppermap = {
+const genmap<wchar_t, wchar_t> touppermap = {
     { L'\xe0', L'\xc0' },
     { L'\xe1', L'\xc1' },
     { L'\xe2', L'\xc2' },
@@ -45,7 +45,7 @@ genmap<wchar_t, wchar_t> const touppermap = {
     { L'\x1b0', L'\x1af' },
 };
 
-genmap<wchar_t, wchar_t> const tolowermap = {
+const genmap<wchar_t, wchar_t> tolowermap = {
     { L'\xc0', L'\xe0' },
     { L'\xc1', L'\xe1' },
     { L'\xc2', L'\xe2' },

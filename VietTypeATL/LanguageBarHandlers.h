@@ -27,7 +27,7 @@ class LanguageBarButton;
 
 class RefreshableButton : public ILanguageBarCallbacks {
 public:
-    explicit RefreshableButton(EngineController *ec);
+    explicit RefreshableButton(EngineController* ec);
     virtual ~RefreshableButton() {
     }
 
@@ -36,15 +36,17 @@ public:
     }
 
     HRESULT Initialize(
-        ITfLangBarItemMgr *langBarItemMgr,
-        GUID const & guidItem,
+        ITfLangBarItemMgr* langBarItemMgr,
+        const GUID& guidItem,
         DWORD style,
         ULONG sort,
-        const std::wstring & description);
+        const std::wstring& description);
     void Uninitialize();
 
 protected:
-    EngineController *_controller;
+    // RefreshableButtons are owned by EngineController
+    // so we don't want to hold an owning reference to EngineController here
+    EngineController* _controller;
     CComPtr<LanguageBarButton> _button;
 
     CComPtr<ITfLangBarItemMgr> _langBarItemMgr;
@@ -55,13 +57,13 @@ private:
 
 class IndicatorButton : public RefreshableButton {
 public:
-    explicit IndicatorButton(EngineController *ec);
+    explicit IndicatorButton(EngineController* ec);
 
     // Inherited via ILanguageBarCallbacks
-    virtual HRESULT OnClick(TfLBIClick click, POINT pt, const RECT * area) override;
-    virtual HRESULT InitMenu(ITfMenu * menu) override;
+    virtual HRESULT OnClick(TfLBIClick click, POINT pt, const RECT* area) override;
+    virtual HRESULT InitMenu(ITfMenu* menu) override;
     virtual HRESULT OnMenuSelect(UINT id) override;
-    virtual HRESULT GetIcon(HICON * hicon) override;
+    virtual HRESULT GetIcon(HICON* hicon) override;
     virtual DWORD GetStatus() override;
     virtual std::wstring GetText() override;
 
@@ -74,13 +76,13 @@ private:
 
 class LangBarButton : public RefreshableButton {
 public:
-    explicit LangBarButton(EngineController *ec);
+    explicit LangBarButton(EngineController* ec);
 
     // Inherited via ILanguageBarCallbacks
-    virtual HRESULT OnClick(TfLBIClick click, POINT pt, const RECT * area) override;
-    virtual HRESULT InitMenu(ITfMenu * menu) override;
+    virtual HRESULT OnClick(TfLBIClick click, POINT pt, const RECT* area) override;
+    virtual HRESULT InitMenu(ITfMenu* menu) override;
     virtual HRESULT OnMenuSelect(UINT id) override;
-    virtual HRESULT GetIcon(HICON * hicon) override;
+    virtual HRESULT GetIcon(HICON* hicon) override;
     virtual DWORD GetStatus() override;
     virtual std::wstring GetText() override;
 

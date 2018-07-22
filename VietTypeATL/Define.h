@@ -44,7 +44,7 @@
 
 /// <summary>support function, do not use directly</summary>
 template <typename... Args>
-void _dprint(const wchar_t *func, int line, const wchar_t *fmt, Args... args) {
+void _dprint(const wchar_t* func, int line, const wchar_t* fmt, Args... args) {
     wchar_t buf[2048];
     StringCchPrintf(buf, 2048, fmt, func, line, args...);
     OutputDebugString(buf);
@@ -68,7 +68,7 @@ void _dprint(const wchar_t *func, int line, const wchar_t *fmt, Args... args) {
 
 /// <summary>support function, do not use directly</summary>
 template <typename... Args>
-void _winerrorprint(const wchar_t *func, int line, DWORD err, const wchar_t *fmt, Args... args) {
+void _winerrorprint(const wchar_t* func, int line, DWORD err, const wchar_t* fmt, Args... args) {
     wchar_t errmessage[256];
     auto chars = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, err, 0, errmessage, 256, NULL);
     assert(chars >= 0 && chars < 256);

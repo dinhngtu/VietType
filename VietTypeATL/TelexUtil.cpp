@@ -21,7 +21,7 @@
 namespace VietType {
 namespace Telex {
 
-static CHR_CATEGORIES const letterClasses[26] = {
+static const CHR_CATEGORIES letterClasses[26] = {
     CHR_CATEGORIES::VOWEL, // a
     CHR_CATEGORIES::CONSO_C1, // b
     CHR_CATEGORIES::CONSO_C1 | CHR_CATEGORIES::CONSO_C2, // c

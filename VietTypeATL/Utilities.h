@@ -21,6 +21,6 @@
 
 namespace VietType {
 
-HRESULT IsContextEmpty(_In_ ITfContext *context, TfClientId clientid, _Out_ bool *isempty);
+HRESULT IsContextEmpty(_In_ ITfContext* context, TfClientId clientid, _Out_ bool* isempty);
 
 }

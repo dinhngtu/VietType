@@ -25,7 +25,7 @@ VietType::TextEditSink::TextEditSink() {
 VietType::TextEditSink::~TextEditSink() {
 }
 
-STDMETHODIMP VietType::TextEditSink::OnEndEdit(ITfContext * pic, TfEditCookie ecReadOnly, ITfEditRecord * pEditRecord) {
+STDMETHODIMP VietType::TextEditSink::OnEndEdit(ITfContext* pic, TfEditCookie ecReadOnly, ITfEditRecord* pEditRecord) {
     DBG_DPRINT(L"%s", L"");
 
     if (pEditRecord == nullptr) {
@@ -35,7 +35,7 @@ STDMETHODIMP VietType::TextEditSink::OnEndEdit(ITfContext * pic, TfEditCookie ec
     return S_OK;
 }
 
-HRESULT VietType::TextEditSink::Initialize(ITfDocumentMgr *documentMgr, CompositionManager* compMgr, EngineController* controller) {
+HRESULT VietType::TextEditSink::Initialize(ITfDocumentMgr* documentMgr, CompositionManager* compMgr, EngineController* controller) {
     HRESULT hr;
 
     _compMgr = compMgr;

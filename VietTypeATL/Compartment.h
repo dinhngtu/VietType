@@ -33,12 +33,12 @@ public:
 
 public:
     ITfCompartment* GetCompartment();
-    HRESULT GetCompartmentSource(ITfSource **ppSource);
+    HRESULT GetCompartmentSource(ITfSource** ppSource);
 
-    HRESULT GetValue(long *val);
+    HRESULT GetValue(long* val);
     HRESULT SetValue(long val);
 
-    HRESULT Initialize(IUnknown *punk, TfClientId clientid, GUID const& guidCompartment, bool global = false);
+    HRESULT Initialize(IUnknown* punk, TfClientId clientid, const GUID& guidCompartment, bool global = false);
     HRESULT Uninitialize();
 
 private:

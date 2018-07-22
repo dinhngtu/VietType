@@ -60,13 +60,13 @@ public:
 
 public:
     // Inherited via ITfTextInputProcessorEx
-    virtual STDMETHODIMP Activate(ITfThreadMgr * ptim, TfClientId tid) override;
+    virtual STDMETHODIMP Activate(ITfThreadMgr* ptim, TfClientId tid) override;
     virtual STDMETHODIMP Deactivate(void) override;
-    virtual STDMETHODIMP ActivateEx(ITfThreadMgr * ptim, TfClientId tid, DWORD dwFlags) override;
+    virtual STDMETHODIMP ActivateEx(ITfThreadMgr* ptim, TfClientId tid, DWORD dwFlags) override;
 
     // Inherited via ITfDisplayAttributeProvider
-    virtual STDMETHODIMP EnumDisplayAttributeInfo(IEnumTfDisplayAttributeInfo ** ppEnum) override;
-    virtual STDMETHODIMP GetDisplayAttributeInfo(REFGUID guid, ITfDisplayAttributeInfo ** ppInfo) override;
+    virtual STDMETHODIMP EnumDisplayAttributeInfo(IEnumTfDisplayAttributeInfo** ppEnum) override;
+    virtual STDMETHODIMP GetDisplayAttributeInfo(REFGUID guid, ITfDisplayAttributeInfo** ppInfo) override;
 
 private:
     CComPtr<ITfThreadMgr> _threadMgr;

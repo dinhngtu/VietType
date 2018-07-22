@@ -20,7 +20,7 @@
 namespace VietType {
 namespace Telex {
 
-genmap<std::wstring, std::wstring> const transitions = {
+const genmap<std::wstring, std::wstring> transitions = {
     {L"aa", L"\xe2"},
     {L"ee", L"\xea"},
     {L"iee", L"i\xea"},
@@ -46,7 +46,7 @@ genmap<std::wstring, std::wstring> const transitions = {
     {L"\xf4o", L"oo"},
 };
 
-genmap<std::wstring, int> const respos = {
+const genmap<std::wstring, int> respos = {
     {L"\xe2", 0},
     {L"\xea", 0},
     {L"i\xea", 1},
@@ -69,7 +69,7 @@ genmap<std::wstring, int> const respos = {
     {L"u\xe2y", 1},
 };
 
-genmap<std::wstring, std::wstring> const transitions_w = {
+const genmap<std::wstring, std::wstring> transitions_w = {
     {L"a", L"\x103"},
     {L"o", L"\x1a1"},
     {L"oa", L"o\x103"},
@@ -81,7 +81,7 @@ genmap<std::wstring, std::wstring> const transitions_w = {
     {L"\x1b0o", L"\x1b0\x1a1"},
 };
 
-genmap<std::wstring, int> const respos_w = {
+const genmap<std::wstring, int> respos_w = {
     {L"\x103", 0},
     {L"\x1a1", 0},
     {L"o\x103", 1},
@@ -93,12 +93,12 @@ genmap<std::wstring, int> const respos_w = {
     {L"\x1b0\x1a1i", 1},
 };
 
-genmap<std::wstring, std::wstring> const transitions_v_c2 = {
+const genmap<std::wstring, std::wstring> transitions_v_c2 = {
     {L"u\x1a1", L"\x1b0\x1a1"},
     {L"\x1b0o", L"\x1b0\x1a1"},
 };
 
-genmap<wchar_t, std::wstring> const transitions_tones = {
+const genmap<wchar_t, std::wstring> transitions_tones = {
     {L'a', L"a\xe0\x1ea1\x1ea3\xe1\xe3"},
     {L'\xe2', L"\xe2\x1ea7\x1ead\x1ea9\x1ea5\x1eab"},
     {L'\x103', L"\x103\x1eb1\x1eb7\x1eb3\x1eaf\x1eb5"},
@@ -113,7 +113,7 @@ genmap<wchar_t, std::wstring> const transitions_tones = {
     {L'y', L"y\x1ef3\x1ef5\x1ef7\xfd\x1ef9"},
 };
 
-genset<std::wstring> const valid_c1 = {
+const genset<std::wstring> valid_c1 = {
     L"",
     L"b",
     L"c",
@@ -145,7 +145,7 @@ genset<std::wstring> const valid_c1 = {
     L"x",
 };
 
-genmap<std::wstring, VINFO> const valid_v = {
+const genmap<std::wstring, VINFO> valid_v = {
     {L"a", {0, C2MODE::EITHER}},
     {L"\x103", {0, C2MODE::MUSTC2}}, // ă
     {L"\xe2", {0, C2MODE::MUSTC2}},  // â
@@ -211,7 +211,7 @@ genmap<std::wstring, VINFO> const valid_v = {
     {L"y\xeau", {1, C2MODE::NOC2}},      // yêu
 };
 
-genmap<std::wstring, VINFO> const valid_v_q = {
+const genmap<std::wstring, VINFO> valid_v_q = {
     {L"u\xe2", {1, C2MODE::MUSTC2}}, // uâ
     {L"u\xf4", {1, C2MODE::EITHER}}, // ô
     {L"u\xea", {1, C2MODE::EITHER}}, // uê
@@ -228,7 +228,7 @@ genmap<std::wstring, VINFO> const valid_v_q = {
     {L"u\xf4", {1, C2MODE::MUSTC2}}, // uô
 };
 
-genmap<std::wstring, VINFO> const valid_v_qu = {
+const genmap<std::wstring, VINFO> valid_v_qu = {
     {L"\xe2", {0, C2MODE::MUSTC2}}, // uâ
     {L"\xf4", {0, C2MODE::EITHER}}, // ô
     {L"\xea", {0, C2MODE::EITHER}}, // uê
@@ -245,7 +245,7 @@ genmap<std::wstring, VINFO> const valid_v_qu = {
     {L"\xf4", {0, C2MODE::MUSTC2}}, // uô
 };
 
-genmap<std::wstring, VINFO> const valid_v_gi = {
+const genmap<std::wstring, VINFO> valid_v_gi = {
     {L"", {-1, C2MODE::EITHER}},
     {L"a", {0, C2MODE::EITHER}},
     {L"\x103", {0, C2MODE::MUSTC2}}, // ă
@@ -279,7 +279,7 @@ genmap<std::wstring, VINFO> const valid_v_gi = {
 };
 
 // bool is whether tones are restricted to s/j or not
-genmap<std::wstring, bool> const valid_c2 = {
+const genmap<std::wstring, bool> valid_c2 = {
     {L"", false},
     {L"c", true},
     {L"m", false},
@@ -292,13 +292,13 @@ genmap<std::wstring, bool> const valid_c2 = {
     {L"nh", false},
 };
 
-genmap<std::wstring, VINFO> const valid_v_oa_uy = {
+const genmap<std::wstring, VINFO> valid_v_oa_uy = {
     {L"oa", {0, C2MODE::EITHER}},
     {L"oe", {0, C2MODE::EITHER}},
     {L"uy", {0, C2MODE::EITHER}},
 };
 
-genmap<wchar_t, std::wstring> const backconversions = {
+const genmap<wchar_t, std::wstring> backconversions = {
     { L'\xe0', L"af" },
     { L'\xe1', L"as" },
     { L'\xe2', L"aa" },

@@ -57,7 +57,7 @@ static CComPtr<VietType::EnumDisplayAttributeInfo> CreateAttributeStore() {
         std::get<0>(VietType::ComposingAttributeData),
         std::get<1>(VietType::ComposingAttributeData),
         std::get<2>(VietType::ComposingAttributeData));
-    CComPtr<ITfDisplayAttributeInfo> info1(static_cast<ITfDisplayAttributeInfo *>(attr1));
+    CComPtr<ITfDisplayAttributeInfo> info1(static_cast<ITfDisplayAttributeInfo*>(attr1));
     assert(info1);
     ret->AddAttribute(info1);
 
@@ -72,11 +72,11 @@ VietType::TextService::TextService() {
 VietType::TextService::~TextService() {
 }
 
-STDMETHODIMP VietType::TextService::Activate(ITfThreadMgr * ptim, TfClientId tid) {
+STDMETHODIMP VietType::TextService::Activate(ITfThreadMgr* ptim, TfClientId tid) {
     return ActivateEx(ptim, tid, 0);
 }
 
-STDMETHODIMP VietType::TextService::ActivateEx(ITfThreadMgr * ptim, TfClientId tid, DWORD dwFlags) {
+STDMETHODIMP VietType::TextService::ActivateEx(ITfThreadMgr* ptim, TfClientId tid, DWORD dwFlags) {
     DBG_DPRINT(L"h = %p, threadno = %ld, tid = %ld, flags = %lx", Globals::dllInstance, GetCurrentThreadId(), tid, dwFlags);
 
     HRESULT hr;
@@ -140,7 +140,7 @@ STDMETHODIMP VietType::TextService::Deactivate(void) {
     return S_OK;
 }
 
-STDMETHODIMP VietType::TextService::EnumDisplayAttributeInfo(IEnumTfDisplayAttributeInfo ** ppEnum) {
+STDMETHODIMP VietType::TextService::EnumDisplayAttributeInfo(IEnumTfDisplayAttributeInfo** ppEnum) {
     if (!attributeStore) {
         return E_FAIL;
     }
@@ -149,6 +149,6 @@ STDMETHODIMP VietType::TextService::EnumDisplayAttributeInfo(IEnumTfDisplayAttri
     return S_OK;
 }
 
-STDMETHODIMP VietType::TextService::GetDisplayAttributeInfo(REFGUID guid, ITfDisplayAttributeInfo ** ppInfo) {
+STDMETHODIMP VietType::TextService::GetDisplayAttributeInfo(REFGUID guid, ITfDisplayAttributeInfo** ppInfo) {
     return attributeStore->FindAttributeByGuid(guid, ppInfo);
 }

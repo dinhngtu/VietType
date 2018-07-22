@@ -21,7 +21,7 @@
 
 namespace VietType {
 
-extern std::tuple<GUID, std::wstring, TF_DISPLAYATTRIBUTE> const ComposingAttributeData;
+extern const std::tuple<GUID, std::wstring, TF_DISPLAYATTRIBUTE> ComposingAttributeData;
 
 class DisplayAttributeInfo :
     public CComObjectRootEx<CComSingleThreadModel>,
@@ -38,14 +38,14 @@ public:
 
 public:
     // Inherited via ITfDisplayAttributeInfo
-    virtual STDMETHODIMP GetGUID(GUID * pguid) override;
-    virtual STDMETHODIMP GetDescription(BSTR * pbstrDesc) override;
-    virtual STDMETHODIMP GetAttributeInfo(TF_DISPLAYATTRIBUTE * pda) override;
-    virtual STDMETHODIMP SetAttributeInfo(const TF_DISPLAYATTRIBUTE * pda) override;
+    virtual STDMETHODIMP GetGUID(GUID* pguid) override;
+    virtual STDMETHODIMP GetDescription(BSTR* pbstrDesc) override;
+    virtual STDMETHODIMP GetAttributeInfo(TF_DISPLAYATTRIBUTE* pda) override;
+    virtual STDMETHODIMP SetAttributeInfo(const TF_DISPLAYATTRIBUTE* pda) override;
     virtual STDMETHODIMP Reset(void) override;
 
 public:
-    void Initialize(GUID const& guid, std::wstring description, TF_DISPLAYATTRIBUTE attr);
+    void Initialize(const GUID& guid, std::wstring description, TF_DISPLAYATTRIBUTE attr);
 
 private:
     GUID _guid;

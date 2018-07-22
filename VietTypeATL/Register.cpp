@@ -125,7 +125,7 @@ extern "C" __declspec(dllexport) HRESULT __cdecl RegisterCategories() {
     hr = categoryMgr.CoCreateInstance(CLSID_TF_CategoryMgr, NULL, CLSCTX_INPROC_SERVER);
     HRESULT_CHECK_RETURN(hr, L"%s", L"categoryMgr.CoCreateInstance failed");
 
-    for (auto const& cat : SupportedCategories) {
+    for (const auto& cat : SupportedCategories) {
         DBG_DPRINT(
             L"registering %08lx-%04hx-%04hx-%02hhx%02hhx-%02hhx%02hhx%02hhx%02hhx%02hhx%02hhx",
             cat.Data1, cat.Data2, cat.Data3, cat.Data4[0], cat.Data4[1], cat.Data4[2], cat.Data4[3], cat.Data4[4], cat.Data4[5], cat.Data4[6], cat.Data4[7]);

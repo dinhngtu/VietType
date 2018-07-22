@@ -20,13 +20,13 @@
 
 #include "stdafx.h"
 
-extern "C" typedef HRESULT(__cdecl *funtype)();
+extern "C" typedef HRESULT(__cdecl* funtype)();
 
 // registrar 0|1 0|1
 // first argument: register(0)/unregister(1)
 // second argument: categories(0)/profiles(1)
 // order: install 00-01 / uninstall 11-10
-int main(int argc, wchar_t **argv) {
+int main(int argc, wchar_t** argv) {
     // only load from exe directory
     SetDllDirectory(L"");
 

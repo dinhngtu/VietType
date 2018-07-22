@@ -6,7 +6,7 @@
 
 #define CHECK(hr, fmt, ...) if (FAILED(hr)) { wprintf(L"HRESULT error %lx: " fmt "\n", hr, __VA_ARGS__); return hr; }
 
-std::wstring CppStringFromIID(IID const& iid) {
+std::wstring CppStringFromIID(const IID& iid) {
     CComHeapPtr<OLECHAR> ret;
     HRESULT hr = StringFromCLSID(iid, &ret);
     if (FAILED(hr)) {
@@ -15,7 +15,7 @@ std::wstring CppStringFromIID(IID const& iid) {
     return std::wstring(ret);
 }
 
-void PrintProfileInfo(TF_INPUTPROCESSORPROFILE const *p) {
+void PrintProfileInfo(const TF_INPUTPROCESSORPROFILE* p) {
     if (p->dwProfileType == TF_PROFILETYPE_INPUTPROCESSOR) {
         wprintf(L"TF_PROFILETYPE_INPUTPROCESSOR ");
     } else if (p->dwProfileType == TF_PROFILETYPE_KEYBOARDLAYOUT) {
@@ -129,7 +129,7 @@ HRESULT EnumDefaultKeyboardLanguageProfiles() {
     CHECK(hr, L"%s", L"profiles->GetLanguageList");
 
     for (ULONG i = 0; i < numlangids; i++) {
-        LANGID lid = (static_cast<LANGID *>(langids))[i];
+        LANGID lid = (static_cast<LANGID*>(langids))[i];
         wprintf(L"0x%04x: ", lid);
         CLSID clsid;
         GUID guidProfile;

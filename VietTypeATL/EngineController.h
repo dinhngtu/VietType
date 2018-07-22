@@ -55,15 +55,15 @@ public:
     virtual STDMETHODIMP OnChange(REFGUID rguid) override;
 
     HRESULT Initialize(
-        std::shared_ptr<Telex::TelexEngine> const& engine,
-        ITfThreadMgr * threadMgr,
+        const std::shared_ptr<Telex::TelexEngine>& engine,
+        ITfThreadMgr* threadMgr,
         TfClientId clientid);
     HRESULT Uninitialize();
 
     Telex::TelexEngine& GetEngine();
-    Telex::TelexEngine const& GetEngine() const;
+    const Telex::TelexEngine& GetEngine() const;
 
-    HRESULT IsUserEnabled(long *penabled);
+    HRESULT IsUserEnabled(long* penabled);
     HRESULT WriteUserEnabled(long enabled);
     HRESULT ToggleUserEnabled();
 
@@ -75,13 +75,13 @@ public:
     bool IsEditBlockedPending() const;
     bool ResetEditBlockedPending();
 
-    HRESULT GetOpenClose(long *openclose);
+    HRESULT GetOpenClose(long* openclose);
 
     // update engine and langbar enabled state to match enabled/blocked value
     HRESULT UpdateStates();
 
 private:
-    HRESULT CompartmentReadEnabled(long *pEnabled);
+    HRESULT CompartmentReadEnabled(long* pEnabled);
     HRESULT CompartmentWriteEnabled(long enabled);
     HRESULT InitLanguageBar();
     HRESULT UninitLanguageBar();

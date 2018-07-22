@@ -55,28 +55,28 @@ using genset = std::unordered_set<T>;
 /// transition.
 /// ensure that c1 or v only shrinks by 1 character or stays a constant length with this transition.
 /// </summary>
-extern genmap<std::wstring, std::wstring> const transitions;
+extern const genmap<std::wstring, std::wstring> transitions;
 // which character in _v that is responsible for RESPOS_TRANSITION_V; deleting this character will remove the RESPOS_TRANSITION_V key
-extern genmap<std::wstring, int> const respos;
+extern const genmap<std::wstring, int> respos;
 
-extern genmap<std::wstring, std::wstring> const transitions_w;
+extern const genmap<std::wstring, std::wstring> transitions_w;
 // which character in _v that is responsible for RESPOS_TRANSITION_W
-extern genmap<std::wstring, int> const respos_w;
+extern const genmap<std::wstring, int> respos_w;
 
-extern genmap<std::wstring, std::wstring> const transitions_v_c2;
-extern genmap<wchar_t, std::wstring> const transitions_tones;
+extern const genmap<std::wstring, std::wstring> transitions_v_c2;
+extern const genmap<wchar_t, std::wstring> transitions_tones;
 
-extern genset<std::wstring> const valid_c1;
-extern genmap<std::wstring, VINFO> const valid_v; // value: accent position
-extern genmap<std::wstring, VINFO> const valid_v_q; // value: accent position
-extern genmap<std::wstring, VINFO> const valid_v_qu; // value: accent position
-extern genmap<std::wstring, VINFO> const valid_v_gi; // value: accent position
-extern genmap<std::wstring, bool> const valid_c2;
-extern genmap<std::wstring, VINFO> const valid_v_oa_uy;
-extern genmap<wchar_t, std::wstring> const backconversions;
+extern const genset<std::wstring> valid_c1;
+extern const genmap<std::wstring, VINFO> valid_v; // value: accent position
+extern const genmap<std::wstring, VINFO> valid_v_q; // value: accent position
+extern const genmap<std::wstring, VINFO> valid_v_qu; // value: accent position
+extern const genmap<std::wstring, VINFO> valid_v_gi; // value: accent position
+extern const genmap<std::wstring, bool> valid_c2;
+extern const genmap<std::wstring, VINFO> valid_v_oa_uy;
+extern const genmap<wchar_t, std::wstring> backconversions;
 
-extern genmap<wchar_t, wchar_t> const touppermap;
-extern genmap<wchar_t, wchar_t> const tolowermap;
+extern const genmap<wchar_t, wchar_t> touppermap;
+extern const genmap<wchar_t, wchar_t> tolowermap;
 
 }
 }

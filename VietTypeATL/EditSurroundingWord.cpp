@@ -20,9 +20,9 @@
 #include "EngineController.h"
 #include "VirtualDocument.h"
 
-long const SWF_MAXCHARS = 9; // "nghiêng" + 1 for the padding + 1 for max ignore
+static const long SWF_MAXCHARS = 9; // "nghiêng" + 1 for the padding + 1 for max ignore
 
-std::unordered_set<wchar_t> const vietnamesechars_notaz = {
+const std::unordered_set<wchar_t> vietnamesechars_notaz = {
      L'\xe0', L'\xc0',
      L'\xe1', L'\xc1',
      L'\xe2', L'\xc2',
@@ -118,9 +118,9 @@ bool IsSeparatorCharacter(wchar_t c) {
 
 HRESULT VietType::EditSessions::EditSurroundingWord(
     _In_ TfEditCookie ec,
-    _In_ VietType::CompositionManager *compositionManager,
-    _In_ ITfContext *context,
-    _In_ VietType::EngineController *controller,
+    _In_ VietType::CompositionManager* compositionManager,
+    _In_ ITfContext* context,
+    _In_ VietType::EngineController* controller,
     _In_ int ignore) {
 
     HRESULT hr;

@@ -40,21 +40,21 @@ public:
 
     // Inherited via ITfKeyEventSink
     virtual STDMETHODIMP OnSetFocus(BOOL fForeground) override;
-    virtual STDMETHODIMP OnTestKeyDown(ITfContext * pic, WPARAM wParam, LPARAM lParam, BOOL * pfEaten) override;
-    virtual STDMETHODIMP OnTestKeyUp(ITfContext * pic, WPARAM wParam, LPARAM lParam, BOOL * pfEaten) override;
-    virtual STDMETHODIMP OnKeyDown(ITfContext * pic, WPARAM wParam, LPARAM lParam, BOOL * pfEaten) override;
-    virtual STDMETHODIMP OnKeyUp(ITfContext * pic, WPARAM wParam, LPARAM lParam, BOOL * pfEaten) override;
-    virtual STDMETHODIMP OnPreservedKey(ITfContext * pic, REFGUID rguid, BOOL * pfEaten) override;
+    virtual STDMETHODIMP OnTestKeyDown(ITfContext* pic, WPARAM wParam, LPARAM lParam, BOOL* pfEaten) override;
+    virtual STDMETHODIMP OnTestKeyUp(ITfContext* pic, WPARAM wParam, LPARAM lParam, BOOL* pfEaten) override;
+    virtual STDMETHODIMP OnKeyDown(ITfContext* pic, WPARAM wParam, LPARAM lParam, BOOL* pfEaten) override;
+    virtual STDMETHODIMP OnKeyUp(ITfContext* pic, WPARAM wParam, LPARAM lParam, BOOL* pfEaten) override;
+    virtual STDMETHODIMP OnPreservedKey(ITfContext* pic, REFGUID rguid, BOOL* pfEaten) override;
 
     HRESULT Initialize(
-        ITfThreadMgr * threadMgr,
+        ITfThreadMgr* threadMgr,
         TfClientId clientid,
         CompositionManager* compositionManager,
         EngineController* controller);
     HRESULT Uninitialize();
 
 private:
-    HRESULT CallKeyEdit(ITfContext *context, WPARAM wParam, LPARAM lParam, BYTE const *keyState);
+    HRESULT CallKeyEdit(ITfContext* context, WPARAM wParam, LPARAM lParam, BYTE const* keyState);
 
 private:
     TfClientId _clientid;

@@ -60,7 +60,7 @@ public:
     TelexStates Commit();
     TelexStates ForceCommit();
     TelexStates Cancel();
-    TelexStates Backconvert(_In_ std::wstring const& s);
+    TelexStates Backconvert(_In_ const std::wstring& s);
 
     TelexStates GetState() const;
     std::wstring Retrieve() const;

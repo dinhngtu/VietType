@@ -26,7 +26,7 @@ HMENU GetMenu() {
     return menu;
 }
 
-int PopMenu(POINT pt, const RECT * area) {
+int PopMenu(POINT pt, const RECT* area) {
     HMENU menu = GetMenu();
     if (!menu) {
         DBG_DPRINT(L"%s", L"load menu failed");
@@ -40,7 +40,7 @@ int PopMenu(POINT pt, const RECT * area) {
     return itemId;
 }
 
-HRESULT CopyTfMenu(ITfMenu *menu) {
+HRESULT CopyTfMenu(ITfMenu* menu) {
     HRESULT hr;
 
     HMENU menuSource = GetMenu();
@@ -99,7 +99,7 @@ HRESULT CopyTfMenu(ITfMenu *menu) {
 HRESULT OnMenuSelectAll(UINT id) {
     switch (id) {
     case ID_TRAY_ABOUT: {
-        wchar_t const *text = nullptr;
+        wchar_t const* text = nullptr;
         // LoadString will return a read-only pointer to the loaded resource string, no need to free
         if (!LoadString(VietType::Globals::dllInstance, IDS_LICENSENOTICE, reinterpret_cast<LPWSTR>(&text), 0)) {
             WINERROR_RETURN_HRESULT(L"%s", L"LoadString failed");
@@ -116,11 +116,11 @@ HRESULT OnMenuSelectAll(UINT id) {
 // RefreshableButton
 ////////////////////////////////////////////////////////////////////////////////
 
-VietType::RefreshableButton::RefreshableButton(EngineController * ec) {
+VietType::RefreshableButton::RefreshableButton(EngineController* ec) {
     _controller = ec;
 }
 
-HRESULT VietType::RefreshableButton::Initialize(ITfLangBarItemMgr *langBarItemMgr, GUID const & guidItem, DWORD style, ULONG sort, const std::wstring & description) {
+HRESULT VietType::RefreshableButton::Initialize(ITfLangBarItemMgr* langBarItemMgr, const GUID& guidItem, DWORD style, ULONG sort, const std::wstring& description) {
     HRESULT hr;
 
     _langBarItemMgr = langBarItemMgr;
@@ -153,10 +153,10 @@ void VietType::RefreshableButton::Uninitialize() {
 // IndicatorButton
 ////////////////////////////////////////////////////////////////////////////////
 
-VietType::IndicatorButton::IndicatorButton(EngineController * ec) : RefreshableButton(ec) {
+VietType::IndicatorButton::IndicatorButton(EngineController* ec) : RefreshableButton(ec) {
 }
 
-HRESULT VietType::IndicatorButton::OnClick(TfLBIClick click, POINT pt, const RECT * area) {
+HRESULT VietType::IndicatorButton::OnClick(TfLBIClick click, POINT pt, const RECT* area) {
     if (click == TF_LBI_CLK_LEFT) {
         return _controller->ToggleUserEnabled();
     } else if (click == TF_LBI_CLK_RIGHT) {
@@ -168,7 +168,7 @@ HRESULT VietType::IndicatorButton::OnClick(TfLBIClick click, POINT pt, const REC
     return S_OK;
 }
 
-HRESULT VietType::IndicatorButton::InitMenu(ITfMenu * menu) {
+HRESULT VietType::IndicatorButton::InitMenu(ITfMenu* menu) {
     CopyTfMenu(menu);
     return S_OK;
 }
@@ -177,7 +177,7 @@ HRESULT VietType::IndicatorButton::OnMenuSelect(UINT id) {
     return OnMenuSelectAll(id);
 }
 
-HRESULT VietType::IndicatorButton::GetIcon(HICON * hicon) {
+HRESULT VietType::IndicatorButton::GetIcon(HICON* hicon) {
     // Windows docs is a liar, icons are mandatory
     assert(Globals::dllInstance);
     if (_controller->GetBlocked() == BlockedKind::BLOCKED) {
@@ -211,10 +211,10 @@ std::wstring VietType::IndicatorButton::GetText() {
 // LangBarButton
 ////////////////////////////////////////////////////////////////////////////////
 
-VietType::LangBarButton::LangBarButton(EngineController * ec) : RefreshableButton(ec) {
+VietType::LangBarButton::LangBarButton(EngineController* ec) : RefreshableButton(ec) {
 }
 
-HRESULT VietType::LangBarButton::OnClick(TfLBIClick click, POINT pt, const RECT * area) {
+HRESULT VietType::LangBarButton::OnClick(TfLBIClick click, POINT pt, const RECT* area) {
     if (click == TF_LBI_CLK_LEFT) {
         return _controller->ToggleUserEnabled();
     } else if (click == TF_LBI_CLK_RIGHT) {
@@ -226,7 +226,7 @@ HRESULT VietType::LangBarButton::OnClick(TfLBIClick click, POINT pt, const RECT 
     return S_OK;
 }
 
-HRESULT VietType::LangBarButton::InitMenu(ITfMenu * menu) {
+HRESULT VietType::LangBarButton::InitMenu(ITfMenu* menu) {
     CopyTfMenu(menu);
     return S_OK;
 }
@@ -235,7 +235,7 @@ HRESULT VietType::LangBarButton::OnMenuSelect(UINT id) {
     return OnMenuSelectAll(id);
 }
 
-HRESULT VietType::LangBarButton::GetIcon(HICON * hicon) {
+HRESULT VietType::LangBarButton::GetIcon(HICON* hicon) {
     // Windows docs is a liar, icons are mandatory
     assert(Globals::dllInstance);
     if (_controller->GetBlocked() == BlockedKind::BLOCKED) {

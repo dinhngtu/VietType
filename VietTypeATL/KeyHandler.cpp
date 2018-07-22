@@ -65,10 +65,10 @@ STDMETHODIMP VietType::KeyHandlerEditSession::DoEditSession(TfEditCookie ec) {
 
 void VietType::KeyHandlerEditSession::Initialize(
     CompositionManager* compositionManager,
-    ITfContext *context,
+    ITfContext* context,
     WPARAM wParam,
     LPARAM lParam,
-    BYTE const * keyState,
+    BYTE const* keyState,
     EngineController* controller) {
 
     // since edit sessions are asynchronous, we can't know when the reference to the edit session will die

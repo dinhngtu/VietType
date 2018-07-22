@@ -87,7 +87,7 @@ public:
         return client_id_ != TF_CLIENTID_NULL;
     }
 
-    HRESULT Advise(IUnknown* source, TfClientId client_id, SinkInterface *sink) {
+    HRESULT Advise(IUnknown* source, TfClientId client_id, SinkInterface* sink) {
         HRESULT hr;
 
         if (!source || !client_id || !sink)

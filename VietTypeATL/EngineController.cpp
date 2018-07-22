@@ -48,8 +48,8 @@ HRESULT VietType::EngineController::OnChange(REFGUID rguid) {
 }
 
 HRESULT VietType::EngineController::Initialize(
-    std::shared_ptr<Telex::TelexEngine> const& engine,
-    ITfThreadMgr * threadMgr,
+    const std::shared_ptr<Telex::TelexEngine>& engine,
+    ITfThreadMgr* threadMgr,
     TfClientId clientid) {
 
     HRESULT hr;
@@ -124,11 +124,11 @@ VietType::Telex::TelexEngine& VietType::EngineController::GetEngine() {
     return *_engine;
 }
 
-VietType::Telex::TelexEngine const& VietType::EngineController::GetEngine() const {
+const VietType::Telex::TelexEngine& VietType::EngineController::GetEngine() const {
     return *_engine;
 }
 
-HRESULT VietType::EngineController::IsUserEnabled(long *penabled) {
+HRESULT VietType::EngineController::IsUserEnabled(long* penabled) {
     return CompartmentReadEnabled(penabled);
 }
 
@@ -188,7 +188,7 @@ bool VietType::EngineController::ResetEditBlockedPending() {
     return pending;
 }
 
-HRESULT VietType::EngineController::GetOpenClose(long * openclose) {
+HRESULT VietType::EngineController::GetOpenClose(long* openclose) {
     return _openCloseCompartment->GetValue(openclose);
 }
 
@@ -219,7 +219,7 @@ HRESULT VietType::EngineController::UpdateStates() {
     return S_OK;
 }
 
-HRESULT VietType::EngineController::CompartmentReadEnabled(long * pEnabled) {
+HRESULT VietType::EngineController::CompartmentReadEnabled(long* pEnabled) {
     HRESULT hr;
 
     hr = _settingsCompartment->GetValue(pEnabled);

@@ -28,15 +28,15 @@ class EditSessions {
 public:
     static HRESULT EditBlocked(
         TfEditCookie ec,
-        CompositionManager *compositionManager,
-        ITfContext *context,
-        EngineController *controller);
+        CompositionManager* compositionManager,
+        ITfContext* context,
+        EngineController* controller);
 
     static HRESULT EditSurroundingWord(
         _In_ TfEditCookie ec,
-        _In_ VietType::CompositionManager *compositionManager,
-        _In_ ITfContext *context,
-        _In_ VietType::EngineController *controller,
+        _In_ VietType::CompositionManager* compositionManager,
+        _In_ ITfContext* context,
+        _In_ VietType::EngineController* controller,
         _In_ int ignore);
 
 private:

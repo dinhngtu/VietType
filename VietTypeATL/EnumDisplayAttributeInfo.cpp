@@ -30,7 +30,7 @@ VietType::EnumDisplayAttributeInfo::EnumDisplayAttributeInfo() {
 VietType::EnumDisplayAttributeInfo::~EnumDisplayAttributeInfo() {
 }
 
-STDMETHODIMP VietType::EnumDisplayAttributeInfo::Clone(IEnumTfDisplayAttributeInfo ** ppEnum) {
+STDMETHODIMP VietType::EnumDisplayAttributeInfo::Clone(IEnumTfDisplayAttributeInfo** ppEnum) {
     HRESULT hr;
     *ppEnum = nullptr;
 
@@ -44,7 +44,7 @@ STDMETHODIMP VietType::EnumDisplayAttributeInfo::Clone(IEnumTfDisplayAttributeIn
     return S_OK;
 }
 
-STDMETHODIMP VietType::EnumDisplayAttributeInfo::Next(ULONG ulCount, ITfDisplayAttributeInfo ** rgInfo, ULONG * pcFetched) {
+STDMETHODIMP VietType::EnumDisplayAttributeInfo::Next(ULONG ulCount, ITfDisplayAttributeInfo** rgInfo, ULONG* pcFetched) {
     auto index_old = _index;
     for (ULONG i = 0; i < ulCount; i++) {
         if (_index >= _items.size()) {
@@ -72,7 +72,7 @@ STDMETHODIMP VietType::EnumDisplayAttributeInfo::Skip(ULONG ulCount) {
     return (_index < _items.size()) ? S_OK : S_FALSE;
 }
 
-void VietType::EnumDisplayAttributeInfo::Initialize(info_vector_type const & items, info_vector_type::size_type index) {
+void VietType::EnumDisplayAttributeInfo::Initialize(const info_vector_type& items, info_vector_type::size_type index) {
     _items = items;
     _index = index;
 }
@@ -85,11 +85,11 @@ ITfDisplayAttributeInfo* VietType::EnumDisplayAttributeInfo::GetAttribute(info_v
     return _items.at(index);
 }
 
-HRESULT VietType::EnumDisplayAttributeInfo::FindAttributeByGuid(GUID const & guid, ITfDisplayAttributeInfo ** info) {
+HRESULT VietType::EnumDisplayAttributeInfo::FindAttributeByGuid(const GUID& guid, ITfDisplayAttributeInfo** info) {
     HRESULT hr;
     *info = nullptr;
 
-    for (auto const& attr : _items) {
+    for (const auto& attr : _items) {
         GUID aguid;
         hr = attr->GetGUID(&aguid);
         HRESULT_CHECK_RETURN(hr, L"%s", L"attr->GetGUID");

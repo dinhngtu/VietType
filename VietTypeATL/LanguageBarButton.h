@@ -25,10 +25,10 @@ extern const GUID GUID_LanguageBarButton_Item;
 
 class ILanguageBarCallbacks {
 public:
-    virtual HRESULT OnClick(TfLBIClick click, POINT pt, const RECT *area) = 0;
-    virtual HRESULT InitMenu(ITfMenu *menu) = 0;
+    virtual HRESULT OnClick(TfLBIClick click, POINT pt, const RECT* area) = 0;
+    virtual HRESULT InitMenu(ITfMenu* menu) = 0;
     virtual HRESULT OnMenuSelect(UINT id) = 0;
-    virtual HRESULT GetIcon(HICON *hicon) = 0;
+    virtual HRESULT GetIcon(HICON* hicon) = 0;
     virtual DWORD GetStatus() = 0;
     virtual std::wstring GetText() = 0;
 };
@@ -50,26 +50,26 @@ public:
     DECLARE_PROTECT_FINAL_CONSTRUCT()
 
     // Inherited via ITfSource
-    virtual STDMETHODIMP AdviseSink(REFIID riid, IUnknown * punk, DWORD * pdwCookie) override;
+    virtual STDMETHODIMP AdviseSink(REFIID riid, IUnknown* punk, DWORD* pdwCookie) override;
     virtual STDMETHODIMP UnadviseSink(DWORD dwCookie) override;
 
     // Inherited via ITfLangBarItemButton
-    virtual STDMETHODIMP GetInfo(TF_LANGBARITEMINFO * pInfo) override;
-    virtual STDMETHODIMP GetStatus(DWORD * pdwStatus) override;
+    virtual STDMETHODIMP GetInfo(TF_LANGBARITEMINFO* pInfo) override;
+    virtual STDMETHODIMP GetStatus(DWORD* pdwStatus) override;
     virtual STDMETHODIMP Show(BOOL fShow) override;
-    virtual STDMETHODIMP GetTooltipString(BSTR * pbstrToolTip) override;
-    virtual STDMETHODIMP OnClick(TfLBIClick click, POINT pt, const RECT * prcArea) override;
-    virtual STDMETHODIMP InitMenu(ITfMenu * pMenu) override;
+    virtual STDMETHODIMP GetTooltipString(BSTR* pbstrToolTip) override;
+    virtual STDMETHODIMP OnClick(TfLBIClick click, POINT pt, const RECT* prcArea) override;
+    virtual STDMETHODIMP InitMenu(ITfMenu* pMenu) override;
     virtual STDMETHODIMP OnMenuSelect(UINT wID) override;
-    virtual STDMETHODIMP GetIcon(HICON * phIcon) override;
-    virtual STDMETHODIMP GetText(BSTR * pbstrText) override;
+    virtual STDMETHODIMP GetIcon(HICON* phIcon) override;
+    virtual STDMETHODIMP GetText(BSTR* pbstrText) override;
 
     HRESULT Initialize(
-        GUID const& guidItem,
+        const GUID& guidItem,
         DWORD style,
         ULONG sort,
-        std::wstring const& description,
-        ILanguageBarCallbacks *callbacks);
+        const std::wstring& description,
+        ILanguageBarCallbacks* callbacks);
     HRESULT NotifyUpdate(DWORD flags);
     void Uninitialize();
 
@@ -78,7 +78,7 @@ private:
     DWORD _style;
     ULONG _sort;
     std::wstring _description;
-    ILanguageBarCallbacks *_callbacks;
+    ILanguageBarCallbacks* _callbacks;
 
     CComPtr<ITfLangBarItemSink> _itemSink;
 

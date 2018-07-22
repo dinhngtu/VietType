@@ -26,7 +26,7 @@ bool IsTranslatableKey(_In_ WPARAM wParam, _In_ LPARAM lParam) {
     return false;
 }
 
-bool VietType::Telex::IsEditKey(_In_ WPARAM wParam, _In_ LPARAM lParam, _In_ BYTE const *keyState) {
+bool VietType::Telex::IsEditKey(_In_ WPARAM wParam, _In_ LPARAM lParam, _In_ const BYTE* keyState) {
     // only for edit keys that don't commit
     if ((keyState[VK_CONTROL] & 0x80) || (keyState[VK_MENU] & 0x80)) {
         return true;
@@ -40,7 +40,7 @@ bool VietType::Telex::IsEditKey(_In_ WPARAM wParam, _In_ LPARAM lParam, _In_ BYT
     return false;
 }
 
-bool VietType::Telex::IsKeyEaten(bool isComposing, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_ BYTE const *keyState) {
+bool VietType::Telex::IsKeyEaten(bool isComposing, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_ const BYTE* keyState) {
     if ((keyState[VK_CONTROL] & 0x80) || (keyState[VK_MENU] & 0x80) || (keyState[VK_LWIN] & 0x80) || (keyState[VK_RWIN] & 0x80)) {
         // engine doesn't want modifiers
         return false;
@@ -54,7 +54,7 @@ bool VietType::Telex::IsKeyEaten(bool isComposing, _In_ WPARAM wParam, _In_ LPAR
     return false;
 }
 
-VietType::Telex::TelexStates VietType::Telex::PushKey(_In_ VietType::Telex::TelexEngine& engine, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_ BYTE const *keyState) {
+VietType::Telex::TelexStates VietType::Telex::PushKey(_In_ VietType::Telex::TelexEngine& engine, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_ const BYTE* keyState) {
     if (IsTranslatableKey(wParam, lParam)) {
         WCHAR c = 0;
         if (ToUnicode((UINT)wParam, (lParam >> 16) & 0xff, keyState, &c, 1, 0) != 1) {

@@ -31,7 +31,7 @@ VietType::CompositionManager::~CompositionManager() {
 }
 
 
-STDMETHODIMP VietType::CompositionManager::OnCompositionTerminated(TfEditCookie ecWrite, ITfComposition * pComposition) {
+STDMETHODIMP VietType::CompositionManager::OnCompositionTerminated(TfEditCookie ecWrite, ITfComposition* pComposition) {
     HRESULT hr;
 
     DBG_DPRINT(L"ecWrite = %ld", ecWrite);
@@ -42,7 +42,7 @@ STDMETHODIMP VietType::CompositionManager::OnCompositionTerminated(TfEditCookie 
     return S_OK;
 }
 
-HRESULT VietType::CompositionManager::Initialize(TfClientId clientid, ITfDisplayAttributeInfo *composingAttribute, bool comless) {
+HRESULT VietType::CompositionManager::Initialize(TfClientId clientid, ITfDisplayAttributeInfo* composingAttribute, bool comless) {
     HRESULT hr;
 
     _clientid = clientid;
@@ -62,18 +62,18 @@ void VietType::CompositionManager::Uninitialize() {
 }
 
 
-HRESULT VietType::CompositionManager::RequestEditSession(ITfEditSession * session) {
+HRESULT VietType::CompositionManager::RequestEditSession(ITfEditSession* session) {
     return RequestEditSession(session, _context);
 }
 
-HRESULT VietType::CompositionManager::RequestEditSession(ITfEditSession *session, ITfContext *context) {
+HRESULT VietType::CompositionManager::RequestEditSession(ITfEditSession* session, ITfContext* context) {
     assert(_clientid != TF_CLIENTID_NULL);
     assert(context);
     HRESULT hrSession;
     return context->RequestEditSession(_clientid, session, TF_ES_ASYNCDONTCARE | TF_ES_READWRITE, &hrSession);
 }
 
-HRESULT VietType::CompositionManager::StartComposition(ITfContext * pContext) {
+HRESULT VietType::CompositionManager::StartComposition(ITfContext* pContext) {
     assert(_clientid != TF_CLIENTID_NULL);
     assert(!_composition);
     return RequestEditSession(&_StartComposition, this, pContext);
@@ -96,7 +96,7 @@ ITfComposition* VietType::CompositionManager::GetComposition() const {
     return _composition;
 }
 
-HRESULT VietType::CompositionManager::GetRange(ITfRange ** range) {
+HRESULT VietType::CompositionManager::GetRange(ITfRange** range) {
     if (!IsComposing()) {
         return E_FAIL;
     }
@@ -107,7 +107,7 @@ TfClientId VietType::CompositionManager::GetClientId() const {
     return _clientid;
 }
 
-HRESULT VietType::CompositionManager::StartCompositionNow(TfEditCookie ec, ITfContext * context) {
+HRESULT VietType::CompositionManager::StartCompositionNow(TfEditCookie ec, ITfContext* context) {
     HRESULT hr;
 
     CComPtr<ITfCompositionSink> compositionSink;
@@ -126,7 +126,7 @@ HRESULT VietType::CompositionManager::StartCompositionNow(TfEditCookie ec, ITfCo
     hr = context->QueryInterface(&contextComposition);
     HRESULT_CHECK_RETURN(hr, L"%s", L"context->QueryInterface failed");
 
-    ITfComposition *composition;
+    ITfComposition* composition;
     hr = contextComposition->StartComposition(ec, insertRange, compositionSink, &composition);
     if (SUCCEEDED(hr)) {
         _composition = composition;
@@ -150,7 +150,7 @@ HRESULT VietType::CompositionManager::EmptyCompositionText(TfEditCookie ec) {
     CComPtr<ITfRange> range;
     hr = _composition->GetRange(&range);
     HRESULT_CHECK_RETURN(hr, L"%s", L"composition->GetRange failed");
-    
+
     hr = range->SetText(ec, 0, NULL, 0);
     HRESULT_CHECK_RETURN(hr, L"%s", L"range->SetText failed");
 
@@ -209,7 +209,7 @@ HRESULT VietType::CompositionManager::EndCompositionNow(TfEditCookie ec) {
     return S_OK;
 }
 
-HRESULT VietType::CompositionManager::SetCompositionText(TfEditCookie ec, WCHAR const * str, LONG length) {
+HRESULT VietType::CompositionManager::SetCompositionText(TfEditCookie ec, const WCHAR* str, LONG length) {
     HRESULT hr;
 
     if (_composition) {
@@ -230,7 +230,7 @@ HRESULT VietType::CompositionManager::SetCompositionText(TfEditCookie ec, WCHAR 
     return S_OK;
 }
 
-HRESULT VietType::CompositionManager::EnsureCompositionText(TfEditCookie ec, ITfContext *context, WCHAR const * str, LONG length) {
+HRESULT VietType::CompositionManager::EnsureCompositionText(TfEditCookie ec, ITfContext* context, const WCHAR* str, LONG length) {
     HRESULT hr;
 
     if (!_composition) {
@@ -241,7 +241,7 @@ HRESULT VietType::CompositionManager::EnsureCompositionText(TfEditCookie ec, ITf
     return SetCompositionText(ec, str, length);
 }
 
-HRESULT VietType::CompositionManager::SetRangeDisplayAttribute(TfEditCookie ec, ITfContext *context, ITfRange * range, ITfDisplayAttributeInfo * attr) {
+HRESULT VietType::CompositionManager::SetRangeDisplayAttribute(TfEditCookie ec, ITfContext* context, ITfRange* range, ITfDisplayAttributeInfo* attr) {
     HRESULT hr;
 
     if (!_categoryMgr) {
@@ -275,7 +275,7 @@ HRESULT VietType::CompositionManager::SetRangeDisplayAttribute(TfEditCookie ec, 
     return S_OK;
 }
 
-HRESULT VietType::CompositionManager::ClearRangeDisplayAttribute(TfEditCookie ec, ITfContext * context, ITfRange * range) {
+HRESULT VietType::CompositionManager::ClearRangeDisplayAttribute(TfEditCookie ec, ITfContext* context, ITfRange* range) {
     HRESULT hr;
 
     CComPtr<ITfProperty> prop;
@@ -288,10 +288,10 @@ HRESULT VietType::CompositionManager::ClearRangeDisplayAttribute(TfEditCookie ec
     return S_OK;
 }
 
-HRESULT VietType::CompositionManager::_StartComposition(TfEditCookie ec, CompositionManager *instance, ITfContext *context) {
+HRESULT VietType::CompositionManager::_StartComposition(TfEditCookie ec, CompositionManager* instance, ITfContext* context) {
     return instance->StartCompositionNow(ec, context);
 }
 
-HRESULT VietType::CompositionManager::_EndComposition(TfEditCookie ec, CompositionManager *instance, ITfContext *context) {
+HRESULT VietType::CompositionManager::_EndComposition(TfEditCookie ec, CompositionManager* instance, ITfContext* context) {
     return instance->EndCompositionNow(ec);
 }

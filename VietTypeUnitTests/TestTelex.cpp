@@ -29,7 +29,7 @@ static TelexConfig config{
     true,
 };
 
-TelexStates FeedWord(TelexEngine& e, wchar_t const *input) {
+TelexStates FeedWord(TelexEngine& e, const wchar_t* input) {
     e.Reset();
     for (auto c : std::wstring(input)) {
         e.PushChar(c);
@@ -37,7 +37,7 @@ TelexStates FeedWord(TelexEngine& e, wchar_t const *input) {
     return e.GetState();
 }
 
-void TestValidWord(wchar_t const *expected, wchar_t const *input) {
+void TestValidWord(const wchar_t* expected, const wchar_t* input) {
     TelexEngine e(config);
     e.Reset();
     for (auto c : std::wstring(input)) {
@@ -48,7 +48,7 @@ void TestValidWord(wchar_t const *expected, wchar_t const *input) {
     Assert::AreEqual(expected, e.Retrieve().c_str());
 }
 
-void TestInvalidWord(wchar_t const *expected, wchar_t const *input) {
+void TestInvalidWord(const wchar_t* expected, const wchar_t* input) {
     TelexEngine e(config);
     e.Reset();
     for (auto c : std::wstring(input)) {

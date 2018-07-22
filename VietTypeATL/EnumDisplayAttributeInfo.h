@@ -37,17 +37,17 @@ public:
     DECLARE_PROTECT_FINAL_CONSTRUCT()
 
 public:
-    virtual STDMETHODIMP Clone(IEnumTfDisplayAttributeInfo ** ppEnum) override;
-    virtual STDMETHODIMP Next(ULONG ulCount, ITfDisplayAttributeInfo ** rgInfo, ULONG * pcFetched) override;
+    virtual STDMETHODIMP Clone(IEnumTfDisplayAttributeInfo** ppEnum) override;
+    virtual STDMETHODIMP Next(ULONG ulCount, ITfDisplayAttributeInfo** rgInfo, ULONG* pcFetched) override;
     virtual STDMETHODIMP Reset(void) override;
     virtual STDMETHODIMP Skip(ULONG ulCount) override;
 
 public:
-    void Initialize(info_vector_type const& items, info_vector_type::size_type index);
+    void Initialize(const info_vector_type& items, info_vector_type::size_type index);
 
     void AddAttribute(ITfDisplayAttributeInfo* item);
     ITfDisplayAttributeInfo* GetAttribute(info_vector_type::size_type index);
-    HRESULT FindAttributeByGuid(GUID const& guid, ITfDisplayAttributeInfo **info);
+    HRESULT FindAttributeByGuid(const GUID& guid, ITfDisplayAttributeInfo** info);
 
 private:
     info_vector_type _items;

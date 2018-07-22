@@ -104,7 +104,7 @@ static wchar_t TranslateTone(wchar_t c, TONES t) {
 }
 
 /// <summary>destructive</summary>
-static void ApplyCases(std::wstring& str, std::vector<int> const& cases) {
+static void ApplyCases(std::wstring& str, const std::vector<int>& cases) {
     assert(str.length() == cases.size());
     for (size_t i = 0; i < cases.size(); i++) {
         if (cases[i]) {
@@ -460,7 +460,7 @@ TelexStates TelexEngine::Cancel() {
     return _state;
 }
 
-TelexStates TelexEngine::Backconvert(std::wstring const& s) {
+TelexStates TelexEngine::Backconvert(const std::wstring& s) {
     for (auto c : s) {
         if (c >= L'a' && c <= L'z') {
             PushChar(c);

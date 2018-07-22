@@ -22,9 +22,9 @@
 
 HRESULT VietType::EditSessions::EditBlocked(
     TfEditCookie ec,
-    VietType::CompositionManager *compositionManager,
-    ITfContext *context,
-    VietType::EngineController *controller) {
+    VietType::CompositionManager* compositionManager,
+    ITfContext* context,
+    VietType::EngineController* controller) {
 
     HRESULT hr;
 
@@ -106,7 +106,7 @@ HRESULT VietType::EditSessions::EditBlocked(
     HRESULT_CHECK_RETURN(hr, L"%s", L"iis->GetInputScopes failed");
 
     VietType::BlockedKind blocked;
-    InputScope *scopes = pscopes;
+    InputScope* scopes = pscopes;
     for (UINT i = 0; i < scount; i++) {
         switch (scopes[i]) {
         case IS_EMAIL_SMTPEMAILADDRESS:

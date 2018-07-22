@@ -42,10 +42,10 @@ public:
 
     void Initialize(
         CompositionManager* compositionManager,
-        ITfContext *context,
+        ITfContext* context,
         WPARAM wParam,
         LPARAM lParam,
-        BYTE const *keyState,
+        BYTE const* keyState,
         EngineController* controller);
 
 private:
@@ -57,7 +57,7 @@ private:
     CComPtr<ITfContext> _context;
     WPARAM _wParam;
     LPARAM _lParam;
-    BYTE const *_keyState;
+    BYTE const* _keyState;
     CComPtr<EngineController> _controller;
 
 private:

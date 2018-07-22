@@ -1,6 +1,6 @@
 #include "VirtualDocument.h"
 
-HRESULT VietType::VirtualDocument::GetVirtualDocumentMgr(ITfDocumentMgr * dim, ITfDocumentMgr ** pdim) {
+HRESULT VietType::VirtualDocument::GetVirtualDocumentMgr(ITfDocumentMgr* dim, ITfDocumentMgr** pdim) {
     HRESULT hr;
 
     CComPtr<ITfContext> context;
@@ -44,7 +44,7 @@ HRESULT VietType::VirtualDocument::GetVirtualDocumentMgr(ITfDocumentMgr * dim, I
     }
 }
 
-HRESULT VietType::VirtualDocument::GetVirtualDocumentContext(ITfContext * context, ITfContext ** pContext) {
+HRESULT VietType::VirtualDocument::GetVirtualDocumentContext(ITfContext* context, ITfContext** pContext) {
     HRESULT hr;
 
     CComPtr<ITfDocumentMgr> dim;

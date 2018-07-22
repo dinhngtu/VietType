@@ -40,9 +40,9 @@ public:
 
 public:
     // Inherited via ITfTextEditSink
-    virtual STDMETHODIMP OnEndEdit(ITfContext * pic, TfEditCookie ecReadOnly, ITfEditRecord * pEditRecord) override;
+    virtual STDMETHODIMP OnEndEdit(ITfContext* pic, TfEditCookie ecReadOnly, ITfEditRecord* pEditRecord) override;
 
-    HRESULT Initialize(ITfDocumentMgr *documentMgr, CompositionManager* compMgr, EngineController* controller);
+    HRESULT Initialize(ITfDocumentMgr* documentMgr, CompositionManager* compMgr, EngineController* controller);
     HRESULT Uninitialize();
 
 private:
