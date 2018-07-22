@@ -26,7 +26,7 @@ class CompositionManager :
     public CComObjectRootEx<CComSingleThreadModel>,
     public ITfCompositionSink {
 public:
-    CompositionManager();
+    CompositionManager() noexcept;
     ~CompositionManager();
 
     DECLARE_NOT_AGGREGATABLE(CompositionManager)

@@ -28,7 +28,7 @@ class EditSession :
 public:
     using funtype = HRESULT(*)(TfEditCookie ec, Args... args);
 
-    EditSession() {
+    EditSession() noexcept {
     }
     ~EditSession() {
     }
@@ -51,7 +51,7 @@ public:
     }
 
 private:
-    funtype _callback;
+    funtype _callback = nullptr;
     std::tuple<Args...> _args;
 
 private:

@@ -24,7 +24,7 @@
 
 #include "EnumDisplayAttributeInfo.h"
 
-VietType::EnumDisplayAttributeInfo::EnumDisplayAttributeInfo() {
+VietType::EnumDisplayAttributeInfo::EnumDisplayAttributeInfo() noexcept {
 }
 
 VietType::EnumDisplayAttributeInfo::~EnumDisplayAttributeInfo() {

@@ -40,7 +40,7 @@ bool VietType::Telex::IsEditKey(_In_ WPARAM wParam, _In_ LPARAM lParam, _In_ con
     return false;
 }
 
-bool VietType::Telex::IsKeyEaten(bool isComposing, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_ const BYTE* keyState) {
+bool VietType::Telex::IsKeyEaten(_In_ bool isComposing, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_ const BYTE* keyState) {
     if ((keyState[VK_CONTROL] & 0x80) || (keyState[VK_MENU] & 0x80) || (keyState[VK_LWIN] & 0x80) || (keyState[VK_RWIN] & 0x80)) {
         // engine doesn't want modifiers
         return false;

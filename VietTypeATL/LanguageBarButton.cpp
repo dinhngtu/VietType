@@ -19,7 +19,7 @@
 
 const DWORD LanguageBarButtonCookie = 0x5a6fdd5e;
 
-VietType::LanguageBarButton::LanguageBarButton() {
+VietType::LanguageBarButton::LanguageBarButton() noexcept {
 }
 
 VietType::LanguageBarButton::~LanguageBarButton() {

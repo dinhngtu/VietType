@@ -28,7 +28,7 @@ class KeyHandlerEditSession :
     public CComObjectRootEx<CComSingleThreadModel>,
     public ITfEditSession {
 public:
-    KeyHandlerEditSession();
+    KeyHandlerEditSession() noexcept;
     ~KeyHandlerEditSession();
 
     DECLARE_NOT_AGGREGATABLE(KeyHandlerEditSession)
@@ -55,9 +55,9 @@ private:
 private:
     CComPtr<CompositionManager> _compositionManager;
     CComPtr<ITfContext> _context;
-    WPARAM _wParam;
-    LPARAM _lParam;
-    BYTE const* _keyState;
+    WPARAM _wParam = 0;
+    LPARAM _lParam = 0;
+    const BYTE* _keyState = nullptr;
     CComPtr<EngineController> _controller;
 
 private:

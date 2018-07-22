@@ -24,7 +24,7 @@
 
 #include "CompositionManager.h"
 
-VietType::CompositionManager::CompositionManager() {
+VietType::CompositionManager::CompositionManager() noexcept {
 }
 
 VietType::CompositionManager::~CompositionManager() {

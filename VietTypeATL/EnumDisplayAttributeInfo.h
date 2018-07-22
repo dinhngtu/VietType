@@ -27,7 +27,7 @@ class EnumDisplayAttributeInfo :
 public:
     using info_vector_type = std::vector<CComPtr<ITfDisplayAttributeInfo>>;
 
-    EnumDisplayAttributeInfo();
+    EnumDisplayAttributeInfo() noexcept;
     ~EnumDisplayAttributeInfo();
 
     DECLARE_NOT_AGGREGATABLE(EnumDisplayAttributeInfo)

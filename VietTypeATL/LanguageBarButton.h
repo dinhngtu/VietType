@@ -38,7 +38,7 @@ class LanguageBarButton :
     public ITfSource,
     public ITfLangBarItemButton {
 public:
-    LanguageBarButton();
+    LanguageBarButton() noexcept;
     ~LanguageBarButton();
 
     DECLARE_NOT_AGGREGATABLE(LanguageBarButton)
@@ -74,11 +74,11 @@ public:
     void Uninitialize();
 
 private:
-    GUID _guidItem;
-    DWORD _style;
-    ULONG _sort;
+    GUID _guidItem = { 0 };
+    DWORD _style = 0;
+    ULONG _sort = 0;
     std::wstring _description;
-    ILanguageBarCallbacks* _callbacks;
+    ILanguageBarCallbacks* _callbacks = nullptr;
 
     CComPtr<ITfLangBarItemSink> _itemSink;
 

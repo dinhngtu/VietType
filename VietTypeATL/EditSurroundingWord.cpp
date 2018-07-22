@@ -22,7 +22,7 @@
 
 static const long SWF_MAXCHARS = 9; // "nghiêng" + 1 for the padding + 1 for max ignore
 
-const std::unordered_set<wchar_t> vietnamesechars_notaz = {
+const std::unordered_set<WCHAR> vietnamesechars_notaz = {
      L'\xe0', L'\xc0',
      L'\xe1', L'\xc1',
      L'\xe2', L'\xc2',
@@ -92,7 +92,7 @@ const std::unordered_set<wchar_t> vietnamesechars_notaz = {
      L'\x1ef9', L'\x1ef8',
 };
 
-bool IsVietnameseCharacter(wchar_t c) {
+bool IsVietnameseCharacter(WCHAR c) {
     if (c >= L'a' && c <= L'z') {
         return true;
     } else if (c >= L'A' && c <= L'Z') {
@@ -103,7 +103,7 @@ bool IsVietnameseCharacter(wchar_t c) {
     }
 }
 
-bool IsSeparatorCharacter(wchar_t c) {
+bool IsSeparatorCharacter(WCHAR c) {
     if (c >= L' ' && c <= L'@') {
         return true;
     } else if (c >= L'[' && c <= L'`') {
@@ -161,7 +161,7 @@ HRESULT VietType::EditSessions::EditSurroundingWord(
 
     // find word boundary
 
-    std::array<wchar_t, SWF_MAXCHARS> buf;
+    std::array<WCHAR, SWF_MAXCHARS> buf;
     ULONG retrieved;
     hr = rangeTest->GetText(ec, 0, &buf[0], SWF_MAXCHARS, &retrieved);
     HRESULT_CHECK_RETURN(hr, L"%s", L"rangeTest->GetText failed");
@@ -180,7 +180,10 @@ HRESULT VietType::EditSessions::EditSurroundingWord(
 
     DBG_DPRINT(L"wordlen = %ld", wordlen);
 
-    if (wordlen < 1 || (static_cast<ULONG>(wordlen) < retrieved && !IsSeparatorCharacter(buf[retrieved - wordlen - 1 - ignore]))) {
+#pragma warning(push)
+#pragma warning(disable: 26451)
+    if (wordlen < 1 || (static_cast<ULONG>(wordlen) < retrieved && !IsSeparatorCharacter(buf.at(retrieved - wordlen - 1L - ignore)))) {
+#pragma warning(pop)
         // no word, or word is not bordered by separator character
         hr = compositionManager->EndCompositionNow(ec);
         HRESULT_CHECK_RETURN(hr, L"%s", L"compositionManager->EndCompositionNow failed");
@@ -206,7 +209,10 @@ HRESULT VietType::EditSessions::EditSurroundingWord(
 
     // reinitialize engine with text
     controller->GetEngine().Reset();
-    controller->GetEngine().Backconvert(std::wstring(&buf[retrieved - wordlen - ignore], wordlen));
+#pragma warning(push)
+#pragma warning(disable: 26451)
+    controller->GetEngine().Backconvert(std::wstring(&buf[static_cast<size_t>(retrieved - wordlen - ignore)], wordlen));
+#pragma warning(pop)
 
     if (controller->GetEngine().GetState() != Telex::TelexStates::VALID) {
         // if found a bad word, force-terminate the composition

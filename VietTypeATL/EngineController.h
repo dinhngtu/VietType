@@ -42,7 +42,7 @@ class EngineController :
     public CComObjectRootEx<CComSingleThreadModel>,
     public ITfCompartmentEventSink {
 public:
-    EngineController();
+    EngineController() noexcept;
     ~EngineController();
 
     DECLARE_NOT_AGGREGATABLE(EngineController)
@@ -90,7 +90,7 @@ private:
     std::shared_ptr<Telex::TelexEngine> _engine;
     CComPtr<ITfLangBarItemMgr> _langBarItemMgr;
 
-    TfClientId _clientid;
+    TfClientId _clientid = TF_CLIENTID_NULL;
 
     CComPtr<Compartment> _settingsCompartment;
     SinkAdvisor<ITfCompartmentEventSink> _settingsCompartmentEventSink;

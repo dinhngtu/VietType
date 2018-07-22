@@ -29,7 +29,7 @@ class TextEditSink :
     public CComObjectRootEx<CComSingleThreadModel>,
     public ITfTextEditSink {
 public:
-    TextEditSink();
+    TextEditSink() noexcept;
     ~TextEditSink();
 
     DECLARE_NOT_AGGREGATABLE(TextEditSink)

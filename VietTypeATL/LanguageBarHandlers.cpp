@@ -30,6 +30,7 @@ int PopMenu(POINT pt, const RECT* area) {
     HMENU menu = GetMenu();
     if (!menu) {
         DBG_DPRINT(L"%s", L"load menu failed");
+        return 0;
     }
     UINT flags = TPM_NONOTIFY | TPM_RETURNCMD;
     if (GetSystemMetrics(SM_MENUDROPALIGNMENT)) {
@@ -56,7 +57,7 @@ HRESULT CopyTfMenu(ITfMenu* menu) {
         mii.cch++;
         mii.fMask = MIIM_BITMAP | MIIM_CHECKMARKS | MIIM_FTYPE | MIIM_ID | MIIM_STATE | MIIM_STRING;
         // the vector used here can't outlive the copy function, that's why the function has to do the item addition by itself
-        std::vector<wchar_t> buf(mii.cch);
+        std::vector<WCHAR> buf(mii.cch);
         mii.dwTypeData = &buf[0];
         if (!GetMenuItemInfo(menuSource, i, TRUE, &mii)) {
             WINERROR_RETURN_HRESULT(L"%s", L"GetMenuItemInfo failed");
@@ -80,7 +81,13 @@ HRESULT CopyTfMenu(ITfMenu* menu) {
         if (mii.hbmpItem && mii.hbmpItem != reinterpret_cast<HBITMAP>(-1)) {
             tfBitmap = static_cast<HBITMAP>(CopyImage(mii.hbmpItem, IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE));
         }
+        if (!tfBitmap) {
+            break;
+        }
 
+#pragma warning(push)
+#pragma warning(disable: 6387)
+        // hbmpMask is not supposed to be NULL here but it still works anyway so we disabled the warning
         hr = menu->AddMenuItem(
             mii.wID,
             tfFlags,
@@ -89,7 +96,10 @@ HRESULT CopyTfMenu(ITfMenu* menu) {
             &buf[0],
             static_cast<ULONG>(buf.size()),
             NULL);
+#pragma warning(pop)
         DBG_HRESULT_CHECK(hr, L"%s", L"menu->AddMenuItem failed");
+
+        DeleteObject(tfBitmap);
     }
     DestroyMenu(menuSource);
 
@@ -98,8 +108,10 @@ HRESULT CopyTfMenu(ITfMenu* menu) {
 
 HRESULT OnMenuSelectAll(UINT id) {
     switch (id) {
+    case 0:
+        return S_OK;
     case ID_TRAY_ABOUT: {
-        wchar_t const* text = nullptr;
+        const WCHAR* text = nullptr;
         // LoadString will return a read-only pointer to the loaded resource string, no need to free
         if (!LoadString(VietType::Globals::dllInstance, IDS_LICENSENOTICE, reinterpret_cast<LPWSTR>(&text), 0)) {
             WINERROR_RETURN_HRESULT(L"%s", L"LoadString failed");

@@ -66,7 +66,7 @@ static CComPtr<VietType::EnumDisplayAttributeInfo> CreateAttributeStore() {
 
 static CComPtr<VietType::EnumDisplayAttributeInfo> attributeStore = CreateAttributeStore();
 
-VietType::TextService::TextService() {
+VietType::TextService::TextService() noexcept {
 }
 
 VietType::TextService::~TextService() {

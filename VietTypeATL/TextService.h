@@ -45,7 +45,7 @@ class ATL_NO_VTABLE TextService :
     public ITfTextInputProcessorEx,
     public ITfDisplayAttributeProvider {
 public:
-    TextService();
+    TextService() noexcept;
     ~TextService();
 
     DECLARE_REGISTRY_RESOURCEID(IDR_TEXTSERVICE)

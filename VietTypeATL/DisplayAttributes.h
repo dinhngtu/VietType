@@ -27,7 +27,7 @@ class DisplayAttributeInfo :
     public CComObjectRootEx<CComSingleThreadModel>,
     public ITfDisplayAttributeInfo {
 public:
-    DisplayAttributeInfo();
+    DisplayAttributeInfo() noexcept;
     ~DisplayAttributeInfo();
 
     DECLARE_NOT_AGGREGATABLE(DisplayAttributeInfo)
@@ -48,7 +48,7 @@ public:
     void Initialize(const GUID& guid, std::wstring description, TF_DISPLAYATTRIBUTE attr);
 
 private:
-    GUID _guid;
+    GUID _guid = { 0 };
     std::wstring _description;
     TF_DISPLAYATTRIBUTE _attr;
     TF_DISPLAYATTRIBUTE _attrOrig;

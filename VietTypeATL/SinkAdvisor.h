@@ -23,7 +23,7 @@ limitations under the License.
 template <class SinkInterface>
 class SinkAdvisor {
 public:
-    SinkAdvisor() : cookie_(TF_INVALID_COOKIE) {
+    SinkAdvisor() noexcept : cookie_(TF_INVALID_COOKIE) {
     }
 
     virtual ~SinkAdvisor() {
@@ -76,7 +76,7 @@ private:
 template <class SinkInterface>
 class SingleSinkAdvisor {
 public:
-    SingleSinkAdvisor() : client_id_(TF_CLIENTID_NULL) {
+    SingleSinkAdvisor() noexcept : client_id_(TF_CLIENTID_NULL) {
     }
 
     virtual ~SingleSinkAdvisor() {

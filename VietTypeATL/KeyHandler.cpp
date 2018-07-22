@@ -20,7 +20,7 @@
 #include "CompositionManager.h"
 #include "EngineController.h"
 
-VietType::KeyHandlerEditSession::KeyHandlerEditSession() {
+VietType::KeyHandlerEditSession::KeyHandlerEditSession() noexcept {
 }
 
 VietType::KeyHandlerEditSession::~KeyHandlerEditSession() {

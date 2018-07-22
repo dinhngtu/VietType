@@ -29,7 +29,7 @@
 #include "EditSessions.h"
 #include "Utilities.h"
 
-VietType::ThreadMgrEventSink::ThreadMgrEventSink() {
+VietType::ThreadMgrEventSink::ThreadMgrEventSink() noexcept {
 }
 
 VietType::ThreadMgrEventSink::~ThreadMgrEventSink() {

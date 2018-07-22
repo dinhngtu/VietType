@@ -29,7 +29,7 @@ class KeyEventSink :
     public CComObjectRootEx<CComSingleThreadModel>,
     public ITfKeyEventSink {
 public:
-    KeyEventSink();
+    KeyEventSink() noexcept;
     ~KeyEventSink();
 
     DECLARE_NOT_AGGREGATABLE(KeyEventSink)
@@ -57,14 +57,14 @@ private:
     HRESULT CallKeyEdit(ITfContext* context, WPARAM wParam, LPARAM lParam, BYTE const* keyState);
 
 private:
-    TfClientId _clientid;
+    TfClientId _clientid = TF_CLIENTID_NULL;
     CComPtr<ITfKeystrokeMgr> _keystrokeMgr;
     CComPtr<ITfThreadMgr> _threadMgr;
     CComPtr<CompositionManager> _compositionManager;
     CComPtr<EngineController> _controller;
 
     // shared key state buffer; for temporary use only
-    BYTE _keyState[256];
+    BYTE _keyState[256] = { 0 };
 
 private:
     DISALLOW_COPY_AND_ASSIGN(KeyEventSink);

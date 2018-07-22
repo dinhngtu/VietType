@@ -19,7 +19,7 @@
 #include "CompositionManager.h"
 #include "EngineController.h"
 
-VietType::TextEditSink::TextEditSink() {
+VietType::TextEditSink::TextEditSink() noexcept {
 }
 
 VietType::TextEditSink::~TextEditSink() {

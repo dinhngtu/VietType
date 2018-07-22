@@ -31,7 +31,10 @@ const std::tuple<GUID, std::wstring, TF_DISPLAYATTRIBUTE> VietType::ComposingAtt
     }
 );
 
-VietType::DisplayAttributeInfo::DisplayAttributeInfo() {
+#pragma warning(push)
+#pragma warning(disable: 26495)
+VietType::DisplayAttributeInfo::DisplayAttributeInfo() noexcept {
+#pragma warning(pop)
 }
 
 VietType::DisplayAttributeInfo::~DisplayAttributeInfo() {

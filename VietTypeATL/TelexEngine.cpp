@@ -460,7 +460,7 @@ TelexStates TelexEngine::Cancel() {
     return _state;
 }
 
-TelexStates TelexEngine::Backconvert(const std::wstring& s) {
+TelexStates TelexEngine::Backconvert(_In_ const std::wstring& s) {
     for (auto c : s) {
         if (c >= L'a' && c <= L'z') {
             PushChar(c);
@@ -557,7 +557,7 @@ bool TelexEngine::FindTable(_Out_ map_iterator * it) const {
     }
 }
 
-bool TelexEngine::GetTonePos(bool predict, Telex::VINFO *vinfo) const {
+bool TelexEngine::GetTonePos(_In_ bool predict, _Out_ Telex::VINFO *vinfo) const {
     map_iterator it;
     auto found = FindTable(&it);
     VINFO retinfo = { 0 };

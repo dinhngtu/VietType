@@ -24,7 +24,7 @@
 
 #include "Compartment.h"
 
-VietType::Compartment::Compartment() {
+VietType::Compartment::Compartment() noexcept {
 }
 
 VietType::Compartment::~Compartment() {

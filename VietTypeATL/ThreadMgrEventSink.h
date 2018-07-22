@@ -30,7 +30,7 @@ class ThreadMgrEventSink :
     public CComObjectRootEx<CComSingleThreadModel>,
     public ITfThreadMgrEventSink {
 public:
-    ThreadMgrEventSink();
+    ThreadMgrEventSink() noexcept;
     ~ThreadMgrEventSink();
 
     DECLARE_NOT_AGGREGATABLE(ThreadMgrEventSink)
