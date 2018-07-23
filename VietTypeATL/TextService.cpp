@@ -34,7 +34,7 @@
 #include "Telex.h"
 #include "EngineController.h"
 
-static _Ret_valid_ CComPtr<VietType::EnumDisplayAttributeInfo> CreateAttributeStore() {
+static CComPtr<VietType::EnumDisplayAttributeInfo> CreateAttributeStore() {
     HRESULT hr;
 
     CComPtr<VietType::EnumDisplayAttributeInfo> ret;
