@@ -29,19 +29,17 @@ class CompositionManager;
 class EngineController;
 class Compartment;
 
-enum class BlockedKind {
-    // don't change enable setting
-    FREE,
-    // don't change enable setting, but also completely block the engine
-    BLOCKED,
-    // change enable setting to disabled; automatically restore enable setting once free (or if overridden by user)
-    ADVISED,
-};
-
 class EngineController :
     public CComObjectRootEx<CComSingleThreadModel>,
     public ITfCompartmentEventSink {
 public:
+    enum class BlockedKind {
+        // don't change enable setting
+        Free,
+        // don't change enable setting, but also completely block the engine
+        Blocked,
+    };
+
     EngineController() noexcept;
     ~EngineController();
 
@@ -103,7 +101,7 @@ private:
     std::unique_ptr<LangBarButton> _langBarButton;
 
     bool _enabled = true;
-    BlockedKind _blocked = BlockedKind::FREE;
+    BlockedKind _blocked = BlockedKind::Free;
     bool _editBlockedPending = false;
     bool _backconvertPending = false;
 

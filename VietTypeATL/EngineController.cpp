@@ -40,7 +40,7 @@ STDMETHODIMP VietType::EngineController::OnChange(__RPC__in REFGUID rguid) {
     } else if (IsEqualGUID(rguid, GUID_COMPARTMENT_KEYBOARD_OPENCLOSE)) {
         long openclose;
         hr = _openCloseCompartment->GetValue(&openclose);
-        _blocked = openclose ? _blocked : BlockedKind::BLOCKED;
+        _blocked = openclose ? _blocked : BlockedKind::Blocked;
         UpdateStates();
     }
 
@@ -135,7 +135,7 @@ _Check_return_ HRESULT VietType::EngineController::IsUserEnabled(_Out_ long* pen
 HRESULT VietType::EngineController::WriteUserEnabled(_In_ long enabled) {
     HRESULT hr;
 
-    if (_blocked == BlockedKind::BLOCKED) {
+    if (_blocked == BlockedKind::Blocked) {
         DBG_DPRINT("write enabled skipped since engine is blocked");
         return S_OK;
     }
@@ -160,11 +160,11 @@ long VietType::EngineController::IsEnabled() const {
     return _enabled;
 }
 
-VietType::BlockedKind VietType::EngineController::GetBlocked() const {
+VietType::EngineController::BlockedKind VietType::EngineController::GetBlocked() const {
     return _blocked;
 }
 
-void VietType::EngineController::SetBlocked(_In_ VietType::BlockedKind blocked) {
+void VietType::EngineController::SetBlocked(_In_ VietType::EngineController::BlockedKind blocked) {
     _blocked = blocked;
     UpdateStates();
 }
@@ -196,8 +196,7 @@ HRESULT VietType::EngineController::UpdateStates() {
     HRESULT hr;
 
     switch (_blocked) {
-    case BlockedKind::FREE:
-    case BlockedKind::ADVISED: {
+    case BlockedKind::Free: {
         long enabled;
         hr = CompartmentReadEnabled(&enabled);
         HRESULT_CHECK_RETURN(hr, L"%s", L"CompartmentReadEnabled failed");
@@ -205,7 +204,7 @@ HRESULT VietType::EngineController::UpdateStates() {
         _enabled = static_cast<bool>(enabled);
         break;
     }
-    case BlockedKind::BLOCKED:
+    case BlockedKind::Blocked:
         DBG_DPRINT(L"%s", L"blocked");
         _enabled = false;
         break;

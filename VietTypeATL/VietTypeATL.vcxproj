@@ -565,6 +565,7 @@
     <ClInclude Include="Telex.h" />
     <ClInclude Include="TelexEngine.h" />
     <ClInclude Include="TelexData.h" />
+    <ClInclude Include="TelexInternal.h" />
     <ClInclude Include="TelexKeyTranslator.h" />
     <ClInclude Include="TelexUtil.h" />
     <ClInclude Include="TextEditSink.h" />

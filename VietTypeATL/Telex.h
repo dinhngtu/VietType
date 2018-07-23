@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include "TelexData.h"
 #include "TelexUtil.h"
 #include "TelexEngine.h"
 #include "TelexKeyTranslator.h"

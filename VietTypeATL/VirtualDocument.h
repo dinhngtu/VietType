@@ -23,8 +23,8 @@ namespace VietType {
 
 class VirtualDocument {
 public:
-    static HRESULT GetVirtualDocumentMgr(ITfDocumentMgr* dim, ITfDocumentMgr** pdim);
-    static HRESULT GetVirtualDocumentContext(ITfContext* context, ITfContext** pContext);
+    static _Check_return_ HRESULT GetVirtualDocumentMgr(_In_ ITfDocumentMgr* dim, _Outptr_ ITfDocumentMgr** pdim);
+    static _Check_return_ HRESULT GetVirtualDocumentContext(_In_ ITfContext* context, _Outptr_ ITfContext** pContext);
 
 private:
     DISALLOW_IMPLICIT_CONSTRUCTORS(VirtualDocument);

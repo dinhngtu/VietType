@@ -17,7 +17,7 @@
 
 #include "Telex.h"
 
-bool IsTranslatableKey(_In_ WPARAM wParam, _In_ LPARAM lParam) {
+static bool IsTranslatableKey(_In_ WPARAM wParam, _In_ LPARAM lParam) {
     if (wParam >= 65 && wParam <= 90) {
         return true;
     } else if (wParam == 219 || wParam == 221) {
@@ -26,7 +26,7 @@ bool IsTranslatableKey(_In_ WPARAM wParam, _In_ LPARAM lParam) {
     return false;
 }
 
-bool VietType::Telex::IsEditKey(_In_ WPARAM wParam, _In_ LPARAM lParam, _In_ const BYTE* keyState) {
+bool VietType::Telex::IsEditKey(_In_ WPARAM wParam, _In_ LPARAM lParam, _In_reads_(256) const BYTE* keyState) {
     // only for edit keys that don't commit
     if ((keyState[VK_CONTROL] & 0x80) || (keyState[VK_MENU] & 0x80)) {
         return true;
@@ -40,7 +40,7 @@ bool VietType::Telex::IsEditKey(_In_ WPARAM wParam, _In_ LPARAM lParam, _In_ con
     return false;
 }
 
-bool VietType::Telex::IsKeyEaten(_In_ bool isComposing, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_ const BYTE* keyState) {
+bool VietType::Telex::IsKeyEaten(_In_ bool isComposing, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_reads_(256) const BYTE* keyState) {
     if ((keyState[VK_CONTROL] & 0x80) || (keyState[VK_MENU] & 0x80) || (keyState[VK_LWIN] & 0x80) || (keyState[VK_RWIN] & 0x80)) {
         // engine doesn't want modifiers
         return false;
@@ -54,17 +54,17 @@ bool VietType::Telex::IsKeyEaten(_In_ bool isComposing, _In_ WPARAM wParam, _In_
     return false;
 }
 
-VietType::Telex::TelexStates VietType::Telex::PushKey(_In_ VietType::Telex::TelexEngine& engine, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_ const BYTE* keyState) {
+VietType::Telex::TelexStates VietType::Telex::PushKey(_In_ VietType::Telex::TelexEngine& engine, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_reads_(256) const BYTE* keyState) {
     if (IsTranslatableKey(wParam, lParam)) {
         WCHAR c = 0;
         if (ToUnicode((UINT)wParam, (lParam >> 16) & 0xff, keyState, &c, 1, 0) != 1) {
             assert(0);
-            return VietType::Telex::TelexStates::TXERROR;
+            return VietType::Telex::TelexStates::TxError;
         }
         return engine.PushChar(c);
     } else if (wParam == VK_BACK) {
         return engine.Backspace();
     } else {
-        return VietType::Telex::TelexStates::TXERROR;
+        return VietType::Telex::TelexStates::TxError;
     }
 }

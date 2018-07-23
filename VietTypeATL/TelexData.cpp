@@ -145,137 +145,137 @@ const genset<std::wstring> valid_c1 = {
     L"x",
 };
 
-const genmap<std::wstring, VINFO> valid_v = {
-    {L"a", {0, C2MODE::EITHER}},
-    {L"\x103", {0, C2MODE::MUSTC2}}, // ă
-    {L"\xe2", {0, C2MODE::MUSTC2}},  // â
-    {L"e", {0, C2MODE::EITHER}},
-    {L"\xea", {0, C2MODE::EITHER}}, // ê
-    {L"i", {0, C2MODE::EITHER}},
-    {L"o", {0, C2MODE::EITHER}},
-    {L"\xf4", {0, C2MODE::EITHER}},  // ô
-    {L"\x1a1", {0, C2MODE::EITHER}}, // ơ
-    {L"u", {0, C2MODE::EITHER}},
-    {L"\x1b0", {0, C2MODE::EITHER}}, // ư
-    {L"y", {0, C2MODE::NOC2}},
+const genmap<std::wstring, VInfo> valid_v = {
+    {L"a", {0, C2Mode::Either}},
+    {L"\x103", {0, C2Mode::MustC2}}, // ă
+    {L"\xe2", {0, C2Mode::MustC2}},  // â
+    {L"e", {0, C2Mode::Either}},
+    {L"\xea", {0, C2Mode::Either}}, // ê
+    {L"i", {0, C2Mode::Either}},
+    {L"o", {0, C2Mode::Either}},
+    {L"\xf4", {0, C2Mode::Either}},  // ô
+    {L"\x1a1", {0, C2Mode::Either}}, // ơ
+    {L"u", {0, C2Mode::Either}},
+    {L"\x1b0", {0, C2Mode::Either}}, // ư
+    {L"y", {0, C2Mode::NoC2}},
 
-    {L"i\xea", {1, C2MODE::MUSTC2}}, // iê
+    {L"i\xea", {1, C2Mode::MustC2}}, // iê
     // oa_uy must be 1 as default since 0 can only be used if there is no c2
-    {L"oa", {1, C2MODE::EITHER}},     // oa_uy
-    {L"oe", {1, C2MODE::EITHER}},     // oa_uy
-    {L"oo", {1, C2MODE::MUSTC2}},     // oo
-    {L"o\x103", {1, C2MODE::MUSTC2}}, // oă
-    {L"u\xe2", {1, C2MODE::MUSTC2}},  // uâ
-    {L"u\xea", {1, C2MODE::EITHER}},  // uê
-    {L"uy", {1, C2MODE::EITHER}},     // oa_uy, qu different
-    {L"uy\xea", {2, C2MODE::MUSTC2}}, // uyê
-    {L"uyu", {1, C2MODE::NOC2}},
-    {L"\x1b0\x1a1", {1, C2MODE::MUSTC2}}, // ươ
-    {L"y\xea", {1, C2MODE::MUSTC2}},      // yê
+    {L"oa", {1, C2Mode::Either}},     // oa_uy
+    {L"oe", {1, C2Mode::Either}},     // oa_uy
+    {L"oo", {1, C2Mode::MustC2}},     // oo
+    {L"o\x103", {1, C2Mode::MustC2}}, // oă
+    {L"u\xe2", {1, C2Mode::MustC2}},  // uâ
+    {L"u\xea", {1, C2Mode::Either}},  // uê
+    {L"uy", {1, C2Mode::Either}},     // oa_uy, qu different
+    {L"uy\xea", {2, C2Mode::MustC2}}, // uyê
+    {L"uyu", {1, C2Mode::NoC2}},
+    {L"\x1b0\x1a1", {1, C2Mode::MustC2}}, // ươ
+    {L"y\xea", {1, C2Mode::MustC2}},      // yê
 
-    {L"ai", {0, C2MODE::NOC2}},
-    {L"ao", {0, C2MODE::NOC2}},
-    {L"au", {0, C2MODE::NOC2}},
-    {L"ay", {0, C2MODE::NOC2}},
-    {L"\xe2u", {0, C2MODE::NOC2}}, // âu
-    {L"\xe2y", {0, C2MODE::NOC2}}, // ây
-    {L"eo", {0, C2MODE::NOC2}},
-    {L"\xeau", {0, C2MODE::NOC2}}, // êu
-    {L"ia", {0, C2MODE::NOC2}},
-    {L"i\xeau", {1, C2MODE::NOC2}}, // iêu
-    {L"iu", {0, C2MODE::NOC2}},
-    {L"oai", {1, C2MODE::NOC2}},
-    {L"oao", {1, C2MODE::NOC2}}, // does this really exist ?
-    {L"oay", {1, C2MODE::NOC2}},
-    {L"oeo", {1, C2MODE::NOC2}},
-    {L"oi", {0, C2MODE::NOC2}},
-    {L"\xf4i", {0, C2MODE::NOC2}},  // ôi
-    {L"\x1a1i", {0, C2MODE::NOC2}}, // ơi
-    {L"ua", {0, C2MODE::NOC2}},     // c2 either with qu
-    {L"u\xe2y", {1, C2MODE::NOC2}}, // uây
+    {L"ai", {0, C2Mode::NoC2}},
+    {L"ao", {0, C2Mode::NoC2}},
+    {L"au", {0, C2Mode::NoC2}},
+    {L"ay", {0, C2Mode::NoC2}},
+    {L"\xe2u", {0, C2Mode::NoC2}}, // âu
+    {L"\xe2y", {0, C2Mode::NoC2}}, // ây
+    {L"eo", {0, C2Mode::NoC2}},
+    {L"\xeau", {0, C2Mode::NoC2}}, // êu
+    {L"ia", {0, C2Mode::NoC2}},
+    {L"i\xeau", {1, C2Mode::NoC2}}, // iêu
+    {L"iu", {0, C2Mode::NoC2}},
+    {L"oai", {1, C2Mode::NoC2}},
+    {L"oao", {1, C2Mode::NoC2}}, // does this really exist ?
+    {L"oay", {1, C2Mode::NoC2}},
+    {L"oeo", {1, C2Mode::NoC2}},
+    {L"oi", {0, C2Mode::NoC2}},
+    {L"\xf4i", {0, C2Mode::NoC2}},  // ôi
+    {L"\x1a1i", {0, C2Mode::NoC2}}, // ơi
+    {L"ua", {0, C2Mode::NoC2}},     // c2 either with qu
+    {L"u\xe2y", {1, C2Mode::NoC2}}, // uây
                                     //{L"uai" },1 }, // qu only
-    {L"uao", {1, C2MODE::NOC2}},
-    {L"uay", {1, C2MODE::NOC2}},
+    {L"uao", {1, C2Mode::NoC2}},
+    {L"uay", {1, C2Mode::NoC2}},
     // {L"ue" },1 }, // qu only
     //"ueo":
-    {L"ui", {0, C2MODE::NOC2}},
-    {L"u\xf4", {1, C2MODE::MUSTC2}},     // uô
-    {L"u\xf4i", {1, C2MODE::NOC2}},      // uôi
-    {L"u\x1a1", {1, C2MODE::NOC2}},      // uơ
+    {L"ui", {0, C2Mode::NoC2}},
+    {L"u\xf4", {1, C2Mode::MustC2}},     // uô
+    {L"u\xf4i", {1, C2Mode::NoC2}},      // uôi
+    {L"u\x1a1", {1, C2Mode::NoC2}},      // uơ
                                          // "uya" cannot be accented
-    {L"\x1b0\x61", {0, C2MODE::NOC2}},      // ưa
-    {L"\x1b0i", {0, C2MODE::NOC2}},      // ưi
-    {L"\x1b0\x1a1i", {1, C2MODE::NOC2}}, // ươi
-    {L"\x1b0\x1a1u", {1, C2MODE::NOC2}}, // ươu
-    {L"\x1b0u", {0, C2MODE::NOC2}},      // ưu
-    {L"y\xeau", {1, C2MODE::NOC2}},      // yêu
+    {L"\x1b0\x61", {0, C2Mode::NoC2}},      // ưa
+    {L"\x1b0i", {0, C2Mode::NoC2}},      // ưi
+    {L"\x1b0\x1a1i", {1, C2Mode::NoC2}}, // ươi
+    {L"\x1b0\x1a1u", {1, C2Mode::NoC2}}, // ươu
+    {L"\x1b0u", {0, C2Mode::NoC2}},      // ưu
+    {L"y\xeau", {1, C2Mode::NoC2}},      // yêu
 };
 
-const genmap<std::wstring, VINFO> valid_v_q = {
-    {L"u\xe2", {1, C2MODE::MUSTC2}}, // uâ
-    {L"u\xf4", {1, C2MODE::EITHER}}, // ô
-    {L"u\xea", {1, C2MODE::EITHER}}, // uê
-    {L"uy", {1, C2MODE::EITHER}},
-    {L"uy\xea", {2, C2MODE::MUSTC2}}, // uyê
+const genmap<std::wstring, VInfo> valid_v_q = {
+    {L"u\xe2", {1, C2Mode::MustC2}}, // uâ
+    {L"u\xf4", {1, C2Mode::Either}}, // ô
+    {L"u\xea", {1, C2Mode::Either}}, // uê
+    {L"uy", {1, C2Mode::Either}},
+    {L"uy\xea", {2, C2Mode::MustC2}}, // uyê
                                       //{L"uyu" },1 },
-    {L"ua", {1, C2MODE::EITHER}},     // c2 either with qu
-    {L"u\xe2y", {1, C2MODE::NOC2}},   // uây
-    {L"uai", {1, C2MODE::NOC2}},
-    {L"uao", {1, C2MODE::NOC2}},
-    {L"uay", {1, C2MODE::NOC2}},
-    {L"ue", {1, C2MODE::NOC2}},
-    {L"ui", {1, C2MODE::NOC2}},
-    {L"u\xf4", {1, C2MODE::MUSTC2}}, // uô
+    {L"ua", {1, C2Mode::Either}},     // c2 either with qu
+    {L"u\xe2y", {1, C2Mode::NoC2}},   // uây
+    {L"uai", {1, C2Mode::NoC2}},
+    {L"uao", {1, C2Mode::NoC2}},
+    {L"uay", {1, C2Mode::NoC2}},
+    {L"ue", {1, C2Mode::NoC2}},
+    {L"ui", {1, C2Mode::NoC2}},
+    {L"u\xf4", {1, C2Mode::MustC2}}, // uô
 };
 
-const genmap<std::wstring, VINFO> valid_v_qu = {
-    {L"\xe2", {0, C2MODE::MUSTC2}}, // uâ
-    {L"\xf4", {0, C2MODE::EITHER}}, // ô
-    {L"\xea", {0, C2MODE::EITHER}}, // uê
-    {L"y", {0, C2MODE::EITHER}},
-    {L"y\xea", {1, C2MODE::MUSTC2}}, // uyê
+const genmap<std::wstring, VInfo> valid_v_qu = {
+    {L"\xe2", {0, C2Mode::MustC2}}, // uâ
+    {L"\xf4", {0, C2Mode::Either}}, // ô
+    {L"\xea", {0, C2Mode::Either}}, // uê
+    {L"y", {0, C2Mode::Either}},
+    {L"y\xea", {1, C2Mode::MustC2}}, // uyê
                                      //{L"uyu" },1 },
-    {L"a", {0, C2MODE::EITHER}},     // c2 either with qu
-    {L"\xe2y", {0, C2MODE::NOC2}},   // uây
-    {L"ai", {0, C2MODE::NOC2}},
-    {L"ao", {0, C2MODE::NOC2}},
-    {L"ay", {0, C2MODE::NOC2}},
-    {L"e", {0, C2MODE::NOC2}},
-    {L"i", {0, C2MODE::NOC2}},
-    {L"\xf4", {0, C2MODE::MUSTC2}}, // uô
+    {L"a", {0, C2Mode::Either}},     // c2 either with qu
+    {L"\xe2y", {0, C2Mode::NoC2}},   // uây
+    {L"ai", {0, C2Mode::NoC2}},
+    {L"ao", {0, C2Mode::NoC2}},
+    {L"ay", {0, C2Mode::NoC2}},
+    {L"e", {0, C2Mode::NoC2}},
+    {L"i", {0, C2Mode::NoC2}},
+    {L"\xf4", {0, C2Mode::MustC2}}, // uô
 };
 
-const genmap<std::wstring, VINFO> valid_v_gi = {
-    {L"", {-1, C2MODE::EITHER}},
-    {L"a", {0, C2MODE::EITHER}},
-    {L"\x103", {0, C2MODE::MUSTC2}}, // ă
-    {L"\xe2", {0, C2MODE::MUSTC2}},  // â
-    {L"e", {0, C2MODE::NOC2}},
-    {L"\xea", {0, C2MODE::MUSTC2}}, // ê
-    {L"o", {0, C2MODE::EITHER}},
-    {L"\xf4", {0, C2MODE::EITHER}}, // ô
-    {L"\x1a1", {0, C2MODE::EITHER}}, // ơ
-    {L"u", {0, C2MODE::MUSTC2}},
-    {L"\x1b0", {0, C2MODE::EITHER}}, // ư
+const genmap<std::wstring, VInfo> valid_v_gi = {
+    {L"", {-1, C2Mode::Either}},
+    {L"a", {0, C2Mode::Either}},
+    {L"\x103", {0, C2Mode::MustC2}}, // ă
+    {L"\xe2", {0, C2Mode::MustC2}},  // â
+    {L"e", {0, C2Mode::NoC2}},
+    {L"\xea", {0, C2Mode::MustC2}}, // ê
+    {L"o", {0, C2Mode::Either}},
+    {L"\xf4", {0, C2Mode::Either}}, // ô
+    {L"\x1a1", {0, C2Mode::Either}}, // ơ
+    {L"u", {0, C2Mode::MustC2}},
+    {L"\x1b0", {0, C2Mode::Either}}, // ư
 
-    {L"o\x103", {1, C2MODE::MUSTC2}},     // oă
-    {L"\x1b0\x1a1", {1, C2MODE::MUSTC2}}, // ươ
+    {L"o\x103", {1, C2Mode::MustC2}},     // oă
+    {L"\x1b0\x1a1", {1, C2Mode::MustC2}}, // ươ
 
-    {L"ai", {0, C2MODE::NOC2}},
-    {L"ao", {0, C2MODE::NOC2}},
-    {L"au", {0, C2MODE::NOC2}},
-    {L"ay", {0, C2MODE::NOC2}},
-    {L"\xe2u", {0, C2MODE::NOC2}}, // âu
-    {L"\xe2y", {0, C2MODE::NOC2}}, // ây
-    {L"eo", {0, C2MODE::NOC2}},
-    {L"\xeau", {0, C2MODE::NOC2}}, // êu
-    {L"oi", {0, C2MODE::NOC2}},
-    {L"\xf4i", {0, C2MODE::NOC2}},  // ôi
-    {L"\x1a1i", {0, C2MODE::NOC2}}, // ơi
-    {L"ua", {0, C2MODE::NOC2}},     // c2 either with qu
-    {L"ui", {0, C2MODE::NOC2}},
+    {L"ai", {0, C2Mode::NoC2}},
+    {L"ao", {0, C2Mode::NoC2}},
+    {L"au", {0, C2Mode::NoC2}},
+    {L"ay", {0, C2Mode::NoC2}},
+    {L"\xe2u", {0, C2Mode::NoC2}}, // âu
+    {L"\xe2y", {0, C2Mode::NoC2}}, // ây
+    {L"eo", {0, C2Mode::NoC2}},
+    {L"\xeau", {0, C2Mode::NoC2}}, // êu
+    {L"oi", {0, C2Mode::NoC2}},
+    {L"\xf4i", {0, C2Mode::NoC2}},  // ôi
+    {L"\x1a1i", {0, C2Mode::NoC2}}, // ơi
+    {L"ua", {0, C2Mode::NoC2}},     // c2 either with qu
+    {L"ui", {0, C2Mode::NoC2}},
 
-    {L"\x1b0\x61", {0, C2MODE::NOC2}}, // ưa
+    {L"\x1b0\x61", {0, C2Mode::NoC2}}, // ưa
 };
 
 // bool is whether tones are restricted to s/j or not
@@ -292,10 +292,10 @@ const genmap<std::wstring, bool> valid_c2 = {
     {L"nh", false},
 };
 
-const genmap<std::wstring, VINFO> valid_v_oa_uy = {
-    {L"oa", {0, C2MODE::EITHER}},
-    {L"oe", {0, C2MODE::EITHER}},
-    {L"uy", {0, C2MODE::EITHER}},
+const genmap<std::wstring, VInfo> valid_v_oa_uy = {
+    {L"oa", {0, C2Mode::Either}},
+    {L"oe", {0, C2Mode::Either}},
+    {L"uy", {0, C2Mode::Either}},
 };
 
 const genmap<wchar_t, std::wstring> backconversions = {

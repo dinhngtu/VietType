@@ -18,31 +18,30 @@
 #pragma once
 
 #include "Common.h"
-#include "TelexData.h"
-#include "TelexUtil.h"
+#include "TelexInternal.h"
 
 namespace VietType {
 namespace Telex {
 // State transition is as follows:
 
-// VALID (initial) -> VALID|INVALID (by pushing a character)
-// INVALID -> INVALID (by pushing a character)
+// Valid (initial) -> Valid|Invalid (by pushing a character)
+// Invalid -> Invalid (by pushing a character)
 
-// VALID -> COMMITTED|COMMITTED_INVALID (by calling Commit/ForceCommit)
-// INVALID -> COMMITTED_INVALID (by calling Commit/ForceCommit)
-// VALID/INVALID -> COMMITTED_INVALID (by calling Cancel)
+// Valid -> Committed|CommittedInvalid (by calling Commit/ForceCommit)
+// Invalid -> CommittedInvalid (by calling Commit/ForceCommit)
+// Valid/Invalid -> CommittedInvalid (by calling Cancel)
 
-// COMMITTED: can call Retrieve/RetrieveInvalid, does not change state
-// COMMITTED_INVALID: can call RetrieveInvalid, does not change state
+// Committed: can call Retrieve/RetrieveInvalid, does not change state
+// CommittedInvalid: can call RetrieveInvalid, does not change state
 
-// COMMITTED|COMMITTED_INVALID -> VALID (Reset)
+// Committed|CommittedInvalid -> Valid (Reset)
 
 enum class TelexStates {
-    VALID, // valid word, can accept more chars but cannot get result
-    INVALID, // invalid word but can still accept more chars
-    COMMITTED, // valid, tones have been applied, cannot accept any more chars (must get result or Reset)
-    COMMITTED_INVALID, // invalid, cannot accept any more chars
-    TXERROR = -1, // can never be a state, returned when PushChar encounters an error
+    Valid, // valid word, can accept more chars but cannot get result
+    Invalid, // invalid word but can still accept more chars
+    Committed, // valid, tones have been applied, cannot accept any more chars (must get result or Reset)
+    CommittedInvalid, // invalid, cannot accept any more chars
+    TxError = -1, // can never be a state, returned when PushChar encounters an error
 };
 
 struct TelexConfig {
@@ -71,13 +70,13 @@ public:
 private:
     struct TelexConfig _config;
 
-    TelexStates _state = TelexStates::VALID;
+    TelexStates _state = TelexStates::Valid;
 
     std::wstring _keyBuffer;
     std::wstring _c1;
     std::wstring _v;
     std::wstring _c2;
-    TONES _t = TONES::Z;
+    Tones _t = Tones::Z;
     // don't use vector<bool> since that's special
     /// <summary>
     /// only use when valid
@@ -93,9 +92,9 @@ private:
     int _respos_current = 0;
 
 private:
-    using map_iterator = genmap<std::wstring, VINFO>::const_iterator;
+    using map_iterator = genmap<std::wstring, VInfo>::const_iterator;
     bool FindTable(_Out_ map_iterator *it) const;
-    bool GetTonePos(_In_ bool predict, _Out_ Telex::VINFO *vinfo) const;
+    bool GetTonePos(_In_ bool predict, _Out_ VInfo *vinfo) const;
 
 private:
     DISALLOW_COPY_AND_ASSIGN(TelexEngine);

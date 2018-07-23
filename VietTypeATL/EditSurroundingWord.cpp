@@ -214,7 +214,7 @@ HRESULT VietType::EditSessions::EditSurroundingWord(
     controller->GetEngine().Backconvert(std::wstring(&buf[static_cast<size_t>(retrieved - wordlen - ignore)], wordlen));
 #pragma warning(pop)
 
-    if (controller->GetEngine().GetState() != Telex::TelexStates::VALID) {
+    if (controller->GetEngine().GetState() != Telex::TelexStates::Valid) {
         // if found a bad word, force-terminate the composition
         //hr = compositionManager->EndCompositionNow(ec);
         //HRESULT_CHECK_RETURN(hr, L"%s", L"compositionManager->EndCompositionNow failed");

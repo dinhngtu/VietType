@@ -40,7 +40,7 @@ HRESULT VietType::EditSessions::EditBlocked(
 
     if (hr == S_OK && openclose) {
         DBG_DPRINT(L"%s", L"blocked: openclose");
-        controller->SetBlocked(VietType::BlockedKind::BLOCKED);
+        controller->SetBlocked(VietType::EngineController::BlockedKind::Blocked);
         return S_OK;
     }
 
@@ -59,7 +59,7 @@ HRESULT VietType::EditSessions::EditBlocked(
 
     if (hr == S_OK && contextDisabled) {
         DBG_DPRINT(L"%s", L"blocked: context disabled");
-        controller->SetBlocked(VietType::BlockedKind::BLOCKED);
+        controller->SetBlocked(VietType::EngineController::BlockedKind::Blocked);
         return S_OK;
     }
 
@@ -71,7 +71,7 @@ HRESULT VietType::EditSessions::EditBlocked(
     if (st.dwStaticFlags & TF_SS_TRANSITORY) {
         // transitory context doesn't seem to support input scopes, free right away
         DBG_DPRINT(L"%s", L"free: transitory context");
-        controller->SetBlocked(VietType::BlockedKind::FREE);
+        controller->SetBlocked(VietType::EngineController::BlockedKind::Free);
         return S_OK;
     }
 
@@ -92,7 +92,7 @@ HRESULT VietType::EditSessions::EditBlocked(
 
     if (var.vt != VT_UNKNOWN) {
         DBG_DPRINT(L"bad variant type %d", static_cast<int>(var.vt));
-        controller->SetBlocked(VietType::BlockedKind::FREE);
+        controller->SetBlocked(VietType::EngineController::BlockedKind::Free);
         return E_NOINTERFACE;
     }
 
@@ -105,7 +105,7 @@ HRESULT VietType::EditSessions::EditBlocked(
     hr = iis->GetInputScopes(&pscopes, &scount);
     HRESULT_CHECK_RETURN(hr, L"%s", L"iis->GetInputScopes failed");
 
-    VietType::BlockedKind blocked;
+    VietType::EngineController::BlockedKind blocked;
     InputScope* scopes = pscopes;
     for (UINT i = 0; i < scount; i++) {
         switch (scopes[i]) {
@@ -113,14 +113,11 @@ HRESULT VietType::EditSessions::EditBlocked(
         case IS_EMAIL_USERNAME:
         case IS_LOGINNAME:
         case IS_PASSWORD:
-            blocked = VietType::BlockedKind::BLOCKED;
+            blocked = VietType::EngineController::BlockedKind::Blocked;
             goto commit;
-            //case IS_URL:
-            //blocked = VietType::BlockedKind::ADVISED;
-            //goto commit;
         }
     }
-    blocked = VietType::BlockedKind::FREE;
+    blocked = VietType::EngineController::BlockedKind::Free;
 
 commit:
     DBG_DPRINT(L"setting blocked %d", blocked);

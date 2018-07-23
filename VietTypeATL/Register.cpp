@@ -36,14 +36,14 @@ static std::vector<GUID> SupportedCategories = {
 extern "C" __declspec(dllexport) HRESULT __cdecl RegisterProfiles() {
     HRESULT hr;
 
-    if (!VietType::Globals::dllInstance) {
-        DBG_DPRINT(L"%s", L"VietType::Globals::dllInstance is invalid");
+    if (!VietType::Globals::DllInstance) {
+        DBG_DPRINT(L"%s", L"VietType::Globals::DllInstance is invalid");
         return E_UNEXPECTED;
     }
 
     WCHAR dllPath[MAX_PATH] = { 0 };
 
-    auto dllPathLength = GetModuleFileName(VietType::Globals::dllInstance, dllPath, MAX_PATH);
+    auto dllPathLength = GetModuleFileName(VietType::Globals::DllInstance, dllPath, MAX_PATH);
     if (dllPathLength == 0) {
         WINERROR_RETURN_HRESULT(L"%s", L"GetModuleFileName failed");
     }

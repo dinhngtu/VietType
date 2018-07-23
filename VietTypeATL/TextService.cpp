@@ -77,7 +77,7 @@ STDMETHODIMP VietType::TextService::Activate(_In_ ITfThreadMgr* ptim, _In_ TfCli
 }
 
 STDMETHODIMP VietType::TextService::ActivateEx(_In_ ITfThreadMgr* ptim, _In_ TfClientId tid, _In_ DWORD dwFlags) {
-    DBG_DPRINT(L"h = %p, threadno = %ld, tid = %ld, flags = %lx", Globals::dllInstance, GetCurrentThreadId(), tid, dwFlags);
+    DBG_DPRINT(L"h = %p, threadno = %ld, tid = %ld, flags = %lx", Globals::DllInstance, GetCurrentThreadId(), tid, dwFlags);
 
     HRESULT hr;
 
@@ -119,7 +119,7 @@ STDMETHODIMP VietType::TextService::ActivateEx(_In_ ITfThreadMgr* ptim, _In_ TfC
 }
 
 STDMETHODIMP VietType::TextService::Deactivate(void) {
-    DBG_DPRINT(L"h = %p, threadno = %ld, tid = %ld", Globals::dllInstance, GetCurrentThreadId(), _clientId);
+    DBG_DPRINT(L"h = %p, threadno = %ld, tid = %ld", Globals::DllInstance, GetCurrentThreadId(), _clientId);
 
     HRESULT hr;
 

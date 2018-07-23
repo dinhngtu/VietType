@@ -87,13 +87,13 @@ HRESULT VietType::KeyHandlerEditSession::ComposeKey(_In_ TfEditCookie ec) {
     DBG_DPRINT(L"%s", L"");
 
     switch (Telex::PushKey(_controller->GetEngine(), _wParam, _lParam, _keyState)) {
-    case Telex::TelexStates::VALID: {
+    case Telex::TelexStates::Valid: {
         if (_controller->GetEngine().Count()) {
             auto str = _controller->GetEngine().Peek();
             hr = _compositionManager->EnsureCompositionText(ec, _context, &str[0], static_cast<LONG>(str.length()));
             DBG_HRESULT_CHECK(hr, L"%s", L"_compositionManager->EnsureCompositionText failed");
         } else {
-            // backspace returns VALID on an empty buffer
+            // backspace returns Valid on an empty buffer
             _controller->GetEngine().Reset();
             // EndComposition* will not empty composition text so we have to do it manually
             hr = _compositionManager->EmptyCompositionText(ec);
@@ -104,7 +104,7 @@ HRESULT VietType::KeyHandlerEditSession::ComposeKey(_In_ TfEditCookie ec) {
         break;
     }
 
-    case Telex::TelexStates::INVALID: {
+    case Telex::TelexStates::Invalid: {
         assert(_controller->GetEngine().Count() > 0);
         auto str = _controller->GetEngine().RetrieveInvalid();
         hr = _compositionManager->EnsureCompositionText(ec, _context, &str[0], static_cast<LONG>(str.length()));
@@ -131,14 +131,14 @@ HRESULT VietType::KeyHandlerEditSession::Commit(_In_ TfEditCookie ec) {
     }
 
     switch (_controller->GetEngine().Commit()) {
-    case Telex::TelexStates::COMMITTED: {
+    case Telex::TelexStates::Committed: {
         auto str = _controller->GetEngine().Retrieve();
         hr = _compositionManager->SetCompositionText(ec, &str[0], static_cast<LONG>(str.length()));
         DBG_HRESULT_CHECK(hr, L"%s", L"_compositionManager->EnsureCompositionText failed");
         break;
     }
 
-    case Telex::TelexStates::COMMITTED_INVALID: {
+    case Telex::TelexStates::CommittedInvalid: {
         auto str = _controller->GetEngine().RetrieveInvalid();
         hr = _compositionManager->SetCompositionText(ec, &str[0], static_cast<LONG>(str.length()));
         DBG_HRESULT_CHECK(hr, L"%s", L"_compositionManager->EnsureCompositionText failed");

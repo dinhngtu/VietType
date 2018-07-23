@@ -49,7 +49,7 @@ STDMETHODIMP VietType::ThreadMgrEventSink::OnSetFocus(__RPC__in_opt ITfDocumentM
     DBG_DPRINT(L"pdimFocus = %p, pending = %d", pdimFocus, _controller->IsEditBlockedPending());
 
     if (!pdimFocus) {
-        _controller->SetBlocked(BlockedKind::BLOCKED);
+        _controller->SetBlocked(EngineController::BlockedKind::Blocked);
         return S_OK;
     }
 
@@ -64,7 +64,7 @@ STDMETHODIMP VietType::ThreadMgrEventSink::OnSetFocus(__RPC__in_opt ITfDocumentM
     HRESULT_CHECK_RETURN(hr, L"%s", L"pdimFocus->GetTop failed");
 
     if (!context) {
-        _controller->SetBlocked(BlockedKind::BLOCKED);
+        _controller->SetBlocked(EngineController::BlockedKind::Blocked);
         return S_OK;
     }
 
@@ -72,7 +72,7 @@ STDMETHODIMP VietType::ThreadMgrEventSink::OnSetFocus(__RPC__in_opt ITfDocumentM
     hr = VietType::IsContextEmpty(context, _compMgr->GetClientId(), &isempty);
     HRESULT_CHECK_RETURN(hr, L"%s", L"VietType::IsContextEmpty failed");
     if (isempty) {
-        _controller->SetBlocked(BlockedKind::BLOCKED);
+        _controller->SetBlocked(EngineController::BlockedKind::Blocked);
         return S_OK;
     }
 
@@ -99,7 +99,7 @@ STDMETHODIMP VietType::ThreadMgrEventSink::OnSetFocus(__RPC__in_opt ITfDocumentM
         _controller->ResetEditBlockedPending();
         if (FAILED(hr)) {
             DBG_HRESULT_CHECK(hr, L"%s", L"CompositionManager::RequestEditSession failed");
-            _controller->SetBlocked(BlockedKind::FREE);
+            _controller->SetBlocked(EngineController::BlockedKind::Free);
         }
     }
 

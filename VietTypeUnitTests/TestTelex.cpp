@@ -41,10 +41,10 @@ void TestValidWord(const wchar_t* expected, const wchar_t* input) {
     TelexEngine e(config);
     e.Reset();
     for (auto c : std::wstring(input)) {
-        AssertTelexStatesEqual(TelexStates::VALID, e.PushChar(c));
+        AssertTelexStatesEqual(TelexStates::Valid, e.PushChar(c));
     }
     Assert::AreEqual(expected, e.Peek().c_str());
-    AssertTelexStatesEqual(TelexStates::COMMITTED, e.Commit());
+    AssertTelexStatesEqual(TelexStates::Committed, e.Commit());
     Assert::AreEqual(expected, e.Retrieve().c_str());
 }
 
@@ -54,7 +54,7 @@ void TestInvalidWord(const wchar_t* expected, const wchar_t* input) {
     for (auto c : std::wstring(input)) {
         e.PushChar(c);
     }
-    AssertTelexStatesEqual(TelexStates::COMMITTED_INVALID, e.Commit());
+    AssertTelexStatesEqual(TelexStates::CommittedInvalid, e.Commit());
     Assert::AreEqual(expected, e.RetrieveInvalid().c_str());
 }
 
@@ -76,42 +76,42 @@ public:
     TEST_METHOD(TestEmptyPushCharC1_1) {
         TelexEngine e(config);
         e.Reset();
-        AssertTelexStatesEqual(TelexStates::VALID, e.PushChar(L'b'));
+        AssertTelexStatesEqual(TelexStates::Valid, e.PushChar(L'b'));
         Assert::AreEqual(L"b", e.Retrieve().c_str());
     }
 
     TEST_METHOD(TestEmptyPushCharC1_2) {
         TelexEngine e(config);
         e.Reset();
-        AssertTelexStatesEqual(TelexStates::VALID, e.PushChar(L'c'));
+        AssertTelexStatesEqual(TelexStates::Valid, e.PushChar(L'c'));
         Assert::AreEqual(L"c", e.Retrieve().c_str());
     }
 
     TEST_METHOD(TestEmptyPushCharC1_3) {
         TelexEngine e(config);
         e.Reset();
-        AssertTelexStatesEqual(TelexStates::VALID, e.PushChar(L'd'));
+        AssertTelexStatesEqual(TelexStates::Valid, e.PushChar(L'd'));
         Assert::AreEqual(L"d", e.Retrieve().c_str());
     }
 
     TEST_METHOD(TestEmptyPushCharC1_4) {
         TelexEngine e(config);
         e.Reset();
-        AssertTelexStatesEqual(TelexStates::VALID, e.PushChar(L'r'));
+        AssertTelexStatesEqual(TelexStates::Valid, e.PushChar(L'r'));
         Assert::AreEqual(L"r", e.Retrieve().c_str());
     }
 
     TEST_METHOD(TestEmptyPushCharC1_5) {
         TelexEngine e(config);
         e.Reset();
-        AssertTelexStatesEqual(TelexStates::VALID, e.PushChar(L'x'));
+        AssertTelexStatesEqual(TelexStates::Valid, e.PushChar(L'x'));
         Assert::AreEqual(L"x", e.Retrieve().c_str());
     }
 
     TEST_METHOD(TestEmptyPushCharV) {
         TelexEngine e(config);
         e.Reset();
-        AssertTelexStatesEqual(TelexStates::VALID, e.PushChar(L'a'));
+        AssertTelexStatesEqual(TelexStates::Valid, e.PushChar(L'a'));
         Assert::AreEqual(L"a", e.Retrieve().c_str());
     }
 
@@ -120,14 +120,14 @@ public:
     TEST_METHOD(TestEmptyPushCharUpC1) {
         TelexEngine e(config);
         e.Reset();
-        AssertTelexStatesEqual(TelexStates::VALID, e.PushChar(L'B'));
+        AssertTelexStatesEqual(TelexStates::Valid, e.PushChar(L'B'));
         Assert::AreEqual(L"B", e.Retrieve().c_str());
     }
 
     TEST_METHOD(TestEmptyPushCharUpV) {
         TelexEngine e(config);
         e.Reset();
-        AssertTelexStatesEqual(TelexStates::VALID, e.PushChar(L'A'));
+        AssertTelexStatesEqual(TelexStates::Valid, e.PushChar(L'A'));
         Assert::AreEqual(L"A", e.Retrieve().c_str());
     }
 
@@ -146,21 +146,21 @@ public:
     TEST_METHOD(TestEmptyCommit) {
         TelexEngine e(config);
         e.Reset();
-        AssertTelexStatesEqual(TelexStates::COMMITTED, e.Commit());
+        AssertTelexStatesEqual(TelexStates::Committed, e.Commit());
         Assert::AreEqual(L"", e.Retrieve().c_str());
     }
 
     TEST_METHOD(TestEmptyForceCommit) {
         TelexEngine e(config);
         e.Reset();
-        AssertTelexStatesEqual(TelexStates::COMMITTED, e.ForceCommit());
+        AssertTelexStatesEqual(TelexStates::Committed, e.ForceCommit());
         Assert::AreEqual(L"", e.Retrieve().c_str());
     }
 
     TEST_METHOD(TestEmptyCancel) {
         TelexEngine e(config);
         e.Reset();
-        AssertTelexStatesEqual(TelexStates::COMMITTED_INVALID, e.Cancel());
+        AssertTelexStatesEqual(TelexStates::CommittedInvalid, e.Cancel());
         Assert::AreEqual(L"", e.RetrieveInvalid().c_str());
     }
 
@@ -310,13 +310,13 @@ public:
     TEST_METHOD(TestBackspaceDdoongf) {
         TelexEngine e(config);
         FeedWord(e, L"ddoongf");
-        AssertTelexStatesEqual(TelexStates::VALID, e.Backspace());
+        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
         Assert::AreEqual(L"\x111\x1ed3n", e.Peek().c_str());
-        AssertTelexStatesEqual(TelexStates::VALID, e.Backspace());
+        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
         Assert::AreEqual(L"\x111\x1ed3", e.Peek().c_str());
-        AssertTelexStatesEqual(TelexStates::VALID, e.Backspace());
+        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
         Assert::AreEqual(L"\x111", e.Peek().c_str());
-        AssertTelexStatesEqual(TelexStates::VALID, e.Backspace());
+        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
         Assert::AreEqual(L"", e.Peek().c_str());
     }
 
@@ -324,7 +324,7 @@ public:
         TelexEngine e(config);
         FeedWord(e, L"leeen");
         Assert::AreEqual(L"leen", e.Peek().c_str());
-        AssertTelexStatesEqual(TelexStates::INVALID, e.Backspace());
+        AssertTelexStatesEqual(TelexStates::Invalid, e.Backspace());
         Assert::AreEqual(L"lee", e.Peek().c_str());
     }
 
@@ -332,11 +332,11 @@ public:
         TelexEngine e(config);
         FeedWord(e, L"huowng");
         Assert::AreEqual(L"h\x1b0\x1a1ng", e.Peek().c_str());
-        AssertTelexStatesEqual(TelexStates::VALID, e.Backspace());
+        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
         Assert::AreEqual(L"h\x1b0\x1a1n", e.Peek().c_str());
-        AssertTelexStatesEqual(TelexStates::VALID, e.Backspace());
+        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
         Assert::AreEqual(L"hu\x1a1", e.Peek().c_str());
-        AssertTelexStatesEqual(TelexStates::VALID, e.Backspace());
+        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
         Assert::AreEqual(L"hu", e.Peek().c_str());
     }
 
@@ -344,19 +344,19 @@ public:
 
     TEST_METHOD(TestBackconversionDdoongf) {
         TelexEngine e(config);
-        AssertTelexStatesEqual(TelexStates::VALID, e.Backconvert(L"\x111\x1ed3ng"));
+        AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(L"\x111\x1ed3ng"));
         Assert::AreEqual(L"\x111\x1ed3ng", e.Peek().c_str());
     }
 
     TEST_METHOD(TestBackconversionSystem) {
         TelexEngine e(config);
-        AssertTelexStatesEqual(TelexStates::INVALID, e.Backconvert(L"system"));
+        AssertTelexStatesEqual(TelexStates::Invalid, e.Backconvert(L"system"));
         Assert::AreEqual(L"system", e.Peek().c_str());
     }
 
     TEST_METHOD(TestBackconversionThees) {
         TelexEngine e(config);
-        AssertTelexStatesEqual(TelexStates::VALID, e.Backconvert(L"TH\x1ebe"));
+        AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(L"TH\x1ebe"));
         Assert::AreEqual(L"TH\x1ebe", e.Peek().c_str());
     }
 };

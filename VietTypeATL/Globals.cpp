@@ -18,16 +18,16 @@
 #include "stdafx.h"
 #include "Globals.h"
 
-HINSTANCE VietType::Globals::dllInstance = nullptr;
+HINSTANCE VietType::Globals::DllInstance = nullptr;
 
 // {c0dd01a1-0deb-454b-8b42-d22ced1b4b23}
 const CLSID VietType::Globals::CLSID_TextService = { 0xc0dd01a1, 0x0deb, 0x454b, { 0x8b, 0x42, 0xd2, 0x2c, 0xed, 0x1b, 0x4b, 0x23 } };
 
+// {8D93D10A-203B-4C5F-A122-8898EF9C56F5}
+const GUID VietType::Globals::GUID_Profile = { 0x8d93d10a, 0x203b, 0x4c5f,{ 0xa1, 0x22, 0x88, 0x98, 0xef, 0x9c, 0x56, 0xf5 } };
+
 // {B31B741B-63CE-413A-9B5A-D2B69C695A78}
 const GUID VietType::Globals::GUID_SettingsCompartment_Toggle = { 0xb31b741b, 0x63ce, 0x413a, { 0x9b, 0x5a, 0xd2, 0xb6, 0x9c, 0x69, 0x5a, 0x78 } };
-
-// {8D93D10A-203B-4C5F-A122-8898EF9C56F5}
-const GUID VietType::Globals::GUID_Profile = { 0x8d93d10a, 0x203b, 0x4c5f, { 0xa1, 0x22, 0x88, 0x98, 0xef, 0x9c, 0x56, 0xf5 } };
 
 // pass this as guidItem of language bar item to make it show on the input indicator (the one next to the clock) instead of the language bar
 const GUID VietType::Globals::GUID_LBI_INPUTMODE = { 0x2C77A81E, 0x41CC, 0x4178,{ 0xA3, 0xA7, 0x5F, 0x8A, 0x98, 0x75, 0x68, 0xE6 } };

@@ -18,7 +18,7 @@
 #include "Utilities.h"
 #include "Compartment.h"
 
-HRESULT VietType::IsContextEmpty(_In_ ITfContext* context, TfClientId clientid, _Out_ bool* isempty) {
+HRESULT VietType::IsContextEmpty(_In_ ITfContext* context, _In_ TfClientId clientid, _Out_ bool* isempty) {
     HRESULT hr;
 
     CComPtr<Compartment> compEmpty;

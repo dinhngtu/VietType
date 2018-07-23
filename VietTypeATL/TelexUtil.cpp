@@ -21,84 +21,84 @@
 namespace VietType {
 namespace Telex {
 
-static const CHR_CATEGORIES letterClasses[26] = {
-    CHR_CATEGORIES::VOWEL, // a
-    CHR_CATEGORIES::CONSO_C1, // b
-    CHR_CATEGORIES::CONSO_C1 | CHR_CATEGORIES::CONSO_C2, // c
-    CHR_CATEGORIES::CONSO_C1 | CHR_CATEGORIES::CONSO_CONTINUE, // d
-    CHR_CATEGORIES::VOWEL, // e
-    CHR_CATEGORIES::TONE, // f
-    CHR_CATEGORIES::CONSO_C1 | CHR_CATEGORIES::CONSO_CONTINUE, // g
-    CHR_CATEGORIES::CONSO_C1 | CHR_CATEGORIES::CONSO_CONTINUE, // h
-    CHR_CATEGORIES::VOWEL, // i
-    CHR_CATEGORIES::TONE, // j
-    CHR_CATEGORIES::CONSO_C1, // k
-    CHR_CATEGORIES::CONSO_C1, // l
-    CHR_CATEGORIES::CONSO_C1 | CHR_CATEGORIES::CONSO_C2, // m
-    CHR_CATEGORIES::CONSO_C1 | CHR_CATEGORIES::CONSO_C2, // n
-    CHR_CATEGORIES::VOWEL, // o
-    CHR_CATEGORIES::CONSO_C1 | CHR_CATEGORIES::CONSO_C2, // p
-    CHR_CATEGORIES::CONSO_C1, // q
-    CHR_CATEGORIES::TONE | CHR_CATEGORIES::CONSO_C1 | CHR_CATEGORIES::CONSO_CONTINUE, // r
-    CHR_CATEGORIES::TONE | CHR_CATEGORIES::CONSO_C1 | CHR_CATEGORIES::CONSO_CONTINUE, // s
-    CHR_CATEGORIES::CONSO_C1 | CHR_CATEGORIES::CONSO_C2, // t
-    CHR_CATEGORIES::VOWEL, // u
-    CHR_CATEGORIES::CONSO_C1, // v
-    CHR_CATEGORIES::VOWEL_W, // w
-    CHR_CATEGORIES::TONE | CHR_CATEGORIES::CONSO_C1, // x
-    CHR_CATEGORIES::VOWEL, // y
-    CHR_CATEGORIES::TONE, // z
+static const CharTypes letterClasses[26] = {
+    CharTypes::Vowel, // a
+    CharTypes::ConsoC1, // b
+    CharTypes::ConsoC1 | CharTypes::ConsoC2, // c
+    CharTypes::ConsoC1 | CharTypes::ConsoContinue, // d
+    CharTypes::Vowel, // e
+    CharTypes::Tone, // f
+    CharTypes::ConsoC1 | CharTypes::ConsoContinue, // g
+    CharTypes::ConsoC1 | CharTypes::ConsoContinue, // h
+    CharTypes::Vowel, // i
+    CharTypes::Tone, // j
+    CharTypes::ConsoC1, // k
+    CharTypes::ConsoC1, // l
+    CharTypes::ConsoC1 | CharTypes::ConsoC2, // m
+    CharTypes::ConsoC1 | CharTypes::ConsoC2, // n
+    CharTypes::Vowel, // o
+    CharTypes::ConsoC1 | CharTypes::ConsoC2, // p
+    CharTypes::ConsoC1, // q
+    CharTypes::Tone | CharTypes::ConsoC1 | CharTypes::ConsoContinue, // r
+    CharTypes::Tone | CharTypes::ConsoC1 | CharTypes::ConsoContinue, // s
+    CharTypes::ConsoC1 | CharTypes::ConsoC2, // t
+    CharTypes::Vowel, // u
+    CharTypes::ConsoC1, // v
+    CharTypes::VowelW, // w
+    CharTypes::Tone | CharTypes::ConsoC1, // x
+    CharTypes::Vowel, // y
+    CharTypes::Tone, // z
 };
 
-CHR_CATEGORIES ClassifyCharacter(wchar_t c) {
+CharTypes ClassifyCharacter(_In_ wchar_t c) {
     if (c >= L'a' && c <= L'z') {
         return letterClasses[c - L'a'];
     }
     switch (c) {
     case L'\b':
-        return CHR_CATEGORIES::BACKSPACE;
+        return CharTypes::Backspace;
     case L'\0':
-        return CHR_CATEGORIES::FORCECOMMIT;
+        return CharTypes::ForceCommit;
     case L'\t':
     case L'\n':
     case L'\r':
     case L'|':
     case L'~':
-        return CHR_CATEGORIES::COMMIT;
+        return CharTypes::Commit;
     case L'[':
     case L']':
     case L'{':
     case L'}':
-        return CHR_CATEGORIES::SHORTHANDS;
+        return CharTypes::Shorthand;
     }
 
     if (c >= 32 && c <= 64) {
         // ' ' to '@'
-        return CHR_CATEGORIES::COMMIT;
+        return CharTypes::Commit;
     }
     if (c >= 91 && c <= 96) {
-        return CHR_CATEGORIES::COMMIT;
+        return CharTypes::Commit;
     }
 
-    return CHR_CATEGORIES::UNCATEGORIZED;
+    return CharTypes::Uncategorized;
 }
 
-TONES GetTone(wchar_t c) {
+Tones GetTone(_In_ wchar_t c) {
     switch (c) {
     case L'z':
-        return TONES::Z;
+        return Tones::Z;
     case L'f':
-        return TONES::F;
+        return Tones::F;
     case L'j':
-        return TONES::J;
+        return Tones::J;
     case L'r':
-        return TONES::R;
+        return Tones::R;
     case L's':
-        return TONES::S;
+        return Tones::S;
     case L'x':
-        return TONES::X;
+        return Tones::X;
     default:
-        return TONES::Z;
+        return Tones::Z;
     }
 }
 

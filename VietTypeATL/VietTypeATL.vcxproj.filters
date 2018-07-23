@@ -207,6 +207,9 @@
     <ClInclude Include="ComUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TelexInternal.h">
+      <Filter>Telex\Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="VietTypeATL.rc">

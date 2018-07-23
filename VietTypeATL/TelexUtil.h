@@ -17,50 +17,50 @@
 
 #pragma once
 
-#include "TelexData.h"
+#include "TelexInternal.h"
 
 namespace VietType {
 namespace Telex {
 
-enum class CHR_CATEGORIES : int {
-    UNCATEGORIZED = 0,
-    COMMIT = 1 << 0,
-    FORCECOMMIT = 1 << 1,
-    BACKSPACE = 1 << 2,
-    VOWEL = 1 << 3,
-    VOWEL_W = 1 << 4,
+enum class CharTypes : int {
+    Uncategorized = 0,
+    Commit = 1 << 0,
+    ForceCommit = 1 << 1,
+    Backspace = 1 << 2,
+    Vowel = 1 << 3,
+    VowelW = 1 << 4,
     // TODO: classification for vowel continue
-    CONSO = 1 << 5,
-    CONSO_C1 = 1 << 5 | 1 << 6,
-    CONSO_C2 = 1 << 5 | 1 << 7,
-    CONSO_CONTINUE = 1 << 5 | 1 << 8,
-    TONE = 1 << 9,
-    SHORTHANDS = 1 << 10,
+    Conso = 1 << 5,
+    ConsoC1 = 1 << 5 | 1 << 6,
+    ConsoC2 = 1 << 5 | 1 << 7,
+    ConsoContinue = 1 << 5 | 1 << 8,
+    Tone = 1 << 9,
+    Shorthand = 1 << 10,
 };
 
-using CHR_CATEGORIES_T = std::underlying_type_t<CHR_CATEGORIES>;
+using chartypes_t = std::underlying_type_t<CharTypes>;
 
-inline CHR_CATEGORIES operator|(CHR_CATEGORIES lhs, CHR_CATEGORIES rhs) {
-    return static_cast<CHR_CATEGORIES>(static_cast<CHR_CATEGORIES_T>(lhs) | static_cast<CHR_CATEGORIES_T>(rhs));
+inline CharTypes operator|(CharTypes lhs, CharTypes rhs) {
+    return static_cast<CharTypes>(static_cast<chartypes_t>(lhs) | static_cast<chartypes_t>(rhs));
 }
 
-inline CHR_CATEGORIES& operator|=(CHR_CATEGORIES lhs, CHR_CATEGORIES rhs) {
-    lhs = static_cast<CHR_CATEGORIES>(static_cast<CHR_CATEGORIES_T>(lhs) | static_cast<CHR_CATEGORIES_T>(rhs));
+inline CharTypes& operator|=(CharTypes lhs, CharTypes rhs) {
+    lhs = static_cast<CharTypes>(static_cast<chartypes_t>(lhs) | static_cast<chartypes_t>(rhs));
     return lhs;
 }
 
-inline CHR_CATEGORIES operator&(CHR_CATEGORIES lhs, CHR_CATEGORIES rhs) {
-    return static_cast<CHR_CATEGORIES>(static_cast<CHR_CATEGORIES_T>(lhs) & static_cast<CHR_CATEGORIES_T>(rhs));
+inline CharTypes operator&(CharTypes lhs, CharTypes rhs) {
+    return static_cast<CharTypes>(static_cast<chartypes_t>(lhs) & static_cast<chartypes_t>(rhs));
 }
 
-inline CHR_CATEGORIES& operator&=(CHR_CATEGORIES lhs, CHR_CATEGORIES rhs) {
-    lhs = static_cast<CHR_CATEGORIES>(static_cast<CHR_CATEGORIES_T>(lhs) & static_cast<CHR_CATEGORIES_T>(rhs));
+inline CharTypes& operator&=(CharTypes lhs, CharTypes rhs) {
+    lhs = static_cast<CharTypes>(static_cast<chartypes_t>(lhs) & static_cast<chartypes_t>(rhs));
     return lhs;
 }
 
 /// <summary>classifies lower characters only</summary>
-CHR_CATEGORIES ClassifyCharacter(wchar_t c);
-TONES GetTone(wchar_t c);
+CharTypes ClassifyCharacter(_In_ wchar_t c);
+Tones GetTone(_In_ wchar_t c);
 
 }
 }

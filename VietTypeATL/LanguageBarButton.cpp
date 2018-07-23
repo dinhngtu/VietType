@@ -17,6 +17,7 @@
 
 #include "LanguageBarButton.h"
 
+// just a random number to identify the sink
 const DWORD LanguageBarButtonCookie = 0x5a6fdd5e;
 
 VietType::LanguageBarButton::LanguageBarButton() noexcept {

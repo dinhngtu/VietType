@@ -15,21 +15,41 @@
 // You should have received a copy of the GNU General Public License
 // along with VietType.  If not, see <https://www.gnu.org/licenses/>.
 
-// dllmain.cpp : Implementation of DllMain.
+#pragma once
 
-#include "stdafx.h"
-#include "resource.h"
-#include "VietTypeATL_i.h"
-#include "dllmain.h"
-#include "Globals.h"
+#include <map>
+#include <unordered_map>
+#include <set>
+#include <unordered_set>
+#include <vector>
 
-CVietTypeATLModule _AtlModule;
+namespace VietType {
+namespace Telex {
 
-// DLL Entry Point
-extern "C" BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved)
-{
-    if (dwReason == DLL_PROCESS_ATTACH) {
-        VietType::Globals::DllInstance = hInstance;
-    }
-    return _AtlModule.DllMain(dwReason, lpReserved);
+enum class Tones {
+    Z,
+    F,
+    J,
+    R,
+    S,
+    X,
+};
+
+enum class C2Mode {
+    Either,
+    MustC2,
+    NoC2,
+};
+
+struct VInfo {
+    int tonepos;
+    C2Mode c2mode;
+};
+
+template<typename K, typename V>
+using genmap = std::unordered_map<K, V>;
+template<typename T>
+using genset = std::unordered_set<T>;
+
+}
 }
