@@ -25,8 +25,6 @@
 const GUID VietType::GUID_LanguageBarButton_Item = { 0xcca3d390, 0xef1a, 0x4de4, { 0xb2, 0xff, 0xb6, 0xbc, 0x76, 0xd6, 0x8c, 0x3b } };
 
 VietType::EngineController::EngineController() noexcept {
-    _indicatorButton = std::make_unique<IndicatorButton>(this);
-    _langBarButton = std::make_unique<LangBarButton>(this);
 }
 
 VietType::EngineController::~EngineController() {
@@ -238,6 +236,7 @@ HRESULT VietType::EngineController::CompartmentWriteEnabled(_In_ long enabled) {
 _Check_return_ HRESULT VietType::EngineController::InitLanguageBar() {
     HRESULT hr;
 
+    _indicatorButton = std::make_unique<IndicatorButton>(this);
     hr = _indicatorButton->Initialize(
         _langBarItemMgr,
         Globals::GUID_LBI_INPUTMODE,
@@ -246,6 +245,7 @@ _Check_return_ HRESULT VietType::EngineController::InitLanguageBar() {
         Globals::TextServiceDescription);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_indicatorButton->Initialize failed");
 
+    _langBarButton = std::make_unique<LangBarButton>(this);
     hr = _langBarButton->Initialize(
         _langBarItemMgr,
         VietType::GUID_LanguageBarButton_Item,
@@ -258,8 +258,11 @@ _Check_return_ HRESULT VietType::EngineController::InitLanguageBar() {
 }
 
 HRESULT VietType::EngineController::UninitLanguageBar() {
-    _indicatorButton->Uninitialize();
     _langBarButton->Uninitialize();
+    _langBarButton.reset();
+
+    _indicatorButton->Uninitialize();
+    _indicatorButton.reset();
 
     return S_OK;
 }
