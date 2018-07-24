@@ -45,13 +45,13 @@
 /// <summary>support function, do not use directly</summary>
 template <typename... Args>
 void _dprint(_In_ LPCWSTR func, _In_ int line, _In_ LPCWSTR fmt, Args... args) {
-    WCHAR buf[2048];
-    StringCchPrintf(buf, 2048, fmt, func, line, args...);
-    OutputDebugString(buf);
+    std::array<WCHAR, 2048> buf;
+    StringCchPrintf(&buf[0], buf.size(), fmt, func, line, args...);
+    OutputDebugString(&buf[0]);
 }
 
 // print formatted string to debugger output
-#define DPRINT(fmt, ...) _dprint(__FUNCTIONW__, __LINE__, L"%s:%d: " fmt "\n", __VA_ARGS__)
+#define DPRINT(fmt, ...) _dprint(__FUNCTIONW__, __LINE__, L"%s:%d: " fmt L"\n", __VA_ARGS__)
 // check if HRESULT is successful; if not, print error information to debugger output and return from calling function
 #define HRESULT_CHECK_RETURN(hr, fmt, ...) if (FAILED(hr)) { DPRINT(L"HRESULT error %lx: " fmt, hr, __VA_ARGS__); return hr; }
 
@@ -69,17 +69,17 @@ void _dprint(_In_ LPCWSTR func, _In_ int line, _In_ LPCWSTR fmt, Args... args) {
 /// <summary>support function, do not use directly</summary>
 template <typename... Args>
 void _winerrorprint(_In_ LPCWSTR func, _In_ int line, _In_ DWORD err, _In_ LPCWSTR fmt, Args... args) {
-    WCHAR errmessage[256];
-    auto chars = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, err, 0, errmessage, 256, NULL);
+    std::array<WCHAR, 256> errmessage;
+    auto chars = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, err, 0, &errmessage[0], static_cast<DWORD>(errmessage.size()), NULL);
     assert(chars >= 0 && chars < 256);
     errmessage[chars] = 0;
 
-    WCHAR buf[2048];
-    StringCchPrintf(buf, 2048, fmt, func, line, err, errmessage, args...);
-    OutputDebugString(buf);
+    std::array<WCHAR, 2048> buf;
+    StringCchPrintf(&buf[0], buf.size(), fmt, func, line, err, errmessage, args...);
+    OutputDebugString(&buf[0]);
 }
 
 // format win32 error and print formatted string to debugger output
-#define WINERROR_PRINT(err, fmt, ...) _winerrorprint(__FUNCTIONW__, __LINE__, err, L"%s:%d: WINERROR %lx (%s): " fmt "\n", __VA_ARGS__)
+#define WINERROR_PRINT(err, fmt, ...) _winerrorprint(__FUNCTIONW__, __LINE__, err, L"%s:%d: WINERROR %lx (%s): " fmt L"\n", __VA_ARGS__)
 // format win32 error, print formatted string to debugger output, and return from calling function with error converted to HRESULT
 #define WINERROR_RETURN_HRESULT(fmt, ...) do { auto err = GetLastError(); WINERROR_PRINT(err, fmt, __VA_ARGS__); return HRESULT_FROM_WIN32(err); } while (0)

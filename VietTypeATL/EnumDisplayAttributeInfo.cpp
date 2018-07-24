@@ -55,7 +55,7 @@ STDMETHODIMP VietType::EnumDisplayAttributeInfo::Next(_In_ ULONG ulCount, __RPC_
         _index++;
     }
     if (pcFetched) {
-        *pcFetched = static_cast<ULONG>(i);
+        *pcFetched = i;
     }
     return (i == ulCount) ? S_OK : S_FALSE;
 }
@@ -76,7 +76,7 @@ void VietType::EnumDisplayAttributeInfo::Initialize(_In_ const info_vector_type&
 }
 
 void VietType::EnumDisplayAttributeInfo::AddAttribute(_In_ ITfDisplayAttributeInfo* item) {
-    _items.push_back(item);
+    _items.push_back(CComPtr<ITfDisplayAttributeInfo>(item));
 }
 
 _Ret_valid_ ITfDisplayAttributeInfo* VietType::EnumDisplayAttributeInfo::GetAttribute(_In_ info_vector_type::size_type index) {
