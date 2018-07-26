@@ -46,15 +46,18 @@ along with VietType.  If not, see <https://www.gnu.org/licenses/>.
     <Condition Message="32-bit setup can only run on a 32-bit OS.">Installed OR (NOT VersionNT64)</Condition>
     <?endif ?>
 
-    <SetProperty Id="RegisterCategories" Value='"[INSTALLFOLDER]\Registrar.exe" 0 0' After="CostFinalize" Sequence="execute" />
-    <SetProperty Id="RegisterCategoriesRollback" Value='"[INSTALLFOLDER]\Registrar.exe" 1 0' After="CostFinalize" Sequence="execute" />
-    <SetProperty Id="UnregisterCategories" Value='"[INSTALLFOLDER]\Registrar.exe" 1 0' After="CostFinalize" Sequence="execute" />
-    <SetProperty Id="UnregisterCategoriesRollback" Value='"[INSTALLFOLDER]\Registrar.exe" 0 0' After="CostFinalize" Sequence="execute" />
+    <SetProperty Id="RegisterCategories" Value='"[#Registrar.exe]" 0 0' After="CostFinalize" Sequence="execute" />
+    <SetProperty Id="RegisterCategoriesRollback" Value='"[#Registrar.exe]" 1 0' After="CostFinalize" Sequence="execute" />
+    <SetProperty Id="UnregisterCategories" Value='"[#Registrar.exe]" 1 0' After="CostFinalize" Sequence="execute" />
+    <SetProperty Id="UnregisterCategoriesRollback" Value='"[#Registrar.exe]" 0 0' After="CostFinalize" Sequence="execute" />
 
-    <SetProperty Id="RegisterProfiles" Value='"[INSTALLFOLDER]\Registrar.exe" 0 1' After="CostFinalize" Sequence="execute" />
-    <SetProperty Id="RegisterProfilesRollback" Value='"[INSTALLFOLDER]\Registrar.exe" 1 1' After="CostFinalize" Sequence="execute" />
-    <SetProperty Id="UnregisterProfiles" Value='"[INSTALLFOLDER]\Registrar.exe" 1 1' After="CostFinalize" Sequence="execute" />
-    <SetProperty Id="UnregisterProfilesRollback" Value='"[INSTALLFOLDER]\Registrar.exe" 0 1' After="CostFinalize" Sequence="execute" />
+    <SetProperty Id="RegisterProfiles" Value='"[#Registrar.exe]" 0 1' After="CostFinalize" Sequence="execute" />
+    <SetProperty Id="RegisterProfilesRollback" Value='"[#Registrar.exe]" 1 1' After="CostFinalize" Sequence="execute" />
+    <SetProperty Id="UnregisterProfiles" Value='"[#Registrar.exe]" 1 1' After="CostFinalize" Sequence="execute" />
+    <SetProperty Id="UnregisterProfilesRollback" Value='"[#Registrar.exe]" 0 1' After="CostFinalize" Sequence="execute" />
+
+    <SetProperty Id="ActivateProfiles" Value='"[#Registrar.exe]" 0 2' After="CostFinalize" Sequence="execute" />
+    <SetProperty Id="DeactivateProfiles" Value='"[#Registrar.exe]" 1 2' After="CostFinalize" Sequence="execute" />
 
     <InstallExecuteSequence>
       <Custom Action="RegisterCategoriesRollback" After="InstallFiles">(NOT Installed) OR REINSTALL</Custom>
@@ -130,6 +133,10 @@ along with VietType.  If not, see <https://www.gnu.org/licenses/>.
     <CustomAction Id="RegisterProfilesRollback" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="rollback" />
     <CustomAction Id="UnregisterProfiles" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="deferred" />
     <CustomAction Id="UnregisterProfilesRollback" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="rollback" />
+
+    <CustomAction Id="ActivateProfiles" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="yes" Execute="deferred" Return="ignore" />
+    <!-- since DeactivateProfiles is called during uninstall, we should use ignore instead of asyncNoWait -->
+    <CustomAction Id="DeactivateProfiles" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="yes" Execute="deferred" Return="ignore" />
     
     <?elseif $(var.Platform) = x64 ?>
     <CustomAction Id="RegisterCategories" BinaryKey="WixCA" DllEntry="WixQuietExec64" Impersonate="no" Execute="deferred" />
@@ -141,6 +148,9 @@ along with VietType.  If not, see <https://www.gnu.org/licenses/>.
     <CustomAction Id="RegisterProfilesRollback" BinaryKey="WixCA" DllEntry="WixQuietExec64" Impersonate="no" Execute="rollback" />
     <CustomAction Id="UnregisterProfiles" BinaryKey="WixCA" DllEntry="WixQuietExec64" Impersonate="no" Execute="deferred" />
     <CustomAction Id="UnregisterProfilesRollback" BinaryKey="WixCA" DllEntry="WixQuietExec64" Impersonate="no" Execute="rollback" />
+
+    <CustomAction Id="ActivateProfiles" BinaryKey="WixCA" DllEntry="WixQuietExec64" Impersonate="yes" Execute="deferred" Return="ignore" />
+    <CustomAction Id="DeactivateProfiles" BinaryKey="WixCA" DllEntry="WixQuietExec64" Impersonate="yes" Execute="deferred" Return="ignore" />
     
     <?else ?>
     <?error Unknown architecture ?>
