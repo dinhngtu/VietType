@@ -53,14 +53,11 @@ extern "C" __declspec(dllexport) HRESULT __cdecl RegisterProfiles() {
     dllPath[dllPathLength] = 0;
     DBG_DPRINT(L"found text service DLL: %s", dllPath);
 
-    CComPtr<ITfInputProcessorProfiles> profiles;
-    hr = profiles.CoCreateInstance(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"profiles.CoCreate failed");
+    CComPtr<ITfInputProcessorProfileMgr> profileMgr;
+    hr = profileMgr.CoCreateInstance(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"profileMgr.CoCreateInstance failed");
 
-    hr = profiles->Register(VietType::Globals::CLSID_TextService);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"profiles->Register failed");
-
-    hr = profiles->AddLanguageProfile(
+    hr = profileMgr->RegisterProfile(
         VietType::Globals::CLSID_TextService,
         VietType::Globals::TextServiceLangId,
         VietType::Globals::GUID_Profile,
@@ -68,26 +65,12 @@ extern "C" __declspec(dllexport) HRESULT __cdecl RegisterProfiles() {
         static_cast<LONG>(VietType::Globals::TextServiceDescription.length()),
         dllPath,
         dllPathLength,
-        static_cast<ULONG>(-IDI_IMELOGO));
-    HRESULT_CHECK_RETURN(hr, L"%s", L"profiles->AddLanguageProfile failed");
-
-    // enable & activate profile
-
-    hr = profiles->EnableLanguageProfile(
-        VietType::Globals::CLSID_TextService,
-        VietType::Globals::TextServiceLangId,
-        VietType::Globals::GUID_Profile,
-        TRUE);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"profiles->EnableLanguageProfile failed");
-
-    hr = profiles->ChangeCurrentLanguage(VietType::Globals::TextServiceLangId);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"profiles->ChangeCurrentLanguage failed");
-
-    hr = profiles->ActivateLanguageProfile(
-        VietType::Globals::CLSID_TextService,
-        VietType::Globals::TextServiceLangId,
-        VietType::Globals::GUID_Profile);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"profiles->ActivateLanguageProfile failed");
+        static_cast<ULONG>(-IDI_IMELOGO),
+        NULL,
+        0,
+        FALSE,
+        0);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"profileMgr->RegisterProfile failed");
 
     return S_OK;
 }
@@ -95,25 +78,15 @@ extern "C" __declspec(dllexport) HRESULT __cdecl RegisterProfiles() {
 extern "C" __declspec(dllexport) HRESULT __cdecl UnregisterProfiles() {
     HRESULT hr;
 
-    CComPtr<ITfInputProcessorProfiles> profiles;
-    hr = profiles.CoCreateInstance(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"profiles.CoCreate failed");
+    CComPtr<ITfInputProcessorProfileMgr> profileMgr;
+    hr = profileMgr.CoCreateInstance(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"profileMgr.CoCreateInstance failed");
 
-    hr = profiles->EnableLanguageProfile(
+    hr = profileMgr->UnregisterProfile(
         VietType::Globals::CLSID_TextService,
         VietType::Globals::TextServiceLangId,
         VietType::Globals::GUID_Profile,
-        FALSE);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"profiles->EnableLanguageProfile failed");
-
-    hr = profiles->RemoveLanguageProfile(
-        VietType::Globals::CLSID_TextService,
-        VietType::Globals::TextServiceLangId,
-        VietType::Globals::GUID_Profile);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"profiles->RemoveLanguageProfile failed");
-
-    hr = profiles->Unregister(VietType::Globals::CLSID_TextService);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"profiles->Unregister failed");
+        TF_URP_ALLPROFILES);
 
     return S_OK;
 }
@@ -161,6 +134,42 @@ extern "C" __declspec(dllexport) HRESULT __cdecl UnregisterCategories() {
             break;
         }
     }
+
+    return S_OK;
+}
+
+extern "C" __declspec(dllexport) HRESULT __cdecl ActivateProfiles() {
+    HRESULT hr;
+
+    CComPtr<ITfInputProcessorProfileMgr> profileMgr;
+    hr = profileMgr.CoCreateInstance(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"profileMgr.CoCreateInstance failed");
+
+    hr = profileMgr->ActivateProfile(
+        TF_PROFILETYPE_INPUTPROCESSOR,
+        VietType::Globals::TextServiceLangId,
+        VietType::Globals::CLSID_TextService,
+        VietType::Globals::GUID_Profile,
+        NULL,
+        TF_IPPMF_ENABLEPROFILE | TF_IPPMF_DONTCARECURRENTINPUTLANGUAGE);
+
+    return S_OK;
+}
+
+extern "C" __declspec(dllexport) HRESULT __cdecl DeactivateProfiles() {
+    HRESULT hr;
+
+    CComPtr<ITfInputProcessorProfileMgr> profileMgr;
+    hr = profileMgr.CoCreateInstance(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"profileMgr.CoCreateInstance failed");
+
+    hr = profileMgr->DeactivateProfile(
+        TF_PROFILETYPE_INPUTPROCESSOR,
+        VietType::Globals::TextServiceLangId,
+        VietType::Globals::CLSID_TextService,
+        VietType::Globals::GUID_Profile,
+        NULL,
+        TF_IPPMF_DISABLEPROFILE);
 
     return S_OK;
 }
