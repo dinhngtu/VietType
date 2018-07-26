@@ -42,6 +42,9 @@ VietType::KeyEventSink::KeyEventSink() noexcept {
 }
 
 VietType::KeyEventSink::~KeyEventSink() {
+}
+
+void VietType::KeyEventSink::FinalRelease() {
     HRESULT hr;
 
     CComPtr<ITfKeystrokeMgr> keystrokeMgr;

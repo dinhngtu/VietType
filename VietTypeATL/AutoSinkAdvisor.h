@@ -22,8 +22,6 @@
 template <typename TSink>
 class AutoSinkAdvisor {
 public:
-    AutoSinkAdvisor() noexcept {
-    }
     ~AutoSinkAdvisor() {
         HRESULT hr = sink.Unadvise();
         DBG_HRESULT_CHECK(hr, L"SinkAdvisor<%s>::Unadvise failed", typeid(TSink).name());
@@ -42,8 +40,6 @@ private:
 template <typename TSink>
 class AutoSingleSinkAdvisor {
 public:
-    AutoSingleSinkAdvisor() noexcept {
-    }
     ~AutoSingleSinkAdvisor() {
         HRESULT hr = sink.Unadvise();
         DBG_HRESULT_CHECK(hr, L"SingleSinkAdvisor<%s>::Unadvise failed", typeid(TSink).name());

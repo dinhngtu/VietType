@@ -32,6 +32,8 @@ public:
     KeyEventSink() noexcept;
     ~KeyEventSink();
 
+    void FinalRelease();
+
     DECLARE_NOT_AGGREGATABLE(KeyEventSink)
     BEGIN_COM_MAP(KeyEventSink)
         COM_INTERFACE_ENTRY(ITfKeyEventSink)
