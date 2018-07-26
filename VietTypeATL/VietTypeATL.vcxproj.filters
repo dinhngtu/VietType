@@ -226,6 +226,7 @@
     <None Include="TextService.rgs">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="cpp.hint" />
   </ItemGroup>
   <ItemGroup>
     <Midl Include="VietTypeATL.idl">
