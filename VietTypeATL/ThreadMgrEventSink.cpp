@@ -95,7 +95,7 @@ STDMETHODIMP VietType::ThreadMgrEventSink::OnSetFocus(__RPC__in_opt ITfDocumentM
             VietType::EditSessions::EditBlocked,
             _compMgr,
             context,
-            static_cast<EngineController*>(_controller));
+            _controller.p);
         _controller->ResetEditBlockedPending();
         if (FAILED(hr)) {
             DBG_HRESULT_CHECK(hr, L"%s", L"CompositionManager::RequestEditSession failed");
@@ -125,26 +125,13 @@ _Check_return_ HRESULT VietType::ThreadMgrEventSink::Initialize(
     _compMgr = compMgr;
     _controller = controller;
 
-    hr = _threadMgrEventSinkAdvisor.Advise(threadMgr, this);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_threadMgrEventSinkAdvisor.Advise failed");
+    auto[threadMgrSink, hrSink] = AutoSinkAdvisor<ITfThreadMgrEventSink>::AdviseSink(threadMgr, this);
+    HRESULT_CHECK_RETURN(hrSink, L"%s", L"AdviseSink(threadMgr) failed");
+    _threadMgrEventSinkAdvisor = std::move(threadMgrSink);
 
     CComPtr<ITfDocumentMgr> documentMgr;
     hr = threadMgr->GetFocus(&documentMgr);
     HRESULT_CHECK_RETURN(hr, L"%s", L"threadMgr->GetFocus failed");
-
-    return hr;
-}
-
-HRESULT VietType::ThreadMgrEventSink::Uninitialize() {
-    HRESULT hr;
-
-    hr = _threadMgrEventSinkAdvisor.Unadvise();
-    DBG_HRESULT_CHECK(hr, L"%s", L"_threadMgrEventSinkAdvisor.Unadvise failed");
-
-    _controller.Release();
-    _compMgr.Release();
-
-    _docMgrFocus.Release();
 
     return hr;
 }

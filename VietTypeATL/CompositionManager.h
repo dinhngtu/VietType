@@ -39,7 +39,6 @@ public:
     virtual STDMETHODIMP OnCompositionTerminated(_In_ TfEditCookie ecWrite, __RPC__in_opt ITfComposition* pComposition) override;
 
     _Check_return_ HRESULT Initialize(_In_ TfClientId clientid, _In_ ITfDisplayAttributeInfo* composingAttribute, _In_ bool comless);
-    void Uninitialize();
 
     // this uses the saved context, only use when there is an active composition
     HRESULT RequestEditSession(_In_ ITfEditSession* session);
@@ -76,10 +75,9 @@ public:
         HRESULT hr;
 
         CComPtr<EditSession<CompositionManager*, ITfContext*, Args...>> session;
-        hr = CreateInstance2(&session);
-        HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&session) failed");
+        hr = ConstructInstance(&session, callback, compositionManager, context, args...);
+        HRESULT_CHECK_RETURN(hr, L"%s", L"ConstructInstance(&session) failed");
 
-        session->Initialize(callback, compositionManager, context, args...);
         HRESULT hrSession;
         hr = context->RequestEditSession(compositionManager->_clientid, session, TF_ES_ASYNCDONTCARE | TF_ES_READWRITE, &hrSession);
         HRESULT_CHECK_RETURN(hr, L"%s", L"context->RequestEditSession failed");
@@ -102,10 +100,9 @@ public:
         HRESULT hr;
 
         CComPtr<EditSession<CompositionManager*, ITfContext*, Args...>> session;
-        hr = CreateInstance2(&session);
-        HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&session) failed");
+        hr = ConstructInstance(&session, callback, compositionManager, context, args...);
+        HRESULT_CHECK_RETURN(hr, L"%s", L"ConstructInstance(&session) failed");
 
-        session->Initialize(callback, compositionManager, context, args...);
         hr = context->RequestEditSession(compositionManager->_clientid, session, flags, hrSession);
         HRESULT_CHECK_RETURN(hr, L"%s", L"context->RequestEditSession failed");
 
@@ -126,8 +123,8 @@ private:
     TfClientId _clientid = TF_CLIENTID_NULL;
     CComPtr<ITfContext> _context;
     CComPtr<ITfComposition> _composition;
-    CComPtr<ITfCategoryMgr> _categoryMgr;
     CComPtr<ITfDisplayAttributeInfo> _composingAttribute;
+    CComPtr<ITfCategoryMgr> _categoryMgr;
 
 private:
     DISALLOW_COPY_AND_ASSIGN(CompositionManager);

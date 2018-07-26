@@ -63,7 +63,7 @@ STDMETHODIMP VietType::KeyHandlerEditSession::DoEditSession(_In_ TfEditCookie ec
     return S_OK;
 }
 
-void VietType::KeyHandlerEditSession::Initialize(
+HRESULT VietType::KeyHandlerEditSession::Initialize(
     _In_ CompositionManager* compositionManager,
     _In_ ITfContext* context,
     _In_ WPARAM wParam,
@@ -79,6 +79,8 @@ void VietType::KeyHandlerEditSession::Initialize(
     _lParam = lParam;
     _keyState = keyState;
     _controller = controller;
+
+    return S_OK;
 }
 
 HRESULT VietType::KeyHandlerEditSession::ComposeKey(_In_ TfEditCookie ec) {

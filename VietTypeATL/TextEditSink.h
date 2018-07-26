@@ -18,7 +18,7 @@
 #pragma once
 
 #include "Common.h"
-#include "SinkAdvisor.h"
+#include "AutoSinkAdvisor.h"
 
 namespace VietType {
 
@@ -43,13 +43,12 @@ public:
     virtual STDMETHODIMP OnEndEdit(__RPC__in_opt ITfContext* pic, _In_ TfEditCookie ecReadOnly, __RPC__in_opt ITfEditRecord* pEditRecord) override;
 
     _Check_return_ HRESULT Initialize(_In_ ITfDocumentMgr* documentMgr, _In_ CompositionManager* compMgr, _In_ EngineController* controller);
-    HRESULT Uninitialize();
 
 private:
     CComPtr<CompositionManager> _compMgr;
     CComPtr<EngineController> _controller;
-    SinkAdvisor<ITfTextEditSink> _textEditSinkAdvisor;
     CComPtr<ITfContext> _editContext;
+    std::unique_ptr<AutoSinkAdvisor<ITfTextEditSink>> _textEditSinkAdvisor;
 
 private:
     DISALLOW_COPY_AND_ASSIGN(TextEditSink);

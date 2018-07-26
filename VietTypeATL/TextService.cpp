@@ -46,18 +46,18 @@ static CComPtr<VietType::EnumDisplayAttributeInfo> CreateAttributeStore() {
     }
 
     CComPtr<VietType::DisplayAttributeInfo> attr1;
-    hr = CreateInstance2(&attr1);
+    hr = ConstructInstance(
+        &attr1,
+        std::get<0>(VietType::ComposingAttributeData),
+        std::get<1>(VietType::ComposingAttributeData),
+        std::get<2>(VietType::ComposingAttributeData));
     if (FAILED(hr)) {
-        DBG_HRESULT_CHECK(hr, L"%s", L"CreateInstance2(&attr1) failed");
+        DBG_HRESULT_CHECK(hr, L"%s", L"ConstructInstance(&attr1) failed");
         ret = nullptr;
         return ret;
     }
 
-    attr1->Initialize(
-        std::get<0>(VietType::ComposingAttributeData),
-        std::get<1>(VietType::ComposingAttributeData),
-        std::get<2>(VietType::ComposingAttributeData));
-    CComPtr<ITfDisplayAttributeInfo> info1(static_cast<ITfDisplayAttributeInfo*>(attr1));
+    CComPtr<ITfDisplayAttributeInfo> info1(attr1.p);
     assert(info1);
     ret->AddAttribute(info1);
 
@@ -89,15 +89,11 @@ STDMETHODIMP VietType::TextService::ActivateEx(_In_ ITfThreadMgr* ptim, _In_ TfC
     engineconfig.oa_uy_tone1 = true;
     _engine = std::make_shared<Telex::TelexEngine>(engineconfig);
 
-    hr = CreateInstance2(&_compositionManager);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&_compositionManager) failed");
-    hr = _compositionManager->Initialize(tid, attributeStore->GetAttribute(0), static_cast<bool>(dwFlags & TF_TMAE_COMLESS));
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_compositionManager->Initialize failed");
+    hr = ConstructInstance(&_compositionManager, tid, attributeStore->GetAttribute(0), static_cast<bool>(dwFlags & TF_TMAE_COMLESS));
+    HRESULT_CHECK_RETURN(hr, L"%s", L"ConstructInstance(&_compositionManager) failed");
 
-    hr = CreateInstance2(&_engineController);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&_engineController) failed");
-    hr = _engineController->Initialize(_engine, ptim, tid);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_engineController->Initialize failed");
+    hr = ConstructInstance(&_engineController, _engine, ptim, tid);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"ConstructInstance(&_engineController) failed");
 
     long enabled;
     hr = _engineController->IsUserEnabled(&enabled);
@@ -105,15 +101,11 @@ STDMETHODIMP VietType::TextService::ActivateEx(_In_ ITfThreadMgr* ptim, _In_ TfC
     hr = _engineController->WriteUserEnabled(enabled);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_engineController->UpdateEnabled failed");
 
-    hr = CreateInstance2(&_keyEventSink);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&_keyEventSink) failed");
-    hr = _keyEventSink->Initialize(ptim, tid, _compositionManager, _engineController);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_keyEventSink->Initialize failed");
+    hr = ConstructInstance(&_keyEventSink, ptim, tid, _compositionManager, _engineController);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"ConstructInstance(&_keyEventSink) failed");
 
-    hr = CreateInstance2(&_threadMgrEventSink);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&_threadMgrEventSink) failed");
-    hr = _threadMgrEventSink->Initialize(ptim, tid, _compositionManager, _engineController);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_threadMgrEventSink->Initialize failed");
+    hr = ConstructInstance(&_threadMgrEventSink, ptim, tid, _compositionManager, _engineController);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"ConstructInstance(&_threadMgrEventSink) failed");
 
     return S_OK;
 }
@@ -121,22 +113,12 @@ STDMETHODIMP VietType::TextService::ActivateEx(_In_ ITfThreadMgr* ptim, _In_ TfC
 STDMETHODIMP VietType::TextService::Deactivate(void) {
     DBG_DPRINT(L"h = %p, threadno = %ld, tid = %ld", Globals::DllInstance, GetCurrentThreadId(), _clientId);
 
-    HRESULT hr;
-
-    hr = _threadMgrEventSink->Uninitialize();
-    DBG_HRESULT_CHECK(hr, L"%s", L"_threadMgrEventSink->Uninitialize failed");
     _threadMgrEventSink.Release();
-
-    hr = _keyEventSink->Uninitialize();
-    DBG_HRESULT_CHECK(hr, L"%s", L"_keyEventSink->Uninitialize failed");
     _keyEventSink.Release();
-
-    hr = _engineController->Uninitialize();
-    DBG_HRESULT_CHECK(hr, L"%s", L"_engineController->Uninitialize failed");
     _engineController.Release();
-
-    _compositionManager->Uninitialize();
     _compositionManager.Release();
+    _engine.reset();
+    _threadMgr.Release();
 
     return S_OK;
 }

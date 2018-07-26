@@ -58,7 +58,7 @@ inline CharTypes& operator&=(CharTypes lhs, CharTypes rhs) {
     return lhs;
 }
 
-/// <summary>classifies lower characters only</summary>
+// classifies lower characters only
 CharTypes ClassifyCharacter(_In_ wchar_t c);
 Tones GetTone(_In_ wchar_t c);
 

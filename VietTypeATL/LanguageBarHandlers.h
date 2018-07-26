@@ -27,29 +27,27 @@ class LanguageBarButton;
 
 class RefreshableButton : public ILanguageBarCallbacks {
 public:
-    explicit RefreshableButton(_In_ EngineController* ec);
-    virtual ~RefreshableButton() {
-    }
+    RefreshableButton() noexcept;
+    virtual ~RefreshableButton();
 
     virtual HRESULT Refresh() {
         return E_NOTIMPL;
     }
 
     _Check_return_ HRESULT Initialize(
+        _In_ EngineController* ec,
         _In_ ITfLangBarItemMgr* langBarItemMgr,
         _In_ const GUID& guidItem,
         _In_ DWORD style,
         _In_ ULONG sort,
         _In_ const std::wstring& description);
-    void Uninitialize();
 
 protected:
     // RefreshableButtons are owned by EngineController
     // so we don't want to hold an owning reference to EngineController here
-    EngineController* _controller;
-    CComPtr<LanguageBarButton> _button;
-
+    EngineController* _controller = nullptr;
     CComPtr<ITfLangBarItemMgr> _langBarItemMgr;
+    CComPtr<LanguageBarButton> _button;
 
 private:
     DISALLOW_COPY_AND_ASSIGN(RefreshableButton);
@@ -57,7 +55,7 @@ private:
 
 class IndicatorButton : public RefreshableButton {
 public:
-    explicit IndicatorButton(_In_ EngineController* ec);
+    IndicatorButton() noexcept;
 
     // Inherited via ILanguageBarCallbacks
     virtual HRESULT OnClick(_In_ TfLBIClick click, _In_ POINT pt, __RPC__in const RECT* area) override;
@@ -76,7 +74,7 @@ private:
 
 class LangBarButton : public RefreshableButton {
 public:
-    explicit LangBarButton(_In_ EngineController* ec);
+    LangBarButton() noexcept;
 
     // Inherited via ILanguageBarCallbacks
     virtual HRESULT OnClick(_In_ TfLBIClick click, _In_ POINT pt, __RPC__in const RECT* area) override;

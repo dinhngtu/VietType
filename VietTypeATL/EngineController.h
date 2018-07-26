@@ -18,7 +18,7 @@
 #pragma once
 
 #include "Common.h"
-#include "SinkAdvisor.h"
+#include "AutoSinkAdvisor.h"
 #include "Telex.h"
 
 namespace VietType {
@@ -56,7 +56,6 @@ public:
         _In_ const std::shared_ptr<Telex::TelexEngine>& engine,
         _In_ ITfThreadMgr* threadMgr,
         _In_ TfClientId clientid);
-    HRESULT Uninitialize();
 
     Telex::TelexEngine& GetEngine();
     const Telex::TelexEngine& GetEngine() const;
@@ -82,28 +81,26 @@ private:
     _Check_return_ HRESULT CompartmentReadEnabled(_Out_ long* pEnabled);
     HRESULT CompartmentWriteEnabled(_In_ long enabled);
     _Check_return_ HRESULT InitLanguageBar();
-    HRESULT UninitLanguageBar();
 
 private:
-    std::shared_ptr<Telex::TelexEngine> _engine;
-    CComPtr<ITfLangBarItemMgr> _langBarItemMgr;
-
     TfClientId _clientid = TF_CLIENTID_NULL;
-
-    CComPtr<Compartment> _settingsCompartment;
-    SinkAdvisor<ITfCompartmentEventSink> _settingsCompartmentEventSink;
-
-    CComPtr<Compartment> _openCloseCompartment;
-    SinkAdvisor<ITfCompartmentEventSink> _openCloseCompartmentEventSink;
-
-    // unique_ptr is not necessary but used just to break include cycle
-    std::unique_ptr<IndicatorButton> _indicatorButton;
-    std::unique_ptr<LangBarButton> _langBarButton;
-
     bool _enabled = true;
     BlockedKind _blocked = BlockedKind::Free;
     bool _editBlockedPending = false;
     bool _backconvertPending = false;
+
+    std::shared_ptr<Telex::TelexEngine> _engine;
+    CComPtr<ITfLangBarItemMgr> _langBarItemMgr;
+
+    CComPtr<Compartment> _settingsCompartment;
+    std::unique_ptr<AutoSinkAdvisor<ITfCompartmentEventSink>> _settingsCompartmentEventSink;
+
+    CComPtr<Compartment> _openCloseCompartment;
+    std::unique_ptr<AutoSinkAdvisor<ITfCompartmentEventSink>> _openCloseCompartmentEventSink;
+
+    // unique_ptr is not necessary but used just to break include cycle
+    std::unique_ptr<IndicatorButton> _indicatorButton;
+    std::unique_ptr<LangBarButton> _langBarButton;
 
 private:
     DISALLOW_COPY_AND_ASSIGN(EngineController);

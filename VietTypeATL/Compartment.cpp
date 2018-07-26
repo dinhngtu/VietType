@@ -92,9 +92,3 @@ _Check_return_ HRESULT VietType::Compartment::Initialize(_In_ IUnknown* punk, _I
 
     return S_OK;
 }
-
-HRESULT VietType::Compartment::Uninitialize() {
-    _compartment.Release();
-
-    return S_OK;
-}

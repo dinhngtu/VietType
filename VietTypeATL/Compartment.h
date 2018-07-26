@@ -39,11 +39,10 @@ public:
     HRESULT SetValue(_In_ long val);
 
     _Check_return_ HRESULT Initialize(_In_ IUnknown* punk, _In_ TfClientId clientid, _In_ const GUID& guidCompartment, _In_ bool global = false);
-    HRESULT Uninitialize();
 
 private:
-    CComPtr<ITfCompartment> _compartment;
     TfClientId _clientid = TF_CLIENTID_NULL;
+    CComPtr<ITfCompartment> _compartment;
 
 private:
     DISALLOW_COPY_AND_ASSIGN(Compartment);

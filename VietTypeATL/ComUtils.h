@@ -34,3 +34,20 @@ template <typename TFrom, typename TTo>
 _Check_return_ HRESULT QueryInterface2(_In_ TFrom* from, _Outptr_ TTo** to) {
     return from->QueryInterface(__uuidof(TTo), reinterpret_cast<void**>(to));
 }
+
+template <typename T, typename... Args>
+_Check_return_ HRESULT ConstructInstance(_Outptr_ T** ppout, Args... args) {
+    HRESULT hr;
+
+    ATL::CComObject<T>* p;
+    hr = ATL::CComObject<T>::CreateInstance(&p);
+    HRESULT_CHECK_RETURN_A(hr, "ATL::CComObject<%s>::CreateInstance failed", typeid(T).name());
+
+    p->AddRef();
+    *ppout = p;
+
+    hr = (*ppout)->Initialize(args...);
+    HRESULT_CHECK_RETURN_A(hr, "%s::Initialize failed", typeid(T).name());
+
+    return S_OK;
+}

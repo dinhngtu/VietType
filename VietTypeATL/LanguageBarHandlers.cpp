@@ -128,11 +128,16 @@ HRESULT OnMenuSelectAll(_In_ UINT id) {
 // RefreshableButton
 ////////////////////////////////////////////////////////////////////////////////
 
-VietType::RefreshableButton::RefreshableButton(_In_ EngineController* ec) {
-    _controller = ec;
+VietType::RefreshableButton::RefreshableButton() noexcept {
+}
+
+VietType::RefreshableButton::~RefreshableButton() {
+    HRESULT hr = _langBarItemMgr->RemoveItem(_button);
+    DBG_HRESULT_CHECK(hr, L"%s", L"langBarItemMgr->RemoveItem failed");
 }
 
 _Check_return_ HRESULT VietType::RefreshableButton::Initialize(
+    _In_ EngineController* ec,
     _In_ ITfLangBarItemMgr* langBarItemMgr,
     _In_ const GUID& guidItem,
     _In_ DWORD style,
@@ -140,37 +145,28 @@ _Check_return_ HRESULT VietType::RefreshableButton::Initialize(
     _In_ const std::wstring& description) {
     HRESULT hr;
 
+    _controller = ec;
     _langBarItemMgr = langBarItemMgr;
 
-    hr = CreateInstance2(&_button);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&_button) failed");
-    hr = _button->Initialize(
+    hr = ConstructInstance(
+        &_button,
         guidItem,
         style,
         sort,
         description,
         this);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_button->Initialize failed");
+    HRESULT_CHECK_RETURN(hr, L"%s", L"ConstructInstance(&_button) failed");
     hr = _langBarItemMgr->AddItem(_button);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_langBarItemMgr->AddItem failed");
 
     return S_OK;
 }
 
-void VietType::RefreshableButton::Uninitialize() {
-    HRESULT hr;
-    hr = _langBarItemMgr->RemoveItem(_button);
-    DBG_HRESULT_CHECK(hr, L"%s", L"langBarItemMgr->RemoveItem failed");
-    _button->Uninitialize();
-    _button.Release();
-    _langBarItemMgr.Release();
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 // IndicatorButton
 ////////////////////////////////////////////////////////////////////////////////
 
-VietType::IndicatorButton::IndicatorButton(_In_ EngineController* ec) : RefreshableButton(ec) {
+VietType::IndicatorButton::IndicatorButton() noexcept : RefreshableButton() {
 }
 
 HRESULT VietType::IndicatorButton::OnClick(_In_ TfLBIClick click, _In_ POINT pt, __RPC__in const RECT* area) {
@@ -231,7 +227,7 @@ std::wstring VietType::IndicatorButton::GetText() {
 // LangBarButton
 ////////////////////////////////////////////////////////////////////////////////
 
-VietType::LangBarButton::LangBarButton(_In_ EngineController* ec) : RefreshableButton(ec) {
+VietType::LangBarButton::LangBarButton() noexcept : RefreshableButton() {
 }
 
 HRESULT VietType::LangBarButton::OnClick(_In_ TfLBIClick click, _In_ POINT pt, __RPC__in const RECT* area) {

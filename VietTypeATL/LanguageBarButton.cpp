@@ -147,7 +147,3 @@ HRESULT VietType::LanguageBarButton::NotifyUpdate(_In_ DWORD flags) {
 
     return S_OK;
 }
-
-void VietType::LanguageBarButton::Uninitialize() {
-    _callbacks = nullptr;
-}

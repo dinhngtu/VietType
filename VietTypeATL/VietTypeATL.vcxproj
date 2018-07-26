@@ -541,6 +541,7 @@
     <ClCompile Include="VirtualDocument.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AutoSinkAdvisor.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="Compartment.h" />
     <ClInclude Include="CompositionManager.h" />

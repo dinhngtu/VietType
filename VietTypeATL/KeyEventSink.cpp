@@ -42,6 +42,17 @@ VietType::KeyEventSink::KeyEventSink() noexcept {
 }
 
 VietType::KeyEventSink::~KeyEventSink() {
+    HRESULT hr;
+
+    CComPtr<ITfKeystrokeMgr> keystrokeMgr;
+    hr = _threadMgr->QueryInterface(&keystrokeMgr);
+    DBG_HRESULT_CHECK(hr, L"%s", L"_threadMgr->QueryInterface failed");
+
+    hr = keystrokeMgr->UnpreserveKey(GUID_KeyEventSink_PreservedKey_Toggle, &PK_Toggle);
+    DBG_HRESULT_CHECK(hr, L"%s", L"keystrokeMgr->UnpreserveKey failed");
+
+    hr = keystrokeMgr->UnadviseKeyEventSink(_clientid);
+    DBG_HRESULT_CHECK(hr, L"%s", L"keystrokeMgr->UnadviseKeyEventSink failed");
 }
 
 STDMETHODIMP VietType::KeyEventSink::OnSetFocus(_In_ BOOL fForeground) {
@@ -98,7 +109,7 @@ STDMETHODIMP VietType::KeyEventSink::OnSetFocus(_In_ BOOL fForeground) {
             VietType::EditSessions::EditBlocked,
             _compositionManager,
             context,
-            static_cast<EngineController*>(_controller));
+            _controller.p);
         _controller->ResetEditBlockedPending();
         if (FAILED(hr)) {
             DBG_HRESULT_CHECK(hr, L"%s", L"CompositionManager::RequestEditSession failed");
@@ -207,7 +218,7 @@ STDMETHODIMP VietType::KeyEventSink::OnPreservedKey(_In_ ITfContext* pic, _In_ R
             VietType::EditSessions::EditSurroundingWord,
             _compositionManager,
             pic,
-            static_cast<EngineController*>(_controller),
+            _controller.p,
             0);
         HRESULT_CHECK_RETURN(hr, L"%s", L"CompositionManager::RequestEditSession failed");
     } else {
@@ -230,32 +241,15 @@ _Check_return_ HRESULT VietType::KeyEventSink::Initialize(
     _compositionManager = compositionManager;
     _controller = engine;
 
-    hr = threadMgr->QueryInterface(&_keystrokeMgr);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"threadMgr->QueryInterface failed");
+    CComPtr<ITfKeystrokeMgr> keystrokeMgr;
+    hr = _threadMgr->QueryInterface(&keystrokeMgr);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_threadMgr->QueryInterface failed");
 
-    hr = _keystrokeMgr->AdviseKeyEventSink(_clientid, this, TRUE);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_keystrokeMgr->AdviseKeyEventSink failed");
+    hr = keystrokeMgr->AdviseKeyEventSink(_clientid, this, TRUE);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"keystrokeMgr->AdviseKeyEventSink failed");
 
-    hr = _keystrokeMgr->PreserveKey(_clientid, GUID_KeyEventSink_PreservedKey_Toggle, &PK_Toggle, NULL, 0);
-    // probably not fatal
-    DBG_HRESULT_CHECK(hr, L"%s", L"_keystrokeMgr->PreserveKey failed");
-
-    return S_OK;
-}
-
-HRESULT VietType::KeyEventSink::Uninitialize() {
-    HRESULT hr;
-
-    hr = _keystrokeMgr->UnpreserveKey(GUID_KeyEventSink_PreservedKey_Toggle, &PK_Toggle);
-    DBG_HRESULT_CHECK(hr, L"%s", L"_keystrokeMgr->UnpreserveKey failed");
-
-    hr = _keystrokeMgr->UnadviseKeyEventSink(_clientid);
-    DBG_HRESULT_CHECK(hr, L"%s", L"_keystrokeMgr->UnadviseKeyEventSink failed");
-
-    _controller.Release();
-    _compositionManager.Release();
-    _threadMgr.Release();
-    _keystrokeMgr.Release();
+    hr = keystrokeMgr->PreserveKey(_clientid, GUID_KeyEventSink_PreservedKey_Toggle, &PK_Toggle, NULL, 0);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"keystrokeMgr->PreserveKey failed");
 
     return S_OK;
 }
@@ -264,9 +258,8 @@ HRESULT VietType::KeyEventSink::CallKeyEdit(_In_ ITfContext* context, _In_ WPARA
     HRESULT hr;
 
     CComPtr<KeyHandlerEditSession> keyHandlerEditSession;
-    hr = CreateInstance2(&keyHandlerEditSession);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_keyHandlerEditSession.CreateInstance failed");
-    keyHandlerEditSession->Initialize(_compositionManager, context, wParam, lParam, _keyState, _controller);
+    hr = ConstructInstance(&keyHandlerEditSession, _compositionManager, context, wParam, lParam, _keyState, _controller);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"ConstructInstance(&keyHandlerEditSession) failed");
     hr = _compositionManager->RequestEditSession(keyHandlerEditSession, context);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_compositionManager->RequestEditSession failed");
 
