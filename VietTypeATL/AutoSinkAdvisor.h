@@ -24,6 +24,7 @@ class AutoSinkAdvisor {
 public:
     ~AutoSinkAdvisor() {
         HRESULT hr = sink.Unadvise();
+        hr;
         DBG_HRESULT_CHECK(hr, L"SinkAdvisor<%s>::Unadvise failed", typeid(TSink).name());
     }
 
@@ -42,6 +43,7 @@ class AutoSingleSinkAdvisor {
 public:
     ~AutoSingleSinkAdvisor() {
         HRESULT hr = sink.Unadvise();
+        hr;
         DBG_HRESULT_CHECK(hr, L"SingleSinkAdvisor<%s>::Unadvise failed", typeid(TSink).name());
     }
 

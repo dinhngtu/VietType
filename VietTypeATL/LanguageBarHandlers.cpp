@@ -133,6 +133,7 @@ VietType::RefreshableButton::RefreshableButton() noexcept {
 
 VietType::RefreshableButton::~RefreshableButton() {
     HRESULT hr = _langBarItemMgr->RemoveItem(_button);
+    hr;
     DBG_HRESULT_CHECK(hr, L"%s", L"langBarItemMgr->RemoveItem failed");
 }
 
