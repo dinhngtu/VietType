@@ -17,6 +17,7 @@
 
 #include "LanguageBarHandlers.h"
 #include "EngineController.h"
+#include "Version.h"
 
 HMENU GetMenu() {
     assert(VietType::Globals::DllInstance);
@@ -111,13 +112,37 @@ HRESULT OnMenuSelectAll(_In_ UINT id) {
     case 0:
         return S_OK;
     case ID_TRAY_ABOUT: {
-        LPCWSTR text = nullptr;
+        LPCWSTR aboutFormatString = nullptr;
         // LoadString will return a read-only pointer to the loaded resource string, no need to free
-        if (!LoadString(VietType::Globals::DllInstance, IDS_LICENSENOTICE, reinterpret_cast<LPWSTR>(&text), 0)) {
+        if (!LoadString(VietType::Globals::DllInstance, IDS_ABOUTSTRING, reinterpret_cast<LPWSTR>(&aboutFormatString), 0)) {
             WINERROR_RETURN_HRESULT(L"%s", L"LoadString failed");
         }
-        assert(text);
-        MessageBox(NULL, text, VietType::Globals::TextServiceDescription.c_str(), MB_OK | MB_ICONINFORMATION);
+        assert(aboutFormatString);
+
+        LPCWSTR text = nullptr;
+        auto version = VietType::ReadVersionData();
+        std::array<DWORD_PTR, 5> args = {
+            std::get<0>(version),
+            std::get<1>(version),
+            std::get<2>(version),
+            std::get<3>(version),
+            reinterpret_cast<DWORD_PTR>(VCS_REVISION)
+        };
+        if (!FormatMessage(
+            FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_STRING | FORMAT_MESSAGE_ARGUMENT_ARRAY,
+            aboutFormatString,
+            0,
+            0,
+            reinterpret_cast<LPWSTR>(&text),
+            0,
+            reinterpret_cast<va_list*>(&args[0]))) {
+            WINERROR_RETURN_HRESULT(L"%s", L"FormatMessage failed");
+        }
+
+        if (!MessageBox(NULL, text, VietType::Globals::TextServiceDescription.c_str(), MB_OK | MB_ICONINFORMATION)) {
+            WINERROR_RETURN_HRESULT(L"%s", L"MessageBox failed");
+        }
+        LocalFree((HLOCAL)text);
         break;
     }
     }

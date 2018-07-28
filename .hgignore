@@ -12,3 +12,4 @@ TestRelease/
 *.i
 *_i.c
 *_i.h
+VietTypeATL/VersionVCS.h
