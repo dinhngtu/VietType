@@ -95,7 +95,7 @@ STDMETHODIMP VietType::ThreadMgrEventSink::OnSetFocus(__RPC__in_opt ITfDocumentM
             VietType::EditSessions::EditBlocked,
             _compMgr,
             context,
-            static_cast<EngineController*>(_controller));
+            _controller.p);
         _controller->ResetEditBlockedPending();
         if (FAILED(hr)) {
             DBG_HRESULT_CHECK(hr, L"%s", L"CompositionManager::RequestEditSession failed");

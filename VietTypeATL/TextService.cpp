@@ -57,7 +57,7 @@ static CComPtr<VietType::EnumDisplayAttributeInfo> CreateAttributeStore() {
         std::get<0>(VietType::ComposingAttributeData),
         std::get<1>(VietType::ComposingAttributeData),
         std::get<2>(VietType::ComposingAttributeData));
-    CComPtr<ITfDisplayAttributeInfo> info1(static_cast<ITfDisplayAttributeInfo*>(attr1));
+    CComPtr<ITfDisplayAttributeInfo> info1(attr1.p);
     assert(info1);
     ret->AddAttribute(info1);
 
