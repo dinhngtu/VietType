@@ -60,35 +60,60 @@ _Check_return_ HRESULT VietType::EngineController::Initialize(
 
     // init settings compartment & listener
 
-    // GUID_SettingsCompartment_Toggle is global
-    hr = ConstructInstance(&_settingsCompartment, threadMgr, clientid, Globals::GUID_SettingsCompartment_Toggle, true);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"ConstructInstance(&_settingsCompartment) failed");
+    hr = CreateInstance2(&_settingsCompartment);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&_settingsCompartment) failed");
 
-    // listen to _settingsCompartment
+    // GUID_SettingsCompartment_Toggle is global
+    hr = _settingsCompartment->Initialize(threadMgr, clientid, Globals::GUID_SettingsCompartment_Toggle, true);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_settingsCompartment->Initialize failed");
+
     CComPtr<ITfSource> settingsSource;
     hr = _settingsCompartment->GetCompartmentSource(&settingsSource);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_settingsCompartment->GetCompartmentSource failed");
-    auto[settingsSink, hrSettingsSink] = AutoSinkAdvisor<ITfCompartmentEventSink>::AdviseSink(settingsSource.p, this);
-    HRESULT_CHECK_RETURN(hrSettingsSink, L"%s", L"AdviseSink(settingsSource) failed");
-    _settingsCompartmentEventSink = std::move(settingsSink);
+
+    hr = _settingsCompartmentEventSink.Advise(settingsSource, this);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_settingsCompartmentEventSink.Advise failed");
 
     // init GUID_COMPARTMENT_KEYBOARD_OPENCLOSE listener
 
-    hr = ConstructInstance(&_openCloseCompartment, threadMgr, clientid, GUID_COMPARTMENT_HANDWRITING_OPENCLOSE);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"ConstructInstance(&_openCloseCompartment) failed");
+    hr = CreateInstance2(&_openCloseCompartment);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&_openCloseCompartment) failed");
 
-    // listen to _openCloseCompartment
+    hr = _openCloseCompartment->Initialize(threadMgr, clientid, GUID_COMPARTMENT_HANDWRITING_OPENCLOSE);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_openCloseCompartment->Initialize failed");
+
     CComPtr<ITfSource> openCloseSource;
     hr = _openCloseCompartment->GetCompartmentSource(&openCloseSource);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_openCloseCompartment->GetCompartmentSource failed");
-    auto[openCloseSink, hrOpenCloseSink] = AutoSinkAdvisor<ITfCompartmentEventSink>::AdviseSink(openCloseSource.p, this);
-    HRESULT_CHECK_RETURN(hrOpenCloseSink, L"%s", L"AdviseSink(openCloseSource) failed");
-    _openCloseCompartmentEventSink = std::move(openCloseSink);
+
+    hr = _openCloseCompartmentEventSink.Advise(openCloseSource, this);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_openCloseCompartmentEventSink.Advise failed");
 
     // langbar
 
     hr = InitLanguageBar();
     HRESULT_CHECK_RETURN(hr, L"%s", L"InitLanguageBar failed");
+
+    return S_OK;
+}
+
+HRESULT VietType::EngineController::Uninitialize() {
+    HRESULT hr;
+
+    hr = UninitLanguageBar();
+    DBG_HRESULT_CHECK(hr, L"%s", L"UninitLanguageBar failed");
+
+    hr = _settingsCompartmentEventSink.Unadvise();
+    DBG_HRESULT_CHECK(hr, L"%s", L"_compartmentEventSink.Unadvise failed");
+
+    _openCloseCompartment->Uninitialize();
+    _openCloseCompartment.Release();
+
+    _settingsCompartment->Uninitialize();
+    _settingsCompartment.Release();
+
+    _langBarItemMgr.Release();
+    _engine.reset();
 
     return S_OK;
 }
@@ -230,6 +255,16 @@ _Check_return_ HRESULT VietType::EngineController::InitLanguageBar() {
         0,
         Globals::TextServiceDescription);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_langBarButton->Initialize failed");
+
+    return S_OK;
+}
+
+HRESULT VietType::EngineController::UninitLanguageBar() {
+    _langBarButton->Uninitialize();
+    _langBarButton.reset();
+
+    _indicatorButton->Uninitialize();
+    _indicatorButton.reset();
 
     return S_OK;
 }

@@ -28,7 +28,6 @@ class LanguageBarButton;
 class RefreshableButton : public ILanguageBarCallbacks {
 public:
     RefreshableButton() noexcept;
-    virtual ~RefreshableButton();
 
     virtual HRESULT Refresh() = 0;
 
@@ -39,13 +38,15 @@ public:
         _In_ DWORD style,
         _In_ ULONG sort,
         _In_ const std::wstring& description);
+    void Uninitialize();
 
 protected:
     // RefreshableButtons are owned by EngineController
     // so we don't want to hold an owning reference to EngineController here
     EngineController* _controller = nullptr;
-    CComPtr<ITfLangBarItemMgr> _langBarItemMgr;
     CComPtr<LanguageBarButton> _button;
+
+    CComPtr<ITfLangBarItemMgr> _langBarItemMgr;
 
 private:
     DISALLOW_COPY_AND_ASSIGN(RefreshableButton);

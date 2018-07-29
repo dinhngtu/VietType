@@ -62,11 +62,9 @@ STDMETHODIMP VietType::DisplayAttributeInfo::Reset(void) {
     return S_OK;
 }
 
-HRESULT VietType::DisplayAttributeInfo::Initialize(_In_ const GUID& guid, _In_ std::wstring description, _In_ TF_DISPLAYATTRIBUTE attr) {
+void VietType::DisplayAttributeInfo::Initialize(_In_ const GUID& guid, _In_ std::wstring description, _In_ TF_DISPLAYATTRIBUTE attr) {
     _guid = guid;
     _description = description;
     _attr = attr;
     _attrOrig = attr;
-
-    return S_OK;
 }

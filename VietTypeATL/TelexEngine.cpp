@@ -105,7 +105,7 @@ static wchar_t TranslateTone(_In_ wchar_t c, _In_ Tones t) {
     }
 }
 
-// destructive
+/// <summary>destructive</summary>
 static void ApplyCases(_In_ std::wstring& str, _In_ const std::vector<int>& cases) {
     assert(str.length() == cases.size());
     for (size_t i = 0; i < cases.size(); i++) {

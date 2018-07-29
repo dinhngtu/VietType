@@ -22,8 +22,11 @@ HRESULT VietType::IsContextEmpty(_In_ ITfContext* context, _In_ TfClientId clien
     HRESULT hr;
 
     CComPtr<Compartment> compEmpty;
-    hr = ConstructInstance(&compEmpty, context, clientid, GUID_COMPARTMENT_EMPTYCONTEXT);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"ConstructInstance(&compEmpty) failed");
+    hr = CreateInstance2(&compEmpty);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&compEmpty) failed");
+
+    hr = compEmpty->Initialize(context, clientid, GUID_COMPARTMENT_EMPTYCONTEXT);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"compEmpty->Initialize failed");
 
     long contextEmpty;
     hr = compEmpty->GetValue(&contextEmpty);

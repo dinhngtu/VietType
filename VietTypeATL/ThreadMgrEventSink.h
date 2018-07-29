@@ -18,7 +18,7 @@
 #pragma once
 
 #include "Common.h"
-#include "AutoSinkAdvisor.h"
+#include "SinkAdvisor.h"
 
 namespace VietType {
 
@@ -52,11 +52,12 @@ public:
         _In_ TfClientId tid,
         _In_ CompositionManager* compMgr,
         _In_ EngineController* controller);
+    HRESULT Uninitialize();
 
 private:
+    SinkAdvisor<ITfThreadMgrEventSink> _threadMgrEventSinkAdvisor;
     CComPtr<CompositionManager> _compMgr;
     CComPtr<EngineController> _controller;
-    std::unique_ptr<AutoSinkAdvisor<ITfThreadMgrEventSink>> _threadMgrEventSinkAdvisor;
     CComPtr<ITfDocumentMgr> _docMgrFocus;
 
 private:

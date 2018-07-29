@@ -45,10 +45,9 @@ public:
         return std::apply(_callback, args_ec);
     }
 
-    HRESULT Initialize(_In_ funtype callback, Args... args) {
+    void Initialize(_In_ funtype callback, Args... args) {
         _callback = callback;
         _args = std::make_tuple(args...);
-        return S_OK;
     }
 
 private:

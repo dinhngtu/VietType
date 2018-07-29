@@ -40,7 +40,7 @@ public:
     // Inherited via ITfEditSession
     virtual STDMETHODIMP DoEditSession(_In_ TfEditCookie ec) override;
 
-    HRESULT Initialize(
+    void Initialize(
         _In_ CompositionManager* compositionManager,
         _In_ ITfContext* context,
         _In_ WPARAM wParam,

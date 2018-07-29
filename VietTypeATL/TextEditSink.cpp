@@ -37,7 +37,8 @@ _Check_return_ HRESULT VietType::TextEditSink::Initialize(_In_ ITfDocumentMgr* d
     _compMgr = compMgr;
     _controller = controller;
 
-    _textEditSinkAdvisor.reset();
+    hr = _textEditSinkAdvisor.Unadvise();
+    DBG_HRESULT_CHECK(hr, L"%s", L"_textEditSinkAdvisor.Unadvise failed");
 
     if (!documentMgr) {
         // caller just wanted to clear the previous sink
@@ -56,9 +57,22 @@ _Check_return_ HRESULT VietType::TextEditSink::Initialize(_In_ ITfDocumentMgr* d
     hr = _editContext->QueryInterface(&source);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_editContext->QueryInterface failed");
 
-    auto[textSink, hrSink] = AutoSinkAdvisor<ITfTextEditSink>::AdviseSink(source.p, this);
-    HRESULT_CHECK_RETURN(hrSink, L"%s", L"AdviseSink(source) failed");
-    _textEditSinkAdvisor = std::move(textSink);
+    hr = _textEditSinkAdvisor.Advise(source, this);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_textEditSinkAdvisor.Advise failed");
+
+    return S_OK;
+}
+
+HRESULT VietType::TextEditSink::Uninitialize() {
+    HRESULT hr;
+
+    hr = _textEditSinkAdvisor.Unadvise();
+    DBG_HRESULT_CHECK(hr, L"%s", L"_textEditSinkAdvisor.Unadvise failed");
+
+    _editContext.Release();
+
+    _controller.Release();
+    _compMgr.Release();
 
     return S_OK;
 }

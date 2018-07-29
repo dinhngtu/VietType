@@ -156,12 +156,6 @@ HRESULT OnMenuSelectAll(_In_ UINT id) {
 VietType::RefreshableButton::RefreshableButton() noexcept {
 }
 
-VietType::RefreshableButton::~RefreshableButton() {
-    HRESULT hr = _langBarItemMgr->RemoveItem(_button);
-    hr;
-    DBG_HRESULT_CHECK(hr, L"%s", L"langBarItemMgr->RemoveItem failed");
-}
-
 _Check_return_ HRESULT VietType::RefreshableButton::Initialize(
     _In_ EngineController* ec,
     _In_ ITfLangBarItemMgr* langBarItemMgr,
@@ -174,25 +168,35 @@ _Check_return_ HRESULT VietType::RefreshableButton::Initialize(
     _controller = ec;
     _langBarItemMgr = langBarItemMgr;
 
-    hr = ConstructInstance(
-        &_button,
+    hr = CreateInstance2(&_button);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&_button) failed");
+    hr = _button->Initialize(
         guidItem,
         style,
         sort,
         description,
         this);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"ConstructInstance(&_button) failed");
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_button->Initialize failed");
     hr = _langBarItemMgr->AddItem(_button);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_langBarItemMgr->AddItem failed");
 
     return S_OK;
 }
 
+void VietType::RefreshableButton::Uninitialize() {
+    HRESULT hr;
+    hr = _langBarItemMgr->RemoveItem(_button);
+    DBG_HRESULT_CHECK(hr, L"%s", L"langBarItemMgr->RemoveItem failed");
+    _button->Uninitialize();
+    _button.Release();
+    _langBarItemMgr.Release();
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // IndicatorButton
 ////////////////////////////////////////////////////////////////////////////////
 
-VietType::IndicatorButton::IndicatorButton() noexcept : RefreshableButton() {
+VietType::IndicatorButton::IndicatorButton() noexcept {
 }
 
 HRESULT VietType::IndicatorButton::OnClick(_In_ TfLBIClick click, _In_ POINT pt, __RPC__in const RECT* area) {
@@ -253,7 +257,7 @@ std::wstring VietType::IndicatorButton::GetText() {
 // LangBarButton
 ////////////////////////////////////////////////////////////////////////////////
 
-VietType::LangBarButton::LangBarButton() noexcept : RefreshableButton() {
+VietType::LangBarButton::LangBarButton() noexcept {
 }
 
 HRESULT VietType::LangBarButton::OnClick(_In_ TfLBIClick click, _In_ POINT pt, __RPC__in const RECT* area) {

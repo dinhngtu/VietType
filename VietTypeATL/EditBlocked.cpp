@@ -47,8 +47,11 @@ HRESULT VietType::EditSessions::EditBlocked(
     // check GUID_COMPARTMENT_KEYBOARD_DISABLED
 
     CComPtr<Compartment> compDisabled;
-    hr = ConstructInstance(&compDisabled, context, compositionManager->GetClientId(), GUID_COMPARTMENT_KEYBOARD_DISABLED);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"ConstructInstance(&compDisabled) failed");
+    hr = CreateInstance2(&compDisabled);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&compDisabled) failed");
+
+    hr = compDisabled->Initialize(context, compositionManager->GetClientId(), GUID_COMPARTMENT_KEYBOARD_DISABLED);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"compDisabled->Initialize failed");
 
     long contextDisabled;
     hr = compDisabled->GetValue(&contextDisabled);

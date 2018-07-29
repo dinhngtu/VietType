@@ -56,6 +56,12 @@ _Check_return_ HRESULT VietType::CompositionManager::Initialize(_In_ TfClientId 
     return S_OK;
 }
 
+void VietType::CompositionManager::Uninitialize() {
+    _categoryMgr.Release();
+    _composingAttribute.Release();
+}
+
+
 HRESULT VietType::CompositionManager::RequestEditSession(_In_ ITfEditSession* session) {
     return RequestEditSession(session, _context);
 }

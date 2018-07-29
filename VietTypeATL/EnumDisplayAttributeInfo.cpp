@@ -35,8 +35,9 @@ STDMETHODIMP VietType::EnumDisplayAttributeInfo::Clone(__RPC__deref_out_opt IEnu
     *ppEnum = nullptr;
 
     CComPtr<EnumDisplayAttributeInfo> ret;
-    hr = ConstructInstance(&ret, _items, _index);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"ConstructInstance(&ret) failed");
+    hr = CreateInstance2(&ret);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&ret) failed");
+    ret->Initialize(_items, _index);
 
     *ppEnum = ret;
     (*ppEnum)->AddRef();
@@ -69,10 +70,9 @@ STDMETHODIMP VietType::EnumDisplayAttributeInfo::Skip(_In_ ULONG ulCount) {
     return (_index < _items.size()) ? S_OK : S_FALSE;
 }
 
-HRESULT VietType::EnumDisplayAttributeInfo::Initialize(_In_ const info_vector_type& items, _In_ info_vector_type::size_type index) {
+void VietType::EnumDisplayAttributeInfo::Initialize(_In_ const info_vector_type& items, _In_ info_vector_type::size_type index) {
     _items = items;
     _index = index;
-    return S_OK;
 }
 
 void VietType::EnumDisplayAttributeInfo::AddAttribute(_In_ ITfDisplayAttributeInfo* item) {

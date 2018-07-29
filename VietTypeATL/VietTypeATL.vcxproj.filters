@@ -213,9 +213,6 @@
     <ClInclude Include="TelexInternal.h">
       <Filter>Telex\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="AutoSinkAdvisor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="VersionVCS.h">
       <Filter>Header Files</Filter>
     </ClInclude>

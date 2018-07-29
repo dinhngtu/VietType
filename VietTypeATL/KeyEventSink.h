@@ -18,7 +18,7 @@
 #pragma once
 
 #include "Common.h"
-#include "AutoSinkAdvisor.h"
+#include "SinkAdvisor.h"
 
 namespace VietType {
 
@@ -31,8 +31,6 @@ class KeyEventSink :
 public:
     KeyEventSink() noexcept;
     ~KeyEventSink();
-
-    void FinalRelease();
 
     DECLARE_NOT_AGGREGATABLE(KeyEventSink)
     BEGIN_COM_MAP(KeyEventSink)
@@ -53,12 +51,14 @@ public:
         _In_ TfClientId clientid,
         _In_ CompositionManager* compositionManager,
         _In_ EngineController* controller);
+    HRESULT Uninitialize();
 
 private:
     HRESULT CallKeyEdit(_In_ ITfContext* context, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_reads_(256) const BYTE* keyState);
 
 private:
     TfClientId _clientid = TF_CLIENTID_NULL;
+    CComPtr<ITfKeystrokeMgr> _keystrokeMgr;
     CComPtr<ITfThreadMgr> _threadMgr;
     CComPtr<CompositionManager> _compositionManager;
     CComPtr<EngineController> _controller;
