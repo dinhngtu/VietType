@@ -75,6 +75,9 @@ along with VietType.  If not, see <https://www.gnu.org/licenses/>.
       <Custom Action="UnregisterCategories" After="UnregisterCategoriesRollback">REMOVE OR REINSTALL</Custom>
     </InstallExecuteSequence>
   </Product>
+  
+  <!-- ################################################################################ -->
+  <!-- install paths -->
 
   <?if $(var.Platform) = x86 ?>
   <?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
@@ -92,6 +95,9 @@ along with VietType.  If not, see <https://www.gnu.org/licenses/>.
     </Directory>
   </Fragment>
 
+  <!-- ################################################################################ -->
+  <!-- main files -->
+
   <Fragment>
     <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
       <Component Id="VietTypeATL32">
@@ -101,7 +107,7 @@ along with VietType.  If not, see <https://www.gnu.org/licenses/>.
       </Component>
 
       <?if $(var.Platform) = x64 ?>
-      <Component Id="VietTypeATL64" Win64="yes">
+      <Component Id="VietTypeATL64">
         <File Id="VietTypeATL64.dll" Source="$(var.SolutionDir)\x64\Release\VietTypeATL64.dll" Name="VietTypeATL64.dll">
           <Class Id="{C0DD01A1-0DEB-454B-8B42-D22CED1B4B23}" Context="InprocServer32" Description="VietType" ThreadingModel="apartment" />
         </File>
@@ -126,6 +132,9 @@ along with VietType.  If not, see <https://www.gnu.org/licenses/>.
     </ComponentGroup>
   </Fragment>
 
+  <!-- ################################################################################ -->
+  <!-- symbols -->
+
   <Fragment>
     <ComponentGroup Id="DebugSymbols" Directory="INSTALLFOLDER">
       <Component Id="Symbols32">
@@ -139,6 +148,9 @@ along with VietType.  If not, see <https://www.gnu.org/licenses/>.
       <?endif ?>
     </ComponentGroup>
   </Fragment>
+
+  <!-- ################################################################################ -->
+  <!-- custom actions -->
 
   <Fragment>
     <?if $(var.Platform) = x86 ?>
