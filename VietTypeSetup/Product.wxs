@@ -35,6 +35,7 @@ along with VietType.  If not, see <https://www.gnu.org/licenses/>.
 
     <Feature Id="ProductFeature" Title="VietType" Level="1" Absent="disallow" AllowAdvertise="no">
       <ComponentGroupRef Id="ProductComponents" />
+      <ComponentGroupRef Id="ShortcutComponents" />
     </Feature>
 
     <Feature Id="DebugSymbolsFeature" Title="Debug symbols" Level="10" AllowAdvertise="no">
@@ -128,6 +129,28 @@ along with VietType.  If not, see <https://www.gnu.org/licenses/>.
 
       <Component Id="LICENSE">
         <File Id="LICENSE" Source="$(var.SolutionDir)\LICENSE" Name="LICENSE" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+
+  <!-- ################################################################################ -->
+  <!-- shortcuts -->
+
+  <Fragment>
+    <DirectoryRef Id="TARGETDIR">
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="ShortcutFolder" Name="VietType" />
+      </Directory>
+    </DirectoryRef>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="ShortcutComponents" Directory="ShortcutFolder">
+      <Component Id="Shortcuts">
+        <Shortcut Id="ActivateShortcut" Name="Enable VietType" Target="[!Registrar.exe]" Arguments="0 2" WorkingDirectory="INSTALLFOLDER" />
+        <Shortcut Id="DeactivateShortcut" Name="Disable VietType" Target="[!Registrar.exe]" Arguments="1 2" WorkingDirectory="INSTALLFOLDER" />
+        <RemoveFolder Id="CleanupShortcuts" On="uninstall" />
+        <RegistryValue Root="HKCU" Key="Software\VietType" Name="RegistrarShortcut" Type="integer" Value="1" KeyPath="yes" />
       </Component>
     </ComponentGroup>
   </Fragment>
