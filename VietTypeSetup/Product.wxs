@@ -33,11 +33,15 @@ along with VietType.  If not, see <https://www.gnu.org/licenses/>.
       Schedule="afterInstallInitialize" />
     <MediaTemplate EmbedCab="yes" />
 
-    <Feature Id="ProductFeature" Title="VietTypeSetup" Level="1">
+    <Feature Id="ProductFeature" Title="VietType" Level="1" Absent="disallow" AllowAdvertise="no">
       <ComponentGroupRef Id="ProductComponents" />
     </Feature>
 
-    <UIRef Id="WixUI_Minimal" />
+    <Feature Id="DebugSymbolsFeature" Title="Debug symbols" Level="10" AllowAdvertise="no">
+      <ComponentGroupRef Id="DebugSymbols" />
+    </Feature>
+
+    <UIRef Id="WixUI_FeatureTree" />
     <WixVariable Id="WixUILicenseRtf" Value="$(var.SolutionDir)\LICENSE.rtf" />
 
     <Condition Message="VietType is only compatible with Windows 8 and newer.">Installed OR (VersionNT >= 602)</Condition>
@@ -96,6 +100,14 @@ along with VietType.  If not, see <https://www.gnu.org/licenses/>.
         </File>
       </Component>
 
+      <?if $(var.Platform) = x64 ?>
+      <Component Id="VietTypeATL64" Win64="yes">
+        <File Id="VietTypeATL64.dll" Source="$(var.SolutionDir)\x64\Release\VietTypeATL64.dll" Name="VietTypeATL64.dll">
+          <Class Id="{C0DD01A1-0DEB-454B-8B42-D22CED1B4B23}" Context="InprocServer32" Description="VietType" ThreadingModel="apartment" />
+        </File>
+      </Component>
+      <?endif ?>
+
       <?if $(var.Platform) = x86 ?>
       <Component Id="Registrar">
         <File Id="Registrar.exe" Source="$(var.SolutionDir)\Win32\Release\Registrar.exe" Name="Registrar.exe" />
@@ -111,12 +123,18 @@ along with VietType.  If not, see <https://www.gnu.org/licenses/>.
       <Component Id="LICENSE">
         <File Id="LICENSE" Source="$(var.SolutionDir)\LICENSE" Name="LICENSE" />
       </Component>
+    </ComponentGroup>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="DebugSymbols" Directory="INSTALLFOLDER">
+      <Component Id="Symbols32">
+        <File Id="VietTypeATL32.pdb" Source="$(var.SolutionDir)\Win32\Release\VietTypeATL32.pdb" Name="VietTypeATL32.pdb" />
+      </Component>
 
       <?if $(var.Platform) = x64 ?>
-      <Component Id="VietTypeATL64" Win64="yes">
-        <File Id="VietTypeATL64.dll" Source="$(var.SolutionDir)\x64\Release\VietTypeATL64.dll" Name="VietTypeATL64.dll">
-          <Class Id="{C0DD01A1-0DEB-454B-8B42-D22CED1B4B23}" Context="InprocServer32" Description="VietType" ThreadingModel="apartment" />
-        </File>
+      <Component Id="Symbols64">
+        <File Id="VietTypeATL64.pdb" Source="$(var.SolutionDir)\x64\Release\VietTypeATL64.pdb" Name="VietTypeATL64.pdb" />
       </Component>
       <?endif ?>
     </ComponentGroup>
