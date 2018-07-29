@@ -30,9 +30,7 @@ public:
     RefreshableButton() noexcept;
     virtual ~RefreshableButton();
 
-    virtual HRESULT Refresh() {
-        return E_NOTIMPL;
-    }
+    virtual HRESULT Refresh() = 0;
 
     _Check_return_ HRESULT Initialize(
         _In_ EngineController* ec,
