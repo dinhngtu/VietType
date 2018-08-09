@@ -317,7 +317,7 @@ TelexStates TelexEngine::Backspace() {
 
     // if cannot set tone like in Peek, treat this as invalid (but do not mark word as invalid for further correction)
     VInfo vinfo;
-    auto found = GetTonePos(true, &vinfo);
+    auto found = GetTonePos(false, &vinfo);
     if (!found && _t != Tones::Z) {
         Reset();
         if (buf.size()) {
@@ -529,7 +529,7 @@ std::wstring TelexEngine::Peek() const {
     result.append(_v);
 
     VInfo vinfo;
-    auto found = GetTonePos(true, &vinfo);
+    auto found = GetTonePos(false, &vinfo);
     if (!found) {
         if (_t == Tones::Z) {
             result.append(_c2);
