@@ -340,6 +340,14 @@ public:
         Assert::AreEqual(L"hu", e.Peek().c_str());
     }
 
+    TEST_METHOD(TestBackspaceAoas) {
+        TelexEngine e(config);
+        FeedWord(e, L"aoas");
+        Assert::AreEqual(L"aoas", e.Peek().c_str());
+        e.Backspace();
+        Assert::AreEqual(L"aoa", e.Peek().c_str());
+    }
+
     // test backconversions
 
     TEST_METHOD(TestBackconversionDdoongf) {

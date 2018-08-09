@@ -315,6 +315,20 @@ TelexStates TelexEngine::Backspace() {
         return TelexStates::TxError;
     }
 
+    // if cannot set tone like in Peek, treat this as invalid (but do not mark word as invalid for further correction)
+    VInfo vinfo;
+    auto found = GetTonePos(true, &vinfo);
+    if (!found && _t != Tones::Z) {
+        Reset();
+        if (buf.size()) {
+            buf.pop_back();
+        }
+        for (auto c : buf) {
+            PushChar(c);
+        }
+        return _state;
+    }
+
     assert(_keyBuffer.size() == _respos.size());
     auto rp = _respos;
     auto oldc1 = _c1;
@@ -355,10 +369,10 @@ TelexStates TelexEngine::Backspace() {
                 PushChar(buf[i]);
             }
         } else if (rp[i] == ResposTone) {
-            VInfo vinfo;
+            VInfo vinfoRespos;
             // don't care about found or not
-            GetTonePos(true, &vinfo);
-            if (vinfo.tonepos >= 0 && vinfo.tonepos < toDelete) {
+            GetTonePos(true, &vinfoRespos);
+            if (vinfoRespos.tonepos >= 0 && vinfoRespos.tonepos < toDelete) {
                 PushChar(buf[i]);
             }
         } else {
