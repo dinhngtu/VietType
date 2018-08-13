@@ -179,7 +179,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ControlFlowGuard>Guard</ControlFlowGuard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <DisableSpecificWarnings>26434;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>26439;26434;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -217,7 +217,7 @@
       <PreprocessorDefinitions>_WINDOWS;NDEBUG;_USRDLL;%(PreprocessorDefinitions);VIETTYPE_TEST;VIETTYPE_EXPORTS</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <DisableSpecificWarnings>26434;4251;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>26439;26434;4251;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <ControlFlowGuard>Guard</ControlFlowGuard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -259,7 +259,7 @@
       <SDLCheck>true</SDLCheck>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <DisableSpecificWarnings>26434;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>26439;26434;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -296,7 +296,7 @@
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_USRDLL;%(PreprocessorDefinitions);VIETTYPE_TEST;VIETTYPE_EXPORTS</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <DisableSpecificWarnings>26434;4251;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>26439;26434;4251;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Midl>
@@ -336,7 +336,7 @@
       <SDLCheck>true</SDLCheck>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <DisableSpecificWarnings>26434;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>26439;26434;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -372,7 +372,7 @@
       <PreprocessorDefinitions>_WINDOWS;_DEBUG;_USRDLL;%(PreprocessorDefinitions);VIETTYPE_TEST;VIETTYPE_EXPORTS</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <DisableSpecificWarnings>26434;4251;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>26439;26434;4251;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Midl>
@@ -412,7 +412,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ControlFlowGuard>Guard</ControlFlowGuard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <DisableSpecificWarnings>26434;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>26439;26434;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -451,7 +451,7 @@
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_USRDLL;%(PreprocessorDefinitions);VIETTYPE_TEST;VIETTYPE_EXPORTS</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <DisableSpecificWarnings>26434;4251;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>26439;26434;4251;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <ControlFlowGuard>Guard</ControlFlowGuard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
