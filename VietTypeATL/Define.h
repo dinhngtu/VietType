@@ -52,13 +52,15 @@ void _dprint(_In_ LPCWSTR func, _In_ int line, _In_ LPCWSTR fmt, Args... args) {
 
 // print formatted string to debugger output
 #define DPRINT(fmt, ...) _dprint(__FUNCTIONW__, __LINE__, L"%s:%d: " fmt L"\n", __VA_ARGS__)
+// check if HRESULT is successful; if not, print error information to debugger output
+#define HRESULT_CHECK(hr, fmt, ...) if (FAILED(hr)) { DPRINT(L"HRESULT error %lx: " fmt, hr, __VA_ARGS__); }
 // check if HRESULT is successful; if not, print error information to debugger output and return from calling function
 #define HRESULT_CHECK_RETURN(hr, fmt, ...) if (FAILED(hr)) { DPRINT(L"HRESULT error %lx: " fmt, hr, __VA_ARGS__); return hr; }
 
 #ifdef _DEBUG
-// print formatted string to debugger output in debug builds
+// if in debug builds, print formatted string to debugger output
 #define DBG_DPRINT DPRINT
-// check if HRESULT is successful; if not, print error information to debugger output
+// if in debug builds, check if HRESULT is successful; if not, print error information to debugger output
 #define DBG_HRESULT_CHECK(hr, fmt, ...) if (FAILED(hr)) { DBG_DPRINT(L"HRESULT error %lx: " fmt, hr, __VA_ARGS__); }
 #else
 #define DBG_DPRINT(fmt, ...)
