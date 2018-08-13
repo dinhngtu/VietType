@@ -20,6 +20,18 @@
 #include "Compartment.h"
 #include "CompositionManager.h"
 
+// workaround for annoying IntelliSense error when the full enum name is used in a macro
+using BlockedKind = VietType::EngineController::BlockedKind;
+
+#define EB_HRESULT_CHECK_COMMIT(hr, controller, fmt, msg) \
+    do { \
+        if (FAILED(hr)) { \
+            DPRINT(L"HRESULT error %lx: " fmt, hr, msg); \
+            controller->SetBlocked(BlockedKind::Free); \
+            return hr; \
+        } \
+    } while (0);
+
 HRESULT VietType::EditSessions::EditBlocked(
     _In_ TfEditCookie ec,
     _In_ VietType::CompositionManager* compositionManager,
@@ -36,10 +48,10 @@ HRESULT VietType::EditSessions::EditBlocked(
 
     long openclose;
     hr = controller->GetOpenClose(&openclose);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"controller->GetOpenClose failed");
+    EB_HRESULT_CHECK_COMMIT(hr, controller, L"%s", L"controller->GetOpenClose failed");
 
     if (hr == S_OK && openclose) {
-        DBG_DPRINT(L"%s", L"blocked: openclose");
+        DBG_DPRINT(L"%s", L"scopeBlocked: openclose");
         controller->SetBlocked(VietType::EngineController::BlockedKind::Blocked);
         return S_OK;
     }
@@ -48,17 +60,17 @@ HRESULT VietType::EditSessions::EditBlocked(
 
     CComPtr<Compartment> compDisabled;
     hr = CreateInstance2(&compDisabled);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&compDisabled) failed");
+    EB_HRESULT_CHECK_COMMIT(hr, controller, L"%s", L"CreateInstance2(&compDisabled) failed");
 
     hr = compDisabled->Initialize(context, compositionManager->GetClientId(), GUID_COMPARTMENT_KEYBOARD_DISABLED);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"compDisabled->Initialize failed");
+    EB_HRESULT_CHECK_COMMIT(hr, controller, L"%s", L"compDisabled->Initialize failed");
 
     long contextDisabled;
     hr = compDisabled->GetValue(&contextDisabled);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"compDisabled->GetValue failed");
+    EB_HRESULT_CHECK_COMMIT(hr, controller, L"%s", L"compDisabled->GetValue failed");
 
     if (hr == S_OK && contextDisabled) {
-        DBG_DPRINT(L"%s", L"blocked: context disabled");
+        DBG_DPRINT(L"%s", L"scopeBlocked: context disabled");
         controller->SetBlocked(VietType::EngineController::BlockedKind::Blocked);
         return S_OK;
     }
@@ -67,7 +79,7 @@ HRESULT VietType::EditSessions::EditBlocked(
 
     TF_STATUS st;
     hr = context->GetStatus(&st);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"context->GetStatus failed");
+    EB_HRESULT_CHECK_COMMIT(hr, controller, L"%s", L"context->GetStatus failed");
     if (st.dwStaticFlags & TF_SS_TRANSITORY) {
         // transitory context doesn't seem to support input scopes, free right away
         DBG_DPRINT(L"%s", L"free: transitory context");
@@ -79,33 +91,32 @@ HRESULT VietType::EditSessions::EditBlocked(
 
     CComPtr<ITfReadOnlyProperty> prop;
     hr = context->GetAppProperty(VietType::Globals::GUID_PROP_INPUTSCOPE, &prop);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"context->GetAppProperty failed");
+    EB_HRESULT_CHECK_COMMIT(hr, controller, L"%s", L"context->GetAppProperty failed");
 
     TF_SELECTION sel;
     ULONG fetched;
     hr = context->GetSelection(ec, TF_DEFAULT_SELECTION, 1, &sel, &fetched);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"context->GetSelection failed");
+    EB_HRESULT_CHECK_COMMIT(hr, controller, L"%s", L"context->GetSelection failed");
 
     VARIANT var;
     hr = prop->GetValue(ec, sel.range, &var);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"prop->GetValue failed");
+    EB_HRESULT_CHECK_COMMIT(hr, controller, L"%s", L"prop->GetValue failed");
 
     if (var.vt != VT_UNKNOWN) {
-        DBG_DPRINT(L"bad variant type %d", static_cast<int>(var.vt));
-        controller->SetBlocked(VietType::EngineController::BlockedKind::Free);
-        return E_NOINTERFACE;
+        hr = E_NOINTERFACE;
+        EB_HRESULT_CHECK_COMMIT(hr, controller, L"bad variant type %d", static_cast<int>(var.vt));
     }
 
     CComPtr<ITfInputScope> iis;
     hr = var.punkVal->QueryInterface(&iis);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"var.punkVal->QueryInterface failed");
+    EB_HRESULT_CHECK_COMMIT(hr, controller, L"%s", L"var.punkVal->QueryInterface failed");
 
     CComHeapPtr<InputScope> pscopes;
     UINT scount;
     hr = iis->GetInputScopes(&pscopes, &scount);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"iis->GetInputScopes failed");
+    EB_HRESULT_CHECK_COMMIT(hr, controller, L"%s", L"iis->GetInputScopes failed");
 
-    VietType::EngineController::BlockedKind blocked;
+    VietType::EngineController::BlockedKind scopeBlocked;
     InputScope* scopes = pscopes;
     for (UINT i = 0; i < scount; i++) {
         switch (scopes[i]) {
@@ -113,14 +124,16 @@ HRESULT VietType::EditSessions::EditBlocked(
         case IS_EMAIL_USERNAME:
         case IS_LOGINNAME:
         case IS_PASSWORD:
-            blocked = VietType::EngineController::BlockedKind::Blocked;
+            scopeBlocked = VietType::EngineController::BlockedKind::Blocked;
             goto commit;
         }
     }
-    blocked = VietType::EngineController::BlockedKind::Free;
+    scopeBlocked = VietType::EngineController::BlockedKind::Free;
+
+    hr = S_OK;
 
 commit:
-    DBG_DPRINT(L"setting blocked %d", blocked);
-    controller->SetBlocked(blocked);
-    return S_OK;
+    DBG_DPRINT(L"setting scopeBlocked %d", scopeBlocked);
+    controller->SetBlocked(scopeBlocked);
+    return hr;
 }
