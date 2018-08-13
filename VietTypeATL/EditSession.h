@@ -28,10 +28,10 @@ class EditSession :
 public:
     using funtype = HRESULT(*)(TfEditCookie ec, Args... args);
 
-    EditSession() noexcept {
-    }
-    ~EditSession() {
-    }
+    EditSession() = default;
+    EditSession(const EditSession&) = delete;
+    EditSession& operator=(const EditSession&) = delete;
+    ~EditSession() = default;
 
     DECLARE_NOT_AGGREGATABLE(EditSession)
     BEGIN_COM_MAP(EditSession)
@@ -53,9 +53,6 @@ public:
 private:
     funtype _callback = nullptr;
     std::tuple<Args...> _args;
-
-private:
-    DISALLOW_COPY_AND_ASSIGN(EditSession);
 };
 
 }

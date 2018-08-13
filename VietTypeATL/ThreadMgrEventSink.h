@@ -30,8 +30,10 @@ class ThreadMgrEventSink :
     public CComObjectRootEx<CComSingleThreadModel>,
     public ITfThreadMgrEventSink {
 public:
-    ThreadMgrEventSink() noexcept;
-    ~ThreadMgrEventSink();
+    ThreadMgrEventSink() = default;
+    ThreadMgrEventSink(const ThreadMgrEventSink&) = delete;
+    ThreadMgrEventSink& operator=(const ThreadMgrEventSink&) = delete;
+    ~ThreadMgrEventSink() = default;
 
     DECLARE_NOT_AGGREGATABLE(ThreadMgrEventSink)
     BEGIN_COM_MAP(ThreadMgrEventSink)
@@ -59,9 +61,6 @@ private:
     CComPtr<CompositionManager> _compMgr;
     CComPtr<EngineController> _controller;
     CComPtr<ITfDocumentMgr> _docMgrFocus;
-
-private:
-    DISALLOW_COPY_AND_ASSIGN(ThreadMgrEventSink);
 };
 
 }

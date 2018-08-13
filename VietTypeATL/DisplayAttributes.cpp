@@ -31,12 +31,6 @@ const std::tuple<GUID, std::wstring, TF_DISPLAYATTRIBUTE> VietType::ComposingAtt
     }
 );
 
-VietType::DisplayAttributeInfo::DisplayAttributeInfo() noexcept : _attr(), _attrOrig() {
-}
-
-VietType::DisplayAttributeInfo::~DisplayAttributeInfo() {
-}
-
 STDMETHODIMP VietType::DisplayAttributeInfo::GetGUID(__RPC__out GUID* pguid) {
     *pguid = _guid;
     return S_OK;

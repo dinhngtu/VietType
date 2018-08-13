@@ -27,8 +27,10 @@ class EnumDisplayAttributeInfo :
 public:
     using info_vector_type = std::vector<CComPtr<ITfDisplayAttributeInfo>>;
 
-    EnumDisplayAttributeInfo() noexcept;
-    ~EnumDisplayAttributeInfo();
+    EnumDisplayAttributeInfo() = default;
+    EnumDisplayAttributeInfo(const EnumDisplayAttributeInfo&) = delete;
+    EnumDisplayAttributeInfo& operator=(const EnumDisplayAttributeInfo&) = delete;
+    ~EnumDisplayAttributeInfo() = default;
 
     DECLARE_NOT_AGGREGATABLE(EnumDisplayAttributeInfo)
     BEGIN_COM_MAP(EnumDisplayAttributeInfo)
@@ -52,9 +54,6 @@ public:
 private:
     info_vector_type _items;
     info_vector_type::size_type _index = 0;
-
-private:
-    DISALLOW_COPY_AND_ASSIGN(EnumDisplayAttributeInfo);
 };
 
 }

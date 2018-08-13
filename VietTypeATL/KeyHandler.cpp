@@ -20,12 +20,6 @@
 #include "CompositionManager.h"
 #include "EngineController.h"
 
-VietType::KeyHandlerEditSession::KeyHandlerEditSession() noexcept {
-}
-
-VietType::KeyHandlerEditSession::~KeyHandlerEditSession() {
-}
-
 STDMETHODIMP VietType::KeyHandlerEditSession::DoEditSession(_In_ TfEditCookie ec) {
     assert(_compositionManager);
     DBG_DPRINT(L"ec = %ld", ec);

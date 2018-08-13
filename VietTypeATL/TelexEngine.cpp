@@ -120,9 +120,6 @@ TelexEngine::TelexEngine(_In_ TelexConfig config) {
     Reset();
 }
 
-TelexEngine::~TelexEngine() {
-}
-
 void TelexEngine::Reset() {
     DBG_DPRINT(L"%s", L"resetting engine");
     _state = TelexStates::Valid;

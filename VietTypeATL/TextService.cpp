@@ -33,6 +33,8 @@
 #include "CompositionManager.h"
 #include "Telex.h"
 #include "EngineController.h"
+#include "Compartment.h"
+#include "LanguageBarHandlers.h"
 
 static CComPtr<VietType::EnumDisplayAttributeInfo> CreateAttributeStore() {
     HRESULT hr;
@@ -65,12 +67,6 @@ static CComPtr<VietType::EnumDisplayAttributeInfo> CreateAttributeStore() {
 }
 
 static CComPtr<VietType::EnumDisplayAttributeInfo> attributeStore = CreateAttributeStore();
-
-VietType::TextService::TextService() noexcept {
-}
-
-VietType::TextService::~TextService() {
-}
 
 STDMETHODIMP VietType::TextService::Activate(_In_ ITfThreadMgr* ptim, _In_ TfClientId tid) {
     return ActivateEx(ptim, tid, 0);

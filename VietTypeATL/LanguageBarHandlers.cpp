@@ -153,9 +153,6 @@ HRESULT OnMenuSelectAll(_In_ UINT id) {
 // RefreshableButton
 ////////////////////////////////////////////////////////////////////////////////
 
-VietType::RefreshableButton::RefreshableButton() noexcept {
-}
-
 _Check_return_ HRESULT VietType::RefreshableButton::Initialize(
     _In_ EngineController* ec,
     _In_ ITfLangBarItemMgr* langBarItemMgr,
@@ -195,9 +192,6 @@ void VietType::RefreshableButton::Uninitialize() {
 ////////////////////////////////////////////////////////////////////////////////
 // IndicatorButton
 ////////////////////////////////////////////////////////////////////////////////
-
-VietType::IndicatorButton::IndicatorButton() noexcept {
-}
 
 HRESULT VietType::IndicatorButton::OnClick(_In_ TfLBIClick click, _In_ POINT pt, __RPC__in const RECT* area) {
     if (click == TF_LBI_CLK_LEFT) {
@@ -256,9 +250,6 @@ std::wstring VietType::IndicatorButton::GetText() {
 ////////////////////////////////////////////////////////////////////////////////
 // LangBarButton
 ////////////////////////////////////////////////////////////////////////////////
-
-VietType::LangBarButton::LangBarButton() noexcept {
-}
 
 HRESULT VietType::LangBarButton::OnClick(_In_ TfLBIClick click, _In_ POINT pt, __RPC__in const RECT* area) {
     if (click == TF_LBI_CLK_LEFT) {

@@ -24,12 +24,6 @@
 
 #include "EnumDisplayAttributeInfo.h"
 
-VietType::EnumDisplayAttributeInfo::EnumDisplayAttributeInfo() noexcept {
-}
-
-VietType::EnumDisplayAttributeInfo::~EnumDisplayAttributeInfo() {
-}
-
 STDMETHODIMP VietType::EnumDisplayAttributeInfo::Clone(__RPC__deref_out_opt IEnumTfDisplayAttributeInfo** ppEnum) {
     HRESULT hr;
     *ppEnum = nullptr;

@@ -24,13 +24,6 @@
 
 #include "CompositionManager.h"
 
-VietType::CompositionManager::CompositionManager() noexcept {
-}
-
-VietType::CompositionManager::~CompositionManager() {
-}
-
-
 STDMETHODIMP VietType::CompositionManager::OnCompositionTerminated(_In_ TfEditCookie ecWrite, __RPC__in_opt ITfComposition* pComposition) {
     HRESULT hr;
 

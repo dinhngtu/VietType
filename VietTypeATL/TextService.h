@@ -45,8 +45,10 @@ class ATL_NO_VTABLE TextService :
     public ITfTextInputProcessorEx,
     public ITfDisplayAttributeProvider {
 public:
-    TextService() noexcept;
-    ~TextService();
+    TextService() = default;
+    TextService(const TextService&) = delete;
+    TextService& operator=(const TextService&) = delete;
+    ~TextService() = default;
 
     DECLARE_REGISTRY_RESOURCEID(IDR_TEXTSERVICE)
 
@@ -81,9 +83,6 @@ private:
     CComPtr<CompositionManager> _compositionManager;
 
     CComPtr<EngineController> _engineController;
-
-private:
-    DISALLOW_COPY_AND_ASSIGN(TextService);
 };
 OBJECT_ENTRY_AUTO(VietType::Globals::CLSID_TextService, TextService)
 

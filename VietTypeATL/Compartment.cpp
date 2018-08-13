@@ -24,12 +24,6 @@
 
 #include "Compartment.h"
 
-VietType::Compartment::Compartment() noexcept {
-}
-
-VietType::Compartment::~Compartment() {
-}
-
 _Ret_valid_ ITfCompartment* VietType::Compartment::GetCompartment() {
     return _compartment;
 }

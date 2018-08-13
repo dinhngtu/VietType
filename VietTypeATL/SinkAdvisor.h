@@ -23,8 +23,9 @@ limitations under the License.
 template <class SinkInterface>
 class SinkAdvisor {
 public:
-    SinkAdvisor() noexcept : cookie_(TF_INVALID_COOKIE) {
-    }
+    SinkAdvisor() = default;
+    SinkAdvisor(const SinkAdvisor&) = delete;
+    SinkAdvisor& operator=(const SinkAdvisor&) = delete;
 
     virtual ~SinkAdvisor() {
         if (IsAdvised()) Unadvise();
@@ -67,17 +68,17 @@ public:
     }
 
 private:
-    DWORD cookie_;
+    DWORD cookie_ = TF_INVALID_COOKIE;
     CComPtr<ITfSource> source_;
-    DISALLOW_COPY_AND_ASSIGN(SinkAdvisor);
 };
 
 // Advise and unadvise TSF single sink.
 template <class SinkInterface>
 class SingleSinkAdvisor {
 public:
-    SingleSinkAdvisor() noexcept : client_id_(TF_CLIENTID_NULL) {
-    }
+    SingleSinkAdvisor() = default;
+    SingleSinkAdvisor(const SingleSinkAdvisor&) = delete;
+    SingleSinkAdvisor& operator=(const SingleSinkAdvisor&) = delete;
 
     virtual ~SingleSinkAdvisor() {
         if (IsAdvised()) Unadvise();
@@ -121,6 +122,5 @@ public:
 
 private:
     CComPtr<ITfSourceSingle> source_;
-    TfClientId client_id_;
-    DISALLOW_COPY_AND_ASSIGN(SingleSinkAdvisor);
+    TfClientId client_id_ = TF_CLIENTID_NULL;
 };

@@ -40,8 +40,10 @@ public:
         Blocked,
     };
 
-    EngineController() noexcept;
-    ~EngineController();
+    EngineController() = default;
+    EngineController(const EngineController&) = delete;
+    EngineController& operator=(const EngineController&) = delete;
+    ~EngineController() = default;
 
     DECLARE_NOT_AGGREGATABLE(EngineController)
     BEGIN_COM_MAP(EngineController)
@@ -104,9 +106,6 @@ private:
     BlockedKind _blocked = BlockedKind::Free;
     bool _editBlockedPending = false;
     bool _backconvertPending = false;
-
-private:
-    DISALLOW_COPY_AND_ASSIGN(EngineController);
 };
 
 }

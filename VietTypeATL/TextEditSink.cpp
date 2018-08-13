@@ -19,12 +19,6 @@
 #include "CompositionManager.h"
 #include "EngineController.h"
 
-VietType::TextEditSink::TextEditSink() noexcept {
-}
-
-VietType::TextEditSink::~TextEditSink() {
-}
-
 STDMETHODIMP VietType::TextEditSink::OnEndEdit(__RPC__in_opt ITfContext* pic, _In_ TfEditCookie ecReadOnly, __RPC__in_opt ITfEditRecord* pEditRecord) {
     DBG_DPRINT(L"%s", L"");
 

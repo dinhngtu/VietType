@@ -29,8 +29,10 @@ class KeyEventSink :
     public CComObjectRootEx<CComSingleThreadModel>,
     public ITfKeyEventSink {
 public:
-    KeyEventSink() noexcept;
-    ~KeyEventSink();
+    KeyEventSink() = default;
+    KeyEventSink(const KeyEventSink&) = delete;
+    KeyEventSink& operator=(const KeyEventSink&) = delete;
+    ~KeyEventSink() = default;
 
     DECLARE_NOT_AGGREGATABLE(KeyEventSink)
     BEGIN_COM_MAP(KeyEventSink)
@@ -65,9 +67,6 @@ private:
 
     // shared key state buffer; for temporary use only
     BYTE _keyState[256] = { 0 };
-
-private:
-    DISALLOW_COPY_AND_ASSIGN(KeyEventSink);
 };
 
 }

@@ -38,8 +38,10 @@ class LanguageBarButton :
     public ITfSource,
     public ITfLangBarItemButton {
 public:
-    LanguageBarButton() noexcept;
-    ~LanguageBarButton();
+    LanguageBarButton() = default;
+    LanguageBarButton(const LanguageBarButton&) = delete;
+    LanguageBarButton& operator=(const LanguageBarButton&) = delete;
+    ~LanguageBarButton() = default;
 
     DECLARE_NOT_AGGREGATABLE(LanguageBarButton)
     BEGIN_COM_MAP(LanguageBarButton)
@@ -81,9 +83,6 @@ private:
     ILanguageBarCallbacks* _callbacks = nullptr;
 
     CComPtr<ITfLangBarItemSink> _itemSink;
-
-private:
-    DISALLOW_COPY_AND_ASSIGN(LanguageBarButton);
 };
 
 }

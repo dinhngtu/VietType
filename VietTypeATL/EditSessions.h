@@ -26,6 +26,10 @@ class EngineController;
 
 class EditSessions {
 public:
+    EditSessions() = delete;
+    EditSessions(const EditSessions&) = delete;
+    EditSessions& operator=(const EditSessions&) = delete;
+
     static HRESULT EditBlocked(
         _In_ TfEditCookie ec,
         _In_ CompositionManager* compositionManager,
@@ -38,9 +42,6 @@ public:
         _In_ ITfContext* context,
         _In_ VietType::EngineController* controller,
         _In_ int ignore);
-
-private:
-    DISALLOW_IMPLICIT_CONSTRUCTORS(EditSessions);
 };
 
 }

@@ -29,8 +29,10 @@ class TextEditSink :
     public CComObjectRootEx<CComSingleThreadModel>,
     public ITfTextEditSink {
 public:
-    TextEditSink() noexcept;
-    ~TextEditSink();
+    TextEditSink() = default;
+    TextEditSink(const TextEditSink&) = delete;
+    TextEditSink& operator=(const TextEditSink&) = delete;
+    ~TextEditSink() = default;
 
     DECLARE_NOT_AGGREGATABLE(TextEditSink)
     BEGIN_COM_MAP(TextEditSink)
@@ -50,9 +52,6 @@ private:
     CComPtr<EngineController> _controller;
     SinkAdvisor<ITfTextEditSink> _textEditSinkAdvisor;
     CComPtr<ITfContext> _editContext;
-
-private:
-    DISALLOW_COPY_AND_ASSIGN(TextEditSink);
 };
 
 }

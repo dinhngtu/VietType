@@ -20,12 +20,6 @@
 // just a random number to identify the sink
 const DWORD LanguageBarButtonCookie = 0x5a6fdd5e;
 
-VietType::LanguageBarButton::LanguageBarButton() noexcept {
-}
-
-VietType::LanguageBarButton::~LanguageBarButton() {
-}
-
 STDMETHODIMP VietType::LanguageBarButton::AdviseSink(__RPC__in REFIID riid, __RPC__in_opt IUnknown* punk, __RPC__out DWORD* pdwCookie) {
     HRESULT hr;
 

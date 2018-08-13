@@ -23,8 +23,10 @@ namespace VietType {
 
 class Compartment : public CComObjectRootEx<CComSingleThreadModel> {
 public:
-    Compartment() noexcept;
-    ~Compartment();
+    Compartment() = default;
+    Compartment(const Compartment&) = delete;
+    Compartment& operator=(const Compartment&) = delete;
+    ~Compartment() = default;
 
     DECLARE_NOT_AGGREGATABLE(Compartment)
     BEGIN_COM_MAP(Compartment)
@@ -44,9 +46,6 @@ public:
 private:
     CComPtr<ITfCompartment> _compartment;
     TfClientId _clientid = TF_CLIENTID_NULL;
-
-private:
-    DISALLOW_COPY_AND_ASSIGN(Compartment);
 };
 
 }

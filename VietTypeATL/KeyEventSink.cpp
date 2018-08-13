@@ -38,12 +38,6 @@ static const TF_PRESERVEDKEY PK_Toggle = { VK_OEM_3, TF_MOD_ALT }; // Alt-`
 static const GUID GUID_KeyEventSink_PreservedKey_EditBack = { 0xfac88dbe, 0xe799, 0x474b, { 0x9a, 0x8c, 0x14, 0x49, 0xca, 0xa3, 0x83, 0x48 } };
 static const TF_PRESERVEDKEY PK_EditBack = { VK_LEFT, TF_MOD_ALT };
 
-VietType::KeyEventSink::KeyEventSink() noexcept {
-}
-
-VietType::KeyEventSink::~KeyEventSink() {
-}
-
 STDMETHODIMP VietType::KeyEventSink::OnSetFocus(_In_ BOOL fForeground) {
     HRESULT hr;
 

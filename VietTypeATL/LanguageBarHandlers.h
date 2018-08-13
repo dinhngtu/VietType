@@ -27,7 +27,10 @@ class LanguageBarButton;
 
 class RefreshableButton : public ILanguageBarCallbacks {
 public:
-    RefreshableButton() noexcept;
+    RefreshableButton() = default;
+    RefreshableButton(const RefreshableButton&) = delete;
+    RefreshableButton& operator=(const RefreshableButton&) = delete;
+    ~RefreshableButton() = default;
 
     virtual HRESULT Refresh() = 0;
 
@@ -47,14 +50,14 @@ protected:
     CComPtr<LanguageBarButton> _button;
 
     CComPtr<ITfLangBarItemMgr> _langBarItemMgr;
-
-private:
-    DISALLOW_COPY_AND_ASSIGN(RefreshableButton);
 };
 
 class IndicatorButton : public RefreshableButton {
 public:
-    IndicatorButton() noexcept;
+    IndicatorButton() = default;
+    IndicatorButton(const IndicatorButton&) = delete;
+    IndicatorButton& operator=(const IndicatorButton&) = delete;
+    ~IndicatorButton() = default;
 
     // Inherited via ILanguageBarCallbacks
     virtual HRESULT OnClick(_In_ TfLBIClick click, _In_ POINT pt, __RPC__in const RECT* area) override;
@@ -66,14 +69,14 @@ public:
 
     // Inherited via RefreshableButton
     virtual HRESULT Refresh() override;
-
-private:
-    DISALLOW_COPY_AND_ASSIGN(IndicatorButton);
 };
 
 class LangBarButton : public RefreshableButton {
 public:
-    LangBarButton() noexcept;
+    LangBarButton() = default;
+    LangBarButton(const LangBarButton&) = delete;
+    LangBarButton& operator=(const LangBarButton&) = delete;
+    ~LangBarButton() = default;
 
     // Inherited via ILanguageBarCallbacks
     virtual HRESULT OnClick(_In_ TfLBIClick click, _In_ POINT pt, __RPC__in const RECT* area) override;
@@ -85,9 +88,6 @@ public:
 
     // Inherited via RefreshableButton
     virtual HRESULT Refresh() override;
-
-private:
-    DISALLOW_COPY_AND_ASSIGN(LangBarButton);
 };
 
 }

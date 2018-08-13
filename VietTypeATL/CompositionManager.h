@@ -26,8 +26,10 @@ class CompositionManager :
     public CComObjectRootEx<CComSingleThreadModel>,
     public ITfCompositionSink {
 public:
-    CompositionManager() noexcept;
-    ~CompositionManager();
+    CompositionManager() = default;
+    CompositionManager(const CompositionManager&) = delete;
+    CompositionManager& operator=(const CompositionManager&) = delete;
+    ~CompositionManager() = default;
 
     DECLARE_NOT_AGGREGATABLE(CompositionManager)
     BEGIN_COM_MAP(CompositionManager)
@@ -128,9 +130,6 @@ private:
     CComPtr<ITfComposition> _composition;
     CComPtr<ITfCategoryMgr> _categoryMgr;
     CComPtr<ITfDisplayAttributeInfo> _composingAttribute;
-
-private:
-    DISALLOW_COPY_AND_ASSIGN(CompositionManager);
 };
 
 }

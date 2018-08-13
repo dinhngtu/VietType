@@ -28,8 +28,10 @@ class KeyHandlerEditSession :
     public CComObjectRootEx<CComSingleThreadModel>,
     public ITfEditSession {
 public:
-    KeyHandlerEditSession() noexcept;
-    ~KeyHandlerEditSession();
+    KeyHandlerEditSession() = default;
+    KeyHandlerEditSession(const KeyHandlerEditSession&) = delete;
+    KeyHandlerEditSession& operator=(const KeyHandlerEditSession&) = delete;
+    ~KeyHandlerEditSession() = default;
 
     DECLARE_NOT_AGGREGATABLE(KeyHandlerEditSession)
     BEGIN_COM_MAP(KeyHandlerEditSession)
@@ -59,9 +61,6 @@ private:
     LPARAM _lParam = 0;
     const BYTE* _keyState = nullptr;
     CComPtr<EngineController> _controller;
-
-private:
-    DISALLOW_COPY_AND_ASSIGN(KeyHandlerEditSession);
 };
 
 }

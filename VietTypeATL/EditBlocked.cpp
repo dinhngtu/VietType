@@ -52,7 +52,7 @@ HRESULT VietType::EditSessions::EditBlocked(
 
     if (hr == S_OK && openclose) {
         DBG_DPRINT(L"%s", L"scopeBlocked: openclose");
-        controller->SetBlocked(VietType::EngineController::BlockedKind::Blocked);
+        controller->SetBlocked(BlockedKind::Blocked);
         return S_OK;
     }
 
@@ -71,7 +71,7 @@ HRESULT VietType::EditSessions::EditBlocked(
 
     if (hr == S_OK && contextDisabled) {
         DBG_DPRINT(L"%s", L"scopeBlocked: context disabled");
-        controller->SetBlocked(VietType::EngineController::BlockedKind::Blocked);
+        controller->SetBlocked(BlockedKind::Blocked);
         return S_OK;
     }
 
@@ -83,7 +83,7 @@ HRESULT VietType::EditSessions::EditBlocked(
     if (st.dwStaticFlags & TF_SS_TRANSITORY) {
         // transitory context doesn't seem to support input scopes, free right away
         DBG_DPRINT(L"%s", L"free: transitory context");
-        controller->SetBlocked(VietType::EngineController::BlockedKind::Free);
+        controller->SetBlocked(BlockedKind::Free);
         return S_OK;
     }
 
@@ -116,7 +116,7 @@ HRESULT VietType::EditSessions::EditBlocked(
     hr = iis->GetInputScopes(&pscopes, &scount);
     EB_HRESULT_CHECK_COMMIT(hr, controller, L"%s", L"iis->GetInputScopes failed");
 
-    VietType::EngineController::BlockedKind scopeBlocked;
+    BlockedKind scopeBlocked;
     InputScope* scopes = pscopes;
     for (UINT i = 0; i < scount; i++) {
         switch (scopes[i]) {
@@ -124,11 +124,11 @@ HRESULT VietType::EditSessions::EditBlocked(
         case IS_EMAIL_USERNAME:
         case IS_LOGINNAME:
         case IS_PASSWORD:
-            scopeBlocked = VietType::EngineController::BlockedKind::Blocked;
+            scopeBlocked = BlockedKind::Blocked;
             goto commit;
         }
     }
-    scopeBlocked = VietType::EngineController::BlockedKind::Free;
+    scopeBlocked = BlockedKind::Free;
 
     hr = S_OK;
 

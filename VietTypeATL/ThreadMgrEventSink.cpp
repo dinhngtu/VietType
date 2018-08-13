@@ -29,12 +29,6 @@
 #include "EditSessions.h"
 #include "Utilities.h"
 
-VietType::ThreadMgrEventSink::ThreadMgrEventSink() noexcept {
-}
-
-VietType::ThreadMgrEventSink::~ThreadMgrEventSink() {
-}
-
 STDMETHODIMP VietType::ThreadMgrEventSink::OnInitDocumentMgr(__RPC__in_opt ITfDocumentMgr* pdim) {
     return E_NOTIMPL;
 }
