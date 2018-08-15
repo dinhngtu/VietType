@@ -20,7 +20,9 @@
 #include "CompositionManager.h"
 #include "EngineController.h"
 
-STDMETHODIMP VietType::KeyHandlerEditSession::DoEditSession(_In_ TfEditCookie ec) {
+namespace VietType {
+
+STDMETHODIMP KeyHandlerEditSession::DoEditSession(_In_ TfEditCookie ec) {
     assert(_compositionManager);
     DBG_DPRINT(L"ec = %ld", ec);
 
@@ -57,7 +59,7 @@ STDMETHODIMP VietType::KeyHandlerEditSession::DoEditSession(_In_ TfEditCookie ec
     return S_OK;
 }
 
-void VietType::KeyHandlerEditSession::Initialize(
+void KeyHandlerEditSession::Initialize(
     _In_ CompositionManager* compositionManager,
     _In_ ITfContext* context,
     _In_ WPARAM wParam,
@@ -75,7 +77,7 @@ void VietType::KeyHandlerEditSession::Initialize(
     _controller = controller;
 }
 
-HRESULT VietType::KeyHandlerEditSession::ComposeKey(_In_ TfEditCookie ec) {
+HRESULT KeyHandlerEditSession::ComposeKey(_In_ TfEditCookie ec) {
     HRESULT hr;
 
     DBG_DPRINT(L"%s", L"");
@@ -115,7 +117,7 @@ HRESULT VietType::KeyHandlerEditSession::ComposeKey(_In_ TfEditCookie ec) {
     return S_OK;
 }
 
-HRESULT VietType::KeyHandlerEditSession::Commit(_In_ TfEditCookie ec) {
+HRESULT KeyHandlerEditSession::Commit(_In_ TfEditCookie ec) {
     HRESULT hr;
 
     DBG_DPRINT(L"%s", L"");
@@ -150,4 +152,6 @@ exit:
     _compositionManager->EndCompositionNow(ec);
 
     return S_OK;
+}
+
 }

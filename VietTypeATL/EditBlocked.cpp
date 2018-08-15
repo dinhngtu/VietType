@@ -20,8 +20,10 @@
 #include "Compartment.h"
 #include "CompositionManager.h"
 
+namespace VietType {
+
 // workaround for annoying IntelliSense error when the full enum name is used in a macro
-using BlockedKind = VietType::EngineController::BlockedKind;
+using BlockedKind = EngineController::BlockedKind;
 
 #define EB_HRESULT_CHECK_COMMIT(hr, controller, fmt, msg) \
     do { \
@@ -32,11 +34,11 @@ using BlockedKind = VietType::EngineController::BlockedKind;
         } \
     } while (0);
 
-HRESULT VietType::EditSessions::EditBlocked(
+HRESULT EditSessions::EditBlocked(
     _In_ TfEditCookie ec,
-    _In_ VietType::CompositionManager* compositionManager,
+    _In_ CompositionManager* compositionManager,
     _In_ ITfContext* context,
-    _In_ VietType::EngineController* controller) {
+    _In_ EngineController* controller) {
 
     HRESULT hr;
 
@@ -90,7 +92,7 @@ HRESULT VietType::EditSessions::EditBlocked(
     // check input scopes
 
     CComPtr<ITfReadOnlyProperty> prop;
-    hr = context->GetAppProperty(VietType::Globals::GUID_PROP_INPUTSCOPE, &prop);
+    hr = context->GetAppProperty(Globals::GUID_PROP_INPUTSCOPE, &prop);
     EB_HRESULT_CHECK_COMMIT(hr, controller, L"%s", L"context->GetAppProperty failed");
 
     TF_SELECTION sel;
@@ -136,4 +138,6 @@ commit:
     DBG_DPRINT(L"setting scopeBlocked %d", scopeBlocked);
     controller->SetBlocked(scopeBlocked);
     return hr;
+}
+
 }

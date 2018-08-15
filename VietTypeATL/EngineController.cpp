@@ -21,10 +21,12 @@
 #include "EditSessions.h"
 #include "Compartment.h"
 
-// {CCA3D390-EF1A-4DE4-B2FF-B6BC76D68C3B}
-const GUID VietType::GUID_LanguageBarButton_Item = { 0xcca3d390, 0xef1a, 0x4de4, { 0xb2, 0xff, 0xb6, 0xbc, 0x76, 0xd6, 0x8c, 0x3b } };
+namespace VietType {
 
-STDMETHODIMP VietType::EngineController::OnChange(__RPC__in REFGUID rguid) {
+// {CCA3D390-EF1A-4DE4-B2FF-B6BC76D68C3B}
+static const GUID GUID_LanguageBarButton_Item = { 0xcca3d390, 0xef1a, 0x4de4,{ 0xb2, 0xff, 0xb6, 0xbc, 0x76, 0xd6, 0x8c, 0x3b } };
+
+STDMETHODIMP EngineController::OnChange(__RPC__in REFGUID rguid) {
     HRESULT hr;
 
     if (IsEqualGUID(rguid, Globals::GUID_SettingsCompartment_Toggle)) {
@@ -39,7 +41,7 @@ STDMETHODIMP VietType::EngineController::OnChange(__RPC__in REFGUID rguid) {
     return S_OK;
 }
 
-_Check_return_ HRESULT VietType::EngineController::Initialize(
+_Check_return_ HRESULT EngineController::Initialize(
     _In_ const std::shared_ptr<Telex::TelexEngine>& engine,
     _In_ ITfThreadMgr* threadMgr,
     _In_ TfClientId clientid) {
@@ -91,7 +93,7 @@ _Check_return_ HRESULT VietType::EngineController::Initialize(
     return S_OK;
 }
 
-HRESULT VietType::EngineController::Uninitialize() {
+HRESULT EngineController::Uninitialize() {
     HRESULT hr;
 
     hr = UninitLanguageBar();
@@ -112,19 +114,19 @@ HRESULT VietType::EngineController::Uninitialize() {
     return S_OK;
 }
 
-VietType::Telex::TelexEngine& VietType::EngineController::GetEngine() {
+Telex::TelexEngine& EngineController::GetEngine() {
     return *_engine;
 }
 
-const VietType::Telex::TelexEngine& VietType::EngineController::GetEngine() const {
+const Telex::TelexEngine& EngineController::GetEngine() const {
     return *_engine;
 }
 
-_Check_return_ HRESULT VietType::EngineController::IsUserEnabled(_Out_ long* penabled) {
+_Check_return_ HRESULT EngineController::IsUserEnabled(_Out_ long* penabled) {
     return CompartmentReadEnabled(penabled);
 }
 
-HRESULT VietType::EngineController::WriteUserEnabled(_In_ long enabled) {
+HRESULT EngineController::WriteUserEnabled(_In_ long enabled) {
     HRESULT hr;
 
     if (_blocked == BlockedKind::Blocked) {
@@ -140,7 +142,7 @@ HRESULT VietType::EngineController::WriteUserEnabled(_In_ long enabled) {
     return S_OK;
 }
 
-HRESULT VietType::EngineController::ToggleUserEnabled() {
+HRESULT EngineController::ToggleUserEnabled() {
     HRESULT hr;
     long enabled;
     hr = CompartmentReadEnabled(&enabled);
@@ -148,43 +150,43 @@ HRESULT VietType::EngineController::ToggleUserEnabled() {
     return WriteUserEnabled(!enabled);
 }
 
-long VietType::EngineController::IsEnabled() const {
+long EngineController::IsEnabled() const {
     return _enabled;
 }
 
-VietType::EngineController::BlockedKind VietType::EngineController::GetBlocked() const {
+EngineController::BlockedKind EngineController::GetBlocked() const {
     return _blocked;
 }
 
-void VietType::EngineController::SetBlocked(_In_ VietType::EngineController::BlockedKind blocked) {
+void EngineController::SetBlocked(_In_ EngineController::BlockedKind blocked) {
     _blocked = blocked;
     UpdateStates();
 }
 
-void VietType::EngineController::SetEditBlockedPending() {
+void EngineController::SetEditBlockedPending() {
     _editBlockedPending = true;
 }
 
-bool VietType::EngineController::SetEditBlockedPending(_In_ HRESULT result) {
+bool EngineController::SetEditBlockedPending(_In_ HRESULT result) {
     _editBlockedPending = _editBlockedPending && FAILED(result);
     return _editBlockedPending;
 }
 
-bool VietType::EngineController::IsEditBlockedPending() const {
+bool EngineController::IsEditBlockedPending() const {
     return _editBlockedPending;
 }
 
-bool VietType::EngineController::ResetEditBlockedPending() {
+bool EngineController::ResetEditBlockedPending() {
     bool pending = _editBlockedPending;
     _editBlockedPending = false;
     return pending;
 }
 
-_Check_return_ HRESULT VietType::EngineController::GetOpenClose(_Out_ long* openclose) {
+_Check_return_ HRESULT EngineController::GetOpenClose(_Out_ long* openclose) {
     return _openCloseCompartment->GetValue(openclose);
 }
 
-HRESULT VietType::EngineController::UpdateStates() {
+HRESULT EngineController::UpdateStates() {
     HRESULT hr;
 
     switch (_blocked) {
@@ -210,7 +212,7 @@ HRESULT VietType::EngineController::UpdateStates() {
     return S_OK;
 }
 
-_Check_return_ HRESULT VietType::EngineController::CompartmentReadEnabled(_Out_ long* pEnabled) {
+_Check_return_ HRESULT EngineController::CompartmentReadEnabled(_Out_ long* pEnabled) {
     HRESULT hr;
 
     hr = _settingsCompartment->GetValue(pEnabled);
@@ -223,11 +225,11 @@ _Check_return_ HRESULT VietType::EngineController::CompartmentReadEnabled(_Out_ 
     return hr;
 }
 
-HRESULT VietType::EngineController::CompartmentWriteEnabled(_In_ long enabled) {
+HRESULT EngineController::CompartmentWriteEnabled(_In_ long enabled) {
     return _settingsCompartment->SetValue(enabled);
 }
 
-_Check_return_ HRESULT VietType::EngineController::InitLanguageBar() {
+_Check_return_ HRESULT EngineController::InitLanguageBar() {
     HRESULT hr;
 
     _indicatorButton = std::make_unique<IndicatorButton>();
@@ -244,7 +246,7 @@ _Check_return_ HRESULT VietType::EngineController::InitLanguageBar() {
     hr = _langBarButton->Initialize(
         this,
         _langBarItemMgr,
-        VietType::GUID_LanguageBarButton_Item,
+        GUID_LanguageBarButton_Item,
         TF_LBI_STYLE_BTN_BUTTON | TF_LBI_STYLE_BTN_MENU | TF_LBI_STYLE_SHOWNINTRAY,
         0,
         Globals::TextServiceDescription);
@@ -253,7 +255,7 @@ _Check_return_ HRESULT VietType::EngineController::InitLanguageBar() {
     return S_OK;
 }
 
-HRESULT VietType::EngineController::UninitLanguageBar() {
+HRESULT EngineController::UninitLanguageBar() {
     _langBarButton->Uninitialize();
     _langBarButton.reset();
 
@@ -261,4 +263,6 @@ HRESULT VietType::EngineController::UninitLanguageBar() {
     _indicatorButton.reset();
 
     return S_OK;
+}
+
 }

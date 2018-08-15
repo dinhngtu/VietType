@@ -31,6 +31,8 @@
 #include "EngineController.h"
 #include "Utilities.h"
 
+namespace VietType {
+
 // {8CC27CF8-93D2-416C-B1A3-66827F54244A}
 static const GUID GUID_KeyEventSink_PreservedKey_Toggle = { 0x8cc27cf8, 0x93d2, 0x416c, { 0xb1, 0xa3, 0x66, 0x82, 0x7f, 0x54, 0x24, 0x4a } };
 static const TF_PRESERVEDKEY PK_Toggle = { VK_OEM_3, TF_MOD_ALT }; // Alt-`
@@ -39,7 +41,7 @@ static const TF_PRESERVEDKEY PK_Toggle = { VK_OEM_3, TF_MOD_ALT }; // Alt-`
 static const GUID GUID_KeyEventSink_PreservedKey_EditBack = { 0xfac88dbe, 0xe799, 0x474b, { 0x9a, 0x8c, 0x14, 0x49, 0xca, 0xa3, 0x83, 0x48 } };
 static const TF_PRESERVEDKEY PK_EditBack = { VK_LEFT, TF_MOD_ALT };
 
-STDMETHODIMP VietType::KeyEventSink::OnSetFocus(_In_ BOOL fForeground) {
+STDMETHODIMP KeyEventSink::OnSetFocus(_In_ BOOL fForeground) {
     HRESULT hr;
 
     DBG_DPRINT(L"foreground %d, pending %d", fForeground, _controller->IsEditBlockedPending());
@@ -66,13 +68,13 @@ STDMETHODIMP VietType::KeyEventSink::OnSetFocus(_In_ BOOL fForeground) {
         return S_OK;
     }
 
-    hr = VietType::OnNewContext(context, _compositionManager, _controller);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"VietType::OnNewContext failed");
+    hr = OnNewContext(context, _compositionManager, _controller);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"OnNewContext failed");
 
     return S_OK;
 }
 
-STDMETHODIMP VietType::KeyEventSink::OnTestKeyDown(_In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten) {
+STDMETHODIMP KeyEventSink::OnTestKeyDown(_In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten) {
     HRESULT hr;
 
     if (!_controller->IsEnabled()) {
@@ -99,7 +101,7 @@ STDMETHODIMP VietType::KeyEventSink::OnTestKeyDown(_In_ ITfContext* pic, _In_ WP
     return S_OK;
 }
 
-STDMETHODIMP VietType::KeyEventSink::OnTestKeyUp(_In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten) {
+STDMETHODIMP KeyEventSink::OnTestKeyUp(_In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten) {
     if (!_controller->IsEnabled()) {
         *pfEaten = FALSE;
         return S_OK;
@@ -123,7 +125,7 @@ STDMETHODIMP VietType::KeyEventSink::OnTestKeyUp(_In_ ITfContext* pic, _In_ WPAR
     return S_OK;
 }
 
-STDMETHODIMP VietType::KeyEventSink::OnKeyDown(_In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten) {
+STDMETHODIMP KeyEventSink::OnKeyDown(_In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten) {
     HRESULT hr;
 
     if (!_controller->IsEnabled()) {
@@ -149,11 +151,11 @@ STDMETHODIMP VietType::KeyEventSink::OnKeyDown(_In_ ITfContext* pic, _In_ WPARAM
     return S_OK;
 }
 
-STDMETHODIMP VietType::KeyEventSink::OnKeyUp(_In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten) {
+STDMETHODIMP KeyEventSink::OnKeyUp(_In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten) {
     return OnTestKeyUp(pic, wParam, lParam, pfEaten);
 }
 
-STDMETHODIMP VietType::KeyEventSink::OnPreservedKey(_In_ ITfContext* pic, _In_ REFGUID rguid, _Out_ BOOL* pfEaten) {
+STDMETHODIMP KeyEventSink::OnPreservedKey(_In_ ITfContext* pic, _In_ REFGUID rguid, _Out_ BOOL* pfEaten) {
     HRESULT hr;
 
     if (IsEqualGUID(GUID_KeyEventSink_PreservedKey_Toggle, rguid)) {
@@ -167,7 +169,7 @@ STDMETHODIMP VietType::KeyEventSink::OnPreservedKey(_In_ ITfContext* pic, _In_ R
     } else if (IsEqualGUID(GUID_KeyEventSink_PreservedKey_EditBack, rguid)) {
         *pfEaten = TRUE;
         hr = CompositionManager::RequestEditSession(
-            VietType::EditSessions::EditSurroundingWord,
+            EditSessions::EditSurroundingWord,
             _compositionManager,
             pic,
             _controller.p,
@@ -180,7 +182,7 @@ STDMETHODIMP VietType::KeyEventSink::OnPreservedKey(_In_ ITfContext* pic, _In_ R
     return S_OK;
 }
 
-_Check_return_ HRESULT VietType::KeyEventSink::Initialize(
+_Check_return_ HRESULT KeyEventSink::Initialize(
     _In_ ITfThreadMgr* threadMgr,
     _In_ TfClientId clientid,
     _In_ CompositionManager* compositionManager,
@@ -206,7 +208,7 @@ _Check_return_ HRESULT VietType::KeyEventSink::Initialize(
     return S_OK;
 }
 
-HRESULT VietType::KeyEventSink::Uninitialize() {
+HRESULT KeyEventSink::Uninitialize() {
     HRESULT hr;
 
     hr = _keystrokeMgr->UnpreserveKey(GUID_KeyEventSink_PreservedKey_Toggle, &PK_Toggle);
@@ -223,7 +225,7 @@ HRESULT VietType::KeyEventSink::Uninitialize() {
     return S_OK;
 }
 
-HRESULT VietType::KeyEventSink::CallKeyEdit(_In_ ITfContext* context, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_reads_(256) const BYTE* keyState) {
+HRESULT KeyEventSink::CallKeyEdit(_In_ ITfContext* context, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_reads_(256) const BYTE* keyState) {
     HRESULT hr;
 
     CComPtr<KeyHandlerEditSession> keyHandlerEditSession;
@@ -234,4 +236,6 @@ HRESULT VietType::KeyEventSink::CallKeyEdit(_In_ ITfContext* context, _In_ WPARA
     HRESULT_CHECK_RETURN(hr, L"%s", L"_compositionManager->RequestEditSession failed");
 
     return S_OK;
+}
+
 }

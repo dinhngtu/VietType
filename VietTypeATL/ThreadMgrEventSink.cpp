@@ -30,15 +30,17 @@
 #include "EditSessions.h"
 #include "Utilities.h"
 
-STDMETHODIMP VietType::ThreadMgrEventSink::OnInitDocumentMgr(__RPC__in_opt ITfDocumentMgr* pdim) {
+namespace VietType {
+
+STDMETHODIMP ThreadMgrEventSink::OnInitDocumentMgr(__RPC__in_opt ITfDocumentMgr* pdim) {
     return E_NOTIMPL;
 }
 
-STDMETHODIMP VietType::ThreadMgrEventSink::OnUninitDocumentMgr(__RPC__in_opt ITfDocumentMgr* pdim) {
+STDMETHODIMP ThreadMgrEventSink::OnUninitDocumentMgr(__RPC__in_opt ITfDocumentMgr* pdim) {
     return E_NOTIMPL;
 }
 
-STDMETHODIMP VietType::ThreadMgrEventSink::OnSetFocus(__RPC__in_opt ITfDocumentMgr* pdimFocus, __RPC__in_opt ITfDocumentMgr* pdimPrevFocus) {
+STDMETHODIMP ThreadMgrEventSink::OnSetFocus(__RPC__in_opt ITfDocumentMgr* pdimFocus, __RPC__in_opt ITfDocumentMgr* pdimPrevFocus) {
     HRESULT hr;
 
     DBG_DPRINT(L"pdimFocus = %p, pending = %d", pdimFocus, _controller->IsEditBlockedPending());
@@ -63,25 +65,25 @@ STDMETHODIMP VietType::ThreadMgrEventSink::OnSetFocus(__RPC__in_opt ITfDocumentM
         return S_OK;
     }
 
-    hr = VietType::OnNewContext(context, _compositionManager, _controller);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"VietType::OnNewContext failed");
+    hr = OnNewContext(context, _compositionManager, _controller);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"OnNewContext failed");
 
     return S_OK;
 }
 
-STDMETHODIMP VietType::ThreadMgrEventSink::OnPushContext(__RPC__in_opt ITfContext* pic) {
+STDMETHODIMP ThreadMgrEventSink::OnPushContext(__RPC__in_opt ITfContext* pic) {
     return E_NOTIMPL;
 }
 
-STDMETHODIMP VietType::ThreadMgrEventSink::OnPopContext(__RPC__in_opt ITfContext* pic) {
+STDMETHODIMP ThreadMgrEventSink::OnPopContext(__RPC__in_opt ITfContext* pic) {
     return E_NOTIMPL;
 }
 
-_Check_return_ HRESULT VietType::ThreadMgrEventSink::Initialize(
+_Check_return_ HRESULT ThreadMgrEventSink::Initialize(
     _In_ ITfThreadMgr* threadMgr,
     _In_ TfClientId tid,
-    _In_ VietType::CompositionManager* compMgr,
-    _In_ VietType::EngineController* controller) {
+    _In_ CompositionManager* compMgr,
+    _In_ EngineController* controller) {
 
     HRESULT hr;
 
@@ -98,7 +100,7 @@ _Check_return_ HRESULT VietType::ThreadMgrEventSink::Initialize(
     return hr;
 }
 
-HRESULT VietType::ThreadMgrEventSink::Uninitialize() {
+HRESULT ThreadMgrEventSink::Uninitialize() {
     HRESULT hr;
 
     hr = _threadMgrEventSinkAdvisor.Unadvise();
@@ -110,4 +112,6 @@ HRESULT VietType::ThreadMgrEventSink::Uninitialize() {
     _docMgrFocus.Release();
 
     return hr;
+}
+
 }

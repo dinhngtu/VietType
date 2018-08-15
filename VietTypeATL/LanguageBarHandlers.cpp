@@ -19,15 +19,17 @@
 #include "EngineController.h"
 #include "Version.h"
 
-HMENU GetMenu() {
-    assert(VietType::Globals::DllInstance);
-    HMENU menu = LoadMenu(VietType::Globals::DllInstance, MAKEINTRESOURCE(IDR_MENU_TRAY));
+namespace VietType {
+
+static HMENU GetMenu() {
+    assert(Globals::DllInstance);
+    HMENU menu = LoadMenu(Globals::DllInstance, MAKEINTRESOURCE(IDR_MENU_TRAY));
     menu = GetSubMenu(menu, 0);
 
     return menu;
 }
 
-int PopMenu(POINT pt, const RECT* area) {
+static int PopMenu(POINT pt, const RECT* area) {
     HMENU menu = GetMenu();
     if (!menu) {
         DBG_DPRINT(L"%s", L"load menu failed");
@@ -42,7 +44,7 @@ int PopMenu(POINT pt, const RECT* area) {
     return itemId;
 }
 
-HRESULT CopyTfMenu(_In_ ITfMenu* menu) {
+static HRESULT CopyTfMenu(_In_ ITfMenu* menu) {
     HRESULT hr;
 
     HMENU menuSource = GetMenu();
@@ -107,20 +109,20 @@ HRESULT CopyTfMenu(_In_ ITfMenu* menu) {
     return S_OK;
 }
 
-HRESULT OnMenuSelectAll(_In_ UINT id) {
+static HRESULT OnMenuSelectAll(_In_ UINT id) {
     switch (id) {
     case 0:
         return S_OK;
     case ID_TRAY_ABOUT: {
         LPCWSTR aboutFormatString = nullptr;
         // LoadString will return a read-only pointer to the loaded resource string, no need to free
-        if (!LoadString(VietType::Globals::DllInstance, IDS_ABOUTSTRING, reinterpret_cast<LPWSTR>(&aboutFormatString), 0)) {
+        if (!LoadString(Globals::DllInstance, IDS_ABOUTSTRING, reinterpret_cast<LPWSTR>(&aboutFormatString), 0)) {
             WINERROR_RETURN_HRESULT(L"%s", L"LoadString failed");
         }
         assert(aboutFormatString);
 
         LPCWSTR text = nullptr;
-        auto version = VietType::ReadVersionData();
+        auto version = ReadVersionData();
         std::array<DWORD_PTR, 5> args = {
             std::get<0>(version),
             std::get<1>(version),
@@ -139,7 +141,7 @@ HRESULT OnMenuSelectAll(_In_ UINT id) {
             WINERROR_RETURN_HRESULT(L"%s", L"FormatMessage failed");
         }
 
-        if (!MessageBox(NULL, text, VietType::Globals::TextServiceDescription.c_str(), MB_OK | MB_ICONINFORMATION)) {
+        if (!MessageBox(NULL, text, Globals::TextServiceDescription.c_str(), MB_OK | MB_ICONINFORMATION)) {
             WINERROR_RETURN_HRESULT(L"%s", L"MessageBox failed");
         }
         LocalFree((HLOCAL)text);
@@ -153,7 +155,7 @@ HRESULT OnMenuSelectAll(_In_ UINT id) {
 // RefreshableButton
 ////////////////////////////////////////////////////////////////////////////////
 
-_Check_return_ HRESULT VietType::RefreshableButton::Initialize(
+_Check_return_ HRESULT RefreshableButton::Initialize(
     _In_ EngineController* ec,
     _In_ ITfLangBarItemMgr* langBarItemMgr,
     _In_ const GUID& guidItem,
@@ -180,7 +182,7 @@ _Check_return_ HRESULT VietType::RefreshableButton::Initialize(
     return S_OK;
 }
 
-void VietType::RefreshableButton::Uninitialize() {
+void RefreshableButton::Uninitialize() {
     HRESULT hr;
     hr = _langBarItemMgr->RemoveItem(_button);
     DBG_HRESULT_CHECK(hr, L"%s", L"langBarItemMgr->RemoveItem failed");
@@ -193,7 +195,7 @@ void VietType::RefreshableButton::Uninitialize() {
 // IndicatorButton
 ////////////////////////////////////////////////////////////////////////////////
 
-HRESULT VietType::IndicatorButton::OnClick(_In_ TfLBIClick click, _In_ POINT pt, __RPC__in const RECT* area) {
+HRESULT IndicatorButton::OnClick(_In_ TfLBIClick click, _In_ POINT pt, __RPC__in const RECT* area) {
     if (click == TF_LBI_CLK_LEFT) {
         return _controller->ToggleUserEnabled();
     } else if (click == TF_LBI_CLK_RIGHT) {
@@ -205,7 +207,7 @@ HRESULT VietType::IndicatorButton::OnClick(_In_ TfLBIClick click, _In_ POINT pt,
     return S_OK;
 }
 
-HRESULT VietType::IndicatorButton::InitMenu(__RPC__in_opt ITfMenu* menu) {
+HRESULT IndicatorButton::InitMenu(__RPC__in_opt ITfMenu* menu) {
     if (!menu) {
         return E_INVALIDARG;
     }
@@ -213,11 +215,11 @@ HRESULT VietType::IndicatorButton::InitMenu(__RPC__in_opt ITfMenu* menu) {
     return S_OK;
 }
 
-HRESULT VietType::IndicatorButton::OnMenuSelect(_In_ UINT id) {
+HRESULT IndicatorButton::OnMenuSelect(_In_ UINT id) {
     return OnMenuSelectAll(id);
 }
 
-HRESULT VietType::IndicatorButton::GetIcon(__RPC__deref_out_opt HICON* hicon) {
+HRESULT IndicatorButton::GetIcon(__RPC__deref_out_opt HICON* hicon) {
     // Windows docs is a liar, icons are mandatory
     assert(Globals::DllInstance);
     if (_controller->GetBlocked() == EngineController::BlockedKind::Blocked) {
@@ -230,7 +232,7 @@ HRESULT VietType::IndicatorButton::GetIcon(__RPC__deref_out_opt HICON* hicon) {
     return *hicon ? S_OK : E_FAIL;
 }
 
-HRESULT VietType::IndicatorButton::Refresh() {
+HRESULT IndicatorButton::Refresh() {
     HRESULT hr;
 
     hr = _button->NotifyUpdate(TF_LBI_ICON);
@@ -239,11 +241,11 @@ HRESULT VietType::IndicatorButton::Refresh() {
     return hr;
 }
 
-DWORD VietType::IndicatorButton::GetStatus() {
+DWORD IndicatorButton::GetStatus() {
     return 0;
 }
 
-std::wstring VietType::IndicatorButton::GetText() {
+std::wstring IndicatorButton::GetText() {
     return _controller->IsEnabled() ? std::wstring(L"VIE") : std::wstring(L"ENG");
 }
 
@@ -251,7 +253,7 @@ std::wstring VietType::IndicatorButton::GetText() {
 // LangBarButton
 ////////////////////////////////////////////////////////////////////////////////
 
-HRESULT VietType::LangBarButton::OnClick(_In_ TfLBIClick click, _In_ POINT pt, __RPC__in const RECT* area) {
+HRESULT LangBarButton::OnClick(_In_ TfLBIClick click, _In_ POINT pt, __RPC__in const RECT* area) {
     if (click == TF_LBI_CLK_LEFT) {
         return _controller->ToggleUserEnabled();
     } else if (click == TF_LBI_CLK_RIGHT) {
@@ -263,7 +265,7 @@ HRESULT VietType::LangBarButton::OnClick(_In_ TfLBIClick click, _In_ POINT pt, _
     return S_OK;
 }
 
-HRESULT VietType::LangBarButton::InitMenu(__RPC__in_opt ITfMenu* menu) {
+HRESULT LangBarButton::InitMenu(__RPC__in_opt ITfMenu* menu) {
     if (!menu) {
         return E_INVALIDARG;
     }
@@ -271,11 +273,11 @@ HRESULT VietType::LangBarButton::InitMenu(__RPC__in_opt ITfMenu* menu) {
     return S_OK;
 }
 
-HRESULT VietType::LangBarButton::OnMenuSelect(_In_ UINT id) {
+HRESULT LangBarButton::OnMenuSelect(_In_ UINT id) {
     return OnMenuSelectAll(id);
 }
 
-HRESULT VietType::LangBarButton::GetIcon(__RPC__deref_out_opt HICON* hicon) {
+HRESULT LangBarButton::GetIcon(__RPC__deref_out_opt HICON* hicon) {
     // Windows docs is a liar, icons are mandatory
     assert(Globals::DllInstance);
     if (_controller->GetBlocked() == EngineController::BlockedKind::Blocked) {
@@ -288,19 +290,21 @@ HRESULT VietType::LangBarButton::GetIcon(__RPC__deref_out_opt HICON* hicon) {
     return *hicon ? S_OK : E_FAIL;
 }
 
-DWORD VietType::LangBarButton::GetStatus() {
+DWORD LangBarButton::GetStatus() {
     return 0;
 }
 
-std::wstring VietType::LangBarButton::GetText() {
+std::wstring LangBarButton::GetText() {
     return _controller->IsEnabled() ? std::wstring(L"VIE") : std::wstring(L"ENG");
 }
 
-HRESULT VietType::LangBarButton::Refresh() {
+HRESULT LangBarButton::Refresh() {
     HRESULT hr;
 
     hr = _button->NotifyUpdate(TF_LBI_ICON);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_button->NotifyUpdate failed");
 
     return hr;
+}
+
 }

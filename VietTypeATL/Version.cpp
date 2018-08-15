@@ -17,12 +17,14 @@
 
 #include "Version.h"
 
-std::tuple<WORD, WORD, WORD, WORD> VietType::ReadVersionData() {
+namespace VietType {
+
+std::tuple<WORD, WORD, WORD, WORD> ReadVersionData() {
     auto versionDefault = std::make_tuple((WORD)0, (WORD)0, (WORD)0, (WORD)0);
 
     std::array<WCHAR, MAX_PATH> dllPath;
 
-    auto dllPathLength = GetModuleFileName(VietType::Globals::DllInstance, &dllPath[0], MAX_PATH);
+    auto dllPathLength = GetModuleFileName(Globals::DllInstance, &dllPath[0], MAX_PATH);
     if (dllPathLength == 0) {
         WINERROR_PRINT(GetLastError(), L"%s", L"GetModuleFileName failed");
         return versionDefault;
@@ -57,4 +59,6 @@ std::tuple<WORD, WORD, WORD, WORD> VietType::ReadVersionData() {
         LOWORD(fileInfo->dwFileVersionMS),
         HIWORD(fileInfo->dwFileVersionLS),
         LOWORD(fileInfo->dwFileVersionLS));
+}
+
 }

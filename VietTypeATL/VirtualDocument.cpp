@@ -17,7 +17,9 @@
 
 #include "VirtualDocument.h"
 
-_Check_return_ HRESULT VietType::VirtualDocument::GetVirtualDocumentMgr(_In_ ITfDocumentMgr* dim, _Outptr_ ITfDocumentMgr** pdim) {
+namespace VietType {
+
+_Check_return_ HRESULT VirtualDocument::GetVirtualDocumentMgr(_In_ ITfDocumentMgr* dim, _Outptr_ ITfDocumentMgr** pdim) {
     HRESULT hr;
 
     CComPtr<ITfContext> context;
@@ -61,7 +63,7 @@ _Check_return_ HRESULT VietType::VirtualDocument::GetVirtualDocumentMgr(_In_ ITf
     }
 }
 
-_Check_return_ HRESULT VietType::VirtualDocument::GetVirtualDocumentContext(_In_ ITfContext* context, _Outptr_ ITfContext** pContext) {
+_Check_return_ HRESULT VirtualDocument::GetVirtualDocumentContext(_In_ ITfContext* context, _Outptr_ ITfContext** pContext) {
     HRESULT hr;
 
     CComPtr<ITfDocumentMgr> dim;
@@ -77,4 +79,6 @@ _Check_return_ HRESULT VietType::VirtualDocument::GetVirtualDocumentContext(_In_
     HRESULT_CHECK_RETURN(hr, L"%s", L"GetTransitoryParentDocumentMgr failed");
 
     return pdim->GetTop(pContext);
+}
+
 }

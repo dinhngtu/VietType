@@ -21,8 +21,6 @@
 
 namespace VietType {
 
-extern const GUID GUID_LanguageBarButton_Item;
-
 class ILanguageBarCallbacks {
 public:
     virtual HRESULT OnClick(_In_ TfLBIClick click, _In_ POINT pt, __RPC__in const RECT* prcArea) = 0;

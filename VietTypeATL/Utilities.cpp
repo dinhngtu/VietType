@@ -21,7 +21,9 @@
 #include "EngineController.h"
 #include "EditSessions.h"
 
-HRESULT VietType::IsContextEmpty(_In_ ITfContext* context, _In_ TfClientId clientid, _Out_ bool* isempty) {
+namespace VietType {
+
+HRESULT IsContextEmpty(_In_ ITfContext* context, _In_ TfClientId clientid, _Out_ bool* isempty) {
     HRESULT hr;
 
     CComPtr<Compartment> compEmpty;
@@ -39,14 +41,14 @@ HRESULT VietType::IsContextEmpty(_In_ ITfContext* context, _In_ TfClientId clien
     return hr;
 }
 
-HRESULT VietType::OnNewContext(_In_ ITfContext *context, _In_ VietType::CompositionManager* compositionManager, _In_ VietType::EngineController* controller) {
+HRESULT OnNewContext(_In_ ITfContext *context, _In_ CompositionManager* compositionManager, _In_ EngineController* controller) {
     HRESULT hr;
 
     bool isempty;
-    hr = VietType::IsContextEmpty(context, compositionManager->GetClientId(), &isempty);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"VietType::IsContextEmpty failed");
+    hr = IsContextEmpty(context, compositionManager->GetClientId(), &isempty);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"IsContextEmpty failed");
     if (isempty) {
-        controller->SetBlocked(VietType::EngineController::BlockedKind::Blocked);
+        controller->SetBlocked(EngineController::BlockedKind::Blocked);
         return S_OK;
     }
 
@@ -65,17 +67,19 @@ HRESULT VietType::OnNewContext(_In_ ITfContext *context, _In_ VietType::Composit
 
     if (!controller->IsEditBlockedPending()) {
         controller->SetEditBlockedPending();
-        hr = VietType::CompositionManager::RequestEditSession(
-            VietType::EditSessions::EditBlocked,
+        hr = CompositionManager::RequestEditSession(
+            EditSessions::EditBlocked,
             compositionManager,
             context,
             controller);
         controller->ResetEditBlockedPending();
         if (FAILED(hr)) {
             DBG_HRESULT_CHECK(hr, L"%s", L"CompositionManager::RequestEditSession failed");
-            controller->SetBlocked(VietType::EngineController::BlockedKind::Free);
+            controller->SetBlocked(EngineController::BlockedKind::Free);
         }
     }
 
     return S_OK;
+}
+
 }
