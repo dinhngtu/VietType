@@ -18,16 +18,15 @@
 #include "Version.h"
 
 namespace VietType {
+namespace Version {
 
-std::tuple<WORD, WORD, WORD, WORD> ReadVersionData() {
-    auto versionDefault = std::make_tuple((WORD)0, (WORD)0, (WORD)0, (WORD)0);
-
+static std::unique_ptr<BYTE[]> GetVersionData() {
     std::array<WCHAR, MAX_PATH> dllPath;
 
     auto dllPathLength = GetModuleFileName(Globals::DllInstance, &dllPath[0], MAX_PATH);
     if (dllPathLength == 0) {
         WINERROR_PRINT(GetLastError(), L"%s", L"GetModuleFileName failed");
-        return versionDefault;
+        return std::unique_ptr<BYTE[]>(nullptr);
     }
     if (dllPathLength >= MAX_PATH) {
         dllPathLength--;
@@ -36,29 +35,61 @@ std::tuple<WORD, WORD, WORD, WORD> ReadVersionData() {
 
     DWORD h = 0;
     auto infoSize = GetFileVersionInfoSize(&dllPath[0], &h);
-    if (!infoSize) {
+    if (infoSize == 0) {
         WINERROR_PRINT(GetLastError(), L"%s", L"GetFileVersionInfoSize failed");
-        return versionDefault;
+        return std::unique_ptr<BYTE[]>(nullptr);
     }
 
     auto versionData = std::make_unique<BYTE[]>(infoSize);
     if (!GetFileVersionInfo(&dllPath[0], NULL, infoSize, versionData.get())) {
         WINERROR_PRINT(GetLastError(), L"%s", L"GetFileVersionInfo failed");
-        return versionDefault;
+        return std::unique_ptr<BYTE[]>(nullptr);
+    }
+
+    return versionData;
+}
+
+_Check_return_ _Success_(return) bool GetFileVersion(_Out_ WORD* major, _Out_ WORD* minor, _Out_ WORD* build, _Out_ WORD* privt) {
+    auto versionData = GetVersionData();
+    if (!versionData) {
+        return false;
     }
 
     VS_FIXEDFILEINFO *fileInfo;
     UINT fileInfoSize;
     if (!VerQueryValue(versionData.get(), L"\\", reinterpret_cast<LPVOID*>(&fileInfo), &fileInfoSize)) {
         WINERROR_PRINT(GetLastError(), L"%s", L"VerQueryValue failed");
-        return versionDefault;
+        return false;
     }
 
-    return std::make_tuple(
-        HIWORD(fileInfo->dwFileVersionMS),
-        LOWORD(fileInfo->dwFileVersionMS),
-        HIWORD(fileInfo->dwFileVersionLS),
-        LOWORD(fileInfo->dwFileVersionLS));
+    *major = HIWORD(fileInfo->dwFileVersionMS);
+    *minor = LOWORD(fileInfo->dwFileVersionMS);
+    *build = HIWORD(fileInfo->dwFileVersionLS);
+    *privt = LOWORD(fileInfo->dwFileVersionLS);
+
+    return true;
 }
 
+_Check_return_ _Success_(return) bool GetProductVersion(_Out_ WORD* major, _Out_ WORD* minor, _Out_ WORD* build, _Out_ WORD* privt) {
+    auto versionData = GetVersionData();
+    if (!versionData) {
+        return false;
+    }
+
+    VS_FIXEDFILEINFO *fileInfo;
+    UINT fileInfoSize;
+    if (!VerQueryValue(versionData.get(), L"\\", reinterpret_cast<LPVOID*>(&fileInfo), &fileInfoSize)) {
+        WINERROR_PRINT(GetLastError(), L"%s", L"VerQueryValue failed");
+        return false;
+    }
+
+    *major = HIWORD(fileInfo->dwProductVersionMS);
+    *minor = LOWORD(fileInfo->dwProductVersionMS);
+    *build = HIWORD(fileInfo->dwProductVersionLS);
+    *privt = LOWORD(fileInfo->dwProductVersionLS);
+
+    return true;
+}
+
+}
 }

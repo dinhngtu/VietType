@@ -121,13 +121,17 @@ static HRESULT OnMenuSelectAll(_In_ UINT id) {
         }
         assert(aboutFormatString);
 
+        WORD major, minor, build, privt;
+        if (!Version::GetFileVersion(&major, &minor, &build, &privt)) {
+            WINERROR_RETURN_HRESULT(L"%s", L"Version::GetFileVersion failed");
+        }
+
         LPCWSTR text = nullptr;
-        auto version = ReadFileVersion();
         std::array<DWORD_PTR, 5> args = {
-            std::get<0>(version),
-            std::get<1>(version),
-            std::get<2>(version),
-            std::get<3>(version),
+            major,
+            minor,
+            build,
+            privt,
             reinterpret_cast<DWORD_PTR>(VCS_REVISION)
         };
         if (!FormatMessage(
