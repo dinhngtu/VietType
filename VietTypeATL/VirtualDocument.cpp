@@ -18,8 +18,9 @@
 #include "VirtualDocument.h"
 
 namespace VietType {
+namespace VirtualDocument {
 
-_Check_return_ HRESULT VirtualDocument::GetVirtualDocumentMgr(_In_ ITfDocumentMgr* dim, _Outptr_ ITfDocumentMgr** pdim) {
+_Check_return_ HRESULT GetVirtualDocumentMgr(_In_ ITfDocumentMgr* dim, _Outptr_ ITfDocumentMgr** pdim) {
     HRESULT hr;
 
     CComPtr<ITfContext> context;
@@ -63,7 +64,7 @@ _Check_return_ HRESULT VirtualDocument::GetVirtualDocumentMgr(_In_ ITfDocumentMg
     }
 }
 
-_Check_return_ HRESULT VirtualDocument::GetVirtualDocumentContext(_In_ ITfContext* context, _Outptr_ ITfContext** pContext) {
+_Check_return_ HRESULT GetVirtualDocumentContext(_In_ ITfContext* context, _Outptr_ ITfContext** pContext) {
     HRESULT hr;
 
     CComPtr<ITfDocumentMgr> dim;
@@ -81,4 +82,5 @@ _Check_return_ HRESULT VirtualDocument::GetVirtualDocumentContext(_In_ ITfContex
     return pdim->GetTop(pContext);
 }
 
+}
 }

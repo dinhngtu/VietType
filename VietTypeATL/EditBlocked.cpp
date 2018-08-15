@@ -21,6 +21,7 @@
 #include "CompositionManager.h"
 
 namespace VietType {
+namespace EditSessions {
 
 // workaround for annoying IntelliSense error when the full enum name is used in a macro
 using BlockedKind = EngineController::BlockedKind;
@@ -34,7 +35,7 @@ using BlockedKind = EngineController::BlockedKind;
         } \
     } while (0);
 
-HRESULT EditSessions::EditBlocked(
+HRESULT EditBlocked(
     _In_ TfEditCookie ec,
     _In_ CompositionManager* compositionManager,
     _In_ ITfContext* context,
@@ -140,4 +141,5 @@ commit:
     return hr;
 }
 
+}
 }

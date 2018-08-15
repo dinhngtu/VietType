@@ -24,24 +24,20 @@ namespace VietType {
 class CompositionManager;
 class EngineController;
 
-class EditSessions {
-public:
-    EditSessions() = delete;
-    EditSessions(const EditSessions&) = delete;
-    EditSessions& operator=(const EditSessions&) = delete;
+namespace EditSessions {
 
-    static HRESULT EditBlocked(
-        _In_ TfEditCookie ec,
-        _In_ CompositionManager* compositionManager,
-        _In_ ITfContext* context,
-        _In_ EngineController* controller);
+HRESULT EditBlocked(
+    _In_ TfEditCookie ec,
+    _In_ CompositionManager* compositionManager,
+    _In_ ITfContext* context,
+    _In_ EngineController* controller);
 
-    static HRESULT EditSurroundingWord(
-        _In_ TfEditCookie ec,
-        _In_ VietType::CompositionManager* compositionManager,
-        _In_ ITfContext* context,
-        _In_ VietType::EngineController* controller,
-        _In_ int ignore);
-};
+HRESULT EditSurroundingWord(
+    _In_ TfEditCookie ec,
+    _In_ VietType::CompositionManager* compositionManager,
+    _In_ ITfContext* context,
+    _In_ VietType::EngineController* controller,
+    _In_ int ignore);
 
+}
 }

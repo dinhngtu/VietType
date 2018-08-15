@@ -21,6 +21,7 @@
 #include "VirtualDocument.h"
 
 namespace VietType {
+namespace EditSessions {
 
 static const long SWF_MAXCHARS = 9; // "nghiêng" + 1 for the padding + 1 for max ignore
 
@@ -118,7 +119,7 @@ static bool IsSeparatorCharacter(WCHAR c) {
     return false;
 }
 
-HRESULT EditSessions::EditSurroundingWord(
+HRESULT EditSurroundingWord(
     _In_ TfEditCookie ec,
     _In_ CompositionManager* compositionManager,
     _In_ ITfContext* context,
@@ -226,4 +227,5 @@ HRESULT EditSessions::EditSurroundingWord(
     return S_OK;
 }
 
+}
 }

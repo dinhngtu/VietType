@@ -20,15 +20,10 @@
 #include "Common.h"
 
 namespace VietType {
+namespace VirtualDocument {
 
-class VirtualDocument {
-public:
-    VirtualDocument() = delete;
-    VirtualDocument(const VirtualDocument&) = delete;
-    VirtualDocument& operator=(const VirtualDocument&) = delete;
+_Check_return_ HRESULT GetVirtualDocumentMgr(_In_ ITfDocumentMgr* dim, _Outptr_ ITfDocumentMgr** pdim);
+_Check_return_ HRESULT GetVirtualDocumentContext(_In_ ITfContext* context, _Outptr_ ITfContext** pContext);
 
-    static _Check_return_ HRESULT GetVirtualDocumentMgr(_In_ ITfDocumentMgr* dim, _Outptr_ ITfDocumentMgr** pdim);
-    static _Check_return_ HRESULT GetVirtualDocumentContext(_In_ ITfContext* context, _Outptr_ ITfContext** pContext);
-};
-
+}
 }

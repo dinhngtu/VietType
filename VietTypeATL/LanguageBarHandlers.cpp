@@ -122,7 +122,7 @@ static HRESULT OnMenuSelectAll(_In_ UINT id) {
         assert(aboutFormatString);
 
         LPCWSTR text = nullptr;
-        auto version = ReadVersionData();
+        auto version = ReadFileVersion();
         std::array<DWORD_PTR, 5> args = {
             std::get<0>(version),
             std::get<1>(version),
