@@ -31,7 +31,7 @@ _Ret_valid_ ITfCompartment* Compartment::GetCompartment() {
     return _compartment;
 }
 
-_Check_return_ HRESULT Compartment::GetCompartmentSource(_Outptr_ ITfSource** ppSource) {
+_Check_return_ HRESULT Compartment::GetCompartmentSource(_COM_Outptr_ ITfSource** ppSource) {
     return _compartment->QueryInterface(ppSource);
 }
 

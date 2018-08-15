@@ -87,11 +87,15 @@ _Ret_maybenull_ ITfComposition* CompositionManager::GetComposition() const {
     return _composition;
 }
 
-_Check_return_ HRESULT CompositionManager::GetRange(_Outptr_ ITfRange** range) {
+_Check_return_ HRESULT CompositionManager::GetRange(_COM_Outptr_ ITfRange** range) {
     if (!IsComposing()) {
+        *range = nullptr;
         return E_FAIL;
     }
-    return _composition->GetRange(range);
+    HRESULT hr = _composition->GetRange(range);
+    HRESULT_CHECK_RETURN_OUTPTR(hr, range, L"%s", L"_composition->GetRange failed");
+    
+    return S_OK;
 }
 
 TfClientId CompositionManager::GetClientId() const {

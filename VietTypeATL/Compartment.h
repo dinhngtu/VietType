@@ -35,7 +35,7 @@ public:
 
 public:
     _Ret_valid_ ITfCompartment* GetCompartment();
-    _Check_return_ HRESULT GetCompartmentSource(_Outptr_ ITfSource** ppSource);
+    _Check_return_ HRESULT GetCompartmentSource(_COM_Outptr_ ITfSource** ppSource);
 
     _Check_return_ _Success_(return == S_OK) HRESULT GetValue(_Out_ long* val);
     HRESULT SetValue(_In_ long val);

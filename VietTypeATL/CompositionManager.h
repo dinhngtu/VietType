@@ -51,7 +51,7 @@ public:
     // for use in edit sessions
     _Ret_maybenull_ ITfComposition* GetComposition() const;
     // for use in edit sessions only
-    _Check_return_ HRESULT GetRange(_Outptr_ ITfRange** range);
+    _Check_return_ HRESULT GetRange(_COM_Outptr_ ITfRange** range);
     TfClientId GetClientId() const;
 
     HRESULT StartCompositionNow(_In_ TfEditCookie ec, _In_ ITfContext* context);

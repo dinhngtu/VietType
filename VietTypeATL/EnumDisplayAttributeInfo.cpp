@@ -80,7 +80,7 @@ _Ret_valid_ ITfDisplayAttributeInfo* EnumDisplayAttributeInfo::GetAttribute(_In_
     return _items.at(index);
 }
 
-_Check_return_ HRESULT EnumDisplayAttributeInfo::FindAttributeByGuid(_In_ const GUID& guid, _Outptr_ ITfDisplayAttributeInfo** info) {
+_Check_return_ HRESULT EnumDisplayAttributeInfo::FindAttributeByGuid(_In_ const GUID& guid, _COM_Outptr_ ITfDisplayAttributeInfo** info) {
     HRESULT hr;
     *info = nullptr;
 

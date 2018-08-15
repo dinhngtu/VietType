@@ -34,6 +34,8 @@ void _dprint(_In_ LPCWSTR func, _In_ int line, _In_ LPCWSTR fmt, Args... args) {
 #define HRESULT_CHECK(hr, fmt, ...) if (FAILED(hr)) { DPRINT(L"HRESULT error %lx: " fmt, hr, __VA_ARGS__); }
 // check if HRESULT is successful; if not, print error information to debugger output and return from calling function
 #define HRESULT_CHECK_RETURN(hr, fmt, ...) if (FAILED(hr)) { DPRINT(L"HRESULT error %lx: " fmt, hr, __VA_ARGS__); return hr; }
+// check if HRESULT is successful; if not, set *ptr to nullptr, print error information to debugger output and return from calling function
+#define HRESULT_CHECK_RETURN_OUTPTR(hr, ptr, fmt, ...) if (FAILED(hr)) { *ptr = nullptr; DPRINT(L"HRESULT error %lx: " fmt, hr, __VA_ARGS__); return hr; }
 
 #ifdef _DEBUG
 // if in debug builds, print formatted string to debugger output

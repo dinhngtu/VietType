@@ -20,17 +20,19 @@
 #include <atlbase.h>
 
 template <typename T>
-_Check_return_ HRESULT CreateInstance2(_Outptr_ T** ppout) {
+_Check_return_ HRESULT CreateInstance2(_COM_Outptr_ T** ppout) {
     ATL::CComObject<T>* p;
     HRESULT hr = ATL::CComObject<T>::CreateInstance(&p);
     if (SUCCEEDED(hr)) {
         p->AddRef();
         *ppout = p;
+    } else {
+        *ppout = nullptr;
     }
     return hr;
 }
 
 template <typename TFrom, typename TTo>
-_Check_return_ HRESULT QueryInterface2(_In_ TFrom* from, _Outptr_ TTo** to) {
+_Check_return_ HRESULT QueryInterface2(_In_ TFrom* from, _COM_Outptr_ TTo** to) {
     return from->QueryInterface(__uuidof(TTo), reinterpret_cast<void**>(to));
 }
