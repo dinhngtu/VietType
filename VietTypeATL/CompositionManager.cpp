@@ -55,11 +55,6 @@ void VietType::CompositionManager::Uninitialize() {
     _composingAttribute.Release();
 }
 
-
-HRESULT VietType::CompositionManager::RequestEditSession(_In_ ITfEditSession* session) {
-    return RequestEditSession(session, _context);
-}
-
 HRESULT VietType::CompositionManager::RequestEditSession(_In_ ITfEditSession* session, _In_ ITfContext* context) {
     assert(_clientid != TF_CLIENTID_NULL);
     assert(context);

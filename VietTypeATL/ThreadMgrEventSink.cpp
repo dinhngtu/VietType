@@ -63,40 +63,8 @@ STDMETHODIMP VietType::ThreadMgrEventSink::OnSetFocus(__RPC__in_opt ITfDocumentM
         return S_OK;
     }
 
-    bool isempty;
-    hr = VietType::IsContextEmpty(context, _compMgr->GetClientId(), &isempty);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"VietType::IsContextEmpty failed");
-    if (isempty) {
-        _controller->SetBlocked(EngineController::BlockedKind::Blocked);
-        return S_OK;
-    }
-
-    TF_STATUS st;
-    hr = context->GetStatus(&st);
-    if (SUCCEEDED(hr)) {
-        DBG_DPRINT(
-            L"d=%c%c%c s=%c%c%c",
-            (st.dwDynamicFlags & TF_SD_LOADING) ? L'L' : L'_',
-            (st.dwDynamicFlags & TF_SD_READONLY) ? L'R' : L'_',
-            (st.dwDynamicFlags & TS_SD_UIINTEGRATIONENABLE) ? L'U' : L'_',
-            (st.dwStaticFlags & TF_SS_DISJOINTSEL) ? L'D' : L'_',
-            (st.dwStaticFlags & TF_SS_REGIONS) ? L'R' : L'_',
-            (st.dwStaticFlags & TF_SS_TRANSITORY) ? L'T' : L'_');
-    } else DBG_HRESULT_CHECK(hr, L"%s", L"context->GetStatus failed");
-
-    if (!_controller->IsEditBlockedPending()) {
-        _controller->SetEditBlockedPending();
-        hr = CompositionManager::RequestEditSession(
-            VietType::EditSessions::EditBlocked,
-            _compMgr,
-            context,
-            _controller.p);
-        _controller->ResetEditBlockedPending();
-        if (FAILED(hr)) {
-            DBG_HRESULT_CHECK(hr, L"%s", L"CompositionManager::RequestEditSession failed");
-            _controller->SetBlocked(EngineController::BlockedKind::Free);
-        }
-    }
+    hr = VietType::OnNewContext(context, _compositionManager, _controller);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"VietType::OnNewContext failed");
 
     return S_OK;
 }
@@ -117,7 +85,7 @@ _Check_return_ HRESULT VietType::ThreadMgrEventSink::Initialize(
 
     HRESULT hr;
 
-    _compMgr = compMgr;
+    _compositionManager = compMgr;
     _controller = controller;
 
     hr = _threadMgrEventSinkAdvisor.Advise(threadMgr, this);
@@ -137,7 +105,7 @@ HRESULT VietType::ThreadMgrEventSink::Uninitialize() {
     DBG_HRESULT_CHECK(hr, L"%s", L"_threadMgrEventSinkAdvisor.Unadvise failed");
 
     _controller.Release();
-    _compMgr.Release();
+    _compositionManager.Release();
 
     _docMgrFocus.Release();
 

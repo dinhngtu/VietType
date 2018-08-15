@@ -17,6 +17,9 @@
 
 #include "Utilities.h"
 #include "Compartment.h"
+#include "CompositionManager.h"
+#include "EngineController.h"
+#include "EditSessions.h"
 
 HRESULT VietType::IsContextEmpty(_In_ ITfContext* context, _In_ TfClientId clientid, _Out_ bool* isempty) {
     HRESULT hr;
@@ -34,4 +37,45 @@ HRESULT VietType::IsContextEmpty(_In_ ITfContext* context, _In_ TfClientId clien
 
     *isempty = hr == S_OK && contextEmpty;
     return hr;
+}
+
+HRESULT VietType::OnNewContext(_In_ ITfContext *context, _In_ VietType::CompositionManager* compositionManager, _In_ VietType::EngineController* controller) {
+    HRESULT hr;
+
+    bool isempty;
+    hr = VietType::IsContextEmpty(context, compositionManager->GetClientId(), &isempty);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"VietType::IsContextEmpty failed");
+    if (isempty) {
+        controller->SetBlocked(VietType::EngineController::BlockedKind::Blocked);
+        return S_OK;
+    }
+
+    TF_STATUS st;
+    hr = context->GetStatus(&st);
+    if (SUCCEEDED(hr)) {
+        DBG_DPRINT(
+            L"d=%c%c%c s=%c%c%c",
+            (st.dwDynamicFlags & TF_SD_LOADING) ? L'L' : L'_',
+            (st.dwDynamicFlags & TF_SD_READONLY) ? L'R' : L'_',
+            (st.dwDynamicFlags & TS_SD_UIINTEGRATIONENABLE) ? L'U' : L'_',
+            (st.dwStaticFlags & TF_SS_DISJOINTSEL) ? L'D' : L'_',
+            (st.dwStaticFlags & TF_SS_REGIONS) ? L'R' : L'_',
+            (st.dwStaticFlags & TF_SS_TRANSITORY) ? L'T' : L'_');
+    } else DBG_HRESULT_CHECK(hr, L"%s", L"context->GetStatus failed");
+
+    if (!controller->IsEditBlockedPending()) {
+        controller->SetEditBlockedPending();
+        hr = VietType::CompositionManager::RequestEditSession(
+            VietType::EditSessions::EditBlocked,
+            compositionManager,
+            context,
+            controller);
+        controller->ResetEditBlockedPending();
+        if (FAILED(hr)) {
+            DBG_HRESULT_CHECK(hr, L"%s", L"CompositionManager::RequestEditSession failed");
+            controller->SetBlocked(VietType::EngineController::BlockedKind::Free);
+        }
+    }
+
+    return S_OK;
 }

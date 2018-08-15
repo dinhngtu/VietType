@@ -43,8 +43,6 @@ public:
     _Check_return_ HRESULT Initialize(_In_ TfClientId clientid, _In_ ITfDisplayAttributeInfo* composingAttribute, _In_ bool comless);
     void Uninitialize();
 
-    // this uses the saved context, only use when there is an active composition
-    HRESULT RequestEditSession(_In_ ITfEditSession* session);
     HRESULT RequestEditSession(_In_ ITfEditSession* session, _In_ ITfContext* context);
     HRESULT StartComposition(_In_ ITfContext* pContext);
     HRESULT EndComposition();
@@ -61,9 +59,8 @@ public:
     HRESULT MoveCaretToEnd(_In_ TfEditCookie ec);
     HRESULT EndCompositionNow(_In_ TfEditCookie ec);
     HRESULT SetCompositionText(_In_ TfEditCookie ec, _In_z_ LPCWSTR str, _In_ LONG length);
+    // this uses context to open a new edit session if there's no existing session
     HRESULT EnsureCompositionText(_In_ TfEditCookie ec, _In_ ITfContext* context, _In_z_ LPCWSTR str, _In_ LONG length);
-    HRESULT SetRangeDisplayAttribute(_In_ TfEditCookie ec, _In_ ITfContext* context, _In_ ITfRange* range, _In_ ITfDisplayAttributeInfo* attr);
-    HRESULT ClearRangeDisplayAttribute(_In_ TfEditCookie ec, _In_ ITfContext* context, _In_ ITfRange* range);
 
     template <typename... Args>
     static HRESULT RequestEditSession(
@@ -123,6 +120,9 @@ private:
         /* EditSession */ _In_ TfEditCookie ec,
         /* RequestEditSession */ _In_ CompositionManager* instance,
         /* RequestEditSession */ _In_ ITfContext* context);
+
+    HRESULT SetRangeDisplayAttribute(_In_ TfEditCookie ec, _In_ ITfContext* context, _In_ ITfRange* range, _In_ ITfDisplayAttributeInfo* attr);
+    HRESULT ClearRangeDisplayAttribute(_In_ TfEditCookie ec, _In_ ITfContext* context, _In_ ITfRange* range);
 
 private:
     TfClientId _clientid = TF_CLIENTID_NULL;

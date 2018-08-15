@@ -137,8 +137,6 @@ HRESULT VietType::EditSessions::EditSurroundingWord(
     hr = VirtualDocument::GetVirtualDocumentContext(context, &ppic);
     HRESULT_CHECK_RETURN(hr, L"%s", L"ThreadMgrEventSink::GetTransitoryParentContext failed");
 
-    CComPtr<ITfComposition> composition(compositionManager->GetComposition());
-
     CComPtr<ITfRange> range;
     hr = compositionManager->GetRange(&range);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_composition->GetRange failed");
@@ -189,6 +187,8 @@ HRESULT VietType::EditSessions::EditSurroundingWord(
         HRESULT_CHECK_RETURN(hr, L"%s", L"compositionManager->EndCompositionNow failed");
         return S_OK;
     }
+
+    CComPtr<ITfComposition> composition(compositionManager->GetComposition());
 
     // move composition to the word we found
     hr = range->ShiftStart(ec, -wordlen - ignore, &shifted, &haltcond);

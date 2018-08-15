@@ -58,7 +58,7 @@ public:
 
 private:
     SinkAdvisor<ITfThreadMgrEventSink> _threadMgrEventSinkAdvisor;
-    CComPtr<CompositionManager> _compMgr;
+    CComPtr<CompositionManager> _compositionManager;
     CComPtr<EngineController> _controller;
     CComPtr<ITfDocumentMgr> _docMgrFocus;
 };
