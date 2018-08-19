@@ -23,7 +23,7 @@
 /// <summary>support function, do not use directly</summary>
 template <typename... Args>
 void _dprint(_In_ LPCWSTR func, _In_ int line, _In_ LPCWSTR fmt, Args... args) {
-    std::array<WCHAR, 2048> buf;
+    std::array<WCHAR, 512> buf;
     StringCchPrintf(&buf[0], buf.size(), fmt, func, line, args...);
     OutputDebugString(&buf[0]);
 }
@@ -63,7 +63,7 @@ void _winerrorprint(_In_ LPCWSTR func, _In_ int line, _In_ DWORD err, _In_ LPCWS
         }
     }
 
-    std::array<WCHAR, 2048> buf;
+    std::array<WCHAR, 512> buf;
     StringCchPrintf(&buf[0], buf.size(), fmt, func, line, err, errmessage, args...);
     OutputDebugString(&buf[0]);
 }
