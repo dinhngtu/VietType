@@ -146,6 +146,7 @@ static HRESULT OnMenuSelectAll(_In_ UINT id) {
         }
 
         if (!MessageBox(NULL, text, Globals::TextServiceDescription.c_str(), MB_OK | MB_ICONINFORMATION)) {
+            LocalFree((HLOCAL)text);
             WINERROR_RETURN_HRESULT(L"%s", L"MessageBox failed");
         }
         LocalFree((HLOCAL)text);
