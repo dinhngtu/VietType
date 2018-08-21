@@ -37,8 +37,7 @@ TelexStates FeedWord(TelexEngine& e, const wchar_t* input) {
     return e.GetState();
 }
 
-void TestValidWord(const wchar_t* expected, const wchar_t* input) {
-    TelexEngine e(config);
+void TestValidWord(TelexEngine& e, const wchar_t* expected, const wchar_t* input) {
     e.Reset();
     for (auto c : std::wstring(input)) {
         AssertTelexStatesEqual(TelexStates::Valid, e.PushChar(c));
@@ -46,6 +45,11 @@ void TestValidWord(const wchar_t* expected, const wchar_t* input) {
     Assert::AreEqual(expected, e.Peek().c_str());
     AssertTelexStatesEqual(TelexStates::Committed, e.Commit());
     Assert::AreEqual(expected, e.Retrieve().c_str());
+}
+
+void TestValidWord(const wchar_t* expected, const wchar_t* input) {
+    TelexEngine e(config);
+    TestValidWord(e, expected, input);
 }
 
 void TestInvalidWord(const wchar_t* expected, const wchar_t* input) {
@@ -366,6 +370,21 @@ public:
         TelexEngine e(config);
         AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(L"TH\x1ebe"));
         Assert::AreEqual(L"TH\x1ebe", e.Peek().c_str());
+    }
+
+    // test oa/oe/uy
+
+    TEST_METHOD(TestTypingOaUy) {
+        TestValidWord(L"ho\xe0", L"hoaf");
+        TestValidWord(L"ho\xe8", L"hoef");
+        TestValidWord(L"lu\x1ef5", L"luyj");
+    }
+
+    TEST_METHOD(TestTypingOaUyOff) {
+        TelexEngine e(TelexConfig{ false });
+        TestValidWord(e, L"h\xf2""a", L"hoaf");
+        TestValidWord(e, L"h\xf2""e", L"hoef");
+        TestValidWord(e, L"l\x1ee5y", L"luyj");
     }
 };
 
