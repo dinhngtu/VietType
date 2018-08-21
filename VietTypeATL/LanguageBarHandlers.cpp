@@ -18,6 +18,7 @@
 #include "LanguageBarHandlers.h"
 #include "EngineController.h"
 #include "Version.h"
+#include "SettingsDialog.h"
 
 namespace VietType {
 
@@ -88,9 +89,8 @@ static HRESULT CopyTfMenu(_In_ ITfMenu* menu) {
             break;
         }
 
-#pragma warning(push)
-#pragma warning(disable: 6387)
-        // hbmpMask is not supposed to be NULL here but it still works anyway so we disabled the warning
+        // hbmpMask is not supposed to be NULL here but it still works anyway so we suppress the warning
+#pragma warning(suppress: 6387)
         hr = menu->AddMenuItem(
             mii.wID,
             tfFlags,
@@ -99,7 +99,6 @@ static HRESULT CopyTfMenu(_In_ ITfMenu* menu) {
             &buf[0],
             static_cast<ULONG>(buf.size()),
             NULL);
-#pragma warning(pop)
         DBG_HRESULT_CHECK(hr, L"%s", L"menu->AddMenuItem failed");
 
         DeleteObject(tfBitmap);
@@ -109,10 +108,26 @@ static HRESULT CopyTfMenu(_In_ ITfMenu* menu) {
     return S_OK;
 }
 
-static HRESULT OnMenuSelectAll(_In_ UINT id) {
+static HRESULT OnMenuSelectAll(_In_ UINT id, _In_ EngineController* controller) {
     switch (id) {
     case 0:
         return S_OK;
+
+    case ID_TRAY_OPTIONS: {
+        HRESULT hr;
+        if (!controller) {
+            return E_INVALIDARG;
+        }
+        auto dlg = controller->CreateSettingsDialog();
+        INT_PTR result;
+        hr = dlg.ShowDialog(&result);
+        HRESULT_CHECK_RETURN(hr, L"%s", L"dlg.ShowDialog failed");
+        if (result == IDOK) {
+            controller->CommitSettings(dlg);
+        }
+        break;
+    }
+
     case ID_TRAY_ABOUT: {
         LPCWSTR aboutFormatString = nullptr;
         // LoadString will return a read-only pointer to the loaded resource string, no need to free
@@ -206,7 +221,7 @@ HRESULT IndicatorButton::OnClick(_In_ TfLBIClick click, _In_ POINT pt, __RPC__in
     } else if (click == TF_LBI_CLK_RIGHT) {
         int itemId = PopMenu(pt, area);
         if (itemId) {
-            return OnMenuSelectAll(itemId);
+            return OnMenuSelectAll(itemId, _controller);
         }
     }
     return S_OK;
@@ -221,7 +236,7 @@ HRESULT IndicatorButton::InitMenu(__RPC__in_opt ITfMenu* menu) {
 }
 
 HRESULT IndicatorButton::OnMenuSelect(_In_ UINT id) {
-    return OnMenuSelectAll(id);
+    return OnMenuSelectAll(id, _controller);
 }
 
 HRESULT IndicatorButton::GetIcon(__RPC__deref_out_opt HICON* hicon) {
@@ -264,7 +279,7 @@ HRESULT LangBarButton::OnClick(_In_ TfLBIClick click, _In_ POINT pt, __RPC__in c
     } else if (click == TF_LBI_CLK_RIGHT) {
         int itemId = PopMenu(pt, area);
         if (itemId) {
-            return OnMenuSelectAll(itemId);
+            return OnMenuSelectAll(itemId, _controller);
         }
     }
     return S_OK;
@@ -279,7 +294,7 @@ HRESULT LangBarButton::InitMenu(__RPC__in_opt ITfMenu* menu) {
 }
 
 HRESULT LangBarButton::OnMenuSelect(_In_ UINT id) {
-    return OnMenuSelectAll(id);
+    return OnMenuSelectAll(id, _controller);
 }
 
 HRESULT LangBarButton::GetIcon(__RPC__deref_out_opt HICON* hicon) {

@@ -20,6 +20,7 @@
 #include "CompositionManager.h"
 #include "EditSessions.h"
 #include "Compartment.h"
+#include "SettingsDialog.h"
 
 namespace VietType {
 
@@ -184,6 +185,14 @@ bool EngineController::ResetEditBlockedPending() {
 
 _Check_return_ HRESULT EngineController::GetOpenClose(_Out_ long* openclose) {
     return _openCloseCompartment->GetValue(openclose);
+}
+
+SettingsDialog EngineController::CreateSettingsDialog() const {
+    return SettingsDialog(_engine->GetConfig());
+}
+
+void EngineController::CommitSettings(const SettingsDialog& dlg) {
+    _engine->SetConfig(dlg.GetTelexConfig());
 }
 
 HRESULT EngineController::UpdateStates() {

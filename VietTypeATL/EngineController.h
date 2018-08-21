@@ -28,6 +28,7 @@ class LangBarButton;
 class CompositionManager;
 class EngineController;
 class Compartment;
+class SettingsDialog;
 
 class EngineController :
     public CComObjectRootEx<CComSingleThreadModel>,
@@ -76,6 +77,9 @@ public:
     bool ResetEditBlockedPending();
 
     _Check_return_ HRESULT GetOpenClose(_Out_ long* openclose);
+
+    SettingsDialog CreateSettingsDialog() const;
+    void CommitSettings(const SettingsDialog& dlg);
 
     // update engine and langbar enabled state to match enabled/blocked value
     HRESULT UpdateStates();
