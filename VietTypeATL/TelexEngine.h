@@ -54,6 +54,9 @@ public:
     TelexEngine(const TelexEngine&) = delete;
     TelexEngine& operator=(const TelexEngine&) = delete;
 
+    const TelexConfig& GetConfig() const;
+    void SetConfig(const TelexConfig& config);
+
     void Reset();
     TelexStates PushChar(_In_ wchar_t c);
     TelexStates Backspace();
