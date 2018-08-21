@@ -55,7 +55,7 @@ void _winerrorprint(_In_ LPCWSTR func, _In_ int line, _In_ DWORD err, _In_ LPCWS
     auto chars = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, err, 0, &errmessage[0], static_cast<DWORD>(errmessage.size()), NULL);
     assert(chars >= 0 && chars < 256);
     errmessage[chars] = 0;
-    for (auto c = chars - 1; c >= 0; c--) {
+    for (auto c = static_cast<long>(chars) - 1; c >= 0; c--) {
         if (errmessage[c] == L'\r' || errmessage[c] == L'\n') {
             errmessage[c] = 0;
         } else {
