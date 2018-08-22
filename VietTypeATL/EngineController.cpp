@@ -34,7 +34,8 @@ STDMETHODIMP EngineController::OnChange(__RPC__in REFGUID rguid) {
         UpdateStates();
     } else if (IsEqualGUID(rguid, GUID_COMPARTMENT_KEYBOARD_OPENCLOSE)) {
         long openclose;
-        hr = _openCloseCompartment->GetValue(&openclose);
+        hr = _openCloseCompartment.GetValue(&openclose);
+        assert(hr == S_OK);
         _blocked = openclose ? _blocked : BlockedKind::Blocked;
         UpdateStates();
     }
@@ -57,15 +58,12 @@ _Check_return_ HRESULT EngineController::Initialize(
 
     // init settings compartment & listener
 
-    hr = CreateInstance2(&_settingsCompartment);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&_settingsCompartment) failed");
-
     // GUID_SettingsCompartment_Toggle is global
-    hr = _settingsCompartment->Initialize(threadMgr, clientid, Globals::GUID_SettingsCompartment_Toggle, true);
+    hr = _settingsCompartment.Initialize(threadMgr, clientid, Globals::GUID_SettingsCompartment_Toggle, true);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_settingsCompartment->Initialize failed");
 
     CComPtr<ITfSource> settingsSource;
-    hr = _settingsCompartment->GetCompartmentSource(&settingsSource);
+    hr = _settingsCompartment.GetCompartmentSource(&settingsSource);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_settingsCompartment->GetCompartmentSource failed");
 
     hr = _settingsCompartmentEventSink.Advise(settingsSource, this);
@@ -73,14 +71,11 @@ _Check_return_ HRESULT EngineController::Initialize(
 
     // init GUID_COMPARTMENT_KEYBOARD_OPENCLOSE listener
 
-    hr = CreateInstance2(&_openCloseCompartment);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&_openCloseCompartment) failed");
-
-    hr = _openCloseCompartment->Initialize(threadMgr, clientid, GUID_COMPARTMENT_HANDWRITING_OPENCLOSE);
+    hr = _openCloseCompartment.Initialize(threadMgr, clientid, GUID_COMPARTMENT_HANDWRITING_OPENCLOSE);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_openCloseCompartment->Initialize failed");
 
     CComPtr<ITfSource> openCloseSource;
-    hr = _openCloseCompartment->GetCompartmentSource(&openCloseSource);
+    hr = _openCloseCompartment.GetCompartmentSource(&openCloseSource);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_openCloseCompartment->GetCompartmentSource failed");
 
     hr = _openCloseCompartmentEventSink.Advise(openCloseSource, this);
@@ -103,11 +98,8 @@ HRESULT EngineController::Uninitialize() {
     hr = _settingsCompartmentEventSink.Unadvise();
     DBG_HRESULT_CHECK(hr, L"%s", L"_compartmentEventSink.Unadvise failed");
 
-    _openCloseCompartment->Uninitialize();
-    _openCloseCompartment.Release();
-
-    _settingsCompartment->Uninitialize();
-    _settingsCompartment.Release();
+    _openCloseCompartment.Uninitialize();
+    _settingsCompartment.Uninitialize();
 
     _langBarItemMgr.Release();
     _engine.reset();
@@ -124,7 +116,7 @@ const Telex::TelexEngine& EngineController::GetEngine() const {
 }
 
 _Check_return_ HRESULT EngineController::IsUserEnabled(_Out_ long* penabled) {
-    return CompartmentReadEnabled(penabled);
+    return _settingsCompartment.GetValueOrWriteback(penabled, 1);
 }
 
 HRESULT EngineController::WriteUserEnabled(_In_ long enabled) {
@@ -135,8 +127,8 @@ HRESULT EngineController::WriteUserEnabled(_In_ long enabled) {
         return S_OK;
     }
 
-    hr = CompartmentWriteEnabled(enabled);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"CompartmentWriteEnabled failed");
+    hr = _settingsCompartment.SetValue(enabled);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_settingsCompartment->SetValue failed");
     hr = UpdateStates();
     HRESULT_CHECK_RETURN(hr, L"%s", L"UpdateEnabled failed");
 
@@ -146,8 +138,8 @@ HRESULT EngineController::WriteUserEnabled(_In_ long enabled) {
 HRESULT EngineController::ToggleUserEnabled() {
     HRESULT hr;
     long enabled;
-    hr = CompartmentReadEnabled(&enabled);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"CompartmentReadEnabled failed");
+    hr = _settingsCompartment.GetValueOrWriteback(&enabled, 1);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_settingsCompartment->GetValueOrWriteback failed");
     return WriteUserEnabled(!enabled);
 }
 
@@ -184,7 +176,7 @@ bool EngineController::ResetEditBlockedPending() {
 }
 
 _Check_return_ HRESULT EngineController::GetOpenClose(_Out_ long* openclose) {
-    return _openCloseCompartment->GetValue(openclose);
+    return _openCloseCompartment.GetValue(openclose);
 }
 
 SettingsDialog EngineController::CreateSettingsDialog() const {
@@ -201,8 +193,8 @@ HRESULT EngineController::UpdateStates() {
     switch (_blocked) {
     case BlockedKind::Free: {
         long enabled;
-        hr = CompartmentReadEnabled(&enabled);
-        HRESULT_CHECK_RETURN(hr, L"%s", L"CompartmentReadEnabled failed");
+        hr = _settingsCompartment.GetValueOrWriteback(&enabled, 1);
+        HRESULT_CHECK_RETURN(hr, L"%s", L"_settingsCompartment->GetValueOrWriteback failed");
         DBG_DPRINT(L"block = %d, enabled = %ld", static_cast<int>(_blocked), enabled);
         _enabled = static_cast<bool>(enabled);
         break;
@@ -219,23 +211,6 @@ HRESULT EngineController::UpdateStates() {
     DBG_HRESULT_CHECK(hr, L"%s", L"_langBarButton->Refresh failed");
 
     return S_OK;
-}
-
-_Check_return_ HRESULT EngineController::CompartmentReadEnabled(_Out_ long* pEnabled) {
-    HRESULT hr;
-
-    hr = _settingsCompartment->GetValue(pEnabled);
-    if (hr == S_FALSE) {
-        hr = CompartmentWriteEnabled(1);
-        HRESULT_CHECK_RETURN(hr, L"%s", L"CompartmentWriteEnabled failed");
-        *pEnabled = 1;
-    }
-
-    return hr;
-}
-
-HRESULT EngineController::CompartmentWriteEnabled(_In_ long enabled) {
-    return _settingsCompartment->SetValue(enabled);
 }
 
 _Check_return_ HRESULT EngineController::InitLanguageBar() {

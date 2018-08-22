@@ -27,45 +27,15 @@
 
 namespace VietType {
 
-_Ret_valid_ ITfCompartment* Compartment::GetCompartment() {
+_Ret_valid_ ITfCompartment* CompartmentBase::GetCompartment() {
     return _compartment;
 }
 
-_Check_return_ HRESULT Compartment::GetCompartmentSource(_COM_Outptr_ ITfSource** ppSource) {
+_Check_return_ HRESULT CompartmentBase::GetCompartmentSource(_COM_Outptr_ ITfSource** ppSource) {
     return _compartment->QueryInterface(ppSource);
 }
 
-_Check_return_ _Success_(return == S_OK) HRESULT Compartment::GetValue(_Out_ long* val) {
-    HRESULT hr;
-
-    VARIANT v;
-    hr = _compartment->GetValue(&v);
-    if (hr == S_FALSE) {
-        return S_FALSE;
-    } else if (hr == S_OK) {
-        if (v.vt != VT_I4) {
-            return E_FAIL;
-        }
-        *val = v.lVal;
-    }
-
-    return hr;
-}
-
-HRESULT Compartment::SetValue(_In_ long val) {
-    HRESULT hr;
-
-    VARIANT v;
-    VariantInit(&v);
-    v.vt = VT_I4;
-    v.lVal = val;
-    hr = _compartment->SetValue(_clientid, &v);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_compartment->SetValue failed");
-
-    return S_OK;
-}
-
-_Check_return_ HRESULT Compartment::Initialize(_In_ IUnknown* punk, _In_ TfClientId clientid, _In_ const GUID& guidCompartment, _In_ bool global) {
+_Check_return_ HRESULT CompartmentBase::Initialize(_In_ IUnknown* punk, _In_ TfClientId clientid, _In_ const GUID& guidCompartment, _In_ bool global) {
     HRESULT hr;
 
     CComPtr<ITfCompartmentMgr> compartmentMgr;
@@ -90,7 +60,7 @@ _Check_return_ HRESULT Compartment::Initialize(_In_ IUnknown* punk, _In_ TfClien
     return S_OK;
 }
 
-HRESULT Compartment::Uninitialize() {
+HRESULT CompartmentBase::Uninitialize() {
     _compartment.Release();
 
     return S_OK;

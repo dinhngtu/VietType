@@ -26,15 +26,12 @@ namespace VietType {
 HRESULT IsContextEmpty(_In_ ITfContext* context, _In_ TfClientId clientid, _Out_ bool* isempty) {
     HRESULT hr;
 
-    CComPtr<Compartment> compEmpty;
-    hr = CreateInstance2(&compEmpty);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&compEmpty) failed");
-
-    hr = compEmpty->Initialize(context, clientid, GUID_COMPARTMENT_EMPTYCONTEXT);
+    Compartment<long> compEmpty;
+    hr = compEmpty.Initialize(context, clientid, GUID_COMPARTMENT_EMPTYCONTEXT);
     HRESULT_CHECK_RETURN(hr, L"%s", L"compEmpty->Initialize failed");
 
     long contextEmpty;
-    hr = compEmpty->GetValue(&contextEmpty);
+    hr = compEmpty.GetValue(&contextEmpty);
     HRESULT_CHECK_RETURN(hr, L"%s", L"compDisabled->GetValue failed");
 
     *isempty = hr == S_OK && contextEmpty;

@@ -21,31 +21,87 @@
 
 namespace VietType {
 
-class Compartment : public CComObjectRootEx<CComSingleThreadModel> {
+class CompartmentBase {
 public:
-    Compartment() = default;
-    Compartment(const Compartment&) = delete;
-    Compartment& operator=(const Compartment&) = delete;
-    ~Compartment() = default;
-
-    DECLARE_NOT_AGGREGATABLE(Compartment)
-    BEGIN_COM_MAP(Compartment)
-    END_COM_MAP()
-    DECLARE_PROTECT_FINAL_CONSTRUCT()
+    CompartmentBase() = default;
+    CompartmentBase(const CompartmentBase&) = delete;
+    CompartmentBase& operator=(const CompartmentBase&) = delete;
+    ~CompartmentBase() = default;
 
 public:
     _Ret_valid_ ITfCompartment* GetCompartment();
     _Check_return_ HRESULT GetCompartmentSource(_COM_Outptr_ ITfSource** ppSource);
 
-    _Check_return_ _Success_(return == S_OK) HRESULT GetValue(_Out_ long* val);
-    HRESULT SetValue(_In_ long val);
-
     _Check_return_ HRESULT Initialize(_In_ IUnknown* punk, _In_ TfClientId clientid, _In_ const GUID& guidCompartment, _In_ bool global = false);
     HRESULT Uninitialize();
 
-private:
+protected:
     CComPtr<ITfCompartment> _compartment;
     TfClientId _clientid = TF_CLIENTID_NULL;
+
+    template <typename T>
+    struct variantInfo {
+        static constexpr VARTYPE vartype = VT_ILLEGAL;
+        static constexpr T& accessor(VARIANT& v) = delete;
+    };
+};
+
+template <typename T>
+class Compartment : public CompartmentBase {
+public:
+    _Check_return_ _Success_(return == S_OK) HRESULT GetValue(_Out_ T* val) {
+        HRESULT hr;
+
+        VARIANT v;
+        hr = _compartment->GetValue(&v);
+        if (hr == S_FALSE) {
+            return S_FALSE;
+        } else if (hr == S_OK) {
+            if (v.vt != _var.vartype) {
+                return E_FAIL;
+            }
+            *val = _var.accessor(v);
+        }
+
+        return hr;
+    }
+
+    HRESULT SetValue(const T& val) {
+        HRESULT hr;
+
+        VARIANT v;
+        VariantInit(&v);
+        v.vt = _var.vartype;
+        _var.accessor(v) = val;
+        hr = _compartment->SetValue(_clientid, &v);
+        HRESULT_CHECK_RETURN(hr, L"%s", L"_compartment->SetValue failed");
+
+        return S_OK;
+    }
+
+    _Check_return_ HRESULT GetValueOrWriteback(_Out_ T* val, const T& defaultValue) {
+        HRESULT hr = GetValue(val);
+        if (hr == S_FALSE) {
+            hr = SetValue(defaultValue);
+            if (SUCCEEDED(hr)) {
+                *val = defaultValue;
+                return S_FALSE;
+            }
+            return hr;
+        }
+        return hr;
+    }
+
+private:
+    variantInfo<T> _var;
+};
+
+template <>
+struct CompartmentBase::variantInfo<long> {
+    static constexpr VARTYPE vartype = VT_I4;
+    static constexpr long& accessor(VARIANT& v) {
+        return v.lVal;
+    }
 };
 
 }

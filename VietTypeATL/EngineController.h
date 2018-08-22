@@ -20,6 +20,7 @@
 #include "Common.h"
 #include "SinkAdvisor.h"
 #include "Telex.h"
+#include "Compartment.h"
 
 namespace VietType {
 
@@ -27,7 +28,6 @@ class IndicatorButton;
 class LangBarButton;
 class CompositionManager;
 class EngineController;
-class Compartment;
 class SettingsDialog;
 
 class EngineController :
@@ -85,8 +85,6 @@ public:
     HRESULT UpdateStates();
 
 private:
-    _Check_return_ HRESULT CompartmentReadEnabled(_Out_ long* pEnabled);
-    HRESULT CompartmentWriteEnabled(_In_ long enabled);
     _Check_return_ HRESULT InitLanguageBar();
     HRESULT UninitLanguageBar();
 
@@ -96,10 +94,10 @@ private:
 
     TfClientId _clientid = TF_CLIENTID_NULL;
 
-    CComPtr<Compartment> _settingsCompartment;
+    Compartment<long> _settingsCompartment;
     SinkAdvisor<ITfCompartmentEventSink> _settingsCompartmentEventSink;
 
-    CComPtr<Compartment> _openCloseCompartment;
+    Compartment<long> _openCloseCompartment;
     SinkAdvisor<ITfCompartmentEventSink> _openCloseCompartmentEventSink;
 
     // unique_ptr is not necessary but used just to break include cycle

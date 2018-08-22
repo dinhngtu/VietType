@@ -61,16 +61,13 @@ HRESULT EditBlocked(
 
     // check GUID_COMPARTMENT_KEYBOARD_DISABLED
 
-    CComPtr<Compartment> compDisabled;
-    hr = CreateInstance2(&compDisabled);
-    EB_HRESULT_CHECK_COMMIT(hr, controller, L"%s", L"CreateInstance2(&compDisabled) failed");
-
-    hr = compDisabled->Initialize(context, compositionManager->GetClientId(), GUID_COMPARTMENT_KEYBOARD_DISABLED);
-    EB_HRESULT_CHECK_COMMIT(hr, controller, L"%s", L"compDisabled->Initialize failed");
+    Compartment<long> compDisabled;
+    hr = compDisabled.Initialize(context, compositionManager->GetClientId(), GUID_COMPARTMENT_KEYBOARD_DISABLED);
+    EB_HRESULT_CHECK_COMMIT(hr, controller, L"%s", L"compDisabled.Initialize failed");
 
     long contextDisabled;
-    hr = compDisabled->GetValue(&contextDisabled);
-    EB_HRESULT_CHECK_COMMIT(hr, controller, L"%s", L"compDisabled->GetValue failed");
+    hr = compDisabled.GetValue(&contextDisabled);
+    EB_HRESULT_CHECK_COMMIT(hr, controller, L"%s", L"compDisabled.GetValue failed");
 
     if (hr == S_OK && contextDisabled) {
         DBG_DPRINT(L"%s", L"scopeBlocked: context disabled");
