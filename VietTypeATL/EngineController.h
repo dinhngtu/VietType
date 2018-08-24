@@ -101,7 +101,6 @@ private:
 
     bool _enabled = true;
     BlockedKind _blocked = BlockedKind::Free;
-    bool _backconvertPending = false;
 };
 
 }
