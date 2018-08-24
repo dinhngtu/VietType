@@ -88,30 +88,22 @@ STDMETHODIMP TextService::ActivateEx(_In_ ITfThreadMgr* ptim, _In_ TfClientId ti
     engineconfig.oa_uy_tone1 = true;
     _engine = std::make_shared<Telex::TelexEngine>(engineconfig);
 
-    hr = CreateInstance2(&_compositionManager);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&_compositionManager) failed");
-    hr = _compositionManager->Initialize(tid, attributeStore->GetAttribute(0), static_cast<bool>(dwFlags & TF_TMAE_COMLESS));
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_compositionManager->Initialize failed");
+    hr = CreateInitialize(&_compositionManager, tid, attributeStore->GetAttribute(0), static_cast<bool>(dwFlags & TF_TMAE_COMLESS));
+    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(&_compositionManager) failed");
 
-    hr = CreateInstance2(&_engineController);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&_engineController) failed");
-    hr = _engineController->Initialize(_engine, ptim, tid);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_engineController->Initialize failed");
+    hr = CreateInitialize(&_engineController, _engine, ptim, tid);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(&_engineController) failed");
 
     long enabled;
     // this already sets enabled state if the compartment is empty
     hr = _engineController->IsUserEnabled(&enabled);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_engineController->IsUserEnabled failed");
 
-    hr = CreateInstance2(&_keyEventSink);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&_keyEventSink) failed");
-    hr = _keyEventSink->Initialize(ptim, tid, _compositionManager, _engineController);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_keyEventSink->Initialize failed");
+    hr = CreateInitialize(&_keyEventSink, ptim, tid, _compositionManager, _engineController);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(&_keyEventSink) failed");
 
-    hr = CreateInstance2(&_threadMgrEventSink);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&_threadMgrEventSink) failed");
-    hr = _threadMgrEventSink->Initialize(ptim, tid, _compositionManager, _engineController);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_threadMgrEventSink->Initialize failed");
+    hr = CreateInitialize(&_threadMgrEventSink, ptim, tid, _compositionManager, _engineController);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(&_threadMgrEventSink) failed");
 
     return S_OK;
 }

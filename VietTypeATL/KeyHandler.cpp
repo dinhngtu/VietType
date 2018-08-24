@@ -59,7 +59,7 @@ STDMETHODIMP KeyHandlerEditSession::DoEditSession(_In_ TfEditCookie ec) {
     return S_OK;
 }
 
-void KeyHandlerEditSession::Initialize(
+HRESULT KeyHandlerEditSession::Initialize(
     _In_ CompositionManager* compositionManager,
     _In_ ITfContext* context,
     _In_ WPARAM wParam,
@@ -75,6 +75,7 @@ void KeyHandlerEditSession::Initialize(
     _lParam = lParam;
     _keyState = keyState;
     _controller = controller;
+    return S_OK;
 }
 
 HRESULT KeyHandlerEditSession::ComposeKey(_In_ TfEditCookie ec) {

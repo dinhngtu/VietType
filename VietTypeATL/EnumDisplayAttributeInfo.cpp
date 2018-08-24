@@ -32,9 +32,8 @@ STDMETHODIMP EnumDisplayAttributeInfo::Clone(__RPC__deref_out_opt IEnumTfDisplay
     *ppEnum = nullptr;
 
     CComPtr<EnumDisplayAttributeInfo> ret;
-    hr = CreateInstance2(&ret);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&ret) failed");
-    ret->Initialize(_items, _index);
+    hr = CreateInitialize(&ret, _items, _index);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(&ret) failed");
 
     *ppEnum = ret;
     (*ppEnum)->AddRef();
@@ -67,9 +66,10 @@ STDMETHODIMP EnumDisplayAttributeInfo::Skip(_In_ ULONG ulCount) {
     return (_index < _items.size()) ? S_OK : S_FALSE;
 }
 
-void EnumDisplayAttributeInfo::Initialize(_In_ const info_vector_type& items, _In_ info_vector_type::size_type index) {
+HRESULT EnumDisplayAttributeInfo::Initialize(_In_ const info_vector_type& items, _In_ info_vector_type::size_type index) {
     _items = items;
     _index = index;
+    return S_OK;
 }
 
 void EnumDisplayAttributeInfo::AddAttribute(_In_ ITfDisplayAttributeInfo* item) {

@@ -47,7 +47,7 @@ public:
     virtual STDMETHODIMP Reset(void) override;
 
 public:
-    void Initialize(_In_ const GUID& guid, _In_ std::wstring description, _In_ TF_DISPLAYATTRIBUTE attr);
+    HRESULT Initialize(_In_ const GUID& guid, _In_ std::wstring description, _In_ TF_DISPLAYATTRIBUTE attr);
 
 private:
     GUID _guid = { 0 };

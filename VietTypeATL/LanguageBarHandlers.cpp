@@ -187,15 +187,14 @@ _Check_return_ HRESULT RefreshableButton::Initialize(
     _controller = ec;
     _langBarItemMgr = langBarItemMgr;
 
-    hr = CreateInstance2(&_button);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&_button) failed");
-    hr = _button->Initialize(
+    hr = CreateInitialize(
+        &_button,
         guidItem,
         style,
         sort,
         description,
         this);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_button->Initialize failed");
+    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(&_button) failed");
     hr = _langBarItemMgr->AddItem(_button);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_langBarItemMgr->AddItem failed");
 

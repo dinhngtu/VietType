@@ -75,10 +75,9 @@ public:
         HRESULT hr;
 
         CComPtr<EditSession<CompositionManager*, ITfContext*, Args...>> session;
-        hr = CreateInstance2(&session);
-        HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&session) failed");
+        hr = CreateInitialize(&session, callback, compositionManager, context, args...);
+        HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(&session) failed");
 
-        session->Initialize(callback, compositionManager, context, args...);
         HRESULT hrSession;
         hr = context->RequestEditSession(compositionManager->_clientid, session, TF_ES_ASYNCDONTCARE | TF_ES_READWRITE, &hrSession);
         HRESULT_CHECK_RETURN(hr, L"%s", L"context->RequestEditSession failed");
@@ -101,10 +100,9 @@ public:
         HRESULT hr;
 
         CComPtr<EditSession<CompositionManager*, ITfContext*, Args...>> session;
-        hr = CreateInstance2(&session);
-        HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&session) failed");
+        hr = CreateInitialize(&session, callback, compositionManager, context, args...);
+        HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(&session) failed");
 
-        session->Initialize(callback, compositionManager, context, args...);
         hr = context->RequestEditSession(compositionManager->_clientid, session, flags, hrSession);
         HRESULT_CHECK_RETURN(hr, L"%s", L"context->RequestEditSession failed");
 

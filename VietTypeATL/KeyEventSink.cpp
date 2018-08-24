@@ -229,9 +229,8 @@ HRESULT KeyEventSink::CallKeyEdit(_In_ ITfContext* context, _In_ WPARAM wParam, 
     HRESULT hr;
 
     CComPtr<KeyHandlerEditSession> keyHandlerEditSession;
-    hr = CreateInstance2(&keyHandlerEditSession);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_keyHandlerEditSession.CreateInstance failed");
-    keyHandlerEditSession->Initialize(_compositionManager, context, wParam, lParam, _keyState, _controller);
+    hr = CreateInitialize(&keyHandlerEditSession, _compositionManager, context, wParam, lParam, _keyState, _controller);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(&keyHandlerEditSession) failed");
     hr = _compositionManager->RequestEditSession(keyHandlerEditSession, context);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_compositionManager->RequestEditSession failed");
 
