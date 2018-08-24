@@ -32,6 +32,20 @@ _Check_return_ HRESULT CreateInstance2(_COM_Outptr_ T** ppout) {
     return hr;
 }
 
+template <typename T, typename... Args>
+_Check_return_ HRESULT CreateInitialize(_COM_Outptr_ T** ppout, Args... args) {
+    ATL::CComObject<T>* p;
+    HRESULT hr = ATL::CComObject<T>::CreateInstance(&p);
+    if (SUCCEEDED(hr)) {
+        p->AddRef();
+        *ppout = p;
+        hr = (*ppout)->Initialize(args...);
+    } else {
+        *ppout = nullptr;
+    }
+    return hr;
+}
+
 template <typename TFrom, typename TTo>
 _Check_return_ HRESULT QueryInterface2(_In_ TFrom* from, _COM_Outptr_ TTo** to) {
     return from->QueryInterface(__uuidof(TTo), reinterpret_cast<void**>(to));
