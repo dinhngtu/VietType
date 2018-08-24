@@ -52,6 +52,7 @@
 #include <array>
 #include <algorithm>
 #include <iterator>
+#include <optional>
 
 #include <strsafe.h>
 #include <msctf.h>

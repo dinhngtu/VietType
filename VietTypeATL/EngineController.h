@@ -21,6 +21,7 @@
 #include "SinkAdvisor.h"
 #include "Telex.h"
 #include "Compartment.h"
+#include "SettingsStore.h"
 
 namespace VietType {
 
@@ -90,8 +91,7 @@ private:
 
     TfClientId _clientid = TF_CLIENTID_NULL;
 
-    Compartment<long> _settingsCompartment;
-    SinkAdvisor<ITfCompartmentEventSink> _settingsCompartmentEventSink;
+    CComPtr<CachedCompartmentSetting<long>> _enabled;
 
     Compartment<long> _openCloseCompartment;
     SinkAdvisor<ITfCompartmentEventSink> _openCloseCompartmentEventSink;
@@ -100,7 +100,6 @@ private:
     std::unique_ptr<IndicatorButton> _indicatorButton;
     std::unique_ptr<LangBarButton> _langBarButton;
 
-    bool _enabled = true;
     BlockedKind _blocked = BlockedKind::Free;
 };
 

@@ -59,15 +59,8 @@ _Check_return_ HRESULT EngineController::Initialize(
     // init settings compartment & listener
 
     // GUID_SettingsCompartment_Toggle is global
-    hr = _settingsCompartment.Initialize(threadMgr, clientid, Globals::GUID_SettingsCompartment_Toggle, true);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_settingsCompartment->Initialize failed");
-
-    CComPtr<ITfSource> settingsSource;
-    hr = _settingsCompartment.GetCompartmentSource(&settingsSource);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_settingsCompartment->GetCompartmentSource failed");
-
-    hr = _settingsCompartmentEventSink.Advise(settingsSource, this);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_settingsCompartmentEventSink.Advise failed");
+    hr = CreateInitialize(&_enabled, threadMgr, clientid, Globals::GUID_SettingsCompartment_Toggle, true, [this](const long&) { this->UpdateStates(); });
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_enabled->Initialize failed");
 
     // init GUID_COMPARTMENT_KEYBOARD_OPENCLOSE listener
 
@@ -95,11 +88,9 @@ HRESULT EngineController::Uninitialize() {
     hr = UninitLanguageBar();
     DBG_HRESULT_CHECK(hr, L"%s", L"UninitLanguageBar failed");
 
-    hr = _settingsCompartmentEventSink.Unadvise();
-    DBG_HRESULT_CHECK(hr, L"%s", L"_compartmentEventSink.Unadvise failed");
-
-    _openCloseCompartment.Uninitialize();
-    _settingsCompartment.Uninitialize();
+    hr = _enabled->Uninitialize();
+    DBG_HRESULT_CHECK(hr, L"%s", L"_enabled->Uninitialize failed");
+    _enabled.Release();
 
     _langBarItemMgr.Release();
     _engine.reset();
@@ -116,7 +107,7 @@ const Telex::TelexEngine& EngineController::GetEngine() const {
 }
 
 _Check_return_ HRESULT EngineController::IsUserEnabled(_Out_ long* penabled) {
-    return _settingsCompartment.GetValueOrWriteback(penabled, 1);
+    return _enabled->GetValueOrWriteback(penabled, 1);
 }
 
 HRESULT EngineController::ToggleUserEnabled() {
@@ -128,11 +119,11 @@ HRESULT EngineController::ToggleUserEnabled() {
     }
 
     long enabled;
-    hr = _settingsCompartment.GetValueOrWriteback(&enabled, 1);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_settingsCompartment->GetValueOrWriteback failed");
+    hr = _enabled->GetValueOrWriteback(&enabled, 1);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_enabled->GetValueOrWriteback failed");
 
-    hr = _settingsCompartment.SetValue(!enabled);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_settingsCompartment->SetValue failed");
+    hr = _enabled->SetValue(!enabled);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_enabled->SetValue failed");
     hr = UpdateStates();
     HRESULT_CHECK_RETURN(hr, L"%s", L"UpdateEnabled failed");
     
@@ -140,7 +131,10 @@ HRESULT EngineController::ToggleUserEnabled() {
 }
 
 long EngineController::IsEnabled() const {
-    return _enabled && _blocked == BlockedKind::Free;
+    long enabled;
+    HRESULT hr = _enabled->GetValueOrWriteback(&enabled, 1);
+    assert(SUCCEEDED(hr));
+    return enabled && _blocked == BlockedKind::Free;
 }
 
 EngineController::BlockedKind EngineController::GetBlocked() const {
@@ -168,9 +162,8 @@ HRESULT EngineController::UpdateStates() {
     HRESULT hr;
 
     long enabled;
-    hr = _settingsCompartment.GetValueOrWriteback(&enabled, 1);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_settingsCompartment->GetValueOrWriteback failed");
-    _enabled = static_cast<bool>(enabled);
+    hr = _enabled->GetValueOrWriteback(&enabled, 1);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_enabled->GetValueOrWriteback failed");
 
     DBG_DPRINT(L"enabled = %ld, blocked = %d", enabled, static_cast<int>(_blocked));
 
