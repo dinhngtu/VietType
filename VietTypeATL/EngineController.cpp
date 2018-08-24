@@ -119,7 +119,7 @@ _Check_return_ HRESULT EngineController::IsUserEnabled(_Out_ long* penabled) {
     return _settingsCompartment.GetValueOrWriteback(penabled, 1);
 }
 
-HRESULT EngineController::WriteUserEnabled(_In_ long enabled) {
+HRESULT EngineController::ToggleUserEnabled() {
     HRESULT hr;
 
     if (_blocked == BlockedKind::Blocked) {
@@ -127,20 +127,16 @@ HRESULT EngineController::WriteUserEnabled(_In_ long enabled) {
         return S_OK;
     }
 
-    hr = _settingsCompartment.SetValue(enabled);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_settingsCompartment->SetValue failed");
-    hr = UpdateStates();
-    HRESULT_CHECK_RETURN(hr, L"%s", L"UpdateEnabled failed");
-
-    return S_OK;
-}
-
-HRESULT EngineController::ToggleUserEnabled() {
-    HRESULT hr;
     long enabled;
     hr = _settingsCompartment.GetValueOrWriteback(&enabled, 1);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_settingsCompartment->GetValueOrWriteback failed");
-    return WriteUserEnabled(!enabled);
+
+    hr = _settingsCompartment.SetValue(!enabled);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_settingsCompartment->SetValue failed");
+    hr = UpdateStates();
+    HRESULT_CHECK_RETURN(hr, L"%s", L"UpdateEnabled failed");
+    
+    return S_OK;
 }
 
 long EngineController::IsEnabled() const {

@@ -99,10 +99,9 @@ STDMETHODIMP TextService::ActivateEx(_In_ ITfThreadMgr* ptim, _In_ TfClientId ti
     HRESULT_CHECK_RETURN(hr, L"%s", L"_engineController->Initialize failed");
 
     long enabled;
+    // this already sets enabled state if the compartment is empty
     hr = _engineController->IsUserEnabled(&enabled);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_engineController->IsUserEnabled failed");
-    hr = _engineController->WriteUserEnabled(enabled);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_engineController->UpdateEnabled failed");
 
     hr = CreateInstance2(&_keyEventSink);
     HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&_keyEventSink) failed");

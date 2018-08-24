@@ -65,7 +65,6 @@ public:
     const Telex::TelexEngine& GetEngine() const;
 
     _Check_return_ HRESULT IsUserEnabled(_Out_ long* penabled);
-    HRESULT WriteUserEnabled(_In_ long enabled);
     HRESULT ToggleUserEnabled();
 
     long IsEnabled() const;
