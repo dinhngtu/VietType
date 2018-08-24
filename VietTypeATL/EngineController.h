@@ -67,6 +67,7 @@ public:
     _Check_return_ HRESULT IsUserEnabled(_Out_ long* penabled);
     HRESULT ToggleUserEnabled();
 
+    // effective enabled status, from the combination of user setting and blocked state
     long IsEnabled() const;
     BlockedKind GetBlocked() const;
     void SetBlocked(_In_ BlockedKind blocked);

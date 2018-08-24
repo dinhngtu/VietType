@@ -55,7 +55,7 @@ static HRESULT CopyTfMenu(_In_ ITfMenu* menu) {
         mii.dwTypeData = NULL;
         mii.fMask = MIIM_STRING;
         if (!GetMenuItemInfo(menuSource, i, TRUE, &mii)) {
-            WINERROR_RETURN_HRESULT(L"%s", L"GetMenuItemInfo failed");
+            WINERROR_GLE_RETURN_HRESULT(L"%s", L"GetMenuItemInfo failed");
         }
 
         mii.cch++;
@@ -64,7 +64,7 @@ static HRESULT CopyTfMenu(_In_ ITfMenu* menu) {
         std::vector<WCHAR> buf(mii.cch);
         mii.dwTypeData = &buf[0];
         if (!GetMenuItemInfo(menuSource, i, TRUE, &mii)) {
-            WINERROR_RETURN_HRESULT(L"%s", L"GetMenuItemInfo failed");
+            WINERROR_GLE_RETURN_HRESULT(L"%s", L"GetMenuItemInfo failed");
         }
 
         DWORD tfFlags = 0;
@@ -132,13 +132,13 @@ static HRESULT OnMenuSelectAll(_In_ UINT id, _In_ EngineController* controller) 
         LPCWSTR aboutFormatString = nullptr;
         // LoadString will return a read-only pointer to the loaded resource string, no need to free
         if (!LoadString(Globals::DllInstance, IDS_ABOUTSTRING, reinterpret_cast<LPWSTR>(&aboutFormatString), 0)) {
-            WINERROR_RETURN_HRESULT(L"%s", L"LoadString failed");
+            WINERROR_GLE_RETURN_HRESULT(L"%s", L"LoadString failed");
         }
         assert(aboutFormatString);
 
         WORD major, minor, build, privt;
         if (!Version::GetFileVersion(&major, &minor, &build, &privt)) {
-            WINERROR_RETURN_HRESULT(L"%s", L"Version::GetFileVersion failed");
+            WINERROR_GLE_RETURN_HRESULT(L"%s", L"Version::GetFileVersion failed");
         }
 
         LPCWSTR text = nullptr;
@@ -157,12 +157,12 @@ static HRESULT OnMenuSelectAll(_In_ UINT id, _In_ EngineController* controller) 
             reinterpret_cast<LPWSTR>(&text),
             0,
             reinterpret_cast<va_list*>(&args[0]))) {
-            WINERROR_RETURN_HRESULT(L"%s", L"FormatMessage failed");
+            WINERROR_GLE_RETURN_HRESULT(L"%s", L"FormatMessage failed");
         }
 
         if (!MessageBox(NULL, text, Globals::TextServiceDescription.c_str(), MB_OK | MB_ICONINFORMATION)) {
             LocalFree((HLOCAL)text);
-            WINERROR_RETURN_HRESULT(L"%s", L"MessageBox failed");
+            WINERROR_GLE_RETURN_HRESULT(L"%s", L"MessageBox failed");
         }
         LocalFree((HLOCAL)text);
         break;

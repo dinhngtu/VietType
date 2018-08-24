@@ -57,10 +57,10 @@ public:
         if (hr == S_FALSE) {
             return S_FALSE;
         } else if (hr == S_OK) {
-            if (v.vt != _var.vartype) {
+            if (v.vt != variantInfo<T>::vartype) {
                 return E_FAIL;
             }
-            *val = _var.accessor(v);
+            *val = variantInfo<T>::accessor(v);
         }
 
         return hr;
@@ -71,8 +71,8 @@ public:
 
         VARIANT v;
         VariantInit(&v);
-        v.vt = _var.vartype;
-        _var.accessor(v) = val;
+        v.vt = variantInfo<T>::vartype;
+        variantInfo<T>::accessor(v) = val;
         hr = _compartment->SetValue(_clientid, &v);
         HRESULT_CHECK_RETURN(hr, L"%s", L"_compartment->SetValue failed");
 
@@ -91,9 +91,6 @@ public:
         }
         return hr;
     }
-
-private:
-    variantInfo<T> _var;
 };
 
 template <>

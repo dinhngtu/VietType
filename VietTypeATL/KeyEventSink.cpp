@@ -83,7 +83,7 @@ STDMETHODIMP KeyEventSink::OnTestKeyDown(_In_ ITfContext* pic, _In_ WPARAM wPara
     }
 
     if (!GetKeyboardState(_keyState)) {
-        WINERROR_RETURN_HRESULT(L"%s", L"GetKeyboardState failed");
+        WINERROR_GLE_RETURN_HRESULT(L"%s", L"GetKeyboardState failed");
     }
 
     *pfEaten = Telex::IsKeyEaten(
@@ -110,7 +110,7 @@ STDMETHODIMP KeyEventSink::OnTestKeyUp(_In_ ITfContext* pic, _In_ WPARAM wParam,
     // essentially we eat the KeyUp event if a composition is active; is this the correct behavior?
     if (_compositionManager->IsComposing()) {
         if (!GetKeyboardState(_keyState)) {
-            WINERROR_RETURN_HRESULT(L"%s", L"GetKeyboardState failed");
+            WINERROR_GLE_RETURN_HRESULT(L"%s", L"GetKeyboardState failed");
         }
 
         *pfEaten = Telex::IsKeyEaten(
@@ -134,7 +134,7 @@ STDMETHODIMP KeyEventSink::OnKeyDown(_In_ ITfContext* pic, _In_ WPARAM wParam, _
     }
 
     if (!GetKeyboardState(_keyState)) {
-        WINERROR_RETURN_HRESULT(L"%s", L"GetKeyboardState failed");
+        WINERROR_GLE_RETURN_HRESULT(L"%s", L"GetKeyboardState failed");
     }
 
     *pfEaten = Telex::IsKeyEaten(

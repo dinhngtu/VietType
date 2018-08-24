@@ -26,7 +26,7 @@ SettingsDialog::SettingsDialog(const Telex::TelexConfig& telexConfig) {
 _Check_return_ HRESULT SettingsDialog::ShowDialog(_Out_ INT_PTR* result) {
     auto ret = DialogBoxParam(Globals::DllInstance, MAKEINTRESOURCE(IDD_SETTINGS), GetActiveWindow(), SettingsDialogProc, reinterpret_cast<LPARAM>(this));
     if (ret <= 0) {
-        WINERROR_RETURN_HRESULT(L"%s", L"DialogBoxParam failed");
+        WINERROR_GLE_RETURN_HRESULT(L"%s", L"DialogBoxParam failed");
     }
     *result = ret;
     return S_OK;

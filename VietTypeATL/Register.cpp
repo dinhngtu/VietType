@@ -46,7 +46,7 @@ extern "C" __declspec(dllexport) HRESULT __cdecl RegisterProfiles() {
 
     auto dllPathLength = GetModuleFileName(VietType::Globals::DllInstance, dllPath, MAX_PATH);
     if (dllPathLength == 0) {
-        WINERROR_RETURN_HRESULT(L"%s", L"GetModuleFileName failed");
+        WINERROR_GLE_RETURN_HRESULT(L"%s", L"GetModuleFileName failed");
     }
     if (dllPathLength >= MAX_PATH) {
         dllPathLength--;

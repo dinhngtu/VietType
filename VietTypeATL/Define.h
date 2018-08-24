@@ -71,4 +71,6 @@ void _winerrorprint(_In_ LPCWSTR func, _In_ int line, _In_ DWORD err, _In_ LPCWS
 // format win32 error and print formatted string to debugger output
 #define WINERROR_PRINT(err, fmt, ...) _winerrorprint(__FUNCTIONW__, __LINE__, err, L"%s:%d: WINERROR %lx (%s): " fmt L"\n", __VA_ARGS__)
 // format win32 error, print formatted string to debugger output, and return from calling function with error converted to HRESULT
-#define WINERROR_RETURN_HRESULT(fmt, ...) do { auto err = GetLastError(); WINERROR_PRINT(err, fmt, __VA_ARGS__); return HRESULT_FROM_WIN32(err); } while (0)
+#define WINERROR_CHECK_RETURN_HRESULT(err, fmt, ...) if (err != ERROR_SUCCESS) { WINERROR_PRINT(err, fmt, __VA_ARGS__); return HRESULT_FROM_WIN32(err); }
+// get and format win32 error, print formatted string to debugger output, and return from calling function with error converted to HRESULT
+#define WINERROR_GLE_RETURN_HRESULT(fmt, ...) WINERROR_CHECK_RETURN_HRESULT(GetLastError(), fmt, __VA_ARGS__)
