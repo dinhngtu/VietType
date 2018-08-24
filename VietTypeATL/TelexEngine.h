@@ -97,7 +97,7 @@ private:
     int _respos_current = 0;
 
 private:
-    using map_iterator = genmap<std::wstring, VInfo>::const_iterator;
+    using map_iterator = generic_map_type<std::wstring, VInfo>::const_iterator;
     bool FindTable(_Out_ map_iterator *it) const;
     bool GetTonePos(_In_ bool predict, _Out_ VInfo *vinfo) const;
 };

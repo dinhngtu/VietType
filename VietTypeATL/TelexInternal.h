@@ -47,9 +47,9 @@ struct VInfo {
 };
 
 template<typename K, typename V>
-using genmap = std::unordered_map<K, V>;
+using generic_map_type = std::unordered_map<K, V>;
 template<typename T>
-using genset = std::unordered_set<T>;
+using generic_set_type = std::unordered_set<T>;
 
 }
 }

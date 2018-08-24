@@ -20,7 +20,7 @@
 namespace VietType {
 namespace Telex {
 
-const genmap<std::wstring, std::wstring> transitions = {
+const generic_map_type<std::wstring, std::wstring> transitions = {
     {L"aa", L"\xe2"},
     {L"ee", L"\xea"},
     {L"iee", L"i\xea"},
@@ -46,7 +46,7 @@ const genmap<std::wstring, std::wstring> transitions = {
     {L"\xf4o", L"oo"},
 };
 
-const genmap<std::wstring, int> respos = {
+const generic_map_type<std::wstring, int> respos = {
     {L"\xe2", 0},
     {L"\xea", 0},
     {L"i\xea", 1},
@@ -69,7 +69,7 @@ const genmap<std::wstring, int> respos = {
     {L"u\xe2y", 1},
 };
 
-const genmap<std::wstring, std::wstring> transitions_w = {
+const generic_map_type<std::wstring, std::wstring> transitions_w = {
     {L"a", L"\x103"},
     {L"o", L"\x1a1"},
     {L"oa", L"o\x103"},
@@ -81,7 +81,7 @@ const genmap<std::wstring, std::wstring> transitions_w = {
     {L"\x1b0o", L"\x1b0\x1a1"},
 };
 
-const genmap<std::wstring, int> respos_w = {
+const generic_map_type<std::wstring, int> respos_w = {
     {L"\x103", 0},
     {L"\x1a1", 0},
     {L"o\x103", 1},
@@ -93,12 +93,12 @@ const genmap<std::wstring, int> respos_w = {
     {L"\x1b0\x1a1i", 1},
 };
 
-const genmap<std::wstring, std::wstring> transitions_v_c2 = {
+const generic_map_type<std::wstring, std::wstring> transitions_v_c2 = {
     {L"u\x1a1", L"\x1b0\x1a1"},
     {L"\x1b0o", L"\x1b0\x1a1"},
 };
 
-const genmap<wchar_t, std::wstring> transitions_tones = {
+const generic_map_type<wchar_t, std::wstring> transitions_tones = {
     {L'a', L"a\xe0\x1ea1\x1ea3\xe1\xe3"},
     {L'\xe2', L"\xe2\x1ea7\x1ead\x1ea9\x1ea5\x1eab"},
     {L'\x103', L"\x103\x1eb1\x1eb7\x1eb3\x1eaf\x1eb5"},
@@ -113,7 +113,7 @@ const genmap<wchar_t, std::wstring> transitions_tones = {
     {L'y', L"y\x1ef3\x1ef5\x1ef7\xfd\x1ef9"},
 };
 
-const genset<std::wstring> valid_c1 = {
+const generic_set_type<std::wstring> valid_c1 = {
     L"",
     L"b",
     L"c",
@@ -145,7 +145,7 @@ const genset<std::wstring> valid_c1 = {
     L"x",
 };
 
-const genmap<std::wstring, VInfo> valid_v = {
+const generic_map_type<std::wstring, VInfo> valid_v = {
     {L"a", {0, C2Mode::Either}},
     {L"\x103", {0, C2Mode::MustC2}}, // ă
     {L"\xe2", {0, C2Mode::MustC2}},  // â
@@ -211,7 +211,7 @@ const genmap<std::wstring, VInfo> valid_v = {
     {L"y\xeau", {1, C2Mode::NoC2}},      // yêu
 };
 
-const genmap<std::wstring, VInfo> valid_v_q = {
+const generic_map_type<std::wstring, VInfo> valid_v_q = {
     {L"u\xe2", {1, C2Mode::MustC2}}, // uâ
     {L"u\xf4", {1, C2Mode::Either}}, // ô
     {L"u\xea", {1, C2Mode::Either}}, // uê
@@ -228,7 +228,7 @@ const genmap<std::wstring, VInfo> valid_v_q = {
     {L"u\xf4", {1, C2Mode::MustC2}}, // uô
 };
 
-const genmap<std::wstring, VInfo> valid_v_qu = {
+const generic_map_type<std::wstring, VInfo> valid_v_qu = {
     {L"\xe2", {0, C2Mode::MustC2}}, // uâ
     {L"\xf4", {0, C2Mode::Either}}, // ô
     {L"\xea", {0, C2Mode::Either}}, // uê
@@ -245,7 +245,7 @@ const genmap<std::wstring, VInfo> valid_v_qu = {
     {L"\xf4", {0, C2Mode::MustC2}}, // uô
 };
 
-const genmap<std::wstring, VInfo> valid_v_gi = {
+const generic_map_type<std::wstring, VInfo> valid_v_gi = {
     {L"", {-1, C2Mode::Either}},
     {L"a", {0, C2Mode::Either}},
     {L"\x103", {0, C2Mode::MustC2}}, // ă
@@ -279,7 +279,7 @@ const genmap<std::wstring, VInfo> valid_v_gi = {
 };
 
 // bool is whether tones are restricted to s/j or not
-const genmap<std::wstring, bool> valid_c2 = {
+const generic_map_type<std::wstring, bool> valid_c2 = {
     {L"", false},
     {L"c", true},
     {L"m", false},
@@ -292,13 +292,13 @@ const genmap<std::wstring, bool> valid_c2 = {
     {L"nh", false},
 };
 
-const genmap<std::wstring, VInfo> valid_v_oa_uy = {
+const generic_map_type<std::wstring, VInfo> valid_v_oa_uy = {
     {L"oa", {0, C2Mode::Either}},
     {L"oe", {0, C2Mode::Either}},
     {L"uy", {0, C2Mode::Either}},
 };
 
-const genmap<wchar_t, std::wstring> backconversions = {
+const generic_map_type<wchar_t, std::wstring> backconversions = {
     { L'\xe0', L"af" },
     { L'\xe1', L"as" },
     { L'\xe2', L"aa" },

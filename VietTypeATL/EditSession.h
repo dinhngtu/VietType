@@ -26,7 +26,7 @@ class EditSession :
     public CComObjectRootEx<CComSingleThreadModel>,
     public ITfEditSession {
 public:
-    using funtype = HRESULT(*)(TfEditCookie ec, Args... args);
+    using callback_type = HRESULT(*)(TfEditCookie ec, Args... args);
 
     EditSession() = default;
     EditSession(const EditSession&) = delete;
@@ -45,13 +45,13 @@ public:
         return std::apply(_callback, args_ec);
     }
 
-    void Initialize(_In_ funtype callback, Args... args) {
+    void Initialize(_In_ callback_type callback, Args... args) {
         _callback = callback;
         _args = std::make_tuple(args...);
     }
 
 private:
-    funtype _callback = nullptr;
+    callback_type _callback = nullptr;
     std::tuple<Args...> _args;
 };
 
