@@ -49,6 +49,8 @@ public:
         _In_ LPARAM lParam,
         _In_reads_(256) const BYTE* keyState,
         _In_ EngineController* controller);
+    // dummy method
+    HRESULT Uninitialize();
 
 private:
     HRESULT ComposeKey(_In_ TfEditCookie ec);

@@ -41,7 +41,7 @@ public:
         _In_ DWORD style,
         _In_ ULONG sort,
         _In_ const std::wstring& description);
-    void Uninitialize();
+    HRESULT Uninitialize();
 
 protected:
     // RefreshableButtons are owned by EngineController

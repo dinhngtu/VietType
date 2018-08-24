@@ -52,9 +52,10 @@ _Check_return_ HRESULT CompositionManager::Initialize(_In_ TfClientId clientid, 
     return S_OK;
 }
 
-void CompositionManager::Uninitialize() {
+HRESULT CompositionManager::Uninitialize() {
     _categoryMgr.Release();
     _composingAttribute.Release();
+    return S_OK;
 }
 
 HRESULT CompositionManager::RequestEditSession(_In_ ITfEditSession* session, _In_ ITfContext* context) {

@@ -78,6 +78,10 @@ HRESULT KeyHandlerEditSession::Initialize(
     return S_OK;
 }
 
+HRESULT KeyHandlerEditSession::Uninitialize() {
+    return S_OK;
+}
+
 HRESULT KeyHandlerEditSession::ComposeKey(_In_ TfEditCookie ec) {
     HRESULT hr;
 

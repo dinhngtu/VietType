@@ -71,7 +71,7 @@ public:
         _In_ const std::wstring& description,
         _In_ ILanguageBarCallbacks* callbacks);
     HRESULT NotifyUpdate(_In_ DWORD flags);
-    void Uninitialize();
+    HRESULT Uninitialize();
 
 private:
     GUID _guidItem = { 0 };

@@ -201,13 +201,14 @@ _Check_return_ HRESULT RefreshableButton::Initialize(
     return S_OK;
 }
 
-void RefreshableButton::Uninitialize() {
+HRESULT RefreshableButton::Uninitialize() {
     HRESULT hr;
     hr = _langBarItemMgr->RemoveItem(_button);
     DBG_HRESULT_CHECK(hr, L"%s", L"langBarItemMgr->RemoveItem failed");
     _button->Uninitialize();
     _button.Release();
     _langBarItemMgr.Release();
+    return S_OK;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

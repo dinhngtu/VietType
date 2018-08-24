@@ -41,7 +41,7 @@ public:
     virtual STDMETHODIMP OnCompositionTerminated(_In_ TfEditCookie ecWrite, __RPC__in_opt ITfComposition* pComposition) override;
 
     _Check_return_ HRESULT Initialize(_In_ TfClientId clientid, _In_ ITfDisplayAttributeInfo* composingAttribute, _In_ bool comless);
-    void Uninitialize();
+    HRESULT Uninitialize();
 
     HRESULT RequestEditSession(_In_ ITfEditSession* session, _In_ ITfContext* context);
     HRESULT StartComposition(_In_ ITfContext* pContext);

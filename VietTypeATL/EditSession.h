@@ -51,6 +51,11 @@ public:
         return S_OK;
     }
 
+    // dummy method
+    HRESULT Uninitialize() {
+        return S_OK;
+    }
+
 private:
     callback_type _callback = nullptr;
     std::tuple<Args...> _args;

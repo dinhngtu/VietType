@@ -72,6 +72,10 @@ HRESULT EnumDisplayAttributeInfo::Initialize(_In_ const info_vector_type& items,
     return S_OK;
 }
 
+HRESULT EnumDisplayAttributeInfo::Uninitialize() {
+    return S_OK;
+}
+
 void EnumDisplayAttributeInfo::AddAttribute(_In_ ITfDisplayAttributeInfo* item) {
     _items.push_back(CComPtr<ITfDisplayAttributeInfo>(item));
 }

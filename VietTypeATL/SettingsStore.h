@@ -81,8 +81,8 @@ public:
     }
 
 protected:
-    GUID _guidCompartment;
-    callback_type _callback;
+    GUID _guidCompartment = { 0 };
+    callback_type _callback = [](const T&) {};
 };
 
 template <typename T>
@@ -100,6 +100,7 @@ public:
     virtual _Check_return_ HRESULT GetValue(_Out_ T* val) override {
         auto err = SettingsStore::regType<T>::QueryValue(_key, _valueName.c_str(), *val);
         WINERROR_CHECK_RETURN_HRESULT(err, L"%s", L"QueryValue failed");
+        return S_OK;
     }
     virtual _Check_return_ HRESULT GetValueOrWriteback(_Out_ T* val, const T& defaultValue) override {
         auto err = SettingsStore::regType<T>::QueryValue(_key, _valueName.c_str(), *val);
@@ -115,6 +116,12 @@ public:
     virtual HRESULT SetValue(const T& val) override {
         auto err = SettingsStore::regType<T>::SetValue(_key, _valueName.c_str(), val);
         WINERROR_CHECK_RETURN_HRESULT(err, L"%s", L"SetValue failed");
+        long oldNotify;
+        HRESULT hr = _notifyCompartment.GetValueOrWriteback(&oldNotify, 0);
+        HRESULT_CHECK_RETURN(hr, L"%s", L"_notifyCompartment.GetValueOrWriteback failed");
+        HRESULT hr = _notifyCompartment.SetValue(oldNotify + 1);
+        HRESULT_CHECK_RETURN(hr, L"%s", L"_notifyCompartment.SetValue failed");
+        return S_OK;
     }
 
     _Check_return_ HRESULT Initialize(
@@ -191,7 +198,8 @@ public:
         _In_ const GUID& guidDataCompartment,
         _In_ bool global = false,
         _In_ callback_type callback = [](const T&) {}) {
-        _callback = [&, callback](const T& val) { _cache = val; callback(val); };
+        _callback_chain = callback;
+        _callback = [this](const T& val) { this->_cache = val; this->_callback_chain(val); };
 
         return SettingsStore::InitializeSink(punk, clientid, guidDataCompartment, _dataCompartment, _dataCompartmentEventSink, this, global);
     }
@@ -201,6 +209,7 @@ public:
     }
 
 private:
+    callback_type _callback_chain = [](const T&) {};
     std::optional<T> _cache = std::nullopt;
     Compartment<T> _dataCompartment;
     SinkAdvisor<ITfCompartmentEventSink> _dataCompartmentEventSink;

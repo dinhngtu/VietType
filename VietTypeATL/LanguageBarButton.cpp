@@ -144,8 +144,9 @@ HRESULT LanguageBarButton::NotifyUpdate(_In_ DWORD flags) {
     return S_OK;
 }
 
-void LanguageBarButton::Uninitialize() {
+HRESULT LanguageBarButton::Uninitialize() {
     _callbacks = nullptr;
+    return S_OK;
 }
 
 }
