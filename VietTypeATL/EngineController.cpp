@@ -144,7 +144,7 @@ HRESULT EngineController::ToggleUserEnabled() {
 }
 
 long EngineController::IsEnabled() const {
-    return _enabled;
+    return _enabled && _blocked == BlockedKind::Free;
 }
 
 EngineController::BlockedKind EngineController::GetBlocked() const {
@@ -171,20 +171,12 @@ void EngineController::CommitSettings(const SettingsDialog& dlg) {
 HRESULT EngineController::UpdateStates() {
     HRESULT hr;
 
-    switch (_blocked) {
-    case BlockedKind::Free: {
-        long enabled;
-        hr = _settingsCompartment.GetValueOrWriteback(&enabled, 1);
-        HRESULT_CHECK_RETURN(hr, L"%s", L"_settingsCompartment->GetValueOrWriteback failed");
-        DBG_DPRINT(L"block = %d, enabled = %ld", static_cast<int>(_blocked), enabled);
-        _enabled = static_cast<bool>(enabled);
-        break;
-    }
-    case BlockedKind::Blocked:
-        DBG_DPRINT(L"%s", L"blocked");
-        _enabled = false;
-        break;
-    }
+    long enabled;
+    hr = _settingsCompartment.GetValueOrWriteback(&enabled, 1);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_settingsCompartment->GetValueOrWriteback failed");
+    _enabled = static_cast<bool>(enabled);
+
+    DBG_DPRINT(L"enabled = %ld, blocked = %d", enabled, static_cast<int>(_blocked));
 
     hr = _indicatorButton->Refresh();
     DBG_HRESULT_CHECK(hr, L"%s", L"_indicatorButton->Refresh failed");
