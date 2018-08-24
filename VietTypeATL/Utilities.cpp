@@ -49,6 +49,7 @@ HRESULT OnNewContext(_In_ ITfContext *context, _In_ CompositionManager* composit
         return S_OK;
     }
 
+#ifdef _DEBUG
     TF_STATUS st;
     hr = context->GetStatus(&st);
     if (SUCCEEDED(hr)) {
@@ -61,6 +62,7 @@ HRESULT OnNewContext(_In_ ITfContext *context, _In_ CompositionManager* composit
             (st.dwStaticFlags & TF_SS_REGIONS) ? L'R' : L'_',
             (st.dwStaticFlags & TF_SS_TRANSITORY) ? L'T' : L'_');
     } else DBG_HRESULT_CHECK(hr, L"%s", L"context->GetStatus failed");
+#endif
 
     hr = CompositionManager::RequestEditSession(
         EditSessions::EditBlocked,
