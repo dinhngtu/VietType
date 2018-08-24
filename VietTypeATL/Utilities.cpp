@@ -62,18 +62,14 @@ HRESULT OnNewContext(_In_ ITfContext *context, _In_ CompositionManager* composit
             (st.dwStaticFlags & TF_SS_TRANSITORY) ? L'T' : L'_');
     } else DBG_HRESULT_CHECK(hr, L"%s", L"context->GetStatus failed");
 
-    if (!controller->IsEditBlockedPending()) {
-        controller->SetEditBlockedPending();
-        hr = CompositionManager::RequestEditSession(
-            EditSessions::EditBlocked,
-            compositionManager,
-            context,
-            controller);
-        controller->ResetEditBlockedPending();
-        if (FAILED(hr)) {
-            DBG_HRESULT_CHECK(hr, L"%s", L"CompositionManager::RequestEditSession failed");
-            controller->SetBlocked(EngineController::BlockedKind::Free);
-        }
+    hr = CompositionManager::RequestEditSession(
+        EditSessions::EditBlocked,
+        compositionManager,
+        context,
+        controller);
+    if (FAILED(hr)) {
+        DBG_HRESULT_CHECK(hr, L"%s", L"CompositionManager::RequestEditSession failed");
+        controller->SetBlocked(EngineController::BlockedKind::Free);
     }
 
     return S_OK;

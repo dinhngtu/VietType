@@ -156,25 +156,6 @@ void EngineController::SetBlocked(_In_ EngineController::BlockedKind blocked) {
     UpdateStates();
 }
 
-void EngineController::SetEditBlockedPending() {
-    _editBlockedPending = true;
-}
-
-bool EngineController::SetEditBlockedPending(_In_ HRESULT result) {
-    _editBlockedPending = _editBlockedPending && FAILED(result);
-    return _editBlockedPending;
-}
-
-bool EngineController::IsEditBlockedPending() const {
-    return _editBlockedPending;
-}
-
-bool EngineController::ResetEditBlockedPending() {
-    bool pending = _editBlockedPending;
-    _editBlockedPending = false;
-    return pending;
-}
-
 _Check_return_ HRESULT EngineController::GetOpenClose(_Out_ long* openclose) {
     return _openCloseCompartment.GetValue(openclose);
 }

@@ -45,8 +45,6 @@ HRESULT EditBlocked(
 
     DBG_DPRINT(L"ec = %ld", ec);
 
-    controller->ResetEditBlockedPending();
-
     // check GUID_COMPARTMENT_KEYBOARD_OPENCLOSE from EngineController
 
     long openclose;

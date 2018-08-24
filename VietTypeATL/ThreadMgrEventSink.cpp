@@ -43,7 +43,7 @@ STDMETHODIMP ThreadMgrEventSink::OnUninitDocumentMgr(__RPC__in_opt ITfDocumentMg
 STDMETHODIMP ThreadMgrEventSink::OnSetFocus(__RPC__in_opt ITfDocumentMgr* pdimFocus, __RPC__in_opt ITfDocumentMgr* pdimPrevFocus) {
     HRESULT hr;
 
-    DBG_DPRINT(L"pdimFocus = %p, pending = %d", pdimFocus, _controller->IsEditBlockedPending());
+    DBG_DPRINT(L"pdimFocus = %p", pdimFocus);
 
     if (!pdimFocus) {
         _controller->SetBlocked(EngineController::BlockedKind::Blocked);
@@ -51,10 +51,6 @@ STDMETHODIMP ThreadMgrEventSink::OnSetFocus(__RPC__in_opt ITfDocumentMgr* pdimFo
     }
 
     _docMgrFocus = pdimFocus;
-
-    if (_controller->IsEditBlockedPending()) {
-        return S_OK;
-    }
 
     CComPtr<ITfContext> context;
     hr = _docMgrFocus->GetTop(&context);

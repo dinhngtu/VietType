@@ -44,9 +44,9 @@ static const TF_PRESERVEDKEY PK_EditBack = { VK_LEFT, TF_MOD_ALT };
 STDMETHODIMP KeyEventSink::OnSetFocus(_In_ BOOL fForeground) {
     HRESULT hr;
 
-    DBG_DPRINT(L"foreground %d, pending %d", fForeground, _controller->IsEditBlockedPending());
+    DBG_DPRINT(L"foreground %d", fForeground);
 
-    if (!fForeground || _controller->IsEditBlockedPending()) {
+    if (!fForeground) {
         return S_OK;
     }
 

@@ -71,10 +71,6 @@ public:
     long IsEnabled() const;
     BlockedKind GetBlocked() const;
     void SetBlocked(_In_ BlockedKind blocked);
-    void SetEditBlockedPending();
-    bool SetEditBlockedPending(_In_ HRESULT result);
-    bool IsEditBlockedPending() const;
-    bool ResetEditBlockedPending();
 
     _Check_return_ HRESULT GetOpenClose(_Out_ long* openclose);
 
@@ -106,7 +102,6 @@ private:
 
     bool _enabled = true;
     BlockedKind _blocked = BlockedKind::Free;
-    bool _editBlockedPending = false;
     bool _backconvertPending = false;
 };
 
