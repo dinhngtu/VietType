@@ -101,6 +101,16 @@ HRESULT EngineController::Uninitialize() {
     hr = UninitLanguageBar();
     DBG_HRESULT_CHECK(hr, L"%s", L"UninitLanguageBar failed");
 
+    hr = _tc_oa_uy_tone1->Uninitialize();
+    DBG_HRESULT_CHECK(hr, L"%s", L"_tc_oa_uy_tone1->Uninitialize failed");
+    _tc_oa_uy_tone1.Release();
+
+    hr = _openCloseCompartmentEventSink.Unadvise();
+    DBG_HRESULT_CHECK(hr, L"%s", L"_openCloseCompartmentEventSink.Unadvise failed");
+
+    hr = _openCloseCompartment.Uninitialize();
+    DBG_HRESULT_CHECK(hr, L"%s", L"_openCloseCompartment.Uninitialize failed");
+
     hr = _enabled->Uninitialize();
     DBG_HRESULT_CHECK(hr, L"%s", L"_enabled->Uninitialize failed");
     _enabled.Release();
