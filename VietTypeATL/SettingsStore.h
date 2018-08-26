@@ -114,12 +114,14 @@ public:
         return err;
     }
     virtual HRESULT SetValue(const T& val) override {
-        auto err = SettingsStore::regType<T>::SetValue(_key, _valueName.c_str(), val);
+        HRESULT hr;
+        LSTATUS err;
+        err = SettingsStore::regType<T>::SetValue(_key, _valueName.c_str(), val);
         WINERROR_CHECK_RETURN_HRESULT(err, L"%s", L"SetValue failed");
         long oldNotify;
-        HRESULT hr = _notifyCompartment.GetValueOrWriteback(&oldNotify, 0);
+        hr = _notifyCompartment.GetValueOrWriteback(&oldNotify, 0);
         HRESULT_CHECK_RETURN(hr, L"%s", L"_notifyCompartment.GetValueOrWriteback failed");
-        HRESULT hr = _notifyCompartment.SetValue(oldNotify + 1);
+        hr = _notifyCompartment.SetValue(oldNotify + 1);
         HRESULT_CHECK_RETURN(hr, L"%s", L"_notifyCompartment.SetValue failed");
         return S_OK;
     }
