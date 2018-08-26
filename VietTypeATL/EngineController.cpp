@@ -74,6 +74,19 @@ _Check_return_ HRESULT EngineController::Initialize(
     hr = _openCloseCompartmentEventSink.Advise(openCloseSource, this);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_openCloseCompartmentEventSink.Advise failed");
 
+    // TelexConfig
+    hr = CreateInitialize(
+        &_tc_oa_uy_tone1,
+        HKEY_CURRENT_USER,
+        L"Software\\VietType",
+        L"oa_uy_tone1",
+        threadMgr,
+        clientid,
+        Globals::GUID_TelexConfigCompartment,
+        false,
+        [this](const DWORD& val) { UpdateStates(); });
+    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(_tc_oa_uy_tone1) failed");
+
     // langbar
 
     hr = InitLanguageBar();
@@ -166,6 +179,12 @@ HRESULT EngineController::UpdateStates() {
     HRESULT_CHECK_RETURN(hr, L"%s", L"_enabled->GetValueOrWriteback failed");
 
     DBG_DPRINT(L"enabled = %ld, blocked = %d", enabled, static_cast<int>(_blocked));
+
+    DWORD oa_uy_tone1;
+    _tc_oa_uy_tone1->GetValueOrWriteback(&oa_uy_tone1, _engine->GetConfig().oa_uy_tone1);
+    auto cfg = _engine->GetConfig();
+    cfg.oa_uy_tone1 = static_cast<bool>(oa_uy_tone1);
+    _engine->SetConfig(cfg);
 
     hr = _indicatorButton->Refresh();
     DBG_HRESULT_CHECK(hr, L"%s", L"_indicatorButton->Refresh failed");

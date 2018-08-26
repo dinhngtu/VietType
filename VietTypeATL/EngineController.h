@@ -96,6 +96,9 @@ private:
     Compartment<long> _openCloseCompartment;
     SinkAdvisor<ITfCompartmentEventSink> _openCloseCompartmentEventSink;
 
+    // TelexConfig
+    CComPtr<RegistrySetting<DWORD>> _tc_oa_uy_tone1;
+
     // unique_ptr is not necessary but used just to break include cycle
     std::unique_ptr<IndicatorButton> _indicatorButton;
     std::unique_ptr<LangBarButton> _langBarButton;
