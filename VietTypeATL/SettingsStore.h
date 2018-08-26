@@ -135,8 +135,9 @@ public:
         _In_ callback_type callback = [](const T&) {}) {
         _valueName = valueName;
         _callback = callback;
-        auto err = _key.Open(hkeyParent, keyName.c_str());
-        WINERROR_CHECK_RETURN_HRESULT(err, L"%s", L"_key.Open failed");
+
+        auto err = _key.Create(hkeyParent, keyName.c_str());
+        WINERROR_CHECK_RETURN_HRESULT(err, L"%s", L"_key.Create failed");
 
         return SettingsStore::InitializeSink(punk, clientid, guidNotifyCompartment, _notifyCompartment, _notifyCompartmentEventSink, this, global);
     }
