@@ -155,6 +155,7 @@ HRESULT EngineController::ToggleUserEnabled() {
 
 long EngineController::IsEnabled() const {
     long enabled;
+#pragma warning(suppress: 4189)
     HRESULT hr = _enabled->GetValueOrWriteback(&enabled, 1);
     assert(SUCCEEDED(hr));
     return enabled && _blocked == BlockedKind::Free;
