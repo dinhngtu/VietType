@@ -24,13 +24,17 @@
 
 namespace VietType {
 
+// {B31B741B-63CE-413A-9B5A-D2B69C695A78}
+static const GUID GUID_SettingsCompartment_Toggle = { 0xb31b741b, 0x63ce, 0x413a, { 0x9b, 0x5a, 0xd2, 0xb6, 0x9c, 0x69, 0x5a, 0x78 } };
+// {57335895-0C34-40BA-83F7-72E90A39C222}
+static const GUID GUID_TelexConfigCompartment = { 0x57335895, 0xc34, 0x40ba, { 0x83, 0xf7, 0x72, 0xe9, 0xa, 0x39, 0xc2, 0x22 } };
 // {CCA3D390-EF1A-4DE4-B2FF-B6BC76D68C3B}
 static const GUID GUID_LanguageBarButton_Item = { 0xcca3d390, 0xef1a, 0x4de4,{ 0xb2, 0xff, 0xb6, 0xbc, 0x76, 0xd6, 0x8c, 0x3b } };
 
 STDMETHODIMP EngineController::OnChange(__RPC__in REFGUID rguid) {
     HRESULT hr;
 
-    if (IsEqualGUID(rguid, Globals::GUID_SettingsCompartment_Toggle)) {
+    if (IsEqualGUID(rguid, GUID_SettingsCompartment_Toggle)) {
         UpdateStates();
     } else if (IsEqualGUID(rguid, GUID_COMPARTMENT_KEYBOARD_OPENCLOSE)) {
         long openclose;
@@ -59,7 +63,7 @@ _Check_return_ HRESULT EngineController::Initialize(
     // init settings compartment & listener
 
     // GUID_SettingsCompartment_Toggle is global
-    hr = CreateInitialize(&_enabled, threadMgr, clientid, Globals::GUID_SettingsCompartment_Toggle, true, [this](const long&) { this->UpdateStates(); });
+    hr = CreateInitialize(&_enabled, threadMgr, clientid, GUID_SettingsCompartment_Toggle, true, [this](const long&) { this->UpdateStates(); });
     HRESULT_CHECK_RETURN(hr, L"%s", L"_enabled->Initialize failed");
 
     // init GUID_COMPARTMENT_KEYBOARD_OPENCLOSE listener
@@ -82,7 +86,7 @@ _Check_return_ HRESULT EngineController::Initialize(
         L"oa_uy_tone1",
         threadMgr,
         clientid,
-        Globals::GUID_TelexConfigCompartment,
+        GUID_TelexConfigCompartment,
         false,
         [this](const DWORD& val) { UpdateStates(); });
     HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(_tc_oa_uy_tone1) failed");
