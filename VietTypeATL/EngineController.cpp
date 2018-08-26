@@ -190,12 +190,13 @@ HRESULT EngineController::UpdateStates() {
 
     long enabled;
     hr = _enabled->GetValueOrWriteback(&enabled, 1);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_enabled->GetValueOrWriteback failed");
+    DBG_HRESULT_CHECK(hr, L"%s", L"_enabled->GetValueOrWriteback failed");
 
     DBG_DPRINT(L"enabled = %ld, blocked = %d", enabled, static_cast<int>(_blocked));
 
     DWORD oa_uy_tone1;
-    _tc_oa_uy_tone1->GetValueOrWriteback(&oa_uy_tone1, _engine->GetConfig().oa_uy_tone1);
+    hr = _tc_oa_uy_tone1->GetValueOrWriteback(&oa_uy_tone1, _engine->GetConfig().oa_uy_tone1);
+    DBG_HRESULT_CHECK(hr, L"%s", L"_tc_oa_uy_tone1->GetValueOrWriteback failed");
     auto cfg = _engine->GetConfig();
     cfg.oa_uy_tone1 = static_cast<bool>(oa_uy_tone1);
     _engine->SetConfig(cfg);
