@@ -177,8 +177,11 @@ SettingsDialog EngineController::CreateSettingsDialog() const {
     return SettingsDialog(_engine->GetConfig());
 }
 
-void EngineController::CommitSettings(const SettingsDialog& dlg) {
+HRESULT EngineController::CommitSettings(const SettingsDialog& dlg) {
+    HRESULT hr;
     _engine->SetConfig(dlg.GetTelexConfig());
+    hr = _tc_oa_uy_tone1->SetValue(static_cast<DWORD>(dlg.GetTelexConfig().oa_uy_tone1));
+    return hr;
 }
 
 HRESULT EngineController::UpdateStates() {

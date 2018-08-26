@@ -123,7 +123,8 @@ static HRESULT OnMenuSelectAll(_In_ UINT id, _In_ EngineController* controller) 
         hr = dlg.ShowDialog(&result);
         HRESULT_CHECK_RETURN(hr, L"%s", L"dlg.ShowDialog failed");
         if (result == IDOK) {
-            controller->CommitSettings(dlg);
+            hr = controller->CommitSettings(dlg);
+            HRESULT_CHECK_RETURN(hr, L"%s", L"controller->CommitSettings failed");
         }
         break;
     }
