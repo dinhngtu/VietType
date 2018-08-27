@@ -81,7 +81,7 @@ extern "C" __declspec(dllexport) HRESULT __cdecl SetSettingsKeyAcl() {
     PACL pNewAcl;
     err = SetEntriesInAcl(1, &ea, dacl, &pNewAcl);
     WINERROR_CHECK_RETURN_HRESULT(err, L"%s", L"SetEntriesInAcl failed");
-    std::unique_ptr<std::remove_pointer<PACL>::type, decltype(&LocalFree)> newAcl(pNewAcl, &LocalFree);
+    std::unique_ptr<ACL, decltype(&LocalFree)> newAcl(pNewAcl, &LocalFree);
 
     std::vector<BYTE> newSdBuf(SECURITY_DESCRIPTOR_MIN_LENGTH);
     if (!InitializeSecurityDescriptor(&newSdBuf[0], SECURITY_DESCRIPTOR_REVISION)) {

@@ -142,7 +142,7 @@ static HRESULT OnMenuSelectAll(_In_ UINT id, _In_ EngineController* controller) 
             WINERROR_GLE_RETURN_HRESULT(L"%s", L"Version::GetFileVersion failed");
         }
 
-        LPCWSTR ptext = nullptr;
+        LPWSTR ptext = nullptr;
         std::array<DWORD_PTR, 5> args = {
             major,
             minor,
@@ -160,7 +160,7 @@ static HRESULT OnMenuSelectAll(_In_ UINT id, _In_ EngineController* controller) 
             reinterpret_cast<va_list*>(&args[0]))) {
             WINERROR_GLE_RETURN_HRESULT(L"%s", L"FormatMessage failed");
         }
-        std::unique_ptr<std::remove_pointer<LPCWSTR>::type, decltype(&LocalFree)> text(ptext, &LocalFree);
+        std::unique_ptr<WCHAR, decltype(&LocalFree)> text(ptext, &LocalFree);
 
         if (!MessageBox(NULL, text.get(), Globals::TextServiceDescription.c_str(), MB_OK | MB_ICONINFORMATION)) {
             WINERROR_GLE_RETURN_HRESULT(L"%s", L"MessageBox failed");
