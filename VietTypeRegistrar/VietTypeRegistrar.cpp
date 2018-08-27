@@ -33,6 +33,7 @@ int main(int argc, wchar_t** argv) {
     long result;
 
     if (argc != 3) {
+        wprintf_s(L"usage: registrar 0|1 0|1|2\n");
         return E_FAIL;
     }
 
