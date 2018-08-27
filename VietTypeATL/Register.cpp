@@ -41,26 +41,21 @@ static std::vector<GUID> SupportedCategories = {
 extern "C" __declspec(dllexport) HRESULT __cdecl SetSettingsKeyAcl() {
     LSTATUS err;
 
-    CRegKey key;
-    err = key.Create(HKEY_CURRENT_USER, L"Software\\VietType", nullptr, 0, READ_CONTROL | WRITE_DAC);
-    WINERROR_CHECK_RETURN_HRESULT(err, L"%s", L"key.Open failed");
-
-    std::vector<BYTE> sdbuf;
-    DWORD sdbufsize = SECURITY_DESCRIPTOR_MIN_LENGTH * 2;
-    for (int i = 0; i < 2; i++) {
-        sdbuf.resize(sdbufsize);
-        err = key.GetKeySecurity(DACL_SECURITY_INFORMATION, &sdbuf[0], &sdbufsize);
-        if (err != ERROR_INSUFFICIENT_BUFFER) {
-            break;
-        }
-    }
-    WINERROR_CHECK_RETURN_HRESULT(err, L"%s", L"key.GetKeySecurity failed");
-
+    PSECURITY_DESCRIPTOR psd;
     PACL dacl;
-    BOOL daclPresent, daclDefaulted;
-    if (!GetSecurityDescriptorDacl(&sdbuf[0], &daclPresent, &dacl, &daclDefaulted)) {
-        WINERROR_GLE_RETURN_HRESULT(L"%s", L"GetSecurityDescriptorDacl failed");
-    }
+    auto key = std::wstring(L"CURRENT_USER\\") + VietType::Globals::ConfigKeyName;
+
+    err = GetNamedSecurityInfo(
+        key.c_str(),
+        SE_REGISTRY_KEY,
+        DACL_SECURITY_INFORMATION,
+        nullptr,
+        nullptr,
+        &dacl,
+        nullptr,
+        &psd);
+    WINERROR_CHECK_RETURN_HRESULT(err, L"%s", L"GetNamedSecurityInfo failed");
+    std::unique_ptr<void, decltype(&LocalFree)> sd(psd, &LocalFree);
 
     std::array<BYTE, SECURITY_MAX_SID_SIZE> sid;
     DWORD cbSid = static_cast<DWORD>(sid.size());
@@ -83,17 +78,15 @@ extern "C" __declspec(dllexport) HRESULT __cdecl SetSettingsKeyAcl() {
     WINERROR_CHECK_RETURN_HRESULT(err, L"%s", L"SetEntriesInAcl failed");
     std::unique_ptr<ACL, decltype(&LocalFree)> newAcl(pNewAcl, &LocalFree);
 
-    std::vector<BYTE> newSdBuf(SECURITY_DESCRIPTOR_MIN_LENGTH);
-    if (!InitializeSecurityDescriptor(&newSdBuf[0], SECURITY_DESCRIPTOR_REVISION)) {
-        WINERROR_GLE_RETURN_HRESULT(L"%s", L"InitializeSecurityDescriptor failed");
-    }
-
-    if (!SetSecurityDescriptorDacl(&newSdBuf[0], TRUE, newAcl.get(), daclDefaulted)) {
-        WINERROR_GLE_RETURN_HRESULT(L"%s", L"SetSecurityDescriptorDacl failed");
-    }
-
-    err = key.SetKeySecurity(DACL_SECURITY_INFORMATION, &newSdBuf[0]);
-    WINERROR_CHECK_RETURN_HRESULT(err, L"%s", L"key.SetKeySecurity failed");
+    err = SetNamedSecurityInfo(
+        const_cast<LPWSTR>(key.c_str()),
+        SE_REGISTRY_KEY,
+        DACL_SECURITY_INFORMATION,
+        nullptr,
+        nullptr,
+        dacl,
+        nullptr);
+    WINERROR_CHECK_RETURN_HRESULT(err, L"%s", L"SetNamedSecurityInfo failed");
 
     return S_OK;
 }
