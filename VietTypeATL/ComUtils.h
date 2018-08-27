@@ -43,7 +43,6 @@ _Check_return_ HRESULT CreateInitialize(_COM_Outptr_ T** ppout, Args... args) {
         if (FAILED(hr)) {
             auto tn = std::string(typeid(T).name());
             HRESULT_CHECK(hr, L"%s->Initialize failed", std::wstring(tn.begin(), tn.end()).c_str());
-            HRESULT_CHECK((*ppout)->Uninitialize(), L"%s->Uninitialize failed, this is a very bad state!", std::wstring(tn.begin(), tn.end()).c_str());
             p->Release();
             *ppout = nullptr;
         }
