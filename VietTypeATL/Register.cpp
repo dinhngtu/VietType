@@ -24,6 +24,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved
 
 #include "Common.h"
+#include <Windows.h>
+#include <AccCtrl.h>
+#include <AclAPI.h>
 
 static std::vector<GUID> SupportedCategories = {
     GUID_TFCAT_TIP_KEYBOARD,
@@ -33,6 +36,67 @@ static std::vector<GUID> SupportedCategories = {
     GUID_TFCAT_TIPCAP_SYSTRAYSUPPORT, // systray on win8+?
     GUID_TFCAT_DISPLAYATTRIBUTEPROVIDER, // display attributes for composition
 };
+
+// allow ALL APPLICATION PACKAGES permissions to query/set value, otherwise we can't change config from within IME
+extern "C" __declspec(dllexport) HRESULT __cdecl SetSettingsKeyAcl() {
+    LSTATUS err;
+
+    CRegKey key;
+    err = key.Create(HKEY_CURRENT_USER, L"Software\\VietType", nullptr, 0, READ_CONTROL | WRITE_DAC);
+    WINERROR_CHECK_RETURN_HRESULT(err, L"%s", L"key.Open failed");
+
+    std::vector<BYTE> sdbuf;
+    DWORD sdbufsize = SECURITY_DESCRIPTOR_MIN_LENGTH * 2;
+    for (int i = 0; i < 2; i++) {
+        sdbuf.resize(sdbufsize);
+        err = key.GetKeySecurity(DACL_SECURITY_INFORMATION, &sdbuf[0], &sdbufsize);
+        if (err != ERROR_INSUFFICIENT_BUFFER) {
+            break;
+        }
+    }
+    WINERROR_CHECK_RETURN_HRESULT(err, L"%s", L"key.GetKeySecurity failed");
+
+    PACL dacl;
+    BOOL daclPresent, daclDefaulted;
+    if (!GetSecurityDescriptorDacl(&sdbuf[0], &daclPresent, &dacl, &daclDefaulted)) {
+        WINERROR_GLE_RETURN_HRESULT(L"%s", L"GetSecurityDescriptorDacl failed");
+    }
+
+    std::array<BYTE, SECURITY_MAX_SID_SIZE> sid;
+    DWORD cbSid = static_cast<DWORD>(sid.size());
+    if (!CreateWellKnownSid(WinBuiltinAnyPackageSid, NULL, &sid[0], &cbSid)) {
+        WINERROR_GLE_RETURN_HRESULT(L"%s", L"CreateWellKnownSid failed");
+    }
+
+    EXPLICIT_ACCESS ea;
+    ea.grfAccessPermissions = KEY_QUERY_VALUE | KEY_SET_VALUE;
+    ea.grfAccessMode = GRANT_ACCESS;
+    ea.grfInheritance = NO_INHERITANCE;
+    ea.Trustee.pMultipleTrustee = nullptr;
+    ea.Trustee.MultipleTrusteeOperation = NO_MULTIPLE_TRUSTEE;
+    ea.Trustee.TrusteeForm = TRUSTEE_IS_SID;
+    ea.Trustee.TrusteeType = TRUSTEE_IS_WELL_KNOWN_GROUP;
+    ea.Trustee.ptstrName = reinterpret_cast<LPWCH>(&sid[0]);
+
+    PACL pNewAcl;
+    err = SetEntriesInAcl(1, &ea, dacl, &pNewAcl);
+    WINERROR_CHECK_RETURN_HRESULT(err, L"%s", L"SetEntriesInAcl failed");
+    std::unique_ptr<std::remove_pointer<PACL>::type, decltype(&LocalFree)> newAcl(pNewAcl, &LocalFree);
+
+    std::vector<BYTE> newSdBuf(SECURITY_DESCRIPTOR_MIN_LENGTH);
+    if (!InitializeSecurityDescriptor(&newSdBuf[0], SECURITY_DESCRIPTOR_REVISION)) {
+        WINERROR_GLE_RETURN_HRESULT(L"%s", L"InitializeSecurityDescriptor failed");
+    }
+
+    if (!SetSecurityDescriptorDacl(&newSdBuf[0], TRUE, newAcl.get(), daclDefaulted)) {
+        WINERROR_GLE_RETURN_HRESULT(L"%s", L"SetSecurityDescriptorDacl failed");
+    }
+
+    err = key.SetKeySecurity(DACL_SECURITY_INFORMATION, &newSdBuf[0]);
+    WINERROR_CHECK_RETURN_HRESULT(err, L"%s", L"key.SetKeySecurity failed");
+
+    return S_OK;
+}
 
 extern "C" __declspec(dllexport) HRESULT __cdecl RegisterProfiles() {
     HRESULT hr;
@@ -141,6 +205,9 @@ extern "C" __declspec(dllexport) HRESULT __cdecl UnregisterCategories() {
 
 extern "C" __declspec(dllexport) HRESULT __cdecl ActivateProfiles() {
     HRESULT hr;
+
+    hr = SetSettingsKeyAcl();
+    HRESULT_CHECK_RETURN(hr, L"%s", L"SetSettingsKeyAcl failed");
 
     CComPtr<ITfInputProcessorProfileMgr> profileMgr;
     hr = profileMgr.CoCreateInstance(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER);

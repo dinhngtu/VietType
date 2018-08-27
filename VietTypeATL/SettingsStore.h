@@ -138,7 +138,7 @@ public:
         _valueName = valueName;
         _callback = callback;
 
-        auto err = _key.Create(hkeyParent, keyName.c_str());
+        auto err = _key.Create(hkeyParent, keyName.c_str(), nullptr, 0, KEY_QUERY_VALUE | KEY_SET_VALUE);
         WINERROR_CHECK_RETURN_HRESULT(err, L"%s", L"_key.Create failed");
 
         return SettingsStore::InitializeSink(punk, clientid, guidNotifyCompartment, _notifyCompartment, _notifyCompartmentEventSink, this, global);
