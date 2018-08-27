@@ -35,6 +35,7 @@ const GUID GUID_LBI_INPUTMODE = { 0x2C77A81E, 0x41CC, 0x4178,{ 0xA3, 0xA7, 0x5F,
 const GUID GUID_PROP_INPUTSCOPE = { 0x1713dd5a, 0x68e7, 0x4a5b,{ 0x9a, 0xf6, 0x59, 0x2a, 0x59, 0x5c, 0x77, 0x8d } };
 
 const std::wstring TextServiceDescription = L"VietType";
+extern const std::wstring ConfigKeyName = L"Software\\VietType";
 
 // with MAKELANGID(LANG_JAPANESE, SUBLANG_JAPANESE_JAPAN), the TIP configuration UI works correctly
 // without having to call SetLanguageProfileDisplayName

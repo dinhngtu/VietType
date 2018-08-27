@@ -82,7 +82,7 @@ _Check_return_ HRESULT EngineController::Initialize(
     hr = CreateInitialize(
         &_tc_oa_uy_tone1,
         HKEY_CURRENT_USER,
-        L"Software\\VietType",
+        Globals::ConfigKeyName.c_str(),
         L"oa_uy_tone1",
         threadMgr,
         clientid,
