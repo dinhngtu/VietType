@@ -22,9 +22,9 @@
 
 extern "C" typedef HRESULT(__cdecl* funtype)();
 
-// registrar 0|1 0|1|2
+// registrar 0|1 0|1|2|3
 // first argument: register(0)/unregister(1)
-// second argument: categories(0)/profiles(1)/activate(2)
+// second argument: categories(0)/profiles(1)/activate(2)/setacl(3)
 // order: install 00-01(-02) / uninstall (12-)11-10
 int main(int argc, wchar_t** argv) {
     // only load from exe directory
@@ -42,8 +42,6 @@ int main(int argc, wchar_t** argv) {
         a1 = 0;
     } else if (argv[1][0] == L'1') {
         a1 = 1;
-    } else if (argv[1][0] == L'2') {
-        a1 = 2;
     } else {
         wprintf_s(L"bad parameters\n");
         return E_FAIL;
@@ -56,6 +54,8 @@ int main(int argc, wchar_t** argv) {
         a2 = 1;
     } else if (argv[2][0] == L'2') {
         a2 = 2;
+    } else if (argv[2][0] == L'3') {
+        a2 = 3;
     } else {
         wprintf_s(L"bad parameters\n");
         return E_FAIL;
@@ -92,6 +92,9 @@ int main(int argc, wchar_t** argv) {
     } else if (a1 == 0 && a2 == 2) {
         wprintf_s(L"ActivateProfiles ");
         fun = reinterpret_cast<funtype>(GetProcAddress(mod, "ActivateProfiles"));
+    } else if (a1 == 0 && a2 == 3) {
+        wprintf_s(L"SetSettingsKeyAcl ");
+        fun = reinterpret_cast<funtype>(GetProcAddress(mod, "SetSettingsKeyAcl"));
     } else if (a1 == 1 && a2 == 2) {
         wprintf_s(L"DeactivateProfiles ");
         fun = reinterpret_cast<funtype>(GetProcAddress(mod, "DeactivateProfiles"));
