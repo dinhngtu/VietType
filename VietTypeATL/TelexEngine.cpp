@@ -205,7 +205,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
             // if there is no transition, there must be a new character -> must push case
             _cases.push_back(ccase);
             // invalidate if same char entered twice in a row in order to undo transition
-            if (_keyBuffer.size() > 1 && c == _keyBuffer.rbegin()[1] && _respos.back() == ResposTransitionV) {
+            if (_keyBuffer.size() > 1 && c == ToLower(_keyBuffer.rbegin()[1]) && _respos.back() == ResposTransitionV) {
                 _keyBuffer.pop_back();
                 _state = TelexStates::Invalid;
             }
@@ -230,7 +230,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
             _respos.push_back(ResposTransitionW);
         } else {
             // pop back only if same char entered twice in a row
-            if (c == _keyBuffer.rbegin()[1]) {
+            if (c == ToLower(_keyBuffer.rbegin()[1])) {
                 _keyBuffer.pop_back();
             }
             _state = TelexStates::Invalid;
@@ -252,7 +252,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
             // the condition "_c1 == L"gi" || _v.size()" should ensure this already
             assert(_keyBuffer.length() > 1);
             // pop back only if same char entered twice in a row
-            if (c == _keyBuffer.rbegin()[1]) {
+            if (c == ToLower(_keyBuffer.rbegin()[1])) {
                 _keyBuffer.pop_back();
             }
             _state = TelexStates::Invalid;
@@ -284,7 +284,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
         } else {
             assert(_keyBuffer.length() > 1);
             // pop back only if same char entered twice in a row
-            if (c == _keyBuffer.rbegin()[1]) {
+            if (c == ToLower(_keyBuffer.rbegin()[1])) {
                 _keyBuffer.pop_back();
             }
             _state = TelexStates::Invalid;

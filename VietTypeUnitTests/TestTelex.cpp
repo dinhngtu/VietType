@@ -309,6 +309,28 @@ public:
         TestInvalidWord(L"XuOnWfWx", L"XuOnWfWx");
     }
 
+    // caps repeat
+
+    TEST_METHOD(TestCapsOSS) {
+        TestInvalidWord(L"OS", L"OSS");
+    }
+
+    TEST_METHOD(TestCapsAAA) {
+        TestInvalidWord(L"AA", L"AAA");
+    }
+
+    TEST_METHOD(TestCapsOWW) {
+        TestInvalidWord(L"OW", L"OWW");
+    }
+
+    TEST_METHOD(TestCapsGIFF) {
+        TestInvalidWord(L"GIF", L"GIFF");
+    }
+
+    TEST_METHOD(TestCapsGISS) {
+        TestInvalidWord(L"GIS", L"GISS");
+    }
+
     // backspace tests
 
     TEST_METHOD(TestBackspaceDdoongf) {
