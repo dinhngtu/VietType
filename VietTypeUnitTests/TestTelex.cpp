@@ -190,10 +190,6 @@ public:
         TestValidWord(L"ng\x1b0i", L"nguiw");
     }
 
-    TEST_METHOD(TestTypingNhuwowngx) {
-        TestValidWord(L"nh\x1b0\x1ee1ng", L"nhuwowngx");
-    }
-
     TEST_METHOD(TestTypingThoio) {
         TestValidWord(L"th\xf4i", L"thoio");
     }
@@ -218,6 +214,10 @@ public:
 
     TEST_METHOD(TestTypingGiuwax) {
         TestValidWord(L"gi\x1eef""a", L"giuwax");
+    }
+
+    TEST_METHOD(TestTypingNguwoif) {
+        TestValidWord(L"ng\x1b0\x1eddi", L"nguwoif");
     }
 
     // test 'aua' and similar transitions
