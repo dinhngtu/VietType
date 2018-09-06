@@ -374,6 +374,22 @@ public:
         Assert::AreEqual(L"aoa", e.Peek().c_str());
     }
 
+    TEST_METHOD(TestBackspaceHeei) {
+        TelexEngine e(config);
+        FeedWord(e, L"heei");
+        Assert::AreEqual(L"h\xeai", e.Peek().c_str());
+        e.Backspace();
+        Assert::AreEqual(L"h\xea", e.Peek().c_str());
+    }
+
+    TEST_METHOD(TestBackspaceOwa) {
+        TelexEngine e(config);
+        FeedWord(e, L"owa");
+        Assert::AreEqual(L"\x1a1""a", e.Peek().c_str());
+        e.Backspace();
+        Assert::AreEqual(L"\x1a1", e.Peek().c_str());
+    }
+
     // test backconversions
 
     TEST_METHOD(TestBackconversionDdoongf) {

@@ -367,10 +367,14 @@ TelexStates TelexEngine::Backspace() {
             auto rp_it = respos.find(oldv);
             if (rp_it != respos.end() && (static_cast<int>(oldc1.size()) + rp_it->second) < toDelete) {
                 PushChar(buf[i]);
+            } else if (rp_it == respos.end()) {
+                PushChar(buf[i]);
             }
         } else if (rp[i] == ResposTransitionW) {
             auto rpw_it = respos_w.find(oldv);
             if (rpw_it != respos_w.end() && (static_cast<int>(oldc1.size()) + rpw_it->second) < toDelete) {
+                PushChar(buf[i]);
+            } else if (rpw_it == respos_w.end()) {
                 PushChar(buf[i]);
             }
         } else if (rp[i] == ResposTone) {
