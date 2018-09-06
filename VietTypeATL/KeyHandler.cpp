@@ -41,10 +41,11 @@ STDMETHODIMP KeyHandlerEditSession::DoEditSession(_In_ TfEditCookie ec) {
         _controller->GetEngine().Reset();
         return _compositionManager->EndCompositionNow(ec);
     } else if (_wParam == VK_ESCAPE) {
-        // eaten, empties and ends composition
+        // eaten, revert and end composition
+        auto str = _controller->GetEngine().RetrieveInvalid();
         _controller->GetEngine().Reset();
-        hr = _compositionManager->EmptyCompositionText(ec);
-        DBG_HRESULT_CHECK(hr, L"%s", L"_compositionManager->EmptyCompositionText failed");
+        hr = _compositionManager->SetCompositionText(ec, &str[0], static_cast<LONG>(str.length()));
+        DBG_HRESULT_CHECK(hr, L"%s", L"_compositionManager->SetCompositionText failed");
         return _compositionManager->EndCompositionNow(ec);
     } else if (Telex::IsKeyEaten(_compositionManager->IsComposing(), _wParam, _lParam, _keyState)) {
         // eaten, updates composition
