@@ -546,7 +546,6 @@
     <ClCompile Include="TextService.cpp" />
     <ClCompile Include="ThreadMgrEventSink.cpp" />
     <ClCompile Include="Utilities.cpp" />
-    <ClCompile Include="Version.cpp" />
     <ClCompile Include="VietTypeATL.cpp" />
     <ClCompile Include="VietTypeATL_i.c">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
@@ -611,6 +610,7 @@
     <ClInclude Include="ThreadMgrEventSink.h" />
     <ClInclude Include="Utilities.h" />
     <ClInclude Include="Version.h" />
+    <ClInclude Include="VersionNumbers.h" />
     <ClInclude Include="VersionVCS.h" />
     <ClInclude Include="VietTypeATL_i.h" />
     <ClInclude Include="VirtualDocument.h" />
@@ -621,6 +621,9 @@
   <ItemGroup>
     <None Include="cpp.hint" />
     <None Include="TextService.rgs" />
+    <None Include="version.rci">
+      <FileType>Text</FileType>
+    </None>
     <None Include="VietTypeATL.def" />
     <None Include="VietTypeATL.rgs" />
   </ItemGroup>

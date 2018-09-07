@@ -17,14 +17,5 @@
 
 #pragma once
 
-#include "Common.h"
+#include "VersionNumbers.h"
 #include "VersionVCS.h"
-
-namespace VietType {
-namespace Version {
-
-_Check_return_ _Success_(return) bool GetFileVersion(_Out_ WORD* major, _Out_ WORD* minor, _Out_ WORD* build, _Out_ WORD* privt);
-_Check_return_ _Success_(return) bool GetProductVersion(_Out_ WORD* major, _Out_ WORD* minor, _Out_ WORD* build, _Out_ WORD* privt);
-
-}
-}

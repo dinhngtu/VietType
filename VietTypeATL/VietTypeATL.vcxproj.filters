@@ -109,9 +109,6 @@
     <ClCompile Include="EditSurroundingWord.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Version.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SettingsDialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -231,6 +228,9 @@
     <ClInclude Include="SettingsStore.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="VersionNumbers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="VietTypeATL.rc">
@@ -248,6 +248,9 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="cpp.hint" />
+    <None Include="version.rci">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Midl Include="VietTypeATL.idl">

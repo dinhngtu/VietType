@@ -137,17 +137,9 @@ static HRESULT OnMenuSelectAll(_In_ UINT id, _In_ EngineController* controller) 
         }
         assert(aboutFormatString);
 
-        WORD major, minor, build, privt;
-        if (!Version::GetFileVersion(&major, &minor, &build, &privt)) {
-            WINERROR_GLE_RETURN_HRESULT(L"%s", L"Version::GetFileVersion failed");
-        }
-
         LPWSTR ptext = nullptr;
         std::array<DWORD_PTR, 5> args = {
-            major,
-            minor,
-            build,
-            privt,
+            PRODUCTVERSION_TUPLE,
             reinterpret_cast<DWORD_PTR>(VCS_REVISION)
         };
         if (!FormatMessage(

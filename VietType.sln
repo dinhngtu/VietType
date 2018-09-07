@@ -17,6 +17,15 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VietTypeUnitTests", "VietTy
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TfDumper", "TfDumper\TfDumper.vcxproj", "{62F82C74-9FDC-4673-B392-06399E06CE45}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{2174A4C2-3E83-4DA1-ABDA-8C48F5080E96}"
+	ProjectSection(SolutionItems) = preProject
+		LICENSE = LICENSE
+		LICENSE.rtf = LICENSE.rtf
+		UpdateVersion.ps1 = UpdateVersion.ps1
+		UpdateVersionWix.ps1 = UpdateVersionWix.ps1
+		Version.ps1 = Version.ps1
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
