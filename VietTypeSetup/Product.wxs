@@ -102,16 +102,12 @@ along with VietType.  If not, see <https://www.gnu.org/licenses/>.
   <Fragment>
     <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
       <Component Id="VietTypeATL32">
-        <File Id="VietTypeATL32.dll" Source="$(var.SolutionDir)\Win32\Release\VietTypeATL32.dll" Name="VietTypeATL32.dll">
-          <Class Id="{C0DD01A1-0DEB-454B-8B42-D22CED1B4B23}" Context="InprocServer32" Description="VietType" ThreadingModel="apartment" />
-        </File>
+        <File Id="VietTypeATL32.dll" Source="$(var.SolutionDir)\Win32\Release\VietTypeATL32.dll" Name="VietTypeATL32.dll" SelfRegCost="1" />
       </Component>
 
       <?if $(var.Platform) = x64 ?>
       <Component Id="VietTypeATL64">
-        <File Id="VietTypeATL64.dll" Source="$(var.SolutionDir)\x64\Release\VietTypeATL64.dll" Name="VietTypeATL64.dll">
-          <Class Id="{C0DD01A1-0DEB-454B-8B42-D22CED1B4B23}" Context="InprocServer32" Description="VietType" ThreadingModel="apartment" />
-        </File>
+        <File Id="VietTypeATL64.dll" Source="$(var.SolutionDir)\x64\Release\VietTypeATL64.dll" Name="VietTypeATL64.dll" SelfRegCost="1" />
       </Component>
       <?endif ?>
 
