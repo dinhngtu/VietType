@@ -80,18 +80,13 @@ along with VietType.  If not, see <https://www.gnu.org/licenses/>.
   <!-- ################################################################################ -->
   <!-- install paths -->
 
-  <?if $(var.Platform) = x86 ?>
-  <?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
-  <?elseif $(var.Platform) = x64 ?>
-  <?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
-  <?else ?>
-  <?error Unknown architecture ?>
-  <?endif ?>
-
   <Fragment>
     <Directory Id="TARGETDIR" Name="SourceDir">
-      <Directory Id="$(var.PlatformProgramFilesFolder)">
+      <Directory Id="ProgramFilesFolder">
         <Directory Id="INSTALLFOLDER" Name="VietType" />
+      </Directory>
+      <Directory Id="ProgramFiles64Folder">
+        <Directory Id="INSTALLFOLDER64" Name="VietType" />
       </Directory>
     </Directory>
   </Fragment>
@@ -100,31 +95,28 @@ along with VietType.  If not, see <https://www.gnu.org/licenses/>.
   <!-- main files -->
 
   <Fragment>
-    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
-      <Component Id="VietTypeATL32">
-        <File Id="VietTypeATL32.dll" Source="$(var.SolutionDir)\Win32\Release\VietTypeATL32.dll" Name="VietTypeATL32.dll" SelfRegCost="1" />
+    <ComponentGroup Id="ProductComponents">
+      <!-- Component Id is required, else Wix can't generate class registration entries -->
+      <Component Id="VietTypeATL32.dll" Win64="no" Directory="INSTALLFOLDER">
+        <File Id="VietTypeATL32.dll" Source="$(var.SolutionDir)\Win32\Release\VietTypeATL32.dll" Name="VietTypeATL32.dll">
+          <Class Id="{C0DD01A1-0DEB-454B-8B42-D22CED1B4B23}" Context="InprocServer32" Description="VietType" ThreadingModel="apartment" />
+        </File>
       </Component>
 
       <?if $(var.Platform) = x64 ?>
-      <Component Id="VietTypeATL64">
-        <File Id="VietTypeATL64.dll" Source="$(var.SolutionDir)\x64\Release\VietTypeATL64.dll" Name="VietTypeATL64.dll" SelfRegCost="1" />
+      <Component Id="VietTypeATL64.dll" Win64="yes" Directory="INSTALLFOLDER64">
+        <File Id="VietTypeATL64.dll" Source="$(var.SolutionDir)\x64\Release\VietTypeATL64.dll" Name="VietTypeATL64.dll">
+          <Class Id="{C0DD01A1-0DEB-454B-8B42-D22CED1B4B23}" Context="InprocServer32" Description="VietType" ThreadingModel="apartment" />
+        </File>
       </Component>
       <?endif ?>
 
-      <?if $(var.Platform) = x86 ?>
-      <Component Id="Registrar">
+      <Component Win64="no" Directory="INSTALLFOLDER">
         <File Id="Registrar.exe" Source="$(var.SolutionDir)\Win32\Release\Registrar.exe" Name="Registrar.exe" />
       </Component>
-      <?elseif $(var.Platform) = x64 ?>
-      <Component Id="Registrar">
-        <File Id="Registrar.exe" Source="$(var.SolutionDir)\x64\Release\Registrar.exe" Name="Registrar.exe" />
-      </Component>
-      <?else ?>
-      <?error Unknown architecture ?>
-      <?endif ?>
 
-      <Component Id="LICENSE">
-        <File Id="LICENSE" Source="$(var.SolutionDir)\LICENSE" Name="LICENSE" />
+      <Component Win64="no" Directory="INSTALLFOLDER">
+        <File Source="$(var.SolutionDir)\LICENSE" Name="LICENSE" />
       </Component>
     </ComponentGroup>
   </Fragment>
@@ -142,7 +134,7 @@ along with VietType.  If not, see <https://www.gnu.org/licenses/>.
 
   <Fragment>
     <ComponentGroup Id="ShortcutComponents" Directory="ShortcutFolder">
-      <Component Id="Shortcuts">
+      <Component>
         <Shortcut Id="ActivateShortcut" Name="Enable VietType" Target="[!Registrar.exe]" Arguments="0 2" WorkingDirectory="INSTALLFOLDER" />
         <Shortcut Id="DeactivateShortcut" Name="Disable VietType" Target="[!Registrar.exe]" Arguments="1 2" WorkingDirectory="INSTALLFOLDER" />
         <RemoveFolder Id="CleanupShortcuts" On="uninstall" />
@@ -155,14 +147,14 @@ along with VietType.  If not, see <https://www.gnu.org/licenses/>.
   <!-- symbols -->
 
   <Fragment>
-    <ComponentGroup Id="DebugSymbols" Directory="INSTALLFOLDER">
-      <Component Id="Symbols32">
-        <File Id="VietTypeATL32.pdb" Source="$(var.SolutionDir)\Win32\Release\VietTypeATL32.pdb" Name="VietTypeATL32.pdb" />
+    <ComponentGroup Id="DebugSymbols">
+      <Component Win64="no" Directory="INSTALLFOLDER">
+        <File Source="$(var.SolutionDir)\Win32\Release\VietTypeATL32.pdb" Name="VietTypeATL32.pdb" />
       </Component>
 
       <?if $(var.Platform) = x64 ?>
-      <Component Id="Symbols64">
-        <File Id="VietTypeATL64.pdb" Source="$(var.SolutionDir)\x64\Release\VietTypeATL64.pdb" Name="VietTypeATL64.pdb" />
+      <Component Win64="yes" Directory="INSTALLFOLDER64">
+        <File Source="$(var.SolutionDir)\x64\Release\VietTypeATL64.pdb" Name="VietTypeATL64.pdb" />
       </Component>
       <?endif ?>
     </ComponentGroup>
@@ -172,7 +164,6 @@ along with VietType.  If not, see <https://www.gnu.org/licenses/>.
   <!-- custom actions -->
 
   <Fragment>
-    <?if $(var.Platform) = x86 ?>
     <CustomAction Id="RegisterCategories" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="deferred" />
     <CustomAction Id="RegisterCategoriesRollback" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="rollback" />
     <CustomAction Id="UnregisterCategories" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="deferred" />
@@ -186,23 +177,5 @@ along with VietType.  If not, see <https://www.gnu.org/licenses/>.
     <CustomAction Id="ActivateProfiles" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="yes" Execute="deferred" Return="ignore" />
     <!-- since DeactivateProfiles is called during uninstall, we should use ignore instead of asyncNoWait -->
     <CustomAction Id="DeactivateProfiles" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="yes" Execute="deferred" Return="ignore" />
-    
-    <?elseif $(var.Platform) = x64 ?>
-    <CustomAction Id="RegisterCategories" BinaryKey="WixCA" DllEntry="WixQuietExec64" Impersonate="no" Execute="deferred" />
-    <CustomAction Id="RegisterCategoriesRollback" BinaryKey="WixCA" DllEntry="WixQuietExec64" Impersonate="no" Execute="rollback" />
-    <CustomAction Id="UnregisterCategories" BinaryKey="WixCA" DllEntry="WixQuietExec64" Impersonate="no" Execute="deferred" />
-    <CustomAction Id="UnregisterCategoriesRollback" BinaryKey="WixCA" DllEntry="WixQuietExec64" Impersonate="no" Execute="rollback" />
-
-    <CustomAction Id="RegisterProfiles" BinaryKey="WixCA" DllEntry="WixQuietExec64" Impersonate="no" Execute="deferred" />
-    <CustomAction Id="RegisterProfilesRollback" BinaryKey="WixCA" DllEntry="WixQuietExec64" Impersonate="no" Execute="rollback" />
-    <CustomAction Id="UnregisterProfiles" BinaryKey="WixCA" DllEntry="WixQuietExec64" Impersonate="no" Execute="deferred" />
-    <CustomAction Id="UnregisterProfilesRollback" BinaryKey="WixCA" DllEntry="WixQuietExec64" Impersonate="no" Execute="rollback" />
-
-    <CustomAction Id="ActivateProfiles" BinaryKey="WixCA" DllEntry="WixQuietExec64" Impersonate="yes" Execute="deferred" Return="ignore" />
-    <CustomAction Id="DeactivateProfiles" BinaryKey="WixCA" DllEntry="WixQuietExec64" Impersonate="yes" Execute="deferred" Return="ignore" />
-    
-    <?else ?>
-    <?error Unknown architecture ?>
-    <?endif ?>
   </Fragment>
 </Wix>
