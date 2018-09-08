@@ -51,7 +51,7 @@ HRESULT EditBlocked(
     hr = controller->GetOpenClose(&openclose);
     EB_HRESULT_CHECK_COMMIT(hr, controller, L"%s", L"controller->GetOpenClose failed");
 
-    if (hr == S_OK && openclose) {
+    if (hr == S_OK && !openclose) {
         DBG_DPRINT(L"%s", L"scopeBlocked: openclose");
         controller->SetBlocked(BlockedKind::Blocked);
         return S_OK;
