@@ -297,6 +297,13 @@ public:
         TestInvalidWord(L"nhuwox", L"nhuwox");
     }
 
+    BEGIN_TEST_METHOD_ATTRIBUTE(TestToool)
+        TEST_IGNORE()
+    END_TEST_METHOD_ATTRIBUTE()
+    TEST_METHOD(TestToool) {
+        TestInvalidWord(L"tool", L"toool");
+    }
+
     // caps
 
     TEST_METHOD(TestCapsPeekD) {
