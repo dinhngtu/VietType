@@ -194,6 +194,10 @@ public:
         TestValidWord(L"th\xf4i", L"thoio");
     }
 
+    TEST_METHOD(TestTypingNuaw) {
+        TestValidWord(L"n\x1b0""a", L"nuaw");
+    }
+
     // test variations of 'gi'
 
     TEST_METHOD(TestTypingGif) {

@@ -76,6 +76,7 @@ const generic_map_type<std::wstring, std::wstring> transitions_w = {
     {L"oa", L"o\x103"},
     {L"oi", L"\x1a1i"},
     {L"u", L"\x1b0"},
+    {L"ua", L"\x1b0""a"},
     {L"ui", L"\x1b0i"},
     {L"uo", L"u\x1a1"},
     {L"uoi", L"\x1b0\x1a1i"},
