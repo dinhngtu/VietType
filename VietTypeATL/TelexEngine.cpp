@@ -200,7 +200,11 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
             if (after == before) {
                 _cases.push_back(ccase);
             }
-            _respos.push_back(ResposTransitionV);
+            if (_keyBuffer.size() > 1 && c == ToLower(_keyBuffer.rbegin()[1]) && _respos.back() == ResposTransitionV) {
+                _keyBuffer.pop_back();
+            } else {
+                _respos.push_back(ResposTransitionV);
+            }
         } else {
             // if there is no transition, there must be a new character -> must push case
             _cases.push_back(ccase);
