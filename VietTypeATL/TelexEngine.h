@@ -82,16 +82,16 @@ private:
     std::wstring _v;
     std::wstring _c2;
     Tones _t = Tones::Z;
-    // don't use vector<bool> since that's special
+    // don't use bool vector since that's special cased in the STL
     /// <summary>
-    /// only use when valid
+    /// only use when valid;
     /// 1 = uppercase, 0 = lowercase
     /// </summary>
     std::vector<int> _cases;
     /// <summary>
-    /// only use when valid
-    /// for each character in the _keyBuffer, record which output character it's responsible for
-    /// fx. 'đuống' (dduoongs) _respos = 0C12V34T (T = tone, C = transition _c1, V = transition _v)
+    /// only use when valid;
+    /// for each character in the _keyBuffer, record which output character it's responsible for,
+    /// ex. 'đuống' (dduoongs) _respos = 0C12V34T (T = tone, C = transition _c1, V = transition _v)
     /// </summary>
     std::vector<int> _respos;
     int _respos_current = 0;
