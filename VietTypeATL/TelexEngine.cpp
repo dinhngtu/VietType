@@ -320,6 +320,7 @@ TelexStates TelexEngine::Backspace() {
         for (auto c : buf) {
             PushChar(c);
         }
+        assert(CheckInvariants());
         return _state;
     } else if (_state != TelexStates::Valid) {
         return TelexStates::TxError;
@@ -336,6 +337,7 @@ TelexStates TelexEngine::Backspace() {
         for (auto c : buf) {
             PushChar(c);
         }
+        assert(CheckInvariants());
         return _state;
     }
 
@@ -393,6 +395,7 @@ TelexStates TelexEngine::Backspace() {
             PushChar(buf[i]);
         }
     }
+
     assert(CheckInvariants());
     return _state;
 }
