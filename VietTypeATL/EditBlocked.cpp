@@ -91,6 +91,12 @@ HRESULT EditBlocked(
     hr = context->GetAppProperty(Globals::GUID_PROP_INPUTSCOPE, &prop);
     EB_HRESULT_CHECK_COMMIT(hr, controller, L"%s", L"context->GetAppProperty failed");
 
+    if (!prop) {
+        DBG_DPRINT(L"%s", L"GUID_PROP_INPUTSCOPE prop is null, blocking");
+        controller->SetBlocked(BlockedKind::Blocked);
+        return S_OK;
+    }
+
     TF_SELECTION sel;
     ULONG fetched;
     hr = context->GetSelection(ec, TF_DEFAULT_SELECTION, 1, &sel, &fetched);
