@@ -40,7 +40,7 @@ extern const std::wstring ConfigKeyName = L"Software\\VietType";
 // with MAKELANGID(LANG_JAPANESE, SUBLANG_JAPANESE_JAPAN), the TIP configuration UI works correctly
 // without having to call SetLanguageProfileDisplayName
 // and TIP is correctly activated globally rather than per-app
-const LANGID TextServiceLangId = MAKELANGID(LANG_JAPANESE, SUBLANG_JAPANESE_JAPAN);
+const LANGID TextServiceLangId = MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US);
 
 }
 }
