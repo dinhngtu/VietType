@@ -21,7 +21,8 @@ static bool IsTranslatableKey(_In_ WPARAM wParam, _In_ LPARAM lParam) {
     if (wParam >= 65 && wParam <= 90) {
         return true;
     } else if (wParam == 219 || wParam == 221) {
-        return true;
+        // square brackets
+        return false;
     }
     return false;
 }
