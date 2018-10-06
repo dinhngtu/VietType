@@ -57,7 +57,7 @@ template <typename T>
 class NotifiedSetting :
     public ITfCompartmentEventSink {
 public:
-    using callback_type = std::function<void(const T&)>;
+    using callback_type = std::function<HRESULT()>;
 
     NotifiedSetting() = default;
     NotifiedSetting(const NotifiedSetting&) = delete;
@@ -70,19 +70,15 @@ public:
 
     // Inherited via ITfCompartmentEventSink
     virtual STDMETHODIMP OnChange(__RPC__in REFGUID rguid) override {
-        HRESULT hr;
         if (rguid == _guidCompartment) {
-            T val;
-            hr = GetValue(&val);
-            HRESULT_CHECK_RETURN(hr, L"%s", L"GetValue failed");
-            _callback(val);
+            return _callback();
         }
         return S_OK;
     }
 
 protected:
     GUID _guidCompartment = { 0 };
-    callback_type _callback = [](const T&) {};
+    callback_type _callback = [] { return S_OK; };
 };
 
 template <typename T>
@@ -134,7 +130,7 @@ public:
         _In_ TfClientId clientid,
         _In_ const GUID& guidNotifyCompartment,
         _In_ bool global = false,
-        _In_ callback_type callback = [](const T&) {}) {
+        _In_ callback_type callback = [] { return S_OK; }) {
         _valueName = valueName;
         _callback = callback;
 
@@ -200,11 +196,11 @@ public:
         _In_ TfClientId clientid,
         _In_ const GUID& guidDataCompartment,
         _In_ bool global = false,
-        _In_ callback_type callback = [](const T&) {}) {
+        _In_ callback_type callback = [] { return S_OK; }) {
 
         _guidCompartment = guidDataCompartment;
         _callback_chain = callback;
-        _callback = [this](const T& val) { this->_cache = val; this->_callback_chain(val); };
+        _callback = [this] { return CachingCallback();  };
 
         return SettingsStore::InitializeSink(punk, clientid, guidDataCompartment, _dataCompartment, _dataCompartmentEventSink, this, global);
     }
@@ -214,7 +210,16 @@ public:
     }
 
 private:
-    callback_type _callback_chain = [](const T&) {};
+    HRESULT CachingCallback() {
+        T val;
+        HRESULT hr = _dataCompartment.GetValue(&val);
+        HRESULT_CHECK_RETURN(hr, L"%s", L"_dataCompartment.GetValue failed");
+        _cache = val;
+        return _callback_chain();
+    }
+
+private:
+    callback_type _callback_chain = [] { return S_OK; };
     std::optional<T> _cache = std::nullopt;
     Compartment<T> _dataCompartment;
     SinkAdvisor<ITfCompartmentEventSink> _dataCompartmentEventSink;

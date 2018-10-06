@@ -63,7 +63,7 @@ _Check_return_ HRESULT EngineController::Initialize(
     // init settings compartment & listener
 
     // GUID_SettingsCompartment_Toggle is global
-    hr = CreateInitialize(&_enabled, threadMgr, clientid, GUID_SettingsCompartment_Toggle, true, [this](const long&) { this->UpdateStates(); });
+    hr = CreateInitialize(&_enabled, threadMgr, clientid, GUID_SettingsCompartment_Toggle, true, [this] { return UpdateStates(); });
     HRESULT_CHECK_RETURN(hr, L"%s", L"_enabled->Initialize failed");
 
     // init GUID_COMPARTMENT_KEYBOARD_OPENCLOSE listener
@@ -88,7 +88,7 @@ _Check_return_ HRESULT EngineController::Initialize(
         clientid,
         GUID_TelexConfigCompartment,
         false,
-        [this](const DWORD& val) { UpdateStates(); });
+        [this] { return UpdateStates(); });
     HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(_tc_oa_uy_tone1) failed");
 
     // langbar
