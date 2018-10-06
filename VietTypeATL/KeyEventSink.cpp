@@ -205,12 +205,14 @@ _Check_return_ HRESULT KeyEventSink::Initialize(
     hr = _keystrokeMgr->AdviseKeyEventSink(_clientid, this, TRUE);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_keystrokeMgr->AdviseKeyEventSink failed");
 
-    hr = _keystrokeMgr->PreserveKey(_clientid, GUID_KeyEventSink_PreservedKey_Toggle, &PK_Toggle, NULL, 0);
-    // probably not fatal
-    DBG_HRESULT_CHECK(hr, L"%s", L"_keystrokeMgr->PreserveKey failed");
-
-    hr = _keystrokeMgr->PreserveKey(_clientid, GUID_KeyEventSink_PreservedKey_ToggleJA, &PK_ToggleJA, NULL, 0);
-    DBG_HRESULT_CHECK(hr, L"%s", L"_keystrokeMgr->PreserveKey failed for JA");
+    if (Globals::TextServiceLangId == MAKELANGID(LANG_JAPANESE, SUBLANG_JAPANESE_JAPAN)) {
+        hr = _keystrokeMgr->PreserveKey(_clientid, GUID_KeyEventSink_PreservedKey_ToggleJA, &PK_ToggleJA, NULL, 0);
+        DBG_HRESULT_CHECK(hr, L"%s", L"_keystrokeMgr->PreserveKey failed for JA");
+    } else {
+        hr = _keystrokeMgr->PreserveKey(_clientid, GUID_KeyEventSink_PreservedKey_Toggle, &PK_Toggle, NULL, 0);
+        // probably not fatal
+        DBG_HRESULT_CHECK(hr, L"%s", L"_keystrokeMgr->PreserveKey failed");
+    }
 
     return S_OK;
 }
@@ -218,11 +220,13 @@ _Check_return_ HRESULT KeyEventSink::Initialize(
 HRESULT KeyEventSink::Uninitialize() {
     HRESULT hr;
 
-    hr = _keystrokeMgr->UnpreserveKey(GUID_KeyEventSink_PreservedKey_Toggle, &PK_ToggleJA);
-    DBG_HRESULT_CHECK(hr, L"%s", L"_keystrokeMgr->UnpreserveKey failed for JA");
-
-    hr = _keystrokeMgr->UnpreserveKey(GUID_KeyEventSink_PreservedKey_Toggle, &PK_Toggle);
-    DBG_HRESULT_CHECK(hr, L"%s", L"_keystrokeMgr->UnpreserveKey failed");
+    if (Globals::TextServiceLangId == MAKELANGID(LANG_JAPANESE, SUBLANG_JAPANESE_JAPAN)) {
+        hr = _keystrokeMgr->UnpreserveKey(GUID_KeyEventSink_PreservedKey_Toggle, &PK_ToggleJA);
+        DBG_HRESULT_CHECK(hr, L"%s", L"_keystrokeMgr->UnpreserveKey failed for JA");
+    } else {
+        hr = _keystrokeMgr->UnpreserveKey(GUID_KeyEventSink_PreservedKey_Toggle, &PK_Toggle);
+        DBG_HRESULT_CHECK(hr, L"%s", L"_keystrokeMgr->UnpreserveKey failed");
+    }
 
     hr = _keystrokeMgr->UnadviseKeyEventSink(_clientid);
     DBG_HRESULT_CHECK(hr, L"%s", L"_keystrokeMgr->UnadviseKeyEventSink failed");
