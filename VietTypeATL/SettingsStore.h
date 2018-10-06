@@ -201,6 +201,8 @@ public:
         _In_ const GUID& guidDataCompartment,
         _In_ bool global = false,
         _In_ callback_type callback = [](const T&) {}) {
+
+        _guidCompartment = guidDataCompartment;
         _callback_chain = callback;
         _callback = [this](const T& val) { this->_cache = val; this->_callback_chain(val); };
 
