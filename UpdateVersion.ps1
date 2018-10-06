@@ -3,7 +3,7 @@ $vcsOld = Get-Content -ErrorAction Ignore -Raw $vcsFile
 $vcsRev = hg id -i
 $vcsNew = "#pragma once`n`n#define VCS_REVISION L""$vcsRev""`n"
 if ($vcsOld -ne $vcsNew) {
-    echo "Updating revision: $vcsNew"
+    echo "Updating revision: $vcsRev"
     [System.IO.File]::WriteAllText($vcsFile, [string]::Join("`n", $vcsNew))
 }
 
