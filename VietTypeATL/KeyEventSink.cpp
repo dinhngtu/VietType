@@ -162,7 +162,7 @@ STDMETHODIMP KeyEventSink::OnKeyUp(_In_ ITfContext* pic, _In_ WPARAM wParam, _In
 STDMETHODIMP KeyEventSink::OnPreservedKey(_In_ ITfContext* pic, _In_ REFGUID rguid, _Out_ BOOL* pfEaten) {
     HRESULT hr;
 
-    if (IsEqualGUID(GUID_KeyEventSink_PreservedKey_Toggle, rguid) || IsEqualGUID(GUID_KeyEventSink_PreservedKey_ToggleJA, rguid)) {
+    if (GUID_KeyEventSink_PreservedKey_Toggle == rguid || GUID_KeyEventSink_PreservedKey_ToggleJA == rguid) {
         *pfEaten = TRUE;
         _controller->GetEngine().Reset();
         hr = _compositionManager->EndComposition();
@@ -170,7 +170,7 @@ STDMETHODIMP KeyEventSink::OnPreservedKey(_In_ ITfContext* pic, _In_ REFGUID rgu
         hr = _controller->ToggleUserEnabled();
         DBG_HRESULT_CHECK(hr, L"%s", L"_engine->ToggleEnabled failed");
 
-    } else if (IsEqualGUID(GUID_KeyEventSink_PreservedKey_EditBack, rguid)) {
+    } else if (GUID_KeyEventSink_PreservedKey_EditBack == rguid) {
         *pfEaten = TRUE;
         hr = CompositionManager::RequestEditSession(
             EditSessions::EditSurroundingWord,

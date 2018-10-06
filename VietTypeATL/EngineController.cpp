@@ -34,9 +34,9 @@ static const GUID GUID_LanguageBarButton_Item = { 0xcca3d390, 0xef1a, 0x4de4,{ 0
 STDMETHODIMP EngineController::OnChange(__RPC__in REFGUID rguid) {
     HRESULT hr;
 
-    if (IsEqualGUID(rguid, GUID_SettingsCompartment_Toggle)) {
+    if (rguid == GUID_SettingsCompartment_Toggle) {
         UpdateStates();
-    } else if (IsEqualGUID(rguid, GUID_COMPARTMENT_KEYBOARD_OPENCLOSE)) {
+    } else if (rguid == GUID_COMPARTMENT_KEYBOARD_OPENCLOSE) {
         long openclose;
         hr = _openCloseCompartment.GetValue(&openclose);
         assert(hr == S_OK);

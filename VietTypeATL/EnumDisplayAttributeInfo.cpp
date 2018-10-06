@@ -92,7 +92,7 @@ _Check_return_ HRESULT EnumDisplayAttributeInfo::FindAttributeByGuid(_In_ const 
         GUID aguid;
         hr = attr->GetGUID(&aguid);
         HRESULT_CHECK_RETURN(hr, L"%s", L"attr->GetGUID");
-        if (IsEqualGUID(guid, aguid)) {
+        if (guid == aguid) {
             *info = attr;
             (*info)->AddRef();
             return S_OK;

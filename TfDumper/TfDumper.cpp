@@ -26,13 +26,13 @@ void PrintProfileInfo(const TF_INPUTPROCESSORPROFILE* p) {
     wprintf(L"clsid: %s, guidProfile: %s\n", CppStringFromIID(p->clsid).c_str(), CppStringFromIID(p->guidProfile).c_str());
 
     std::wstring catid = CppStringFromIID(p->catid);
-    if (IsEqualGUID(p->catid, GUID_TFCAT_TIP_KEYBOARD)) {
+    if (p->catid == GUID_TFCAT_TIP_KEYBOARD) {
         wprintf(L"catid: %s (GUID_TFCAT_TIP_KEYBOARD)\n", catid.c_str());
-    } else if (IsEqualGUID(p->catid, GUID_TFCAT_TIP_SPEECH)) {
+    } else if (p->catid == GUID_TFCAT_TIP_SPEECH) {
         wprintf(L"catid: %s (GUID_TFCAT_TIP_SPEECH)\n", catid.c_str());
-    } else if (IsEqualGUID(p->catid, GUID_TFCAT_TIP_HANDWRITING)) {
+    } else if (p->catid == GUID_TFCAT_TIP_HANDWRITING) {
         wprintf(L"catid: %s (GUID_TFCAT_TIP_HANDWRITING)\n", catid.c_str());
-    } else if (IsEqualGUID(p->catid, GUID_TFCAT_CATEGORY_OF_TIP)) {
+    } else if (p->catid == GUID_TFCAT_CATEGORY_OF_TIP) {
         wprintf(L"catid: %s (GUID_TFCAT_CATEGORY_OF_TIP)\n", catid.c_str());
     } else {
         wprintf(L"catid: %s (unknown category)\n", catid.c_str());
