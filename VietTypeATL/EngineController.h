@@ -86,6 +86,9 @@ private:
     _Check_return_ HRESULT InitLanguageBar();
     HRESULT UninitLanguageBar();
 
+    _Check_return_ HRESULT InitSettings(_In_ ITfThreadMgr* threadMgr, _In_ TfClientId clientid);
+    HRESULT UninitSettings();
+
 private:
     std::shared_ptr<Telex::TelexEngine> _engine;
     CComPtr<ITfLangBarItemMgr> _langBarItemMgr;

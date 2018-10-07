@@ -78,30 +78,8 @@ _Check_return_ HRESULT EngineController::Initialize(
     hr = _openCloseCompartmentEventSink.Advise(openCloseSource, this);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_openCloseCompartmentEventSink.Advise failed");
 
-    // TelexConfig
-    hr = CreateInitialize(
-        &_tc_oa_uy_tone1,
-        HKEY_CURRENT_USER,
-        Globals::ConfigKeyName.c_str(),
-        L"oa_uy_tone1",
-        threadMgr,
-        clientid,
-        GUID_TelexConfigCompartment,
-        false,
-        [this] { return UpdateStates(); });
-    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(_tc_oa_uy_tone1) failed");
-
-    hr = CreateInitialize(
-        &_tc_accept_dd,
-        HKEY_CURRENT_USER,
-        Globals::ConfigKeyName.c_str(),
-        L"accept_dd",
-        threadMgr,
-        clientid,
-        GUID_TelexConfigCompartment,
-        false,
-        [this] { return UpdateStates(); });
-    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(_tc_accept_dd) failed");
+    hr = InitSettings(threadMgr, clientid);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"InitSettings failed");
 
     // langbar
 
@@ -117,13 +95,8 @@ HRESULT EngineController::Uninitialize() {
     hr = UninitLanguageBar();
     DBG_HRESULT_CHECK(hr, L"%s", L"UninitLanguageBar failed");
 
-    hr = _tc_accept_dd->Uninitialize();
-    DBG_HRESULT_CHECK(hr, L"%s", L"_tc_accept_dd->Uninitialize failed");
-    _tc_accept_dd.Release();
-
-    hr = _tc_oa_uy_tone1->Uninitialize();
-    DBG_HRESULT_CHECK(hr, L"%s", L"_tc_oa_uy_tone1->Uninitialize failed");
-    _tc_oa_uy_tone1.Release();
+    hr = UninitSettings();
+    DBG_HRESULT_CHECK(hr, L"%s", L"UninitSettings failed");
 
     hr = _openCloseCompartmentEventSink.Unadvise();
     DBG_HRESULT_CHECK(hr, L"%s", L"_openCloseCompartmentEventSink.Unadvise failed");
@@ -275,6 +248,50 @@ HRESULT EngineController::UninitLanguageBar() {
 
     _indicatorButton->Uninitialize();
     _indicatorButton.reset();
+
+    return S_OK;
+}
+
+_Check_return_ HRESULT EngineController::InitSettings(_In_ ITfThreadMgr* threadMgr, _In_ TfClientId clientid) {
+    HRESULT hr;
+
+    hr = CreateInitialize(
+        &_tc_oa_uy_tone1,
+        HKEY_CURRENT_USER,
+        Globals::ConfigKeyName.c_str(),
+        L"oa_uy_tone1",
+        threadMgr,
+        clientid,
+        GUID_TelexConfigCompartment,
+        false,
+        [this] { return LoadSettings(); });
+    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(_tc_oa_uy_tone1) failed");
+
+    hr = CreateInitialize(
+        &_tc_accept_dd,
+        HKEY_CURRENT_USER,
+        Globals::ConfigKeyName.c_str(),
+        L"accept_dd",
+        threadMgr,
+        clientid,
+        GUID_TelexConfigCompartment,
+        false,
+        [this] { return LoadSettings(); });
+    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(_tc_accept_dd) failed");
+
+    return S_OK;
+}
+
+HRESULT EngineController::UninitSettings() {
+    HRESULT hr;
+
+    hr = _tc_accept_dd->Uninitialize();
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_accept_dd->Uninitialize failed");
+    _tc_accept_dd.Release();
+
+    hr = _tc_oa_uy_tone1->Uninitialize();
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_oa_uy_tone1->Uninitialize failed");
+    _tc_oa_uy_tone1.Release();
 
     return S_OK;
 }

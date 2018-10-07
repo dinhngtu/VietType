@@ -28,7 +28,7 @@ namespace VietType {
 // - add an implementation for the setting prop in SettingsDialog.cpp
 // - handle setting load/commit in SettingsDialogProc
 // - add a new backing store for the setting in EngineController.h (e.g. CComPtr<RegistrySetting<DWORD>>)
-// - add code to init and uninit the backing store in EngineController.cpp
+// - add code to init and uninit the backing store in EngineController::InitSettings/UninitSettings
 // - modify LoadSettings/CommitSettings in EngineController.cpp to load/commit settings to the engine
 
 class SettingsDialog {
