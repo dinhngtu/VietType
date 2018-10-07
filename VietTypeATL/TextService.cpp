@@ -36,6 +36,7 @@
 #include "EngineController.h"
 #include "Compartment.h"
 #include "LanguageBarHandlers.h"
+#include "EngineSettingsController.h"
 
 namespace VietType {
 

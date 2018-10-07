@@ -21,13 +21,12 @@
 #include "EditSessions.h"
 #include "Compartment.h"
 #include "SettingsDialog.h"
+#include "EngineSettingsController.h"
 
 namespace VietType {
 
 // {B31B741B-63CE-413A-9B5A-D2B69C695A78}
 static const GUID GUID_SettingsCompartment_Toggle = { 0xb31b741b, 0x63ce, 0x413a, { 0x9b, 0x5a, 0xd2, 0xb6, 0x9c, 0x69, 0x5a, 0x78 } };
-// {57335895-0C34-40BA-83F7-72E90A39C222}
-static const GUID GUID_TelexConfigCompartment = { 0x57335895, 0xc34, 0x40ba, { 0x83, 0xf7, 0x72, 0xe9, 0xa, 0x39, 0xc2, 0x22 } };
 // {CCA3D390-EF1A-4DE4-B2FF-B6BC76D68C3B}
 static const GUID GUID_LanguageBarButton_Item = { 0xcca3d390, 0xef1a, 0x4de4,{ 0xb2, 0xff, 0xb6, 0xbc, 0x76, 0xd6, 0x8c, 0x3b } };
 
@@ -78,8 +77,8 @@ _Check_return_ HRESULT EngineController::Initialize(
     hr = _openCloseCompartmentEventSink.Advise(openCloseSource, this);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_openCloseCompartmentEventSink.Advise failed");
 
-    hr = InitSettings(threadMgr, clientid);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"InitSettings failed");
+    hr = CreateInitialize(&_settings, this, threadMgr, clientid);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(_settings) failed");
 
     // langbar
 
@@ -95,8 +94,9 @@ HRESULT EngineController::Uninitialize() {
     hr = UninitLanguageBar();
     DBG_HRESULT_CHECK(hr, L"%s", L"UninitLanguageBar failed");
 
-    hr = UninitSettings();
-    DBG_HRESULT_CHECK(hr, L"%s", L"UninitSettings failed");
+    hr = _settings->Uninitialize();
+    DBG_HRESULT_CHECK(hr, L"%s", L"_settings->Uninitialize failed");
+    _settings.Release();
 
     hr = _openCloseCompartmentEventSink.Unadvise();
     DBG_HRESULT_CHECK(hr, L"%s", L"_openCloseCompartmentEventSink.Unadvise failed");
@@ -172,28 +172,7 @@ SettingsDialog EngineController::CreateSettingsDialog() const {
 }
 
 HRESULT EngineController::CommitSettings(const SettingsDialog& dlg) {
-    HRESULT hr;
-    _engine->SetConfig(dlg.GetTelexConfig());
-    hr = _tc_oa_uy_tone1->SetValue(static_cast<DWORD>(dlg.GetTelexConfig().oa_uy_tone1));
-    hr = _tc_accept_dd->SetValue(static_cast<DWORD>(dlg.GetTelexConfig().accept_separate_dd));
-    return hr;
-}
-
-HRESULT EngineController::LoadSettings() {
-    HRESULT hr;
-
-    DWORD oa_uy_tone1 = true;
-    hr = _tc_oa_uy_tone1->GetValueOrWriteback(&oa_uy_tone1, _engine->GetConfig().oa_uy_tone1);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_oa_uy_tone1->GetValueOrWriteback failed");
-
-    DWORD accept_dd = true;
-    hr = _tc_accept_dd->GetValueOrWriteback(&accept_dd, _engine->GetConfig().accept_separate_dd);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_accept_dd->GetValueOrWriteback failed");
-
-    auto cfg = _engine->GetConfig();
-    cfg.oa_uy_tone1 = static_cast<bool>(oa_uy_tone1);
-    cfg.accept_separate_dd = static_cast<bool>(accept_dd);
-    _engine->SetConfig(cfg);
+    return _settings->CommitSettings(dlg);
 }
 
 HRESULT EngineController::UpdateStates() {
@@ -205,8 +184,8 @@ HRESULT EngineController::UpdateStates() {
 
     DBG_DPRINT(L"enabled = %ld, blocked = %d", enabled, static_cast<int>(_blocked));
 
-    hr = LoadSettings();
-    DBG_HRESULT_CHECK(L"%s", L"LoadSettings failed");
+    hr = _settings->LoadSettings();
+    DBG_HRESULT_CHECK(hr, L"%s", L"_settings->LoadSettings failed");
 
     hr = _indicatorButton->Refresh();
     DBG_HRESULT_CHECK(hr, L"%s", L"_indicatorButton->Refresh failed");
@@ -248,50 +227,6 @@ HRESULT EngineController::UninitLanguageBar() {
 
     _indicatorButton->Uninitialize();
     _indicatorButton.reset();
-
-    return S_OK;
-}
-
-_Check_return_ HRESULT EngineController::InitSettings(_In_ ITfThreadMgr* threadMgr, _In_ TfClientId clientid) {
-    HRESULT hr;
-
-    hr = CreateInitialize(
-        &_tc_oa_uy_tone1,
-        HKEY_CURRENT_USER,
-        Globals::ConfigKeyName.c_str(),
-        L"oa_uy_tone1",
-        threadMgr,
-        clientid,
-        GUID_TelexConfigCompartment,
-        false,
-        [this] { return LoadSettings(); });
-    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(_tc_oa_uy_tone1) failed");
-
-    hr = CreateInitialize(
-        &_tc_accept_dd,
-        HKEY_CURRENT_USER,
-        Globals::ConfigKeyName.c_str(),
-        L"accept_dd",
-        threadMgr,
-        clientid,
-        GUID_TelexConfigCompartment,
-        false,
-        [this] { return LoadSettings(); });
-    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(_tc_accept_dd) failed");
-
-    return S_OK;
-}
-
-HRESULT EngineController::UninitSettings() {
-    HRESULT hr;
-
-    hr = _tc_accept_dd->Uninitialize();
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_accept_dd->Uninitialize failed");
-    _tc_accept_dd.Release();
-
-    hr = _tc_oa_uy_tone1->Uninitialize();
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_oa_uy_tone1->Uninitialize failed");
-    _tc_oa_uy_tone1.Release();
 
     return S_OK;
 }

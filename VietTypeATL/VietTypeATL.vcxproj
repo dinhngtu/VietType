@@ -517,6 +517,7 @@
     </ClCompile>
     <ClCompile Include="EditBlocked.cpp" />
     <ClCompile Include="EngineController.cpp" />
+    <ClCompile Include="EngineSettingsController.cpp" />
     <ClCompile Include="EnumDisplayAttributeInfo.cpp" />
     <ClCompile Include="Globals.cpp" />
     <ClCompile Include="KeyEventSink.cpp" />
@@ -586,6 +587,7 @@
     <ClInclude Include="EditSession.h" />
     <ClInclude Include="EditSessions.h" />
     <ClInclude Include="EngineController.h" />
+    <ClInclude Include="EngineSettingsController.h" />
     <ClInclude Include="EnumDisplayAttributeInfo.h" />
     <ClInclude Include="Export.h" />
     <ClInclude Include="Globals.h" />

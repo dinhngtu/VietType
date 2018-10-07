@@ -30,6 +30,7 @@ class LangBarButton;
 class CompositionManager;
 class EngineController;
 class SettingsDialog;
+class EngineSettingsController;
 
 class EngineController :
     public CComObjectRootEx<CComSingleThreadModel>,
@@ -77,7 +78,6 @@ public:
 
     SettingsDialog CreateSettingsDialog() const;
     HRESULT CommitSettings(const SettingsDialog& dlg);
-    HRESULT LoadSettings();
 
     // update engine and langbar enabled state to match enabled/blocked value
     HRESULT UpdateStates();
@@ -85,9 +85,6 @@ public:
 private:
     _Check_return_ HRESULT InitLanguageBar();
     HRESULT UninitLanguageBar();
-
-    _Check_return_ HRESULT InitSettings(_In_ ITfThreadMgr* threadMgr, _In_ TfClientId clientid);
-    HRESULT UninitSettings();
 
 private:
     std::shared_ptr<Telex::TelexEngine> _engine;
@@ -100,13 +97,11 @@ private:
     Compartment<long> _openCloseCompartment;
     SinkAdvisor<ITfCompartmentEventSink> _openCloseCompartmentEventSink;
 
-    // TelexConfig
-    CComPtr<RegistrySetting<DWORD>> _tc_oa_uy_tone1;
-    CComPtr<RegistrySetting<DWORD>> _tc_accept_dd;
-
     // unique_ptr is not necessary but used just to break include cycle
     std::unique_ptr<IndicatorButton> _indicatorButton;
     std::unique_ptr<LangBarButton> _langBarButton;
+
+    CComPtr<EngineSettingsController> _settings;
 
     BlockedKind _blocked = BlockedKind::Free;
 };
