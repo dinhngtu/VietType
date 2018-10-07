@@ -167,10 +167,6 @@ _Check_return_ HRESULT EngineController::GetOpenClose(_Out_ long* openclose) {
     return _openCloseCompartment.GetValue(openclose);
 }
 
-SettingsDialog EngineController::CreateSettingsDialog() const {
-    return SettingsDialog(_engine->GetConfig());
-}
-
 HRESULT EngineController::CommitSettings(const SettingsDialog& dlg) {
     return _settings->CommitSettings(dlg);
 }
