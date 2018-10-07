@@ -77,6 +77,7 @@ public:
 
     SettingsDialog CreateSettingsDialog() const;
     HRESULT CommitSettings(const SettingsDialog& dlg);
+    HRESULT LoadSettings();
 
     // update engine and langbar enabled state to match enabled/blocked value
     HRESULT UpdateStates();
@@ -98,6 +99,7 @@ private:
 
     // TelexConfig
     CComPtr<RegistrySetting<DWORD>> _tc_oa_uy_tone1;
+    CComPtr<RegistrySetting<DWORD>> _tc_accept_dd;
 
     // unique_ptr is not necessary but used just to break include cycle
     std::unique_ptr<IndicatorButton> _indicatorButton;

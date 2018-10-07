@@ -164,7 +164,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
         _cases.push_back(ccase);
         _respos.push_back(_respos_current++);
 
-    } else if (!_v.size() && !_c2.size() && c == L'd') {
+    } else if (!_c2.size() && c == L'd' && (_config.accept_separate_dd || !_v.size())) {
         // only used for 'dd'
         // relaxed constraint: !_v.size()
         _c1.push_back(c);

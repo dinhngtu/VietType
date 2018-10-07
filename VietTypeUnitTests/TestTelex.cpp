@@ -25,9 +25,7 @@ using namespace VietType::Telex;
 
 namespace VietTypeUnitTests {
 
-static TelexConfig config{
-    true,
-};
+static TelexConfig config{};
 
 TelexStates FeedWord(TelexEngine& e, const wchar_t* input) {
     e.Reset();
@@ -52,14 +50,18 @@ void TestValidWord(const wchar_t* expected, const wchar_t* input) {
     TestValidWord(e, expected, input);
 }
 
-void TestInvalidWord(const wchar_t* expected, const wchar_t* input) {
-    TelexEngine e(config);
+void TestInvalidWord(TelexEngine& e, const wchar_t* expected, const wchar_t* input) {
     e.Reset();
     for (auto c : std::wstring(input)) {
         e.PushChar(c);
     }
     AssertTelexStatesEqual(TelexStates::CommittedInvalid, e.Commit());
     Assert::AreEqual(expected, e.RetrieveInvalid().c_str());
+}
+
+void TestInvalidWord(const wchar_t* expected, const wchar_t* input) {
+    TelexEngine e(config);
+    TestInvalidWord(e, expected, input);
 }
 
 TEST_CLASS(TestTelex) {
@@ -427,10 +429,25 @@ public:
     }
 
     TEST_METHOD(TestTypingOaUyOff) {
-        TelexEngine e(TelexConfig{ false });
+        auto config1 = config;
+        config1.oa_uy_tone1 = false;
+        TelexEngine e(config1);
         TestValidWord(e, L"h\xf2""a", L"hoaf");
         TestValidWord(e, L"h\xf2""e", L"hoef");
         TestValidWord(e, L"l\x1ee5y", L"luyj");
+    }
+
+    // test dd accept
+
+    TEST_METHOD(TestValidDodongf) {
+        TestValidWord(L"\x111\x1ed3ng", L"dodongf");
+    }
+
+    TEST_METHOD(TestInvalidDodongf) {
+        auto config1 = config;
+        config1.accept_separate_dd = false;
+        TelexEngine e(config1);
+        TestInvalidWord(e, L"dodongf", L"dodongf");
     }
 };
 

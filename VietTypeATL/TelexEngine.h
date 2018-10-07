@@ -46,7 +46,9 @@ enum class TelexStates {
 
 struct TelexConfig {
     // put the tone in "oa"/"uy" in the second character instead of the first
-    bool oa_uy_tone1;
+    bool oa_uy_tone1 = true;
+    // allow typing the second 'd' of 'dd' anywhere in the word
+    bool accept_separate_dd = true;
 };
 
 class TESTEXPORT TelexEngine {

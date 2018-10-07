@@ -84,9 +84,7 @@ STDMETHODIMP TextService::ActivateEx(_In_ ITfThreadMgr* ptim, _In_ TfClientId ti
     _clientId = tid;
     _activateFlags = dwFlags;
 
-    Telex::TelexConfig engineconfig;
-    engineconfig.oa_uy_tone1 = true;
-    _engine = std::make_shared<Telex::TelexEngine>(engineconfig);
+    _engine = std::make_shared<Telex::TelexEngine>(Telex::TelexConfig{});
 
     hr = CreateInitialize(&_compositionManager, tid, attributeStore->GetAttribute(0), static_cast<bool>(dwFlags & TF_TMAE_COMLESS));
     HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(&_compositionManager) failed");

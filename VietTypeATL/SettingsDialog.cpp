@@ -41,7 +41,10 @@ INT_PTR CALLBACK SettingsDialog::SettingsDialogProc(_In_ HWND hwndDlg, _In_ UINT
     if (uMsg == WM_INITDIALOG) {
         instance = reinterpret_cast<SettingsDialog*>(lParam);
         assert(instance);
+
         CheckDlgButton(hwndDlg, IDC_SETTINGS_OA_UY, instance->Property<IDC_SETTINGS_OA_UY>() ? BST_CHECKED : BST_UNCHECKED);
+        CheckDlgButton(hwndDlg, IDC_SETTINGS_ACCEPT_DD, instance->Property<IDC_SETTINGS_ACCEPT_DD>() ? BST_CHECKED : BST_UNCHECKED);
+
         return TRUE;
     }
 
@@ -51,6 +54,7 @@ INT_PTR CALLBACK SettingsDialog::SettingsDialogProc(_In_ HWND hwndDlg, _In_ UINT
         switch (LOWORD(wParam)) {
         case IDOK:
             instance->Property<IDC_SETTINGS_OA_UY>() = IsDlgButtonChecked(hwndDlg, IDC_SETTINGS_OA_UY) != BST_UNCHECKED;
+            instance->Property<IDC_SETTINGS_ACCEPT_DD>() = IsDlgButtonChecked(hwndDlg, IDC_SETTINGS_ACCEPT_DD) != BST_UNCHECKED;
 
             instance = nullptr;
             EndDialog(hwndDlg, IDOK);
@@ -69,6 +73,11 @@ INT_PTR CALLBACK SettingsDialog::SettingsDialogProc(_In_ HWND hwndDlg, _In_ UINT
 template <>
 bool& SettingsDialog::Property<IDC_SETTINGS_OA_UY>() {
     return _data.TelexConfig.oa_uy_tone1;
+}
+
+template <>
+bool& SettingsDialog::Property<IDC_SETTINGS_ACCEPT_DD>() {
+    return _data.TelexConfig.accept_separate_dd;
 }
 
 }

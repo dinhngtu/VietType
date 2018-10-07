@@ -22,6 +22,15 @@
 
 namespace VietType {
 
+// procedure for adding a new setting:
+// - add new setting controls to the settings dialog resource
+// - modify SettingsDialog.h to add a new propType + property
+// - add an implementation for the setting prop in SettingsDialog.cpp
+// - handle setting load/commit in SettingsDialogProc
+// - add a new backing store for the setting in EngineController.h (e.g. CComPtr<RegistrySetting<DWORD>>)
+// - add code to init and uninit the backing store in EngineController.cpp
+// - modify LoadSettings/CommitSettings in EngineController.cpp to load/commit settings to the engine
+
 class SettingsDialog {
 public:
     SettingsDialog() = delete;
@@ -54,6 +63,13 @@ private:
     };
     template <>
     bool& Property<IDC_SETTINGS_OA_UY>();
+
+    template <>
+    struct propType<IDC_SETTINGS_ACCEPT_DD> {
+        using type = bool;
+    };
+    template <>
+    bool& Property<IDC_SETTINGS_ACCEPT_DD>();
 
 private:
     SettingsDialogData _data;

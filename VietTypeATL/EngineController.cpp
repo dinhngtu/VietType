@@ -91,6 +91,18 @@ _Check_return_ HRESULT EngineController::Initialize(
         [this] { return UpdateStates(); });
     HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(_tc_oa_uy_tone1) failed");
 
+    hr = CreateInitialize(
+        &_tc_accept_dd,
+        HKEY_CURRENT_USER,
+        Globals::ConfigKeyName.c_str(),
+        L"accept_dd",
+        threadMgr,
+        clientid,
+        GUID_TelexConfigCompartment,
+        false,
+        [this] { return UpdateStates(); });
+    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(_tc_accept_dd) failed");
+
     // langbar
 
     hr = InitLanguageBar();
@@ -104,6 +116,10 @@ HRESULT EngineController::Uninitialize() {
 
     hr = UninitLanguageBar();
     DBG_HRESULT_CHECK(hr, L"%s", L"UninitLanguageBar failed");
+
+    hr = _tc_accept_dd->Uninitialize();
+    DBG_HRESULT_CHECK(hr, L"%s", L"_tc_accept_dd->Uninitialize failed");
+    _tc_accept_dd.Release();
 
     hr = _tc_oa_uy_tone1->Uninitialize();
     DBG_HRESULT_CHECK(hr, L"%s", L"_tc_oa_uy_tone1->Uninitialize failed");
@@ -186,7 +202,25 @@ HRESULT EngineController::CommitSettings(const SettingsDialog& dlg) {
     HRESULT hr;
     _engine->SetConfig(dlg.GetTelexConfig());
     hr = _tc_oa_uy_tone1->SetValue(static_cast<DWORD>(dlg.GetTelexConfig().oa_uy_tone1));
+    hr = _tc_accept_dd->SetValue(static_cast<DWORD>(dlg.GetTelexConfig().accept_separate_dd));
     return hr;
+}
+
+HRESULT EngineController::LoadSettings() {
+    HRESULT hr;
+
+    DWORD oa_uy_tone1 = true;
+    hr = _tc_oa_uy_tone1->GetValueOrWriteback(&oa_uy_tone1, _engine->GetConfig().oa_uy_tone1);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_oa_uy_tone1->GetValueOrWriteback failed");
+
+    DWORD accept_dd = true;
+    hr = _tc_accept_dd->GetValueOrWriteback(&accept_dd, _engine->GetConfig().accept_separate_dd);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_accept_dd->GetValueOrWriteback failed");
+
+    auto cfg = _engine->GetConfig();
+    cfg.oa_uy_tone1 = static_cast<bool>(oa_uy_tone1);
+    cfg.accept_separate_dd = static_cast<bool>(accept_dd);
+    _engine->SetConfig(cfg);
 }
 
 HRESULT EngineController::UpdateStates() {
@@ -198,12 +232,8 @@ HRESULT EngineController::UpdateStates() {
 
     DBG_DPRINT(L"enabled = %ld, blocked = %d", enabled, static_cast<int>(_blocked));
 
-    DWORD oa_uy_tone1;
-    hr = _tc_oa_uy_tone1->GetValueOrWriteback(&oa_uy_tone1, _engine->GetConfig().oa_uy_tone1);
-    DBG_HRESULT_CHECK(hr, L"%s", L"_tc_oa_uy_tone1->GetValueOrWriteback failed");
-    auto cfg = _engine->GetConfig();
-    cfg.oa_uy_tone1 = static_cast<bool>(oa_uy_tone1);
-    _engine->SetConfig(cfg);
+    hr = LoadSettings();
+    DBG_HRESULT_CHECK(L"%s", L"LoadSettings failed");
 
     hr = _indicatorButton->Refresh();
     DBG_HRESULT_CHECK(hr, L"%s", L"_indicatorButton->Refresh failed");
