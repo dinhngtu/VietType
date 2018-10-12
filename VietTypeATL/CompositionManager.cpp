@@ -58,11 +58,11 @@ HRESULT CompositionManager::Uninitialize() {
     return S_OK;
 }
 
-HRESULT CompositionManager::RequestEditSession(_In_ ITfEditSession* session, _In_ ITfContext* context) {
+HRESULT CompositionManager::RequestEditSession(_In_ ITfEditSession* session, _In_ ITfContext* context, _In_ DWORD flags) {
     assert(_clientid != TF_CLIENTID_NULL);
     assert(context);
     HRESULT hrSession;
-    return context->RequestEditSession(_clientid, session, TF_ES_ASYNCDONTCARE | TF_ES_READWRITE, &hrSession);
+    return context->RequestEditSession(_clientid, session, flags, &hrSession);
 }
 
 HRESULT CompositionManager::StartComposition(_In_ ITfContext* pContext) {

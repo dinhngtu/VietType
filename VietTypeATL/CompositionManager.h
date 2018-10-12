@@ -43,7 +43,7 @@ public:
     _Check_return_ HRESULT Initialize(_In_ TfClientId clientid, _In_ ITfDisplayAttributeInfo* composingAttribute, _In_ bool comless);
     HRESULT Uninitialize();
 
-    HRESULT RequestEditSession(_In_ ITfEditSession* session, _In_ ITfContext* context);
+    HRESULT RequestEditSession(_In_ ITfEditSession* session, _In_ ITfContext* context, _In_ DWORD flags = TF_ES_ASYNCDONTCARE | TF_ES_READWRITE);
     HRESULT StartComposition(_In_ ITfContext* pContext);
     HRESULT EndComposition();
     bool IsComposing() const;
