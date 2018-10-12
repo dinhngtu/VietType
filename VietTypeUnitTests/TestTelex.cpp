@@ -244,6 +244,12 @@ public:
         Assert::AreEqual(L"\x111", e.Peek().c_str());
     }
 
+    TEST_METHOD(TestPeekAd) {
+        TelexEngine e(config);
+        FeedWord(e, L"ad");
+        Assert::AreEqual(L"ad", e.Peek().c_str());
+    }
+
     // used to cause a crash
     TEST_METHOD(TestPeekZ) {
         TelexEngine e(config);
