@@ -26,6 +26,7 @@ const generic_map_type<std::wstring, std::wstring> transitions = {
     {L"iee", L"i\xea"},
     {L"oo", L"\xf4"},
     {L"uaa", L"u\xe2"},
+    {L"uee", L"u\xea"},
     {L"uoo", L"u\xf4"},
     //{ L"u\x1a1" , L"\x1b0\x1a1" }, // transition in v_c2 only
     {L"u\x1a1i", L"\x1b0\x1a1i"},

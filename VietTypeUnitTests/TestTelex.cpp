@@ -226,6 +226,10 @@ public:
         TestValidWord(L"ng\x1b0\x1eddi", L"nguwoif");
     }
 
+    TEST_METHOD(TestTypingThuees) {
+        TestValidWord(L"thu\x1ebf", L"thuees");
+    }
+
     // test 'aua' and similar transitions
 
     TEST_METHOD(TestTypingLauar) {
