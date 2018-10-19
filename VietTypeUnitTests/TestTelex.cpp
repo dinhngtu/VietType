@@ -279,6 +279,12 @@ public:
         Assert::AreEqual(L"cafe", e.Peek().c_str());
     }
 
+    TEST_METHOD(TestPeekDand) {
+        TelexEngine e(config);
+        FeedWord(e, L"dand");
+        Assert::AreEqual(L"\x111""an", e.Peek().c_str());
+    }
+
     // double key tests
 
     TEST_METHOD(TestDoubleKeyXuaaan) {
