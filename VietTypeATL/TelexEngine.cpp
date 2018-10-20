@@ -197,13 +197,22 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
             _v = it->second;
             auto after = _v.size();
             // we don't yet take into account if _v grows in length due to the transition
-            if (after == before) {
-                _cases.push_back(ccase);
-            }
             if (_keyBuffer.size() > 1 && c == ToLower(_keyBuffer.rbegin()[1]) && _respos.back() == ResposTransitionV) {
                 _keyBuffer.pop_back();
-            } else {
+                if (after == before) {
+                    // in case of double key, we want to pretend that the first V transition char didn't happen
+                    // the rest is handled below
+                    _respos.pop_back();
+                }
+            } else if (after < before) {
                 _respos.push_back(ResposTransitionV);
+            }
+            if (after == before) {
+                // in case of 'uơi' -> 'ươi', the transition char itself is a normal character
+                // so it must be recorded as such rather than just a transition
+                // the best solution however is to introduce flags into respos
+                _cases.push_back(ccase);
+                _respos.push_back(_respos_current++);
             }
         } else {
             // if there is no transition, there must be a new character -> must push case

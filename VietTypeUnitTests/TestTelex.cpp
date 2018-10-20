@@ -416,6 +416,14 @@ public:
         Assert::AreEqual(L"\x1a1", e.Peek().c_str());
     }
 
+    TEST_METHOD(TestBackspaceRuowi) {
+        TelexEngine e(config);
+        FeedWord(e, L"ruowi");
+        Assert::AreEqual(L"r\x1b0\x1a1i", e.Peek().c_str());
+        e.Backspace();
+        Assert::AreEqual(L"ru\x1a1", e.Peek().c_str());
+    }
+
     // test backconversions
 
     TEST_METHOD(TestBackconversionDdoongf) {
