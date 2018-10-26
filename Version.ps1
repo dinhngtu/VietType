@@ -1,2 +1,2 @@
-$fileVersion = 1,2,10,0
-$productVersion = 1,2,10,0
+$fileVersion = 1,3,0,0
+$productVersion = 1,3,0,0
