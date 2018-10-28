@@ -631,6 +631,11 @@ bool TelexEngine::GetTonePos(_In_ bool predict, _Out_ VInfo* vinfo) const {
             retinfo.c2mode = C2Mode::Either;
             break;
         }
+        if (_c1 == L"q") {
+            // quick fix to prevent pushing tone character when backspacing to 'qu'
+            retinfo.tonepos = -1;
+            retinfo.c2mode = C2Mode::Either;
+        }
     }
     *vinfo = retinfo;
     return found;

@@ -54,6 +54,7 @@ const generic_map_type<std::wstring, int> respos = {
     {L"i\xea", 1},
     {L"\xf4", 0},
     {L"u\xe2", 1},
+    {L"u\xea", 1},
     {L"u\xf4", 1},
     {L"\x1b0\x1a1", 0}, // keep transition for uwow
     {L"\x1b0\x1a1i", 0},

@@ -424,6 +424,22 @@ public:
         Assert::AreEqual(L"ru\x1a1", e.Peek().c_str());
     }
 
+    TEST_METHOD(TestBackspaceQuee) {
+        TelexEngine e(config);
+        FeedWord(e, L"quee");
+        Assert::AreEqual(L"qu\xea", e.Peek().c_str());
+        e.Backspace();
+        Assert::AreEqual(L"qu", e.Peek().c_str());
+    }
+
+    TEST_METHOD(TestBackspaceQuys) {
+        TelexEngine e(config);
+        FeedWord(e, L"quys");
+        Assert::AreEqual(L"qu\xfd", e.Peek().c_str());
+        e.Backspace();
+        Assert::AreEqual(L"qu", e.Peek().c_str());
+    }
+
     // test backconversions
 
     TEST_METHOD(TestBackconversionDdoongf) {
