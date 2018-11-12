@@ -31,6 +31,7 @@ extern const generic_map_type<std::wstring, std::wstring> transitions;
 extern const generic_map_type<std::wstring, int> respos;
 
 extern const generic_map_type<std::wstring, std::wstring> transitions_w;
+extern const generic_map_type<std::wstring, std::wstring> transitions_w_q;
 // which character in _v that is responsible for ResposTransitionW
 extern const generic_map_type<std::wstring, int> respos_w;
 

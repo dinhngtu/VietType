@@ -200,6 +200,10 @@ public:
         TestValidWord(L"n\x1b0""a", L"nuaw");
     }
 
+    TEST_METHOD(TestTypingQuawms) {
+        TestValidWord(L"qu\x1eafm", L"quawms");
+    }
+
     // test variations of 'gi'
 
     TEST_METHOD(TestTypingGif) {
@@ -252,6 +256,12 @@ public:
         TelexEngine e(config);
         FeedWord(e, L"ad");
         Assert::AreEqual(L"ad", e.Peek().c_str());
+    }
+
+    TEST_METHOD(TestPeekQuaw) {
+        TelexEngine e(config);
+        FeedWord(e, L"quaw");
+        Assert::AreEqual(L"qu\x103", e.Peek().c_str());
     }
 
     // used to cause a crash

@@ -85,10 +85,16 @@ const generic_map_type<std::wstring, std::wstring> transitions_w = {
     {L"\x1b0o", L"\x1b0\x1a1"},
 };
 
+const generic_map_type<std::wstring, std::wstring> transitions_w_q = {
+    {L"ua", L"u\x103"},
+    {L"uo", L"u\x1a1"},
+};
+
 const generic_map_type<std::wstring, int> respos_w = {
     {L"\x103", 0},
     {L"\x1a1", 0},
     {L"o\x103", 1},
+    {L"u\x103", 1},
     {L"\x1a1i", 0},
     {L"\x1b0", 0},
     {L"\x1b0i", 0},
@@ -230,6 +236,8 @@ const generic_map_type<std::wstring, VInfo> valid_v_q = {
     {L"ue", {1, C2Mode::NoC2}},
     {L"ui", {1, C2Mode::NoC2}},
     {L"u\xf4", {1, C2Mode::MustC2}}, // uô
+    {L"u\x1a1", {1, C2Mode::NoC2}},   // uơ
+    {L"u\x103", {1, C2Mode::MustC2}}, // uă
 };
 
 const generic_map_type<std::wstring, VInfo> valid_v_qu = {

@@ -230,6 +230,26 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
             }
         }
 
+    } else if (_c1 == L"q" && _v.size() && IS(cat, VowelW)) {
+        auto it = transitions_w_q.find(_v);
+        if (it != transitions_w_q.end()) {
+            _v = it->second;
+            if (_c2.size()) {
+                auto it2 = transitions_v_c2.find(_v);
+                if (it2 != transitions_v_c2.end()) {
+                    _v = it2->second;
+                }
+            }
+            _respos.push_back(ResposTransitionW);
+        } else {
+            // pop back only if same char entered twice in a row
+            if (c == ToLower(_keyBuffer.rbegin()[1])) {
+                _keyBuffer.pop_back();
+            }
+            _state = TelexStates::Invalid;
+        }
+        // 'w' always keeps V size constant, don't push case
+
     } else if (_v.size() && IS(cat, VowelW)) {
         auto it = transitions_w.find(_v);
         if (it != transitions_w.end()) {
