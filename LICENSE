@@ -690,7 +690,8 @@ Public License instead of this License.  But first, please read
 
 ================================================================================
 
-Portions of this software are derived from the Microsoft Windows classic samples:
+Portions of this software are derived from the Microsoft Windows classic samples.
+See the license notices in each individual source code file for more details.
 
 The MIT License (MIT)
 
@@ -716,7 +717,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 
 ================================================================================
 
-Portions of this software are derived from the Google Input Tools:
+Portions of this software are derived from the Google Input Tools.
+See the license notices in each individual source code file for more details.
 
                                  Apache License
                            Version 2.0, January 2004
