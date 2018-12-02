@@ -1,2 +1,3 @@
-$fileVersion = 1,3,2,0
-$productVersion = 1,3,2,0
+$fileVersion = 1,3,3,0
+$registrarFileVersion = 1,0,0,0
+$productVersion = 1,3,3,0

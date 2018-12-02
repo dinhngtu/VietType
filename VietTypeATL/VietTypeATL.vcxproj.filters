@@ -219,9 +219,6 @@
     <ClInclude Include="TelexInternal.h">
       <Filter>Telex\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VersionVCS.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Version.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -229,9 +226,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SettingsStore.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="VersionNumbers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EngineSettingsController.h">

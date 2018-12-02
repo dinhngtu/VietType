@@ -1,7 +1,7 @@
 #include "VersionNumbers.h"
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION FILEVERSION_TUPLE
+ FILEVERSION REGISTRAR_FILEVERSION_TUPLE
  PRODUCTVERSION PRODUCTVERSION_TUPLE
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
@@ -18,11 +18,11 @@ BEGIN
         BLOCK "040904b0"
         BEGIN
             VALUE "CompanyName", "Dinh Ngoc Tu"
-            VALUE "FileDescription", "Vietnamese input method"
-            VALUE "FileVersion", FILEVERSION_TEXT
-            VALUE "InternalName", "VietTypeATL.dll"
+            VALUE "FileDescription", "VietType text service registration utility"
+            VALUE "FileVersion", REGISTRAR_FILEVERSION_TEXT
+            VALUE "InternalName", "Registrar.exe"
             VALUE "LegalCopyright", "Copyright (c) 2018 Dinh Ngoc Tu."
-            VALUE "OriginalFilename", "VietTypeATL.dll"
+            VALUE "OriginalFilename", "Registrar.exe"
             VALUE "ProductName", "VietType"
             VALUE "ProductVersion", PRODUCTVERSION_TEXT
         END

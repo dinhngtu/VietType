@@ -612,8 +612,6 @@
     <ClInclude Include="ThreadMgrEventSink.h" />
     <ClInclude Include="Utilities.h" />
     <ClInclude Include="Version.h" />
-    <ClInclude Include="VersionNumbers.h" />
-    <ClInclude Include="VersionVCS.h" />
     <ClInclude Include="VietTypeATL_i.h" />
     <ClInclude Include="VirtualDocument.h" />
   </ItemGroup>
