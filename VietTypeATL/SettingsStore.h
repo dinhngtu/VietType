@@ -37,16 +37,16 @@ HRESULT UninitializeSink(_In_ CompartmentBase& compartment, _In_ SinkAdvisor<ITf
 
 template <typename U>
 struct regType {
-    static constexpr LSTATUS QueryValue(_In_ CRegKey& key, _In_opt_z_ LPCTSTR pszValueName, _Out_ U& value) = delete;
-    static constexpr LSTATUS SetValue(_In_ CRegKey& key, _In_opt_z_ LPCTSTR pszValueName, _In_ const U& value) = delete;
+    static LSTATUS QueryValue(_In_ CRegKey& key, _In_opt_z_ LPCTSTR pszValueName, _Out_ U& value) = delete;
+    static LSTATUS SetValue(_In_ CRegKey& key, _In_opt_z_ LPCTSTR pszValueName, _In_ const U& value) = delete;
 };
 
 template <>
 struct regType<DWORD> {
-    static constexpr LSTATUS QueryValue(_In_ CRegKey& key, _In_opt_z_ LPCTSTR pszValueName, _Out_ DWORD& value) {
+    static LSTATUS QueryValue(_In_ CRegKey& key, _In_opt_z_ LPCTSTR pszValueName, _Out_ DWORD& value) {
         return key.QueryDWORDValue(pszValueName, value);
     }
-    static constexpr LSTATUS SetValue(_In_ CRegKey& key, _In_opt_z_ LPCTSTR pszValueName, _In_ const DWORD& value) {
+    static LSTATUS SetValue(_In_ CRegKey& key, _In_opt_z_ LPCTSTR pszValueName, _In_ const DWORD& value) {
         return key.SetDWORDValue(pszValueName, value);
     }
 };
