@@ -668,17 +668,16 @@ bool TelexEngine::CheckInvariants() const {
     if (_c1.size() + _v.size() + _c2.size() > _keyBuffer.size()) {
         return false;
     }
-    if (_c1.size() + _v.size() + _c2.size() != _cases.size()) {
-        return false;
-    }
-    if (_state == TelexStates::Valid && _keyBuffer.size() != _respos.size()) {
-        return false;
-    }
-    if (_state == TelexStates::Committed && _keyBuffer.size() != _respos.size()) {
-        return false;
-    }
-    if (_respos.size() && _respos.back() > 0 && _respos.back() != _respos_current - 1) {
-        return false;
+    if (_state == TelexStates::Valid || _state == TelexStates::Committed) {
+        if (_c1.size() + _v.size() + _c2.size() != _cases.size()) {
+            return false;
+        }
+        if (_keyBuffer.size() != _respos.size()) {
+            return false;
+        }
+        if (_respos.size() && _respos.back() > 0 && _respos.back() != _respos_current - 1) {
+            return false;
+        }
     }
     return true;
 }
