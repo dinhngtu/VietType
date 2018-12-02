@@ -204,6 +204,10 @@ public:
         TestValidWord(L"qu\x1eafm", L"quawms");
     }
 
+    TEST_METHOD(TestTypingQuets) {
+        TestValidWord(L"qu\xe9t", L"quets");
+    }
+
     // test variations of 'gi'
 
     TEST_METHOD(TestTypingGif) {

@@ -232,7 +232,7 @@ const generic_map_type<std::wstring, VInfo> valid_v_q = {
     {L"uai", {1, C2Mode::NoC2}},
     {L"uao", {1, C2Mode::NoC2}},
     {L"uay", {1, C2Mode::NoC2}},
-    {L"ue", {1, C2Mode::NoC2}},
+    {L"ue", {1, C2Mode::Either}},
     {L"ui", {1, C2Mode::NoC2}},
     {L"u\xf4", {1, C2Mode::MustC2}}, // uô
     {L"u\x1a1", {1, C2Mode::NoC2}},   // uơ
