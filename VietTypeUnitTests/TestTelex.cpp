@@ -252,6 +252,12 @@ public:
         Assert::AreEqual(L"\x111", e.Peek().c_str());
     }
 
+    TEST_METHOD(TestPeekDdd) {
+        TelexEngine e(config);
+        FeedWord(e, L"ddd");
+        Assert::AreEqual(L"dd", e.Peek().c_str());
+    }
+
     TEST_METHOD(TestPeekAd) {
         TelexEngine e(config);
         FeedWord(e, L"ad");

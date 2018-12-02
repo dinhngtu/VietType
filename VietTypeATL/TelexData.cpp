@@ -33,7 +33,6 @@ const generic_map_type<std::wstring, std::wstring> transitions = {
     {L"u\x1a1u", L"\x1b0\x1a1u"},
     {L"uyee", L"uy\xea"},
     {L"yee", L"y\xea"},
-    {L"dd", L"\x111"},
     // relaxed transformations
     {L"\x1b0o", L"\x1b0\x1a1"},
     {L"oio", L"\xf4i"},

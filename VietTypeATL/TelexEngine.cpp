@@ -164,23 +164,19 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
         _cases.push_back(ccase);
         _respos.push_back(_respos_current++);
 
-    } else if (c == L'd' && ((_config.accept_separate_dd && _c1 == L"d") || (!_v.size() && !_c2.size()))) {
+    } else if (_c1 == L"d" && c == L'd' && ((_config.accept_separate_dd && _c1 == L"d") || (!_v.size() && !_c2.size()))) {
         // only used for 'dd'
         // relaxed constraint: !_v.size()
-        _c1.push_back(c);
-        auto before = _c1.size();
-        auto it = transitions.find(_c1);
-        if (it != transitions.end()) {
-            _c1 = it->second;
-            _respos.push_back(ResposTransitionC1);
-        } else {
-            _respos.push_back(_respos_current++);
+        _c1 = L"\x111";
+        _respos.push_back(ResposTransitionC1);
+
+    } else if (_c1 == L"\x111" && c == L'd') {
+        // only used for 'dd'
+        // relaxed constraint: !_v.size()
+        if (_keyBuffer.size() > 1 && ToLower(_keyBuffer.rbegin()[1]) == L'd') {
+            _keyBuffer.pop_back();
         }
-        auto after = _c1.size();
-        // remember that c1 cannot grow when adding a char
-        if (after == before) {
-            _cases.push_back(ccase);
-        }
+        _state = TelexStates::Invalid;
 
     } else if (!_v.size() && !_c2.size() && _c1 != L"gi" && IS(cat, ConsoC1)) {
         _c1.push_back(c);
