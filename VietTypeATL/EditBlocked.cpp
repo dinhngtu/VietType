@@ -124,10 +124,15 @@ HRESULT EditBlocked(
     InputScope* scopes = pscopes;
     for (UINT i = 0; i < scount; i++) {
         switch (scopes[i]) {
-        case IS_EMAIL_SMTPEMAILADDRESS:
         case IS_EMAIL_USERNAME:
+        case IS_EMAIL_SMTPEMAILADDRESS:
         case IS_LOGINNAME:
         case IS_PASSWORD:
+        case IS_EMAILNAME_OR_ADDRESS:
+        case IS_NUMERIC_PASSWORD:
+        case IS_NUMERIC_PIN:
+        case IS_ALPHANUMERIC_PIN:
+        case IS_ALPHANUMERIC_PIN_SET:
             scopeBlocked = BlockedKind::Blocked;
             goto commit;
         }
