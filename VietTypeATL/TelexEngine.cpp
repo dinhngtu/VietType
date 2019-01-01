@@ -221,7 +221,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
             _respos.push_back(_respos_current++);
             if (_c2.size()) {
                 // in case there exists no transition when _c2 is already typed
-                // fx. 'cace'
+                // e.g. 'cace'
                 _state = TelexStates::Invalid;
             }
         }

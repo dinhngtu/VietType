@@ -68,8 +68,6 @@ HRESULT KeyHandlerEditSession::Initialize(
     _In_reads_(256) const BYTE* keyState,
     _In_ EngineController* controller) {
 
-    // since edit sessions are asynchronous, we can't know when the reference to the edit session will die
-    // therefore, we don't explicitly uninit the class, leaving it to the destructor when the refcount runs out
     _compositionManager = compositionManager;
     _context = context;
     _wParam = wParam;
@@ -80,6 +78,8 @@ HRESULT KeyHandlerEditSession::Initialize(
 }
 
 HRESULT KeyHandlerEditSession::Uninitialize() {
+    // since edit sessions are asynchronous, we can't know when the reference to the edit session will die
+    // therefore, we don't explicitly uninit the class, leaving it to the destructor when the refcount runs out
     return S_OK;
 }
 
