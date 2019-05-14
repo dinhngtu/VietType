@@ -48,13 +48,17 @@ static int PopMenu(POINT pt, const RECT* area) {
 static HRESULT CopyTfMenu(_In_ ITfMenu* menu) {
     HRESULT hr;
 
-    HMENU menuSource = GetMenu();
-    for (int i = 0; i < GetMenuItemCount(menuSource); i++) {
+    // HMENU menuSource = GetMenu();
+    std::unique_ptr<std::remove_pointer<HMENU>::type, decltype(&DestroyMenu)> menuSource(GetMenu(), &DestroyMenu);
+    if (!menuSource) {
+        return E_FAIL;
+    }
+    for (int i = 0; i < GetMenuItemCount(menuSource.get()); i++) {
         MENUITEMINFO mii;
         mii.cbSize = sizeof(MENUITEMINFO);
         mii.dwTypeData = NULL;
         mii.fMask = MIIM_STRING;
-        if (!GetMenuItemInfo(menuSource, i, TRUE, &mii)) {
+        if (!GetMenuItemInfo(menuSource.get(), i, TRUE, &mii)) {
             WINERROR_GLE_RETURN_HRESULT(L"%s", L"GetMenuItemInfo failed");
         }
 
@@ -63,7 +67,7 @@ static HRESULT CopyTfMenu(_In_ ITfMenu* menu) {
         // the vector used here can't outlive the copy function, that's why the function has to do the item addition by itself
         std::vector<WCHAR> buf(mii.cch);
         mii.dwTypeData = &buf[0];
-        if (!GetMenuItemInfo(menuSource, i, TRUE, &mii)) {
+        if (!GetMenuItemInfo(menuSource.get(), i, TRUE, &mii)) {
             WINERROR_GLE_RETURN_HRESULT(L"%s", L"GetMenuItemInfo failed");
         }
 
@@ -103,7 +107,6 @@ static HRESULT CopyTfMenu(_In_ ITfMenu* menu) {
 
         DeleteObject(tfBitmap);
     }
-    DestroyMenu(menuSource);
 
     return S_OK;
 }

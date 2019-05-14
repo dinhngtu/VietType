@@ -2,6 +2,8 @@ syntax: glob
 .vs
 *.aps
 *.user
+bin/
+obj/
 Win32/
 x64/
 Debug/
