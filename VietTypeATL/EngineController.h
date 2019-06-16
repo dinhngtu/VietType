@@ -66,7 +66,7 @@ public:
     Telex::TelexEngine& GetEngine();
     const Telex::TelexEngine& GetEngine() const;
 
-    _Check_return_ HRESULT IsUserEnabled(_Out_ long* penabled);
+    _Check_return_ HRESULT IsUserEnabled(_Out_ long* penabled) const;
     HRESULT ToggleUserEnabled();
 
     // effective enabled status, from the combination of user setting and blocked state

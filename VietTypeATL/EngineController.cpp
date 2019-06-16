@@ -122,7 +122,7 @@ const Telex::TelexEngine& EngineController::GetEngine() const {
     return *_engine;
 }
 
-_Check_return_ HRESULT EngineController::IsUserEnabled(_Out_ long* penabled) {
+_Check_return_ HRESULT EngineController::IsUserEnabled(_Out_ long* penabled) const {
     return _enabled->GetValueOrWriteback(penabled, 1);
 }
 
@@ -135,8 +135,8 @@ HRESULT EngineController::ToggleUserEnabled() {
     }
 
     long enabled;
-    hr = _enabled->GetValueOrWriteback(&enabled, 1);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_enabled->GetValueOrWriteback failed");
+    hr = this->IsUserEnabled(&enabled);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"this->IsUserEnabled failed");
 
     hr = _enabled->SetValue(!enabled);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_enabled->SetValue failed");
@@ -149,7 +149,7 @@ HRESULT EngineController::ToggleUserEnabled() {
 long EngineController::IsEnabled() const {
     long enabled;
 #pragma warning(suppress: 4189)
-    HRESULT hr = _enabled->GetValueOrWriteback(&enabled, 1);
+    HRESULT hr = this->IsUserEnabled(&enabled);
     assert(SUCCEEDED(hr));
     return enabled && _blocked == BlockedKind::Free;
 }
@@ -175,8 +175,8 @@ HRESULT EngineController::UpdateStates() {
     HRESULT hr;
 
     long enabled;
-    hr = _enabled->GetValueOrWriteback(&enabled, 1);
-    DBG_HRESULT_CHECK(hr, L"%s", L"_enabled->GetValueOrWriteback failed");
+    hr = this->IsUserEnabled(&enabled);
+    DBG_HRESULT_CHECK(hr, L"%s", L"this->IsUserEnabled failed");
 
     DBG_DPRINT(L"enabled = %ld, blocked = %d", enabled, static_cast<int>(_blocked));
 
