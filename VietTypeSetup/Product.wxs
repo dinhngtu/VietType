@@ -100,21 +100,21 @@ along with VietType.  If not, see <https://www.gnu.org/licenses/>.
     <ComponentGroup Id="ProductComponents">
       <!-- Component Id is required, else Wix can't generate class registration entries -->
       <Component Id="VietTypeATL32.dll" Win64="no" Directory="INSTALLFOLDER">
-        <File Id="VietTypeATL32.dll" Source="$(var.SolutionDir)\Win32\Release\VietTypeATL32.dll" Name="VietTypeATL32.dll">
+        <File Id="VietTypeATL32.dll" Source="$(var.SolutionDir)\Win32\$(var.Configuration)\VietTypeATL32.dll" Name="VietTypeATL32.dll">
           <Class Id="{C0DD01A1-0DEB-454B-8B42-D22CED1B4B23}" Context="InprocServer32" Description="VietType" ThreadingModel="apartment" />
         </File>
       </Component>
 
       <?if $(var.Platform) = x64 ?>
       <Component Id="VietTypeATL64.dll" Win64="yes" Directory="INSTALLFOLDER64">
-        <File Id="VietTypeATL64.dll" Source="$(var.SolutionDir)\x64\Release\VietTypeATL64.dll" Name="VietTypeATL64.dll">
+        <File Id="VietTypeATL64.dll" Source="$(var.SolutionDir)\x64\$(var.Configuration)\VietTypeATL64.dll" Name="VietTypeATL64.dll">
           <Class Id="{C0DD01A1-0DEB-454B-8B42-D22CED1B4B23}" Context="InprocServer32" Description="VietType" ThreadingModel="apartment" />
         </File>
       </Component>
       <?endif ?>
 
       <Component Win64="no" Directory="INSTALLFOLDER">
-        <File Id="Registrar.exe" Source="$(var.SolutionDir)\Win32\Release\Registrar.exe" Name="Registrar.exe" />
+        <File Id="Registrar.exe" Source="$(var.SolutionDir)\Win32\$(var.Configuration)\Registrar.exe" Name="Registrar.exe" />
       </Component>
 
       <Component Win64="no" Directory="INSTALLFOLDER">
@@ -151,12 +151,12 @@ along with VietType.  If not, see <https://www.gnu.org/licenses/>.
   <Fragment>
     <ComponentGroup Id="DebugSymbols">
       <Component Win64="no" Directory="INSTALLFOLDER">
-        <File Source="$(var.SolutionDir)\Win32\Release\VietTypeATL32.pdb" Name="VietTypeATL32.pdb" />
+        <File Source="$(var.SolutionDir)\Win32\$(var.Configuration)\VietTypeATL32.pdb" Name="VietTypeATL32.pdb" />
       </Component>
 
       <?if $(var.Platform) = x64 ?>
       <Component Win64="yes" Directory="INSTALLFOLDER64">
-        <File Source="$(var.SolutionDir)\x64\Release\VietTypeATL64.pdb" Name="VietTypeATL64.pdb" />
+        <File Source="$(var.SolutionDir)\x64\$(var.Configuration)\VietTypeATL64.pdb" Name="VietTypeATL64.pdb" />
       </Component>
       <?endif ?>
     </ComponentGroup>
