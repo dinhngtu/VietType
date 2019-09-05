@@ -46,6 +46,7 @@ protected:
     };
 };
 
+// ITfCompartment only supports VT_I4, VT_UNKNOWN and VT_BSTR
 template <typename T>
 class Compartment : public CompartmentBase {
 public:

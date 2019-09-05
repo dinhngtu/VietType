@@ -171,6 +171,10 @@ static HRESULT OnMenuSelectAll(_In_ UINT id, _In_ EngineController* controller) 
             WINERROR_GLE_RETURN_HRESULT(L"%s", L"LoadString failed");
         }
         assert(aboutFormatString);
+        if (!aboutFormatString) {
+            DBG_DPRINT(L"%s", L"cannot get aboutFormatString");
+            return E_FAIL;
+        }
 
         LPWSTR ptext = nullptr;
         std::array<DWORD_PTR, 5> args = {
@@ -268,7 +272,10 @@ HRESULT IndicatorButton::OnMenuSelect(_In_ UINT id) {
 
 HRESULT IndicatorButton::GetIcon(__RPC__deref_out_opt HICON* hicon) {
     // Windows docs is a liar, icons are mandatory
-    assert(Globals::DllInstance);
+    if (!Globals::DllInstance) {
+        DBG_DPRINT(L"%s", L"cannot obtain instance");
+        return E_FAIL;
+    }
     if (_controller->GetBlocked() == EngineController::BlockedKind::Blocked) {
         *hicon = static_cast<HICON>(LoadImage(Globals::DllInstance, MAKEINTRESOURCE(IDI_ICONX), IMAGE_ICON, 16, 16, 0));
     } else if (_controller->IsEnabled()) {
@@ -326,7 +333,10 @@ HRESULT LangBarButton::OnMenuSelect(_In_ UINT id) {
 
 HRESULT LangBarButton::GetIcon(__RPC__deref_out_opt HICON* hicon) {
     // Windows docs is a liar, icons are mandatory
-    assert(Globals::DllInstance);
+    if (!Globals::DllInstance) {
+        DBG_DPRINT(L"%s", L"cannot obtain instance");
+        return E_FAIL;
+    }
     if (_controller->GetBlocked() == EngineController::BlockedKind::Blocked) {
         *hicon = static_cast<HICON>(LoadImage(Globals::DllInstance, MAKEINTRESOURCE(IDI_ICONX), IMAGE_ICON, 16, 16, 0));
     } else if (_controller->IsEnabled()) {

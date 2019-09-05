@@ -59,6 +59,8 @@ _Check_return_ HRESULT EngineController::Initialize(
     hr = threadMgr->QueryInterface(&_langBarItemMgr);
     HRESULT_CHECK_RETURN(hr, L"%s", L"threadMgr->QueryInterface failed");
 
+    // langbar init only inits the two buttons and does not read engine state
+    // so this can be done safely before engine state init
     hr = InitLanguageBar();
     HRESULT_CHECK_RETURN(hr, L"%s", L"InitLanguageBar failed");
 
@@ -68,6 +70,7 @@ _Check_return_ HRESULT EngineController::Initialize(
     HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(_settings) failed");
 
     // GUID_SettingsCompartment_Toggle is global
+    // langbar must be ready before this point to ensure that UpdateStates() calls execute correctly
     hr = CreateInitialize(&_enabled, threadMgr, clientid, GUID_SettingsCompartment_Toggle, true, [this] { return UpdateStates(); });
     HRESULT_CHECK_RETURN(hr, L"%s", L"_enabled->Initialize failed");
 
@@ -168,6 +171,7 @@ long EngineController::IsEnabled() const {
 #pragma warning(suppress: 4189)
     HRESULT hr = this->IsUserEnabled(&enabled);
     assert(SUCCEEDED(hr));
+    HRESULT_CHECK(hr, L"%s", L"this->IsUserEnabled failed");
     return enabled && _blocked == BlockedKind::Free;
 }
 

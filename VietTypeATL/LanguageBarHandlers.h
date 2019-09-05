@@ -34,6 +34,7 @@ public:
 
     virtual HRESULT Refresh() = 0;
 
+    // ensure that langbar init does not read engine state
     _Check_return_ HRESULT Initialize(
         _In_ EngineController* ec,
         _In_ ITfLangBarItemMgr* langBarItemMgr,
@@ -44,8 +45,7 @@ public:
     HRESULT Uninitialize();
 
 protected:
-    // RefreshableButtons are owned by EngineController
-    // so we don't want to hold an owning reference to EngineController here
+    // RefreshableButtons are owned by EngineController, so we don't want to hold an owning reference to EngineController here
     EngineController* _controller = nullptr;
     CComPtr<LanguageBarButton> _button;
 

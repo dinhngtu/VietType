@@ -25,6 +25,10 @@ SettingsDialog::SettingsDialog(DWORD defaultEnabled, const Telex::TelexConfig& t
 }
 
 _Check_return_ HRESULT SettingsDialog::ShowDialog(_Out_ INT_PTR* result) {
+    if (!Globals::DllInstance) {
+        DBG_DPRINT(L"%s", L"cannot obtain instance");
+        return E_FAIL;
+    }
     auto ret = DialogBoxParam(Globals::DllInstance, MAKEINTRESOURCE(IDD_SETTINGS), GetActiveWindow(), SettingsDialogProc, reinterpret_cast<LPARAM>(this));
     if (ret <= 0) {
         WINERROR_GLE_RETURN_HRESULT(L"%s", L"DialogBoxParam failed");

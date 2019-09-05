@@ -59,20 +59,27 @@ HRESULT CompositionManager::Uninitialize() {
 }
 
 HRESULT CompositionManager::RequestEditSession(_In_ ITfEditSession* session, _In_ ITfContext* context, _In_ DWORD flags) {
-    assert(_clientid != TF_CLIENTID_NULL);
-    assert(context);
+    if (_clientid == TF_CLIENTID_NULL || !context) {
+        DBG_DPRINT(L"%s", L"bad edit session request");
+        return E_FAIL;
+    }
     HRESULT hrSession;
     return context->RequestEditSession(_clientid, session, flags, &hrSession);
 }
 
 HRESULT CompositionManager::StartComposition(_In_ ITfContext* pContext) {
-    assert(_clientid != TF_CLIENTID_NULL);
-    assert(!_composition);
+    if (_clientid == TF_CLIENTID_NULL || _composition) {
+        DBG_DPRINT(L"%s", L"bad composition request");
+        return E_FAIL;
+    }
     return RequestEditSession(&_StartComposition, this, pContext);
 }
 
 HRESULT CompositionManager::EndComposition() {
-    assert(_clientid != TF_CLIENTID_NULL);
+    if (_clientid == TF_CLIENTID_NULL) {
+        DBG_DPRINT(L"%s", L"bad end composition request");
+        return E_FAIL;
+    }
     if (_composition) {
         return RequestEditSession(&_EndComposition, this, _context);
     } else {
