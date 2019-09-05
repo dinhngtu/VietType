@@ -22,43 +22,80 @@
 
 namespace VietType {
 
-static HMENU GetMenu() {
-    assert(Globals::DllInstance);
-    HMENU menu = LoadMenu(Globals::DllInstance, MAKEINTRESOURCE(IDR_MENU_TRAY));
-    menu = GetSubMenu(menu, 0);
+class SharedMenu {
+public:
+    SharedMenu() = delete;
+    SharedMenu(const SharedMenu&) = delete;
+    SharedMenu& operator=(const SharedMenu&) = delete;
+    ~SharedMenu() = default;
 
-    return menu;
+    explicit SharedMenu(HMENU menu) : _menu(menu, DestroyMenu) {
+    }
+
+    HMENU GetTrayMenu() {
+        if (!_menu) {
+            return NULL;
+        }
+        return GetSubMenu(_menu.get(), 0);
+    }
+
+    operator bool() const {
+        return !!_menu;
+    }
+
+private:
+    UNIQUE_HANDLE_DECL(HMENU, DestroyMenu) _menu;
+};
+
+static SharedMenu GetSharedMenu() {
+    if (!Globals::DllInstance) {
+        DBG_DPRINT(L"%s", L"cannot obtain instance");
+        return SharedMenu(NULL);
+    }
+    HMENU menu = LoadMenu(Globals::DllInstance, MAKEINTRESOURCE(IDR_MENU_TRAY));
+    if (!menu) {
+        WINERROR_PRINT(GetLastError(), L"%s", L"GetSharedMenu failed");
+        return SharedMenu(NULL);
+    }
+    return SharedMenu(menu);
 }
 
 static int PopMenu(POINT pt, const RECT* area) {
-    HMENU menu = GetMenu();
+    auto menu = GetSharedMenu();
     if (!menu) {
         DBG_DPRINT(L"%s", L"load menu failed");
+        return 0;
+    }
+    auto trayMenu = menu.GetTrayMenu();
+    if (!trayMenu) {
+        DBG_DPRINT(L"%s", L"load tray menu failed");
         return 0;
     }
     UINT flags = TPM_NONOTIFY | TPM_RETURNCMD;
     if (GetSystemMetrics(SM_MENUDROPALIGNMENT)) {
         flags |= TPM_RIGHTALIGN;
     }
-    int itemId = TrackPopupMenuEx(menu, flags, pt.x, pt.y, /* doesn't matter */ GetFocus(), NULL);
-    DestroyMenu(menu);
+    int itemId = TrackPopupMenuEx(trayMenu, flags, pt.x, pt.y, /* doesn't matter */ GetFocus(), NULL);
     return itemId;
 }
 
 static HRESULT CopyTfMenu(_In_ ITfMenu* menu) {
     HRESULT hr;
 
-    // HMENU menuSource = GetMenu();
-    std::unique_ptr<std::remove_pointer<HMENU>::type, decltype(&DestroyMenu)> menuSource(GetMenu(), &DestroyMenu);
+    auto menuSource = GetSharedMenu();
     if (!menuSource) {
         return E_FAIL;
     }
-    for (int i = 0; i < GetMenuItemCount(menuSource.get()); i++) {
+    auto trayMenu = menuSource.GetTrayMenu();
+    if (!trayMenu) {
+        return E_FAIL;
+    }
+    for (int i = 0; i < GetMenuItemCount(trayMenu); i++) {
         MENUITEMINFO mii;
         mii.cbSize = sizeof(MENUITEMINFO);
         mii.dwTypeData = NULL;
         mii.fMask = MIIM_STRING;
-        if (!GetMenuItemInfo(menuSource.get(), i, TRUE, &mii)) {
+        if (!GetMenuItemInfo(trayMenu, i, TRUE, &mii)) {
             WINERROR_GLE_RETURN_HRESULT(L"%s", L"GetMenuItemInfo failed");
         }
 
@@ -67,7 +104,7 @@ static HRESULT CopyTfMenu(_In_ ITfMenu* menu) {
         // the vector used here can't outlive the copy function, that's why the function has to do the item addition by itself
         std::vector<WCHAR> buf(mii.cch);
         mii.dwTypeData = &buf[0];
-        if (!GetMenuItemInfo(menuSource.get(), i, TRUE, &mii)) {
+        if (!GetMenuItemInfo(trayMenu, i, TRUE, &mii)) {
             WINERROR_GLE_RETURN_HRESULT(L"%s", L"GetMenuItemInfo failed");
         }
 
@@ -85,9 +122,9 @@ static HRESULT CopyTfMenu(_In_ ITfMenu* menu) {
             tfFlags |= TF_LBMENUF_GRAYED;
         }
 
-        HBITMAP tfBitmap = NULL;
+        auto tfBitmap = UNIQUE_HANDLE(static_cast<HBITMAP>(NULL), DeleteObject);
         if (mii.hbmpItem && mii.hbmpItem != reinterpret_cast<HBITMAP>(-1)) {
-            tfBitmap = static_cast<HBITMAP>(CopyImage(mii.hbmpItem, IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE));
+            tfBitmap.reset(static_cast<HBITMAP>(CopyImage(mii.hbmpItem, IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE)));
         }
         if (!tfBitmap) {
             break;
@@ -98,14 +135,12 @@ static HRESULT CopyTfMenu(_In_ ITfMenu* menu) {
         hr = menu->AddMenuItem(
             mii.wID,
             tfFlags,
-            tfBitmap,
+            tfBitmap.get(),
             NULL,
             &buf[0],
             static_cast<ULONG>(buf.size()),
             NULL);
         DBG_HRESULT_CHECK(hr, L"%s", L"menu->AddMenuItem failed");
-
-        DeleteObject(tfBitmap);
     }
 
     return S_OK;
@@ -155,8 +190,8 @@ static HRESULT OnMenuSelectAll(_In_ UINT id, _In_ EngineController* controller) 
             reinterpret_cast<va_list*>(&args[0]))) {
             WINERROR_GLE_RETURN_HRESULT(L"%s", L"FormatMessage failed");
         }
-        std::unique_ptr<WCHAR, decltype(&LocalFree)> text(ptext, &LocalFree);
 
+        auto text = UNIQUE_HANDLE(ptext, LocalFree);
         if (!MessageBox(NULL, text.get(), Globals::TextServiceDescription.c_str(), MB_OK | MB_ICONINFORMATION)) {
             WINERROR_GLE_RETURN_HRESULT(L"%s", L"MessageBox failed");
         }
