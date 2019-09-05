@@ -204,10 +204,6 @@ public:
         return hr;
     }
 
-    HRESULT ClearValue() {
-        return _dataCompartment.ClearValue();
-    }
-
     _Check_return_ HRESULT Initialize(
         _In_ IUnknown* punk,
         _In_ TfClientId clientid,

@@ -91,18 +91,6 @@ public:
         }
         return hr;
     }
-
-    HRESULT ClearValue() {
-        HRESULT hr;
-
-        VARIANT v;
-        VariantInit(&v);
-        v.vt = VT_EMPTY;
-        hr = _compartment->SetValue(_clientid, &v);
-        HRESULT_CHECK_RETURN(hr, L"%s", L"_compartment->SetValue failed");
-
-        return S_OK;
-    }
 };
 
 template <>

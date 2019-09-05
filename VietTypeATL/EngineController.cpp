@@ -59,6 +59,9 @@ _Check_return_ HRESULT EngineController::Initialize(
     hr = threadMgr->QueryInterface(&_langBarItemMgr);
     HRESULT_CHECK_RETURN(hr, L"%s", L"threadMgr->QueryInterface failed");
 
+    hr = InitLanguageBar();
+    HRESULT_CHECK_RETURN(hr, L"%s", L"InitLanguageBar failed");
+
     // init settings compartment & listener
 
     hr = CreateInitialize(&_settings, this, threadMgr, clientid);
@@ -67,14 +70,6 @@ _Check_return_ HRESULT EngineController::Initialize(
     // GUID_SettingsCompartment_Toggle is global
     hr = CreateInitialize(&_enabled, threadMgr, clientid, GUID_SettingsCompartment_Toggle, true, [this] { return UpdateStates(); });
     HRESULT_CHECK_RETURN(hr, L"%s", L"_enabled->Initialize failed");
-#ifdef _DEBUG
-    HRESULT hrDbgEn;
-    hrDbgEn = _enabled->ClearValue();
-    DBG_DPRINT(L"clear enabled %ld", hrDbgEn);
-    long dbgEn;
-    hrDbgEn = _enabled->GetValue(&dbgEn);
-    DBG_DPRINT(L"hr = %ld, dbgEn = %ld", hrDbgEn, dbgEn);
-#endif // _DEBUG
 
     // init GUID_COMPARTMENT_KEYBOARD_OPENCLOSE listener
 
@@ -88,23 +83,11 @@ _Check_return_ HRESULT EngineController::Initialize(
     hr = _openCloseCompartmentEventSink.Advise(openCloseSource, this);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_openCloseCompartmentEventSink.Advise failed");
 
-    // langbar
-
-    hr = InitLanguageBar();
-    HRESULT_CHECK_RETURN(hr, L"%s", L"InitLanguageBar failed");
-
     return S_OK;
 }
 
 HRESULT EngineController::Uninitialize() {
     HRESULT hr;
-
-    hr = UninitLanguageBar();
-    DBG_HRESULT_CHECK(hr, L"%s", L"UninitLanguageBar failed");
-
-    hr = _settings->Uninitialize();
-    DBG_HRESULT_CHECK(hr, L"%s", L"_settings->Uninitialize failed");
-    _settings.Release();
 
     hr = _openCloseCompartmentEventSink.Unadvise();
     DBG_HRESULT_CHECK(hr, L"%s", L"_openCloseCompartmentEventSink.Unadvise failed");
@@ -115,6 +98,13 @@ HRESULT EngineController::Uninitialize() {
     hr = _enabled->Uninitialize();
     DBG_HRESULT_CHECK(hr, L"%s", L"_enabled->Uninitialize failed");
     _enabled.Release();
+
+    hr = _settings->Uninitialize();
+    DBG_HRESULT_CHECK(hr, L"%s", L"_settings->Uninitialize failed");
+    _settings.Release();
+
+    hr = UninitLanguageBar();
+    DBG_HRESULT_CHECK(hr, L"%s", L"UninitLanguageBar failed");
 
     _langBarItemMgr.Release();
     _engine.reset();
