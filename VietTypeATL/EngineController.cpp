@@ -39,6 +39,7 @@ STDMETHODIMP EngineController::OnChange(__RPC__in REFGUID rguid) {
         long openclose;
         hr = _openCloseCompartment.GetValue(&openclose);
         assert(hr == S_OK);
+        HRESULT_CHECK(hr, L"%s", L"_openCloseCompartment.GetValue failed");
         _blocked = openclose ? _blocked : BlockedKind::Blocked;
         UpdateStates();
     }
@@ -170,7 +171,6 @@ long EngineController::IsEnabled() const {
     long enabled;
 #pragma warning(suppress: 4189)
     HRESULT hr = this->IsUserEnabled(&enabled);
-    assert(SUCCEEDED(hr));
     HRESULT_CHECK(hr, L"%s", L"this->IsUserEnabled failed");
     return enabled && _blocked == BlockedKind::Free;
 }

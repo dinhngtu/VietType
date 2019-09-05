@@ -26,9 +26,11 @@
 CVietTypeATLModule _AtlModule;
 
 // DLL Entry Point
-extern "C" BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved)
-{
+extern "C" BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved) {
     if (dwReason == DLL_PROCESS_ATTACH) {
+        if (!hInstance) {
+            return FALSE;
+        }
         VietType::Globals::DllInstance = hInstance;
     }
     return _AtlModule.DllMain(dwReason, lpReserved);

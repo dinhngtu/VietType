@@ -97,8 +97,10 @@ public:
         _Out_ HRESULT* hrSession,
         Args... args) {
 
-        assert(compositionManager->_clientid != TF_CLIENTID_NULL);
-        assert(context);
+        if (compositionManager->_clientid == TF_CLIENTID_NULL || !context) {
+            DBG_PRINT(L"%s", L"bad edit session request");
+            return E_FAIL;
+        }
         HRESULT hr;
 
         CComPtr<EditSession<CompositionManager*, ITfContext*, Args...>> session;

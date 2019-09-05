@@ -23,7 +23,9 @@
 namespace VietType {
 
 STDMETHODIMP KeyHandlerEditSession::DoEditSession(_In_ TfEditCookie ec) {
-    assert(_compositionManager);
+    if (!_compositionManager) {
+        return E_FAIL;
+    }
     DBG_DPRINT(L"ec = %ld", ec);
 
     HRESULT hr;
