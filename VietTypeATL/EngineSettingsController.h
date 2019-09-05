@@ -48,8 +48,11 @@ public:
     HRESULT LoadSettings();
     HRESULT CommitSettings(const SettingsDialog& dlg);
 
+    _Check_return_ HRESULT IsDefaultEnabled(_Out_ DWORD* pde) const;
+
 private:
     EngineController* _ec = nullptr;
+    CComPtr<RegistrySetting<DWORD>> _default_enabled;
     CComPtr<RegistrySetting<DWORD>> _tc_oa_uy_tone1;
     CComPtr<RegistrySetting<DWORD>> _tc_accept_dd;
 };

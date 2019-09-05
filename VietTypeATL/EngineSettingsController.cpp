@@ -21,6 +21,8 @@
 
 namespace VietType {
 
+// {B2FBD2E7-922F-4996-BE77-21085B91A8F0}
+static const GUID GUID_DefaultEnabledCompartment = { 0xb2fbd2e7, 0x922f, 0x4996, { 0xbe, 0x77, 0x21, 0x8, 0x5b, 0x91, 0xa8, 0xf0 } };
 // {57335895-0C34-40BA-83F7-72E90A39C222}
 static const GUID GUID_TelexConfigCompartment = { 0x57335895, 0xc34, 0x40ba, { 0x83, 0xf7, 0x72, 0xe9, 0xa, 0x39, 0xc2, 0x22 } };
 
@@ -31,6 +33,21 @@ _Check_return_ HRESULT EngineSettingsController::Initialize(
     HRESULT hr;
 
     _ec = ec;
+
+    hr = CreateInitialize(
+        &_default_enabled,
+        HKEY_CURRENT_USER,
+        Globals::ConfigKeyName.c_str(),
+        L"default_enabled",
+        threadMgr,
+        clientid,
+        GUID_DefaultEnabledCompartment);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(_default_enabled) failed");
+#ifdef _DEBUG
+    DWORD def;
+    HRESULT hrDef = _default_enabled->GetValue(&def);
+    DBG_DPRINT(L"hr = %ld, def = %ld", hrDef, def);
+#endif // _DEBUG
 
     hr = CreateInitialize(
         &_tc_oa_uy_tone1,
@@ -70,11 +87,19 @@ HRESULT EngineSettingsController::Uninitialize() {
     HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_oa_uy_tone1->Uninitialize failed");
     _tc_oa_uy_tone1.Release();
 
+    hr = _default_enabled->Uninitialize();
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_default_enabled->Uninitialize failed");
+    _default_enabled.Release();
+
     return S_OK;
 }
 
 HRESULT EngineSettingsController::LoadSettings() {
     HRESULT hr;
+
+    DWORD default_enabled;
+    hr = this->IsDefaultEnabled(&default_enabled);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"this->IsDefaultEnabled failed");
 
     DWORD oa_uy_tone1 = true;
     hr = _tc_oa_uy_tone1->GetValueOrWriteback(&oa_uy_tone1, _ec->GetEngine().GetConfig().oa_uy_tone1);
@@ -94,14 +119,19 @@ HRESULT EngineSettingsController::LoadSettings() {
 
 HRESULT EngineSettingsController::CommitSettings(const SettingsDialog& dlg) {
     HRESULT hr;
-    _ec->GetEngine().SetConfig(dlg.GetTelexConfig());
+    _ec->GetEngine().SetConfig(dlg.GetConfig().TelexConfig);
 
-    hr = _tc_oa_uy_tone1->SetValue(static_cast<DWORD>(dlg.GetTelexConfig().oa_uy_tone1));
+    hr = _default_enabled->SetValue(static_cast<DWORD>(dlg.GetConfig().DefaultEnabled));
+    hr = _tc_oa_uy_tone1->SetValue(static_cast<DWORD>(dlg.GetConfig().TelexConfig.oa_uy_tone1));
     HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_oa_uy_tone1->SetValue failed");
-    hr = _tc_accept_dd->SetValue(static_cast<DWORD>(dlg.GetTelexConfig().accept_separate_dd));
+    hr = _tc_accept_dd->SetValue(static_cast<DWORD>(dlg.GetConfig().TelexConfig.accept_separate_dd));
     HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_accept_dd->SetValue failed");
 
     return S_OK;
+}
+
+_Check_return_ HRESULT EngineSettingsController::IsDefaultEnabled(_Out_ DWORD* pde) const {
+    return _default_enabled->GetValueOrWriteback(pde, 0);
 }
 
 }

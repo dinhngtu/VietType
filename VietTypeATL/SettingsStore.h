@@ -114,6 +114,9 @@ public:
         LSTATUS err;
         err = SettingsStore::regType<T>::SetValue(_key, _valueName.c_str(), val);
         WINERROR_CHECK_RETURN_HRESULT(err, L"%s", L"SetValue failed");
+        if (!_notifyCompartment.GetCompartment()) {
+            return S_OK;
+        }
         long oldNotify;
         hr = _notifyCompartment.GetValueOrWriteback(&oldNotify, 0);
         HRESULT_CHECK_RETURN(hr, L"%s", L"_notifyCompartment.GetValueOrWriteback failed");
@@ -137,11 +140,19 @@ public:
         auto err = _key.Create(hkeyParent, keyName.c_str(), nullptr, 0, KEY_QUERY_VALUE | KEY_SET_VALUE);
         WINERROR_CHECK_RETURN_HRESULT(err, L"%s", L"_key.Create failed");
 
-        return SettingsStore::InitializeSink(punk, clientid, guidNotifyCompartment, _notifyCompartment, _notifyCompartmentEventSink, this, global);
+        if (guidNotifyCompartment == GUID_NULL) {
+            return S_OK;
+        } else {
+            return SettingsStore::InitializeSink(punk, clientid, guidNotifyCompartment, _notifyCompartment, _notifyCompartmentEventSink, this, global);
+        }
     }
 
     HRESULT Uninitialize() {
-        return SettingsStore::UninitializeSink(_notifyCompartment, _notifyCompartmentEventSink);
+        if (!_notifyCompartment.GetCompartment()) {
+            return S_OK;
+        } else {
+            return SettingsStore::UninitializeSink(_notifyCompartment, _notifyCompartmentEventSink);
+        }
     }
 
 private:
@@ -163,13 +174,15 @@ public:
     DECLARE_PROTECT_FINAL_CONSTRUCT()
 
     // Inherited via Setting
-    virtual _Check_return_ _Success_(return == S_OK) HRESULT GetValue(_Out_ T* val) override {
+    virtual _Check_return_ HRESULT GetValue(_Out_ T* val) override {
         if (_cache.has_value()) {
             *val = _cache.value();
             return S_OK;
         } else {
-            HRESULT hr = _dataCompartment.GetValueOrWriteback(val, T());
-            _cache = *val;
+            HRESULT hr = _dataCompartment.GetValue(val);
+            if (SUCCEEDED(hr)) {
+                _cache = *val;
+            }
             return hr;
         }
     }
@@ -189,6 +202,10 @@ public:
             _cache = val;
         }
         return hr;
+    }
+
+    HRESULT ClearValue() {
+        return _dataCompartment.ClearValue();
     }
 
     _Check_return_ HRESULT Initialize(
@@ -214,7 +231,9 @@ private:
         T val;
         HRESULT hr = _dataCompartment.GetValue(&val);
         HRESULT_CHECK_RETURN(hr, L"%s", L"_dataCompartment.GetValue failed");
-        _cache = val;
+        if (hr == S_OK) {
+            _cache = val;
+        }
         return _callback_chain();
     }
 

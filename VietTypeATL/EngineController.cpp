@@ -61,9 +61,20 @@ _Check_return_ HRESULT EngineController::Initialize(
 
     // init settings compartment & listener
 
+    hr = CreateInitialize(&_settings, this, threadMgr, clientid);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(_settings) failed");
+
     // GUID_SettingsCompartment_Toggle is global
     hr = CreateInitialize(&_enabled, threadMgr, clientid, GUID_SettingsCompartment_Toggle, true, [this] { return UpdateStates(); });
     HRESULT_CHECK_RETURN(hr, L"%s", L"_enabled->Initialize failed");
+#ifdef _DEBUG
+    HRESULT hrDbgEn;
+    hrDbgEn = _enabled->ClearValue();
+    DBG_DPRINT(L"clear enabled %ld", hrDbgEn);
+    long dbgEn;
+    hrDbgEn = _enabled->GetValue(&dbgEn);
+    DBG_DPRINT(L"hr = %ld, dbgEn = %ld", hrDbgEn, dbgEn);
+#endif // _DEBUG
 
     // init GUID_COMPARTMENT_KEYBOARD_OPENCLOSE listener
 
@@ -76,9 +87,6 @@ _Check_return_ HRESULT EngineController::Initialize(
 
     hr = _openCloseCompartmentEventSink.Advise(openCloseSource, this);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_openCloseCompartmentEventSink.Advise failed");
-
-    hr = CreateInitialize(&_settings, this, threadMgr, clientid);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(_settings) failed");
 
     // langbar
 
@@ -123,7 +131,18 @@ const Telex::TelexEngine& EngineController::GetEngine() const {
 }
 
 _Check_return_ HRESULT EngineController::IsUserEnabled(_Out_ long* penabled) const {
-    return _enabled->GetValueOrWriteback(penabled, 1);
+    HRESULT hr;
+    DWORD defaultEnabled;
+
+    hr = _settings->IsDefaultEnabled(&defaultEnabled);
+    if (FAILED(hr)) {
+        defaultEnabled = 0;
+        HRESULT_CHECK(hr, L"%s", L"_default_enabled->GetValueOrWriteback failed");
+    }
+
+    hr = _enabled->GetValueOrWriteback(penabled, static_cast<LONG>(defaultEnabled));
+    DBG_DPRINT(L"getting enabled with writeback hr = %ld enabled = %ld", hr, *penabled);
+    return hr;
 }
 
 HRESULT EngineController::ToggleUserEnabled() {
@@ -136,7 +155,10 @@ HRESULT EngineController::ToggleUserEnabled() {
 
     long enabled;
     hr = this->IsUserEnabled(&enabled);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"this->IsUserEnabled failed");
+    HRESULT_CHECK(hr, L"%s", L"this->IsUserEnabled failed");
+    if (FAILED(hr)) {
+        enabled = false;
+    }
 
     hr = _enabled->SetValue(!enabled);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_enabled->SetValue failed");
@@ -165,6 +187,19 @@ void EngineController::SetBlocked(_In_ EngineController::BlockedKind blocked) {
 
 _Check_return_ HRESULT EngineController::GetOpenClose(_Out_ long* openclose) {
     return _openCloseCompartment.GetValue(openclose);
+}
+
+SettingsDialog EngineController::CreateSettingsDialog() {
+    HRESULT hr;
+    DWORD defaultEnabled;
+
+    hr = _settings->IsDefaultEnabled(&defaultEnabled);
+    if (FAILED(hr)) {
+        defaultEnabled = 0;
+        HRESULT_CHECK(hr, L"%s", L"_default_enabled->GetValueOrWriteback failed");
+    }
+
+    return SettingsDialog(defaultEnabled, _engine->GetConfig());
 }
 
 HRESULT EngineController::CommitSettings(const SettingsDialog& dlg) {

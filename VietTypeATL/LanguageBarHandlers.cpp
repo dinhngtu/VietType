@@ -121,7 +121,7 @@ static HRESULT OnMenuSelectAll(_In_ UINT id, _In_ EngineController* controller) 
         if (!controller) {
             return E_INVALIDARG;
         }
-        auto dlg = SettingsDialog(controller->GetEngine().GetConfig());
+        auto dlg = controller->CreateSettingsDialog();
         INT_PTR result;
         hr = dlg.ShowDialog(&result);
         HRESULT_CHECK_RETURN(hr, L"%s", L"dlg.ShowDialog failed");

@@ -97,6 +97,7 @@ STDMETHODIMP TextService::ActivateEx(_In_ ITfThreadMgr* ptim, _In_ TfClientId ti
     // this already sets enabled state if the compartment is empty
     hr = _engineController->IsUserEnabled(&enabled);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_engineController->IsUserEnabled failed");
+    DBG_DPRINT(L"hr = %ld, enabled = %ld", hr, enabled);
 
     hr = CreateInitialize(&_keyEventSink, ptim, tid, _compositionManager, _engineController);
     HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(&_keyEventSink) failed");

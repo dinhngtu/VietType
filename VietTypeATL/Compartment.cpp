@@ -27,7 +27,7 @@
 
 namespace VietType {
 
-_Ret_valid_ ITfCompartment* CompartmentBase::GetCompartment() {
+_Ret_maybenull_ ITfCompartment* CompartmentBase::GetCompartment() {
     return _compartment;
 }
 

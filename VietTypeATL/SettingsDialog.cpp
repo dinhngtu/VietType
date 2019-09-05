@@ -19,7 +19,8 @@
 
 namespace VietType {
 
-SettingsDialog::SettingsDialog(const Telex::TelexConfig& telexConfig) {
+SettingsDialog::SettingsDialog(DWORD defaultEnabled, const Telex::TelexConfig& telexConfig) {
+    _data.DefaultEnabled = defaultEnabled;
     _data.TelexConfig = telexConfig;
 }
 
@@ -32,8 +33,8 @@ _Check_return_ HRESULT SettingsDialog::ShowDialog(_Out_ INT_PTR* result) {
     return S_OK;
 }
 
-const Telex::TelexConfig& SettingsDialog::GetTelexConfig() const {
-    return _data.TelexConfig;
+const SettingsDialogData& SettingsDialog::GetConfig() const {
+    return _data;
 }
 
 INT_PTR CALLBACK SettingsDialog::SettingsDialogProc(_In_ HWND hwndDlg, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam) {
@@ -42,6 +43,7 @@ INT_PTR CALLBACK SettingsDialog::SettingsDialogProc(_In_ HWND hwndDlg, _In_ UINT
         instance = reinterpret_cast<SettingsDialog*>(lParam);
         assert(instance);
 
+        CheckDlgButton(hwndDlg, IDC_SETTINGS_DEFAULT_ENABLED, instance->Property<IDC_SETTINGS_DEFAULT_ENABLED>() ? BST_CHECKED : BST_UNCHECKED);
         CheckDlgButton(hwndDlg, IDC_SETTINGS_OA_UY, instance->Property<IDC_SETTINGS_OA_UY>() ? BST_CHECKED : BST_UNCHECKED);
         CheckDlgButton(hwndDlg, IDC_SETTINGS_ACCEPT_DD, instance->Property<IDC_SETTINGS_ACCEPT_DD>() ? BST_CHECKED : BST_UNCHECKED);
 
@@ -53,6 +55,7 @@ INT_PTR CALLBACK SettingsDialog::SettingsDialogProc(_In_ HWND hwndDlg, _In_ UINT
         assert(instance);
         switch (LOWORD(wParam)) {
         case IDOK:
+            instance->Property<IDC_SETTINGS_DEFAULT_ENABLED>() = IsDlgButtonChecked(hwndDlg, IDC_SETTINGS_DEFAULT_ENABLED) != BST_UNCHECKED;
             instance->Property<IDC_SETTINGS_OA_UY>() = IsDlgButtonChecked(hwndDlg, IDC_SETTINGS_OA_UY) != BST_UNCHECKED;
             instance->Property<IDC_SETTINGS_ACCEPT_DD>() = IsDlgButtonChecked(hwndDlg, IDC_SETTINGS_ACCEPT_DD) != BST_UNCHECKED;
 
@@ -78,6 +81,11 @@ bool& SettingsDialog::Property<IDC_SETTINGS_OA_UY>() {
 template <>
 bool& SettingsDialog::Property<IDC_SETTINGS_ACCEPT_DD>() {
     return _data.TelexConfig.accept_separate_dd;
+}
+
+template <>
+bool& SettingsDialog::Property<IDC_SETTINGS_DEFAULT_ENABLED>() {
+    return _data.DefaultEnabled;
 }
 
 }

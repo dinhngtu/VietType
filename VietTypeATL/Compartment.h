@@ -29,7 +29,7 @@ public:
     ~CompartmentBase() = default;
 
 public:
-    _Ret_valid_ ITfCompartment* GetCompartment();
+    _Ret_maybenull_ ITfCompartment* GetCompartment();
     _Check_return_ HRESULT GetCompartmentSource(_COM_Outptr_ ITfSource** ppSource);
 
     _Check_return_ HRESULT Initialize(_In_ IUnknown* punk, _In_ TfClientId clientid, _In_ const GUID& guidCompartment, _In_ bool global = false);
@@ -90,6 +90,18 @@ public:
             return hr;
         }
         return hr;
+    }
+
+    HRESULT ClearValue() {
+        HRESULT hr;
+
+        VARIANT v;
+        VariantInit(&v);
+        v.vt = VT_EMPTY;
+        hr = _compartment->SetValue(_clientid, &v);
+        HRESULT_CHECK_RETURN(hr, L"%s", L"_compartment->SetValue failed");
+
+        return S_OK;
     }
 };
 
