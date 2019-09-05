@@ -3,6 +3,7 @@ param([switch] $Force)
 Get-Content "$PSScriptRoot\Version.ps1" | Invoke-Expression
 
 # compile happens in bin\Configuration folder
+$vcsRev = hg id -i
 $wixFile = "..\..\Version.wxi"
 $wixOld = Get-Content -ErrorAction Ignore -Raw $wixFile
 $wixNew = `
@@ -10,6 +11,7 @@ $wixNew = `
 <?xml version="1.0" encoding="utf-8"?>
 <Include>
   <?define productVersion="$($productVersion[0]).$($productVersion[1]).$($productVersion[2]).$($productVersion[3])" ?>
+  <?define vcsRev="$vcsRev" ?>
 </Include>
 
 "@

@@ -28,7 +28,7 @@ along with VietType.  If not, see <https://www.gnu.org/licenses/>.
     Manufacturer="Dinh Ngoc Tu"
     UpgradeCode="e00ac838-881d-4301-aac5-0a723bb0b0ef">
     
-    <Package InstallerVersion="400" Compressed="yes" InstallScope="perMachine" Comments="$(var.productVersion)" />
+    <Package InstallerVersion="400" Compressed="yes" InstallScope="perMachine" Comments="$(var.productVersion)-$(var.vcsRev)" />
 
     <MajorUpgrade
       DowngradeErrorMessage="A newer version of [ProductName] is already installed."
