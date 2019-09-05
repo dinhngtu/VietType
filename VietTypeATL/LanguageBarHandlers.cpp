@@ -126,9 +126,6 @@ static HRESULT CopyTfMenu(_In_ ITfMenu* menu) {
         if (mii.hbmpItem && mii.hbmpItem != reinterpret_cast<HBITMAP>(-1)) {
             tfBitmap.reset(static_cast<HBITMAP>(CopyImage(mii.hbmpItem, IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE)));
         }
-        if (!tfBitmap) {
-            break;
-        }
 
         // hbmpMask is not supposed to be NULL here but it still works anyway so we suppress the warning
 #pragma warning(suppress: 6387)
