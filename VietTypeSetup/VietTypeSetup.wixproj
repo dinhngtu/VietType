@@ -67,7 +67,7 @@
     <PreBuildEvent>powershell.exe -nop -noni -executionpolicy bypass $(SolutionDir)\UpdateVersionWix.ps1</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>autosign $(TargetPath)</PostBuildEvent>
+    <PostBuildEvent>cmd /c if "$(ConfigurationName)" == "Release" autosign $(TargetPath)</PostBuildEvent>
   </PropertyGroup>
   <!--
   To modify your build process, add your task inside one of the targets below and uncomment it.
