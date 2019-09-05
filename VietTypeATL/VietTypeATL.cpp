@@ -39,7 +39,6 @@ STDAPI DllGetClassObject(_In_ REFCLSID rclsid, _In_ REFIID riid, _Outptr_ LPVOID
 }
 
 // DllRegisterServer - Adds entries to the system registry.
-_Use_decl_annotations_
 STDAPI DllRegisterServer(void) {
     // registers object, typelib and all interfaces in typelib
     HRESULT hr = _AtlModule.DllRegisterServer();
@@ -47,7 +46,6 @@ STDAPI DllRegisterServer(void) {
 }
 
 // DllUnregisterServer - Removes entries from the system registry.
-_Use_decl_annotations_
 STDAPI DllUnregisterServer(void) {
     HRESULT hr = _AtlModule.DllUnregisterServer();
     return hr;

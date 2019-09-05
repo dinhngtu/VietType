@@ -32,7 +32,7 @@ namespace VietType {
 // - modify EngineSettingsController::LoadSettings/CommitSettings to load/commit settings to the engine
 
 struct SettingsDialogData {
-    bool DefaultEnabled;
+    bool DefaultEnabled = false;
     Telex::TelexConfig TelexConfig;
 };
 

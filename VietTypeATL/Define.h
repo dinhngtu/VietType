@@ -82,4 +82,5 @@ void _errorprint(_In_ LPCWSTR func, _In_ int line, _In_ DWORD err, _In_ LPCWSTR 
 
 // close a handle, free a memory block, or release some other resource
 // auto handle = UNIQUE_HANDLE(CreateFile(...), CloseHandle);
+#define UNIQUE_HANDLE_DECL(ptype, deleter) std::unique_ptr<std::remove_pointer<ptype>::type, decltype(&(deleter))>
 #define UNIQUE_HANDLE(value, deleter) std::unique_ptr<std::remove_pointer<decltype(value)>::type, decltype(&(deleter))>((value), &(deleter))
