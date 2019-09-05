@@ -56,17 +56,19 @@ void _errorprint(_In_ LPCWSTR func, _In_ int line, _In_ DWORD err, _In_ LPCWSTR 
 
 #define HRESULT_PRINT(hr, fmt, ...) _errorprint(__FUNCTIONW__, __LINE__, hr, L"%s:%d: HRESULT error %lx (%s): " fmt, __VA_ARGS__)
 // check if HRESULT is successful; if not, print error information to debugger output
-#define HRESULT_CHECK(hr, fmt, ...) if (FAILED(hr)) { HRESULT_PRINT(hr, fmt, __VA_ARGS__); }
-// check if HRESULT is successful; if not, print error information to debugger output and return from calling function
-#define HRESULT_CHECK_RETURN(hr, fmt, ...) if (FAILED(hr)) { HRESULT_PRINT(hr, fmt, __VA_ARGS__); return hr; }
-// check if HRESULT is successful; if not, set *ptr to nullptr, print error information to debugger output and return from calling function
-#define HRESULT_CHECK_RETURN_OUTPTR(hr, ptr, fmt, ...) if (FAILED(hr)) { *ptr = nullptr; HRESULT_PRINT(hr, fmt, __VA_ARGS__); return hr; }
+#define HRESULT_CHECK_NOASSERT(hr, fmt, ...) if (FAILED(hr)) { HRESULT_PRINT(hr, fmt, __VA_ARGS__); }
+// assert if HRESULT is successful; if not, print error information to debugger output
+#define HRESULT_CHECK(hr, fmt, ...) if (FAILED(hr)) { assert(!FAILED(hr)); HRESULT_PRINT(hr, fmt, __VA_ARGS__); }
+// assert if HRESULT is successful; if not, print error information to debugger output and return from calling function
+#define HRESULT_CHECK_RETURN(hr, fmt, ...) if (FAILED(hr)) { assert(!FAILED(hr)); HRESULT_PRINT(hr, fmt, __VA_ARGS__); return hr; }
+// assert if HRESULT is successful; if not, set *ptr to nullptr, print error information to debugger output and return from calling function
+#define HRESULT_CHECK_RETURN_OUTPTR(hr, ptr, fmt, ...) if (FAILED(hr)) { assert(!FAILED(hr)); *ptr = nullptr; HRESULT_PRINT(hr, fmt, __VA_ARGS__); return hr; }
 
 #ifdef _DEBUG
 // if in debug builds, print formatted string to debugger output
 #define DBG_DPRINT DPRINT
 // if in debug builds, check if HRESULT is successful; if not, print error information to debugger output
-#define DBG_HRESULT_CHECK HRESULT_CHECK
+#define DBG_HRESULT_CHECK HRESULT_CHECK_NOASSERT
 #else
 #define DBG_DPRINT(fmt, ...)
 #define DBG_HRESULT_CHECK(hr, fmt, ...)
@@ -74,8 +76,8 @@ void _errorprint(_In_ LPCWSTR func, _In_ int line, _In_ DWORD err, _In_ LPCWSTR 
 
 // format win32 error and print formatted string to debugger output
 #define WINERROR_PRINT(err, fmt, ...) _errorprint(__FUNCTIONW__, __LINE__, err, L"%s:%d: WINERROR %lx (%s): " fmt L"\n", __VA_ARGS__)
-// format win32 error, print formatted string to debugger output, and return from calling function with error converted to HRESULT
-#define WINERROR_CHECK_RETURN_HRESULT(err, fmt, ...) if (err != ERROR_SUCCESS) { WINERROR_PRINT(err, fmt, __VA_ARGS__); return HRESULT_FROM_WIN32(err); }
+// assert & format win32 error, print formatted string to debugger output, and return from calling function with error converted to HRESULT
+#define WINERROR_CHECK_RETURN_HRESULT(err, fmt, ...) if (err != ERROR_SUCCESS) { assert(err == ERROR_SUCCESS); WINERROR_PRINT(err, fmt, __VA_ARGS__); return HRESULT_FROM_WIN32(err); }
 // get and format win32 error, print formatted string to debugger output, and return from calling function with error converted to HRESULT
 #define WINERROR_GLE_RETURN_HRESULT(fmt, ...) WINERROR_CHECK_RETURN_HRESULT(GetLastError(), fmt, __VA_ARGS__)
 
