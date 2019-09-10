@@ -71,7 +71,7 @@ public:
         Args... args) {
 
         if (compositionManager->_clientid == TF_CLIENTID_NULL || !context) {
-            DBG_PRINT(L"%s", L"bad edit session request");
+            DBG_DPRINT(L"%s", L"bad edit session request");
             return E_FAIL;
         }
         HRESULT hr;
@@ -98,7 +98,7 @@ public:
         Args... args) {
 
         if (compositionManager->_clientid == TF_CLIENTID_NULL || !context) {
-            DBG_PRINT(L"%s", L"bad edit session request");
+            DBG_DPRINT(L"%s", L"bad edit session request");
             return E_FAIL;
         }
         HRESULT hr;
