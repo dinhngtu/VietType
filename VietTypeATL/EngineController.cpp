@@ -139,11 +139,11 @@ _Check_return_ HRESULT EngineController::IsUserEnabled(_Out_ long* penabled) con
     DBG_DPRINT(L"default enabled %ld", defaultEnabled);
 
     hr = _enabled->GetValueOrWriteback(penabled, static_cast<LONG>(defaultEnabled));
-    if (*penabled != 0 && *penabled != 1) {
+    if (*penabled != 0 && *penabled != -1) {
         DBG_DPRINT(L"resetting enabled from %ld to %ld", *penabled, defaultEnabled);
         // _enabled may contain garbage value, reset if it's the case
-        *penabled = defaultEnabled;
-        DBG_HRESULT_CHECK(_enabled->SetValue(defaultEnabled), L"%s", L"_enabled reset failed");
+        *penabled = defaultEnabled == 0 ? 0 : -1;
+        DBG_HRESULT_CHECK(_enabled->SetValue(*penabled), L"%s", L"_enabled reset failed");
     }
     DBG_DPRINT(L"getting enabled with writeback hr = %ld enabled = %ld", hr, *penabled);
     return hr;
@@ -165,7 +165,7 @@ HRESULT EngineController::ToggleUserEnabled() {
     }
 
     DBG_DPRINT(L"toggling enabled from %ld", enabled);
-    hr = _enabled->SetValue(!enabled);
+    hr = _enabled->SetValue(enabled == 0 ? -1 : 0);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_enabled->SetValue failed");
     hr = UpdateStates();
     HRESULT_CHECK_RETURN(hr, L"%s", L"UpdateEnabled failed");
