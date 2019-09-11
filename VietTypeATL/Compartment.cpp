@@ -55,6 +55,28 @@ _Check_return_ HRESULT CompartmentBase::Initialize(_In_ IUnknown* punk, _In_ TfC
     hr = compartmentMgr->GetCompartment(guidCompartment, &_compartment);
     HRESULT_CHECK_RETURN(hr, L"%s", L"compartmentMgr->GetCompartment failed");
 
+#ifdef _DEBUG
+    if (global) {
+        HRESULT dbgHr;
+        VARIANT v;
+        dbgHr = _compartment->GetValue(&v);
+        DBG_HRESULT_CHECK(dbgHr, L"%s", L"test _compartment->GetValue failed");
+        DBG_DPRINT(L"created global compartment vartype=%u long=%ld", v.vt, v.lVal);
+        CComPtr<IEnumGUID> globalCompartments;
+        dbgHr = compartmentMgr->EnumCompartments(&globalCompartments);
+        DBG_HRESULT_CHECK(dbgHr, L"%s", L"compartmentMgr->EnumCompartments failed");
+        while (1) {
+            GUID guid;
+            dbgHr = globalCompartments->Next(1, &guid, NULL);
+            if (dbgHr == S_OK) {
+                DBG_DPRINT(L"global compartment " GUID_WFORMAT, GUID_COMPONENTS(guid));
+            } else {
+                break;
+            }
+        }
+    }
+#endif // _DEBUG
+
     _clientid = clientid;
 
     return S_OK;

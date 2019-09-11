@@ -109,6 +109,8 @@ HRESULT EngineSettingsController::LoadSettings() {
     hr = _tc_accept_dd->GetValueOrWriteback(&accept_dd, _ec->GetEngine().GetConfig().accept_separate_dd);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_accept_dd->GetValueOrWriteback failed");
 
+    DBG_DPRINT(L"loading settings default=%ld oa_uy=%ld accept_dd=%ld", default_enabled, oa_uy_tone1, accept_dd);
+
     auto cfg = _ec->GetEngine().GetConfig();
     cfg.oa_uy_tone1 = static_cast<bool>(oa_uy_tone1);
     cfg.accept_separate_dd = static_cast<bool>(accept_dd);

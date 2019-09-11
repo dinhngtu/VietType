@@ -164,9 +164,7 @@ extern "C" __declspec(dllexport) HRESULT __cdecl RegisterCategories() {
     HRESULT_CHECK_RETURN(hr, L"%s", L"categoryMgr.CoCreateInstance failed");
 
     for (const auto& cat : SupportedCategories) {
-        DBG_DPRINT(
-            L"registering %08lx-%04hx-%04hx-%02hhx%02hhx-%02hhx%02hhx%02hhx%02hhx%02hhx%02hhx",
-            cat.Data1, cat.Data2, cat.Data3, cat.Data4[0], cat.Data4[1], cat.Data4[2], cat.Data4[3], cat.Data4[4], cat.Data4[5], cat.Data4[6], cat.Data4[7]);
+        DBG_DPRINT(L"registering " GUID_WFORMAT, GUID_COMPONENTS(cat));
         hr = categoryMgr->RegisterCategory(VietType::Globals::CLSID_TextService, cat, VietType::Globals::CLSID_TextService);
         HRESULT_CHECK_RETURN(hr, L"%s", L"categoryMgr->RegisterCategory failed");
     }
@@ -190,9 +188,7 @@ extern "C" __declspec(dllexport) HRESULT __cdecl UnregisterCategories() {
     while (1) {
         hr = registeredCategories->Next(1, &cat, &fetched);
         if (hr == S_OK) {
-            DBG_DPRINT(
-                L"unregistering %08lx-%04hx-%04hx-%02hhx%02hhx-%02hhx%02hhx%02hhx%02hhx%02hhx%02hhx",
-                cat.Data1, cat.Data2, cat.Data3, cat.Data4[0], cat.Data4[1], cat.Data4[2], cat.Data4[3], cat.Data4[4], cat.Data4[5], cat.Data4[6], cat.Data4[7]);
+            DBG_DPRINT(L"unregistering " GUID_WFORMAT, GUID_COMPONENTS(cat));
             hr = categoryMgr->UnregisterCategory(VietType::Globals::CLSID_TextService, cat, VietType::Globals::CLSID_TextService);
             HRESULT_CHECK_RETURN(hr, L"%s", L"categoryMgr->UnregisterCategory failed");
         } else {
