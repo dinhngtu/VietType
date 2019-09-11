@@ -204,6 +204,10 @@ public:
         return hr;
     }
 
+    _Check_return_ HRESULT GetValueDirect(_Out_ T* val) {
+        return _dataCompartment.GetValue(val);
+    }
+
     _Check_return_ HRESULT Initialize(
         _In_ IUnknown* punk,
         _In_ TfClientId clientid,

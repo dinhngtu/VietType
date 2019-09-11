@@ -87,6 +87,8 @@ private:
     HRESULT UninitLanguageBar();
 
 private:
+    bool _initialized = false;
+
     std::shared_ptr<Telex::TelexEngine> _engine;
     CComPtr<ITfLangBarItemMgr> _langBarItemMgr;
 

@@ -60,20 +60,23 @@ _Check_return_ HRESULT EngineController::Initialize(
     hr = threadMgr->QueryInterface(&_langBarItemMgr);
     HRESULT_CHECK_RETURN(hr, L"%s", L"threadMgr->QueryInterface failed");
 
-    // langbar init only inits the two buttons and does not read engine state
-    // so this can be done safely before engine state init
-    hr = InitLanguageBar();
-    HRESULT_CHECK_RETURN(hr, L"%s", L"InitLanguageBar failed");
-
     // init settings compartment & listener
-
     hr = CreateInitialize(&_settings, this, threadMgr, clientid);
     HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(_settings) failed");
 
     // GUID_SettingsCompartment_Toggle is global
-    // langbar must be ready before this point to ensure that UpdateStates() calls execute correctly
     hr = CreateInitialize(&_enabled, threadMgr, clientid, GUID_SettingsCompartment_Toggle, true, [this] { return UpdateStates(); });
     HRESULT_CHECK_RETURN(hr, L"%s", L"_enabled->Initialize failed");
+#ifdef _DEBUG
+    long dbgEnabled = 0;
+    HRESULT dbgHr = _enabled->GetValueDirect(&dbgEnabled);
+    DBG_DPRINT(L"dbgHr %ld dbgEnabled %ld", dbgHr, dbgEnabled);
+#endif // _DEBUG
+
+    this->_initialized = true;
+
+    hr = InitLanguageBar();
+    HRESULT_CHECK_RETURN(hr, L"%s", L"InitLanguageBar failed");
 
     // init GUID_COMPARTMENT_KEYBOARD_OPENCLOSE listener
 
@@ -133,9 +136,11 @@ _Check_return_ HRESULT EngineController::IsUserEnabled(_Out_ long* penabled) con
         defaultEnabled = 0;
         HRESULT_CHECK(hr, L"%s", L"_default_enabled->GetValueOrWriteback failed");
     }
+    DBG_DPRINT(L"default enabled %ld", defaultEnabled);
 
     hr = _enabled->GetValueOrWriteback(penabled, static_cast<LONG>(defaultEnabled));
     if (*penabled != 0 && *penabled != 1) {
+        DBG_DPRINT(L"resetting enabled from %ld to %ld", *penabled, defaultEnabled);
         // _enabled may contain garbage value, reset if it's the case
         *penabled = defaultEnabled;
         DBG_HRESULT_CHECK(_enabled->SetValue(defaultEnabled), L"%s", L"_enabled reset failed");
@@ -159,6 +164,7 @@ HRESULT EngineController::ToggleUserEnabled() {
         enabled = false;
     }
 
+    DBG_DPRINT(L"toggling enabled from %ld", enabled);
     hr = _enabled->SetValue(!enabled);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_enabled->SetValue failed");
     hr = UpdateStates();
@@ -207,6 +213,12 @@ HRESULT EngineController::CommitSettings(const SettingsDialog& dlg) {
 
 HRESULT EngineController::UpdateStates() {
     HRESULT hr;
+
+    DBG_DPRINT(L"%s", L"called");
+
+    if (!this->_initialized) {
+        return S_FALSE;
+    }
 
     long enabled;
     hr = this->IsUserEnabled(&enabled);
