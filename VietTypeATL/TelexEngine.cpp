@@ -1,4 +1,4 @@
-// Copyright (c) Dinh Ngoc Tu.
+// Copyright (c) 2018 Dinh Ngoc Tu.
 // 
 // This file is part of VietType.
 // 

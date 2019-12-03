@@ -1,4 +1,4 @@
-// Copyright (c) Dinh Ngoc Tu.
+// Copyright (c) 2018 Dinh Ngoc Tu.
 // 
 // This file is part of VietType.
 // 
@@ -15,13 +15,15 @@
 // You should have received a copy of the GNU General Public License
 // along with VietType.  If not, see <https://www.gnu.org/licenses/>.
 
-// Derived from Microsoft's SampleIME source code included in the Windows classic samples:
-// THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF
-// ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO
-// THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
-// PARTICULAR PURPOSE.
+// Derived from Microsoft's SampleIME source code included in the Windows classic samples,
+// whose original copyright and permission notice is included below:
 //
-// Copyright (c) Microsoft Corporation. All rights reserved
+//     THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF
+//     ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO
+//     THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
+//     PARTICULAR PURPOSE.
+//
+//     Copyright (c) Microsoft Corporation. All rights reserved
 
 #include "Common.h"
 #include <Windows.h>
