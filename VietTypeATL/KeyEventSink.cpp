@@ -151,8 +151,10 @@ STDMETHODIMP KeyEventSink::OnKeyDown(_In_ ITfContext* pic, _In_ WPARAM wParam, _
 
     DBG_DPRINT(L"OnKeyDown wParam = %lx %s", wParam, *pfEaten ? L"eaten" : L"not eaten");
 
-    hr = CallKeyEdit(pic, wParam, lParam, _keyState);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"CallKeyEdit failed");
+    if (*pfEaten || _compositionManager->IsComposing()) {
+        hr = CallKeyEdit(pic, wParam, lParam, _keyState);
+        HRESULT_CHECK_RETURN(hr, L"%s", L"CallKeyEdit failed");
+    }
 
     return S_OK;
 }
