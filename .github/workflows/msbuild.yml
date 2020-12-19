@@ -47,4 +47,4 @@ jobs:
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v2.2.1
         with:
-          path: VietTypeSetup/bin/x64/*.msi
+          path: VietTypeSetup/bin/Release/*.msi
