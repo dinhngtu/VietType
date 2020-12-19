@@ -11,7 +11,7 @@ $wixNew = `
 <?xml version="1.0" encoding="utf-8"?>
 <Include>
   <?define productVersion="$($productVersion[0]).$($productVersion[1]).$($productVersion[2]).$($productVersion[3])" ?>
-  <?define vcsRev="$vcsRev" ?>
+  <?define vcsRev="Rev-$vcsRev" ?>
 </Include>
 
 "@
