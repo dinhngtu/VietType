@@ -16,6 +16,6 @@ $wixNew = `
 
 "@
 if ($Force -or ($wixOld -ne $wixNew)) {
-    echo "Updating Wix version include"
+    echo "Updating Wix version include: $vcsRev"
     [System.IO.File]::WriteAllText($wixFile, [string]::Join("`n", $wixNew))
 }
