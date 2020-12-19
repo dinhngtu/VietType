@@ -3,7 +3,7 @@ param([switch] $Force)
 Get-Content "$PSScriptRoot\Version.ps1" | Invoke-Expression
 
 # compile happens in bin\Configuration folder
-$vcsRev = git describe --tags --dirty
+$vcsRev = git describe --tags --dirty --always
 $wixFile = "..\..\Version.wxi"
 $wixOld = Get-Content -ErrorAction Ignore -Raw $wixFile
 $wixNew = `
