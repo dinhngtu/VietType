@@ -39,7 +39,7 @@ jobs:
         uses: microsoft/setup-msbuild@v1
 
       - name: Build Win32
-        run: msbuild -m '-target:VietTypeRegistrar:Rebuild;VietTypeATL:Rebuild' -p:Configuration=Release -p:Platform=Win32 .
+        run: msbuild -m "-target:VietTypeRegistrar:Rebuild;VietTypeATL:Rebuild" -p:Configuration=Release -p:Platform=Win32 .
 
       - name: Build x64
         run: msbuild -m -target:VietTypeSetup:Rebuild -p:Configuration=Release -p:Platform=x64 .
