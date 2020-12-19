@@ -1,0 +1,50 @@
+name: MSBuild
+
+on: [push]
+
+env:
+  SOLUTION_FILE_PATH: .
+
+jobs:
+  test:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        platform:
+          - Win32
+          - x64
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v1
+
+      - name: Setup VSTest.console.exe
+        uses: darenm/Setup-VSTest@v1.1.1
+
+      - name: Build unit tests
+        run: msbuild.exe -m -target:VietTypeUnitTests:Rebuild -p:Configuration=TestDebug -p:Platform=${{matrix.platform}} .
+
+      - name: Run tests
+        run: vstest.console.exe ${{matrix.platform}}/TestDebug/VietTypeUnitTests.dll
+
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v1
+
+      - name: Build Win32
+        run: msbuild -m "-target:VietTypeRegistrar:Rebuild;VietTypeATL:Rebuild" -p:Configuration=Release -p:Platform=Win32 .
+
+      - name: Build x64
+        run: msbuild -m -target:VietTypeSetup:Rebuild -p:Configuration=Release -p:Platform=x64 .
+
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v2.2.1
+        with:
+          path: VietTypeSetup/bin/Release/*.msi

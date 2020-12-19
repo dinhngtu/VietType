@@ -112,9 +112,6 @@
     <ResourceCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)\VietTypeATL</AdditionalIncludeDirectories>
     </ResourceCompile>
-    <PostBuildEvent>
-      <Command>autosign $(TargetPath)</Command>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -177,7 +174,8 @@
       <AdditionalIncludeDirectories>$(SolutionDir)\VietTypeATL</AdditionalIncludeDirectories>
     </ResourceCompile>
     <PostBuildEvent>
-      <Command>autosign $(TargetPath)</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
