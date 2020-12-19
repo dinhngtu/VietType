@@ -1,0 +1,26 @@
+name: test
+
+on: [push]
+
+env:
+  SOLUTION_FILE_PATH: .
+  BUILD_CONFIGURATION: TestDebug
+  BUILD_PLATFORM: x64
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v1
+
+    - name: Build
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: msbuild -m -target:VietTypeUnitTests:Rebuild -p:Configuration=${{env.BUILD_CONFIGURATION}} -p:Platform=${{env.BUILD_PLATFORM}} ${{env.SOLUTION_FILE_PATH}}
+
+    - name: Test
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: vstest.console.exe ${{env.BUILD_PLATFORM}}/${{env.BUILD_CONFIGURATION}}/VietTypeUnitTests.dll
