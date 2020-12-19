@@ -24,7 +24,7 @@ jobs:
         uses: darenm/Setup-VSTest@v1.1.1
 
       - name: Build unit tests
-        run: msbuild.exe VietType.sln -target:VietTypeUnitTests:Rebuild -p:Configuration=TestDebug -p:Platform=${{matrix.platform}}
+        run: msbuild.exe -m -target:VietTypeUnitTests:Rebuild -p:Configuration=TestDebug -p:Platform=${{matrix.platform}} .
 
       - name: Run tests
         run: vstest.console.exe ${{matrix.platform}}/TestDebug/VietTypeUnitTests.dll
@@ -39,10 +39,10 @@ jobs:
         uses: microsoft/setup-msbuild@v1
 
       - name: Build Win32
-        run: msbuild -m -target:VietTypeRegistrar:Rebuild;VietTypeATL:Rebuild -p:Configuration=Release -p:Platform=Win32 ${{env.SOLUTION_FILE_PATH}}
+        run: msbuild -m '-target:VietTypeRegistrar:Rebuild;VietTypeATL:Rebuild' -p:Configuration=Release -p:Platform=Win32 .
 
       - name: Build x64
-        run: msbuild -m -target:VietTypeSetup:Rebuild -p:Configuration=Release -p:Platform=x64 ${{env.SOLUTION_FILE_PATH}}
+        run: msbuild -m -target:VietTypeSetup:Rebuild -p:Configuration=Release -p:Platform=x64 .
 
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v2.2.1
