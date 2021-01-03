@@ -28,7 +28,6 @@
     <ClInclude Include="TelexUtil.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="TelexCaseMap.cpp" />
     <ClCompile Include="TelexData.cpp" />
     <ClCompile Include="TelexEngine.cpp" />
     <ClCompile Include="TelexKeyTranslator.cpp" />

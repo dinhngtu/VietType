@@ -25,20 +25,20 @@ enum class CharTypes : int {
 
 using chartypes_t = std::underlying_type_t<CharTypes>;
 
-inline CharTypes operator|(CharTypes lhs, CharTypes rhs) {
+constexpr inline CharTypes operator|(CharTypes lhs, CharTypes rhs) {
     return static_cast<CharTypes>(static_cast<chartypes_t>(lhs) | static_cast<chartypes_t>(rhs));
 }
 
-inline CharTypes& operator|=(CharTypes lhs, CharTypes rhs) {
+constexpr inline CharTypes& operator|=(CharTypes lhs, CharTypes rhs) {
     lhs = static_cast<CharTypes>(static_cast<chartypes_t>(lhs) | static_cast<chartypes_t>(rhs));
     return lhs;
 }
 
-inline CharTypes operator&(CharTypes lhs, CharTypes rhs) {
+constexpr inline CharTypes operator&(CharTypes lhs, CharTypes rhs) {
     return static_cast<CharTypes>(static_cast<chartypes_t>(lhs) & static_cast<chartypes_t>(rhs));
 }
 
-inline CharTypes& operator&=(CharTypes lhs, CharTypes rhs) {
+constexpr inline CharTypes& operator&=(CharTypes lhs, CharTypes rhs) {
     lhs = static_cast<CharTypes>(static_cast<chartypes_t>(lhs) & static_cast<chartypes_t>(rhs));
     return lhs;
 }

@@ -32,8 +32,5 @@ extern const generic_map_type<std::wstring, bool> valid_c2;
 extern const generic_map_type<std::wstring, VInfo> valid_v_oa_uy;
 extern const generic_map_type<wchar_t, std::wstring> backconversions;
 
-extern const generic_map_type<wchar_t, wchar_t> touppermap;
-extern const generic_map_type<wchar_t, wchar_t> tolowermap;
-
 }
 }

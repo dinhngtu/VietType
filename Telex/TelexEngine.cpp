@@ -5,7 +5,7 @@
 #include "TelexData.h"
 #include "TelexUtil.h"
 
-#define IS(cat, type) (static_cast<bool>((cat) & CharTypes::type))
+#define IS(cat, type) (static_cast<bool>((cat) & (type)))
 
 namespace VietType {
 namespace Telex {
@@ -18,66 +18,67 @@ enum ResposTransitions {
     ResposTone = -5,
 };
 
+// case functions hardcode ranges of Vietnamese characters
+// the rest can be correctly transformed or not, doesn't matter
+
 static wchar_t ToUpper(_In_ wchar_t c) {
-    // prechecking for these character ranges gives a sizable boost in performance
-    if (c >= L'A' && c <= L'Z') {
-        return c;
+    auto uc = c & ~32;
+    // Basic Latin
+    if (uc >= L'A' && uc <= L'Z') {
+        return uc;
     }
-    if (c >= L'a' && c <= L'z') {
-        return c & ~32;
+    // Latin-1 Supplement
+    if (c >= L'\xc0' && c <= L'\xde') {
+        return uc;
     }
+    uc = c & ~1;
+    // Latin Extended-A/B
+    if (c >= L'\x100' && c <= L'\x1bf') {
+        return uc;
+    }
+    // Latin Extended Additional
     if (c >= L'\x1ea0' && c <= L'\x1ef9') {
-        return c & ~1;
+        return uc;
     }
-    auto it = touppermap.find(c);
-    if (it != touppermap.end()) {
-        return it->second;
-    } else {
-        return c;
-    }
+    return c;
 }
 
 static wchar_t ToLower(_In_ wchar_t c) {
-    if (c >= L'a' && c <= L'z') {
-        return c;
+    auto lc = c | 32;
+    if (lc >= L'a' && lc <= L'z') {
+        return lc;
     }
-    if (c >= L'A' && c <= L'Z') {
-        return c | 32;
+    if (c >= L'\xe0' && c <= L'\xfe') {
+        return lc;
+    }
+    lc = c | 1;
+    if (c >= L'\x100' && c <= L'\x1bf') {
+        return lc;
     }
     if (c >= L'\x1ea0' && c <= L'\x1ef9') {
-        return c | 1;
+        return lc;
     }
-    auto it = tolowermap.find(c);
-    if (it != tolowermap.end()) {
-        return it->second;
-    } else {
-        return c;
-    }
+    return c;
 }
 
 // return 1 if c is upper, 0 if c is lower
 static int FindLower(_In_ wchar_t c, _Out_ wchar_t *out) {
-    if (c >= L'a' && c <= L'z') {
-        *out = c;
-        return 0;
+    *out = c | 32;
+    if (*out >= L'a' && *out <= L'z') {
+        return *out != c;
     }
-    if (c >= L'A' && c <= L'Z') {
-        *out = c | 32;
-        return 1;
+    if (c >= L'\xe0' && c <= L'\xfe') {
+        return *out != c;
+    }
+    *out = c | 1;
+    if (c >= L'\x100' && c <= L'\x1bf') {
+        return *out != c;
     }
     if (c >= L'\x1ea0' && c <= L'\x1ef9') {
-        int ret = !(c & 1);
-        *out = c | 1;
-        return ret;
+        return *out != c;
     }
-    auto it = tolowermap.find(c);
-    if (it != tolowermap.end()) {
-        *out = it->second;
-        return 1;
-    } else {
-        *out = c;
-        return 0;
-    }
+    *out = c;
+    return 0;
 }
 
 static wchar_t TranslateTone(_In_ wchar_t c, _In_ Tones t) {
@@ -147,7 +148,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
     if (cat == CharTypes::Uncategorized) {
         _state = TelexStates::Invalid;
 
-    } else if (!_c1.size() && !_v.size() && (IS(cat, ConsoC1) || IS(cat, ConsoContinue))) {
+    } else if (!_c1.size() && !_v.size() && (IS(cat, CharTypes::ConsoC1) || IS(cat, CharTypes::ConsoContinue))) {
         _c1.push_back(c);
         _cases.push_back(ccase);
         _respos.push_back(_respos_current++);
@@ -172,12 +173,12 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
         }
         _state = TelexStates::Invalid;
 
-    } else if (!_v.size() && !_c2.size() && _c1 != L"gi" && IS(cat, ConsoC1)) {
+    } else if (!_v.size() && !_c2.size() && _c1 != L"gi" && IS(cat, CharTypes::ConsoC1)) {
         _c1.push_back(c);
         _cases.push_back(ccase);
         _respos.push_back(_respos_current++);
 
-    } else if (IS(cat, Vowel)) {
+    } else if (IS(cat, CharTypes::Vowel)) {
         // relaxed vowel position constraint: !_c2.size()
         // vowel parts (aeiouy)
         _v.push_back(c);
@@ -187,7 +188,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
             _v = it->second;
             auto after = _v.size();
             // we don't yet take into account if _v grows in length due to the transition
-            if (_keyBuffer.size() > 1 && c == ToLower(_keyBuffer.rbegin()[1]) && _respos.back() == ResposTransitionV) {
+            if (_keyBuffer.size() > 1 && _respos.back() == ResposTransitionV && c == ToLower(_keyBuffer.rbegin()[1])) {
                 _keyBuffer.pop_back();
                 if (after == before) {
                     // in case of double key, we want to pretend that the first V transition char didn't happen
@@ -208,7 +209,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
             // if there is no transition, there must be a new character -> must push case
             _cases.push_back(ccase);
             // invalidate if same char entered twice in a row in order to undo transition
-            if (_keyBuffer.size() > 1 && c == ToLower(_keyBuffer.rbegin()[1]) && _respos.back() == ResposTransitionV) {
+            if (_keyBuffer.size() > 1 && _respos.back() == ResposTransitionV && c == ToLower(_keyBuffer.rbegin()[1])) {
                 _keyBuffer.pop_back();
                 _state = TelexStates::Invalid;
             }
@@ -220,7 +221,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
             }
         }
 
-    } else if (_c1 == L"q" && _v.size() && IS(cat, VowelW)) {
+    } else if (_c1 == L"q" && _v.size() && IS(cat, CharTypes::VowelW)) {
         auto it = transitions_w_q.find(_v);
         if (it != transitions_w_q.end()) {
             _v = it->second;
@@ -240,7 +241,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
         }
         // 'w' always keeps V size constant, don't push case
 
-    } else if (_v.size() && IS(cat, VowelW)) {
+    } else if (_v.size() && IS(cat, CharTypes::VowelW)) {
         auto it = transitions_w.find(_v);
         if (it != transitions_w.end()) {
             _v = it->second;
@@ -260,12 +261,12 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
         }
         // 'w' always keeps V size constant, don't push case
 
-    } else if (!_c1.size() && !_v.size() && IS(cat, Tone) && IS(cat, Conso)) {
+    } else if (!_c1.size() && !_v.size() && IS(cat, CharTypes::Tone) && IS(cat, CharTypes::Conso)) {
         // ambiguous (rsx) -> first character
         _c1.push_back(c);
         _cases.push_back(ccase);
 
-    } else if ((_c1 == L"gi" || _v.size()) && IS(cat, Tone) && IS(cat, Conso)) {
+    } else if ((_c1 == L"gi" || _v.size()) && IS(cat, CharTypes::Tone) && IS(cat, CharTypes::Conso)) {
         // ambiguous (rsx) -> tone
         auto newtone = GetTone(c);
         if (newtone != _t) {
@@ -281,7 +282,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
             _state = TelexStates::Invalid;
         }
 
-    } else if (((_c1 == L"gi" && !_v.size()) || _v.size()) && !_c2.size() && IS(cat, ConsoC2)) {
+    } else if (((_c1 == L"gi" && !_v.size()) || _v.size()) && !_c2.size() && IS(cat, CharTypes::ConsoC2)) {
         // word-ending consonants (cnpt)
         auto it = transitions_v_c2.find(_v);
         if (it != transitions_v_c2.end()) {
@@ -291,13 +292,13 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
         _cases.push_back(ccase);
         _respos.push_back(_respos_current++);
 
-    } else if (_c2.size() && IS(cat, ConsoContinue)) {
+    } else if (_c2.size() && IS(cat, CharTypes::ConsoContinue)) {
         // consonant continuation (dgh)
         _c2.push_back(c);
         _cases.push_back(ccase);
         _respos.push_back(_respos_current++);
 
-    } else if ((_c1 == L"gi" || _v.size()) && IS(cat, Tone)) {
+    } else if ((_c1 == L"gi" || _v.size()) && IS(cat, CharTypes::Tone)) {
         // tones-only (fjz)
         // we must check for _c1 == 'gi' to allow typing 'gì'
         auto newtone = GetTone(c);
