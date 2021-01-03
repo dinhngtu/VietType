@@ -20,7 +20,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common.h" />
-    <ClInclude Include="Export.h" />
     <ClInclude Include="Telex.h" />
     <ClInclude Include="TelexData.h" />
     <ClInclude Include="TelexEngine.h" />

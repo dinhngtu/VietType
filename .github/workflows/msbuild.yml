@@ -10,6 +10,9 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
+        configuration:
+          - Debug
+          - Release
         platform:
           - Win32
           - x64
@@ -24,10 +27,10 @@ jobs:
         uses: darenm/Setup-VSTest@v1.1.1
 
       - name: Build unit tests
-        run: msbuild.exe -m -target:VietTypeUnitTests:Rebuild -p:Configuration=TestDebug -p:Platform=${{matrix.platform}} .
+        run: msbuild.exe -m -target:VietTypeUnitTests:Rebuild -p:Configuration=${{matrix.configuration}} -p:Platform=${{matrix.platform}} .
 
       - name: Run tests
-        run: vstest.console.exe ${{matrix.platform}}/TestDebug/VietTypeUnitTests.dll
+        run: vstest.console.exe ${{matrix.platform}}/${{matrix.configuration}}/VietTypeUnitTests.dll
 
   build:
     runs-on: windows-latest

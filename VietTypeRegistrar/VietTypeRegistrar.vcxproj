@@ -192,6 +192,11 @@
   <ItemGroup>
     <None Include="version.rci" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\VietTypeATL\VietTypeATL.vcxproj">
+      <Project>{6ca483bd-b365-42dc-8ae6-7cfbd2014cbe}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

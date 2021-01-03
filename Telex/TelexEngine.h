@@ -51,7 +51,7 @@ struct TelexConfig {
     bool accept_separate_dd = true;
 };
 
-class TESTEXPORT TelexEngine {
+class TelexEngine {
 public:
     explicit TelexEngine(_In_ struct TelexConfig config);
     TelexEngine(const TelexEngine&) = delete;
