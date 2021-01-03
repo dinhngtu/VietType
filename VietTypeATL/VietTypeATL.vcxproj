@@ -180,6 +180,7 @@
       <ControlFlowGuard>Guard</ControlFlowGuard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <DisableSpecificWarnings>26439;26434;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>$(SolutionDir)Telex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -203,7 +204,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <RegisterOutput>false</RegisterOutput>
-      <AdditionalDependencies>mincore.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>mincore.lib;Telex.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
       <Command>powershell.exe -nop -noni -executionpolicy bypass $(SolutionDir)\UpdateVersion.ps1</Command>
@@ -220,6 +222,7 @@
       <DisableSpecificWarnings>26439;26434;4251;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <ControlFlowGuard>Guard</ControlFlowGuard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalIncludeDirectories>$(SolutionDir)Telex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -244,7 +247,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <RegisterOutput>false</RegisterOutput>
-      <AdditionalDependencies>mincore.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>mincore.lib;Telex.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
       <Command>powershell.exe -nop -noni -executionpolicy bypass $(SolutionDir)\UpdateVersion.ps1</Command>
@@ -260,6 +264,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <DisableSpecificWarnings>26439;26434;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>$(SolutionDir)Telex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -282,7 +287,8 @@
       <SubSystem>Windows</SubSystem>
       <ModuleDefinitionFile>.\VietTypeATL.def</ModuleDefinitionFile>
       <RegisterOutput>false</RegisterOutput>
-      <AdditionalDependencies>mincore.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>mincore.lib;Telex.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
       <Command>powershell.exe -nop -noni -executionpolicy bypass $(SolutionDir)\UpdateVersion.ps1</Command>
@@ -298,6 +304,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>26439;26434;4251;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalIncludeDirectories>$(SolutionDir)Telex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -321,7 +328,8 @@
       <SubSystem>Windows</SubSystem>
       <ModuleDefinitionFile>.\VietTypeATL.def</ModuleDefinitionFile>
       <RegisterOutput>false</RegisterOutput>
-      <AdditionalDependencies>mincore.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>mincore.lib;Telex.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
       <Command>powershell.exe -nop -noni -executionpolicy bypass $(SolutionDir)\UpdateVersion.ps1</Command>
@@ -337,6 +345,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <DisableSpecificWarnings>26439;26434;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>$(SolutionDir)Telex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -358,7 +367,8 @@
       <SubSystem>Windows</SubSystem>
       <ModuleDefinitionFile>.\VietTypeATL.def</ModuleDefinitionFile>
       <RegisterOutput>false</RegisterOutput>
-      <AdditionalDependencies>mincore.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>mincore.lib;Telex.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
       <Command>powershell.exe -nop -noni -executionpolicy bypass $(SolutionDir)\UpdateVersion.ps1</Command>
@@ -374,6 +384,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>26439;26434;4251;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalIncludeDirectories>$(SolutionDir)Telex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -396,7 +407,8 @@
       <SubSystem>Windows</SubSystem>
       <ModuleDefinitionFile>.\VietTypeATL.def</ModuleDefinitionFile>
       <RegisterOutput>false</RegisterOutput>
-      <AdditionalDependencies>mincore.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>mincore.lib;Telex.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
       <Command>powershell.exe -nop -noni -executionpolicy bypass $(SolutionDir)\UpdateVersion.ps1</Command>
@@ -413,6 +425,7 @@
       <ControlFlowGuard>Guard</ControlFlowGuard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <DisableSpecificWarnings>26439;26434;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>$(SolutionDir)Telex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -437,7 +450,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <RegisterOutput>false</RegisterOutput>
-      <AdditionalDependencies>mincore.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>mincore.lib;Telex.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
       <Command>powershell.exe -nop -noni -executionpolicy bypass $(SolutionDir)\UpdateVersion.ps1</Command>
@@ -458,6 +472,7 @@
       <DisableSpecificWarnings>26439;26434;4251;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <ControlFlowGuard>Guard</ControlFlowGuard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalIncludeDirectories>$(SolutionDir)Telex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -483,7 +498,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <RegisterOutput>false</RegisterOutput>
-      <AdditionalDependencies>mincore.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>mincore.lib;Telex.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
       <Command>powershell.exe -nop -noni -executionpolicy bypass $(SolutionDir)\UpdateVersion.ps1</Command>
@@ -542,11 +558,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TestRelease|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="EditSurroundingWord.cpp" />
-    <ClCompile Include="TelexEngine.cpp" />
-    <ClCompile Include="TelexCaseMap.cpp" />
-    <ClCompile Include="TelexData.cpp" />
-    <ClCompile Include="TelexKeyTranslator.cpp" />
-    <ClCompile Include="TelexUtil.cpp" />
     <ClCompile Include="TextEditSink.cpp" />
     <ClCompile Include="TextService.cpp" />
     <ClCompile Include="ThreadMgrEventSink.cpp" />
@@ -593,7 +604,6 @@
     <ClInclude Include="EngineController.h" />
     <ClInclude Include="EngineSettingsController.h" />
     <ClInclude Include="EnumDisplayAttributeInfo.h" />
-    <ClInclude Include="Export.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="KeyEventSink.h" />
     <ClInclude Include="KeyHandler.h" />
@@ -605,12 +615,6 @@
     <ClInclude Include="SinkAdvisor.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="Telex.h" />
-    <ClInclude Include="TelexEngine.h" />
-    <ClInclude Include="TelexData.h" />
-    <ClInclude Include="TelexInternal.h" />
-    <ClInclude Include="TelexKeyTranslator.h" />
-    <ClInclude Include="TelexUtil.h" />
     <ClInclude Include="TextEditSink.h" />
     <ClInclude Include="TextService.h" />
     <ClInclude Include="ThreadMgrEventSink.h" />

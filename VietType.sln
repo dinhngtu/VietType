@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VietTypeTests", "VietTypeTests\VietTypeTests.vcxproj", "{78E8E578-91CC-468F-95DF-8BDE6A4CF76D}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VietTypeATL", "VietTypeATL\VietTypeATL.vcxproj", "{6CA483BD-B365-42DC-8AE6-7CFBD2014CBE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{4C4CE742-99A9-40E7-B03A-68A3CBE0AE77} = {4C4CE742-99A9-40E7-B03A-68A3CBE0AE77}
+	EndProjectSection
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "VietTypeSetup", "VietTypeSetup\VietTypeSetup.wixproj", "{8882E9D2-7670-4906-98F5-60A147BF5ECA}"
 EndProject
@@ -29,6 +32,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		UpdateVersionWix.ps1 = UpdateVersionWix.ps1
 		Version.ps1 = Version.ps1
 	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Telex", "Telex\Telex.vcxproj", "{4C4CE742-99A9-40E7-B03A-68A3CBE0AE77}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -133,6 +138,22 @@ Global
 		{62F82C74-9FDC-4673-B392-06399E06CE45}.TestRelease|Win32.Build.0 = Release|Win32
 		{62F82C74-9FDC-4673-B392-06399E06CE45}.TestRelease|x64.ActiveCfg = Release|x64
 		{62F82C74-9FDC-4673-B392-06399E06CE45}.TestRelease|x64.Build.0 = Release|x64
+		{4C4CE742-99A9-40E7-B03A-68A3CBE0AE77}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4C4CE742-99A9-40E7-B03A-68A3CBE0AE77}.Debug|Win32.Build.0 = Debug|Win32
+		{4C4CE742-99A9-40E7-B03A-68A3CBE0AE77}.Debug|x64.ActiveCfg = Debug|x64
+		{4C4CE742-99A9-40E7-B03A-68A3CBE0AE77}.Debug|x64.Build.0 = Debug|x64
+		{4C4CE742-99A9-40E7-B03A-68A3CBE0AE77}.Release|Win32.ActiveCfg = Release|Win32
+		{4C4CE742-99A9-40E7-B03A-68A3CBE0AE77}.Release|Win32.Build.0 = Release|Win32
+		{4C4CE742-99A9-40E7-B03A-68A3CBE0AE77}.Release|x64.ActiveCfg = Release|x64
+		{4C4CE742-99A9-40E7-B03A-68A3CBE0AE77}.Release|x64.Build.0 = Release|x64
+		{4C4CE742-99A9-40E7-B03A-68A3CBE0AE77}.TestDebug|Win32.ActiveCfg = Debug|Win32
+		{4C4CE742-99A9-40E7-B03A-68A3CBE0AE77}.TestDebug|Win32.Build.0 = Debug|Win32
+		{4C4CE742-99A9-40E7-B03A-68A3CBE0AE77}.TestDebug|x64.ActiveCfg = Debug|x64
+		{4C4CE742-99A9-40E7-B03A-68A3CBE0AE77}.TestDebug|x64.Build.0 = Debug|x64
+		{4C4CE742-99A9-40E7-B03A-68A3CBE0AE77}.TestRelease|Win32.ActiveCfg = Release|Win32
+		{4C4CE742-99A9-40E7-B03A-68A3CBE0AE77}.TestRelease|Win32.Build.0 = Release|Win32
+		{4C4CE742-99A9-40E7-B03A-68A3CBE0AE77}.TestRelease|x64.ActiveCfg = Release|x64
+		{4C4CE742-99A9-40E7-B03A-68A3CBE0AE77}.TestRelease|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

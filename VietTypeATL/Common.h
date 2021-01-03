@@ -22,7 +22,6 @@
 #include "stdafx.h"
 #include "Define.h"
 #include "Globals.h"
-#include "Export.h"
 #include "resource.h"
 #include "ComUtils.h"
 
