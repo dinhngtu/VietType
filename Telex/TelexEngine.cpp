@@ -117,6 +117,12 @@ static void ApplyCases(_In_ std::wstring& str, _In_ const std::vector<int>& case
 
 TelexEngine::TelexEngine(_In_ TelexConfig config) {
     _config = config;
+    _keyBuffer.reserve(9);
+    _c1.reserve(9);
+    _v.reserve(9);
+    _c2.reserve(9);
+    _cases.reserve(9);
+    _respos.reserve(9);
     Reset();
 }
 
@@ -142,14 +148,18 @@ void TelexEngine::Reset() {
 
 // remember to push into _cases when adding a new character
 TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
-    wchar_t c;
-    auto ccase = FindLower(corig, &c);
-
-    auto cat = ClassifyCharacter(c);
-
     _keyBuffer.push_back(corig);
 
-    if (_state == TelexStates::Invalid || cat == CharTypes::Uncategorized) {
+    if (_state == TelexStates::Invalid || _keyBuffer.size() > 9) {
+        _state = TelexStates::Invalid;
+        assert(CheckInvariants());
+        return _state;
+    }
+
+    wchar_t c;
+    auto ccase = FindLower(corig, &c);
+    auto cat = ClassifyCharacter(c);
+    if (cat == CharTypes::Uncategorized) {
         _state = TelexStates::Invalid;
 
     } else if (!_c1.size() && !_v.size() && (IS(cat, ConsoC1) || IS(cat, ConsoContinue))) {
