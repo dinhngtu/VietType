@@ -29,7 +29,7 @@ STDMETHODIMP KeyHandlerEditSession::DoEditSession(_In_ TfEditCookie ec) {
         return _compositionManager->EndCompositionNow(ec);
     } else if (_wParam == VK_ESCAPE) {
         // eaten, revert and end composition
-        auto str = _controller->GetEngine().RetrieveInvalid();
+        auto str = _controller->GetEngine().RetrieveRaw();
         _controller->GetEngine().Reset();
         hr = _compositionManager->SetCompositionText(ec, &str[0], static_cast<LONG>(str.length()));
         DBG_HRESULT_CHECK(hr, L"%s", L"_compositionManager->SetCompositionText failed");
@@ -95,7 +95,7 @@ HRESULT KeyHandlerEditSession::ComposeKey(_In_ TfEditCookie ec) {
 
     case Telex::TelexStates::Invalid: {
         assert(_controller->GetEngine().Count() > 0);
-        auto str = _controller->GetEngine().RetrieveInvalid();
+        auto str = _controller->GetEngine().RetrieveRaw();
         hr = _compositionManager->EnsureCompositionText(ec, _context, &str[0], static_cast<LONG>(str.length()));
         DBG_HRESULT_CHECK(hr, L"%s", L"_compositionManager->EnsureCompositionText failed");
         break;
@@ -113,34 +113,14 @@ HRESULT KeyHandlerEditSession::ComposeKey(_In_ TfEditCookie ec) {
 HRESULT KeyHandlerEditSession::Commit(_In_ TfEditCookie ec) {
     HRESULT hr;
 
-    DBG_DPRINT(L"%s", L"");
-
-    if (!_compositionManager->IsComposing()) {
-        goto exit;
-    }
-
-    switch (_controller->GetEngine().Commit()) {
-    case Telex::TelexStates::Committed: {
+    if (_compositionManager->IsComposing()) {
+        auto txstate = _controller->GetEngine().Commit();
+        assert(txstate == Telex::TelexStates::Committed || txstate == Telex::TelexStates::CommittedInvalid);
         auto str = _controller->GetEngine().Retrieve();
         hr = _compositionManager->SetCompositionText(ec, &str[0], static_cast<LONG>(str.length()));
         DBG_HRESULT_CHECK(hr, L"%s", L"_compositionManager->EnsureCompositionText failed");
-        break;
     }
 
-    case Telex::TelexStates::CommittedInvalid: {
-        auto str = _controller->GetEngine().RetrieveInvalid();
-        hr = _compositionManager->SetCompositionText(ec, &str[0], static_cast<LONG>(str.length()));
-        DBG_HRESULT_CHECK(hr, L"%s", L"_compositionManager->EnsureCompositionText failed");
-        break;
-    }
-
-    default:
-        DBG_DPRINT(L"%s", L"Commit returned unexpected value");
-        assert(0);
-        break;
-    }
-
-exit:
     _controller->GetEngine().Reset();
     _compositionManager->EndCompositionNow(ec);
 

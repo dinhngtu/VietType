@@ -62,7 +62,7 @@ static wchar_t ToLower(_In_ wchar_t c) {
 }
 
 // return 1 if c is upper, 0 if c is lower
-static int FindLower(_In_ wchar_t c, _Out_ wchar_t *out) {
+static int FindLower(_In_ wchar_t c, _Out_ wchar_t* out) {
     *out = c | 32;
     if (*out >= L'a' && *out <= L'z') {
         return *out != c;
@@ -134,6 +134,11 @@ void TelexEngine::Reset() {
 
 // remember to push into _cases when adding a new character
 TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
+    // PushChar at any committed/error state is illegal, but fail softly anyway
+    if (_state != TelexStates::Valid && _state != TelexStates::Invalid) {
+        return _state;
+    }
+
     _keyBuffer.push_back(corig);
 
     if (_state == TelexStates::Invalid || _keyBuffer.size() > 9) {
@@ -327,7 +332,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
 }
 
 TelexStates TelexEngine::Backspace() {
-    auto buf = _keyBuffer;
+    std::wstring buf(_keyBuffer);
 
     if (_state == TelexStates::Invalid) {
         Reset();
@@ -362,9 +367,9 @@ TelexStates TelexEngine::Backspace() {
     }
 
     assert(_keyBuffer.size() == _respos.size());
-    auto rp = _respos;
-    auto oldc1 = _c1;
-    auto oldv = _v;
+    std::vector<int> rp(_respos);
+    std::wstring oldc1(_c1);
+    std::wstring oldv(_v);
 
     auto toDelete = static_cast<int>(_c1.size() + _v.size() + _c2.size()) - 1;
 
@@ -546,7 +551,7 @@ TelexStates TelexEngine::GetState() const {
 
 std::wstring TelexEngine::Retrieve() const {
     if (_state == TelexStates::Invalid || _state == TelexStates::CommittedInvalid) {
-        return std::wstring();
+        return RetrieveRaw();
     }
     std::wstring result(_c1);
     result.append(_v);
@@ -555,13 +560,13 @@ std::wstring TelexEngine::Retrieve() const {
     return result;
 }
 
-std::wstring TelexEngine::RetrieveInvalid() const {
+std::wstring TelexEngine::RetrieveRaw() const {
     return std::wstring(_keyBuffer);
 }
 
 std::wstring TelexEngine::Peek() const {
     if (_state == TelexStates::Invalid) {
-        return RetrieveInvalid();
+        return RetrieveRaw();
     }
 
     std::wstring result(_c1);
@@ -575,7 +580,7 @@ std::wstring TelexEngine::Peek() const {
             ApplyCases(result, _cases);
             return result;
         } else {
-            return RetrieveInvalid();
+            return RetrieveRaw();
         }
     }
 

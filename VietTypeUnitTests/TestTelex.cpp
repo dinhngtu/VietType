@@ -41,7 +41,7 @@ void TestInvalidWord(TelexEngine& e, const wchar_t* expected, const wchar_t* inp
         e.PushChar(c);
     }
     AssertTelexStatesEqual(TelexStates::CommittedInvalid, e.Commit());
-    Assert::AreEqual(expected, e.RetrieveInvalid().c_str());
+    Assert::AreEqual(expected, e.RetrieveRaw().c_str());
 }
 
 void TestInvalidWord(const wchar_t* expected, const wchar_t* input) {
@@ -57,7 +57,7 @@ public:
         TelexEngine e(config);
         e.Reset();
         Assert::AreEqual(L"", e.Retrieve().c_str());
-        Assert::AreEqual(L"", e.RetrieveInvalid().c_str());
+        Assert::AreEqual(L"", e.RetrieveRaw().c_str());
         Assert::AreEqual(L"", e.Peek().c_str());
         Assert::AreEqual(std::size_t{ 0 }, e.Count());
     }
@@ -106,6 +106,17 @@ public:
         Assert::AreEqual(L"a", e.Retrieve().c_str());
     }
 
+    TEST_METHOD(TestEmptyCommittedPushChar) {
+        TelexEngine e(config);
+        e.Reset();
+        AssertTelexStatesEqual(TelexStates::Committed, e.Commit());
+        AssertTelexStatesEqual(TelexStates::Committed, e.PushChar('a'));
+        Assert::AreEqual(L"", e.Retrieve().c_str());
+        Assert::AreEqual(L"", e.RetrieveRaw().c_str());
+        Assert::AreEqual(L"", e.Peek().c_str());
+        Assert::AreEqual(std::size_t{ 0 }, e.Count());
+    }
+
     // uppercase
 
     TEST_METHOD(TestEmptyPushCharUpC1) {
@@ -129,7 +140,7 @@ public:
         e.Reset();
         // must leave the class in a valid state
         Assert::AreEqual(L"", e.Retrieve().c_str());
-        Assert::AreEqual(L"", e.RetrieveInvalid().c_str());
+        Assert::AreEqual(L"", e.RetrieveRaw().c_str());
     }
 
     // commit
@@ -152,7 +163,7 @@ public:
         TelexEngine e(config);
         e.Reset();
         AssertTelexStatesEqual(TelexStates::CommittedInvalid, e.Cancel());
-        Assert::AreEqual(L"", e.RetrieveInvalid().c_str());
+        Assert::AreEqual(L"", e.RetrieveRaw().c_str());
     }
 
     // word typing tests

@@ -16,8 +16,8 @@ namespace Telex {
 // Invalid -> CommittedInvalid (by calling Commit/ForceCommit)
 // Valid/Invalid -> CommittedInvalid (by calling Cancel)
 
-// Committed: can call Retrieve/RetrieveInvalid, does not change state
-// CommittedInvalid: can call RetrieveInvalid, does not change state
+// Committed: can call Retrieve/RetrieveRaw, does not change state
+// CommittedInvalid: can call Retrieve/RetrieveRaw, does not change state
 
 // Committed|CommittedInvalid -> Valid (Reset)
 
@@ -55,7 +55,7 @@ public:
 
     TelexStates GetState() const;
     std::wstring Retrieve() const;
-    std::wstring RetrieveInvalid() const;
+    std::wstring RetrieveRaw() const;
     std::wstring Peek() const;
     std::wstring::size_type Count() const;
 
