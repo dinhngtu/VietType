@@ -456,6 +456,14 @@ public:
         Assert::AreEqual(L"qu", e.Peek().c_str());
     }
 
+    TEST_METHOD(TestBackspaceHieef) {
+        TelexEngine e(config);
+        FeedWord(e, L"hieef");
+        Assert::AreEqual(L"hi\x1ec1", e.Peek().c_str());
+        e.Backspace();
+        Assert::AreEqual(L"hi", e.Peek().c_str());
+    }
+
     // test backconversions
 
     TEST_METHOD(TestBackconversionDdoongf) {

@@ -383,7 +383,7 @@ TelexStates TelexEngine::Backspace() {
             rp[i] = ResposExpunged;
         }
     }
-    if (lastTone >= 0) {
+    if (lastTone >= 0 && oldc1.size() + vinfo.tonepos < toDelete) {
         rp[lastTone] = ResposTone;
     }
 
