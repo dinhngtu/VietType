@@ -1,6 +1,6 @@
 param([switch] $Force)
 
-Get-Content "$PSScriptRoot\Version.ps1" | Invoke-Expression
+Get-Content -Raw "$PSScriptRoot\Version.ps1" | Invoke-Expression
 
 # compile happens in bin\Configuration folder
 $vcsRev = git describe --tags --dirty --always
