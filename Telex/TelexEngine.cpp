@@ -383,7 +383,7 @@ TelexStates TelexEngine::Backspace() {
             rp[i] = ResposExpunged;
         }
     }
-    if (lastTone >= 0 && oldc1.size() + vinfo.tonepos < toDelete) {
+    if (lastTone >= 0) {
         rp[lastTone] = ResposTone;
     }
 
@@ -410,10 +410,9 @@ TelexStates TelexEngine::Backspace() {
                 PushChar(buf[i]);
             }
         } else if (rp[i] == ResposTone) {
-            VInfo vinfoRespos;
-            // don't care about found or not
-            GetTonePos(true, &vinfoRespos);
-            if (vinfoRespos.tonepos >= 0 && vinfoRespos.tonepos < toDelete) {
+            if (oldc1.size() + vinfo.tonepos < toDelete) {
+                PushChar(buf[i]);
+            } else if (oldc1 == L"gi" && toDelete >= 2) {
                 PushChar(buf[i]);
             }
         } else {
