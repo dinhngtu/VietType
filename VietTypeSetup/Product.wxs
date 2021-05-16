@@ -6,7 +6,7 @@ SPDX-License-Identifier: GPL-3.0-only
   <?include Version.wxi ?>
   
   <Product
-    Id="*"
+    Id="2BF2AD87-F798-4B92-B6FC-74A1A4550826"
     Name="VietType"
     Language="!(bind.fileLanguage.VietTypeATL32.dll)"
     Version="$(var.productVersion)"
