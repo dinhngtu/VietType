@@ -32,16 +32,29 @@ INT_PTR CALLBACK SettingsDialog::SettingsDialogProc(_In_ HWND hwndDlg, _In_ UINT
         instance = reinterpret_cast<SettingsDialog*>(lParam);
         assert(instance);
 
+        MONITORINFO minfo{ sizeof(minfo) };
+        RECT dlgrect;
+        if (GetMonitorInfo(MonitorFromWindow(hwndDlg, MONITOR_DEFAULTTONEAREST), &minfo) && GetWindowRect(hwndDlg, &dlgrect)) {
+            LONG wx = minfo.rcWork.left / 2 + minfo.rcWork.right / 2 + dlgrect.left / 2 - dlgrect.right / 2;
+            LONG wy = minfo.rcWork.top / 2 + minfo.rcWork.bottom / 2 + dlgrect.top / 2 - dlgrect.bottom / 2;
+            SetWindowPos(
+                hwndDlg,
+                HWND_TOP,
+                std::clamp(wx, 0l, std::max(0l, minfo.rcWork.right - minfo.rcWork.left - dlgrect.right + dlgrect.left)),
+                std::clamp(wy, 0l, std::max(0l, minfo.rcWork.bottom - minfo.rcWork.top - dlgrect.bottom + dlgrect.top)),
+                0,
+                0,
+                SWP_NOSIZE | SWP_NOZORDER);
+        }
+
         CheckDlgButton(hwndDlg, IDC_SETTINGS_DEFAULT_ENABLED, instance->Property<IDC_SETTINGS_DEFAULT_ENABLED>() ? BST_CHECKED : BST_UNCHECKED);
         CheckDlgButton(hwndDlg, IDC_SETTINGS_OA_UY, instance->Property<IDC_SETTINGS_OA_UY>() ? BST_CHECKED : BST_UNCHECKED);
         CheckDlgButton(hwndDlg, IDC_SETTINGS_ACCEPT_DD, instance->Property<IDC_SETTINGS_ACCEPT_DD>() ? BST_CHECKED : BST_UNCHECKED);
         CheckDlgButton(hwndDlg, IDC_SETTINGS_BACKSPACE_INVALID, instance->Property<IDC_SETTINGS_BACKSPACE_INVALID>() ? BST_CHECKED : BST_UNCHECKED);
 
         return TRUE;
-    }
 
-    switch (uMsg) {
-    case WM_COMMAND:
+    } else if (uMsg == WM_COMMAND) {
         assert(instance);
         switch (LOWORD(wParam)) {
         case IDOK:
@@ -58,7 +71,6 @@ INT_PTR CALLBACK SettingsDialog::SettingsDialogProc(_In_ HWND hwndDlg, _In_ UINT
             EndDialog(hwndDlg, IDCANCEL);
             return TRUE;
         }
-        break;
     }
 
     return FALSE;
