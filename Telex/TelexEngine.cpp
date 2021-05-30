@@ -339,7 +339,7 @@ TelexStates TelexEngine::Backspace() {
         if (buf.size()) {
             buf.pop_back();
         }
-        if (buf.size()) {
+        if (buf.size() && _config.backspaced_word_stays_invalid) {
             _state = TelexStates::Invalid;
         }
         for (auto c : buf) {

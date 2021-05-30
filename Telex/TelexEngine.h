@@ -34,6 +34,8 @@ struct TelexConfig {
     bool oa_uy_tone1 = true;
     // allow typing the second 'd' of 'dd' anywhere in the word
     bool accept_separate_dd = true;
+    // whether backspacing from invalid state preserves that invalid state
+    bool backspaced_word_stays_invalid = true;
 };
 
 class TelexEngine {
