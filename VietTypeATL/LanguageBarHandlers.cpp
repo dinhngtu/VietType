@@ -187,6 +187,21 @@ static HRESULT OnMenuSelectAll(_In_ UINT id, _In_ EngineController* controller) 
     return S_OK;
 }
 
+static DWORD GetSystemLightTheme() {
+    CRegKey key;
+    DWORD light = 0;
+    LSTATUS err = key.Open(HKEY_CURRENT_USER, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", KEY_QUERY_VALUE);
+    if (err == ERROR_SUCCESS) {
+        err = key.QueryDWORDValue(L"SystemUsesLightTheme", light);
+        if (err != ERROR_SUCCESS) {
+            light = 0;
+        }
+    } else {
+        light = 0;
+    }
+    return light;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // RefreshableButton
 ////////////////////////////////////////////////////////////////////////////////
@@ -261,12 +276,14 @@ HRESULT IndicatorButton::GetIcon(__RPC__deref_out_opt HICON* hicon) {
         DBG_DPRINT(L"%s", L"cannot obtain instance");
         return E_FAIL;
     }
+
+    DWORD light = GetSystemLightTheme();
     if (_controller->GetBlocked() == EngineController::BlockedKind::Blocked) {
-        *hicon = static_cast<HICON>(LoadImage(Globals::DllInstance, MAKEINTRESOURCE(IDI_ICONX), IMAGE_ICON, 16, 16, 0));
+        *hicon = static_cast<HICON>(LoadImage(Globals::DllInstance, MAKEINTRESOURCE(light ? IDI_ICONXL : IDI_ICONXD), IMAGE_ICON, 16, 16, 0));
     } else if (_controller->IsEnabled()) {
-        *hicon = static_cast<HICON>(LoadImage(Globals::DllInstance, MAKEINTRESOURCE(IDI_ICONV), IMAGE_ICON, 16, 16, 0));
+        *hicon = static_cast<HICON>(LoadImage(Globals::DllInstance, MAKEINTRESOURCE(light ? IDI_ICONVL : IDI_ICONVD), IMAGE_ICON, 16, 16, 0));
     } else {
-        *hicon = static_cast<HICON>(LoadImage(Globals::DllInstance, MAKEINTRESOURCE(IDI_ICONE), IMAGE_ICON, 16, 16, 0));
+        *hicon = static_cast<HICON>(LoadImage(Globals::DllInstance, MAKEINTRESOURCE(light ? IDI_ICONEL : IDI_ICONED), IMAGE_ICON, 16, 16, 0));
     }
     return *hicon ? S_OK : E_FAIL;
 }
@@ -322,12 +339,14 @@ HRESULT LangBarButton::GetIcon(__RPC__deref_out_opt HICON* hicon) {
         DBG_DPRINT(L"%s", L"cannot obtain instance");
         return E_FAIL;
     }
+
+    DWORD light = GetSystemLightTheme();
     if (_controller->GetBlocked() == EngineController::BlockedKind::Blocked) {
-        *hicon = static_cast<HICON>(LoadImage(Globals::DllInstance, MAKEINTRESOURCE(IDI_ICONX), IMAGE_ICON, 16, 16, 0));
+        *hicon = static_cast<HICON>(LoadImage(Globals::DllInstance, MAKEINTRESOURCE(light ? IDI_ICONXL : IDI_ICONXD), IMAGE_ICON, 16, 16, 0));
     } else if (_controller->IsEnabled()) {
-        *hicon = static_cast<HICON>(LoadImage(Globals::DllInstance, MAKEINTRESOURCE(IDI_ICONV), IMAGE_ICON, 16, 16, 0));
+        *hicon = static_cast<HICON>(LoadImage(Globals::DllInstance, MAKEINTRESOURCE(light ? IDI_ICONVL : IDI_ICONVD), IMAGE_ICON, 16, 16, 0));
     } else {
-        *hicon = static_cast<HICON>(LoadImage(Globals::DllInstance, MAKEINTRESOURCE(IDI_ICONE), IMAGE_ICON, 16, 16, 0));
+        *hicon = static_cast<HICON>(LoadImage(Globals::DllInstance, MAKEINTRESOURCE(light ? IDI_ICONEL : IDI_ICONED), IMAGE_ICON, 16, 16, 0));
     }
     return *hicon ? S_OK : E_FAIL;
 }

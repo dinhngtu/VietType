@@ -216,13 +216,22 @@
     <Image Include="resources\logo.ico">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="resources\E.ico">
+    <Image Include="resources\ED.ico">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="resources\V.ico">
+    <Image Include="resources\EL.ico">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="resources\X.ico">
+    <Image Include="resources\VD.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\VL.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\XD.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\XL.ico">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

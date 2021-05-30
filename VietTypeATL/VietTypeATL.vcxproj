@@ -369,10 +369,13 @@
     <Midl Include="VietTypeATL.idl" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="resources\E.ico" />
+    <Image Include="resources\ED.ico" />
+    <Image Include="resources\EL.ico" />
     <Image Include="resources\logo.ico" />
-    <Image Include="resources\V.ico" />
-    <Image Include="resources\X.ico" />
+    <Image Include="resources\VD.ico" />
+    <Image Include="resources\VL.ico" />
+    <Image Include="resources\XD.ico" />
+    <Image Include="resources\XL.ico" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Telex\Telex.vcxproj">
