@@ -160,10 +160,9 @@ HRESULT EngineController::ToggleUserEnabled() {
 
 long EngineController::IsEnabled() const {
     long enabled;
-#pragma warning(suppress: 4189)
     HRESULT hr = this->IsUserEnabled(&enabled);
     HRESULT_CHECK(hr, L"%s", L"this->IsUserEnabled failed");
-    return enabled && _blocked == BlockedKind::Free;
+    return !!enabled && _blocked == BlockedKind::Free;
 }
 
 EngineController::BlockedKind EngineController::GetBlocked() const {
@@ -225,7 +224,7 @@ HRESULT EngineController::UpdateStates() {
 _Check_return_ HRESULT EngineController::InitLanguageBar() {
     HRESULT hr;
 
-    _indicatorButton = std::make_unique<IndicatorButton>();
+    _indicatorButton = std::make_unique<RefreshableButton>();
     hr = _indicatorButton->Initialize(
         this,
         _langBarItemMgr,
@@ -235,7 +234,7 @@ _Check_return_ HRESULT EngineController::InitLanguageBar() {
         Globals::TextServiceDescription);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_indicatorButton->Initialize failed");
 
-    _langBarButton = std::make_unique<LangBarButton>();
+    _langBarButton = std::make_unique<RefreshableButton>();
     hr = _langBarButton->Initialize(
         this,
         _langBarItemMgr,

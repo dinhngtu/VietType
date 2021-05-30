@@ -242,11 +242,7 @@ HRESULT RefreshableButton::Uninitialize() {
     return S_OK;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// IndicatorButton
-////////////////////////////////////////////////////////////////////////////////
-
-HRESULT IndicatorButton::OnClick(_In_ TfLBIClick click, _In_ POINT pt, __RPC__in const RECT* area) {
+HRESULT RefreshableButton::OnClick(_In_ TfLBIClick click, _In_ POINT pt, __RPC__in const RECT* area) {
     if (click == TF_LBI_CLK_LEFT) {
         return _controller->ToggleUserEnabled();
     } else if (click == TF_LBI_CLK_RIGHT) {
@@ -258,7 +254,7 @@ HRESULT IndicatorButton::OnClick(_In_ TfLBIClick click, _In_ POINT pt, __RPC__in
     return S_OK;
 }
 
-HRESULT IndicatorButton::InitMenu(__RPC__in_opt ITfMenu* menu) {
+HRESULT RefreshableButton::InitMenu(__RPC__in_opt ITfMenu* menu) {
     if (!menu) {
         return E_INVALIDARG;
     }
@@ -266,11 +262,11 @@ HRESULT IndicatorButton::InitMenu(__RPC__in_opt ITfMenu* menu) {
     return S_OK;
 }
 
-HRESULT IndicatorButton::OnMenuSelect(_In_ UINT id) {
+HRESULT RefreshableButton::OnMenuSelect(_In_ UINT id) {
     return OnMenuSelectAll(id, _controller);
 }
 
-HRESULT IndicatorButton::GetIcon(__RPC__deref_out_opt HICON* hicon) {
+HRESULT RefreshableButton::GetIcon(__RPC__deref_out_opt HICON* hicon) {
     // Windows docs is a liar, icons are mandatory
     if (!Globals::DllInstance) {
         DBG_DPRINT(L"%s", L"cannot obtain instance");
@@ -288,82 +284,27 @@ HRESULT IndicatorButton::GetIcon(__RPC__deref_out_opt HICON* hicon) {
     return *hicon ? S_OK : E_FAIL;
 }
 
-HRESULT IndicatorButton::Refresh() {
+DWORD RefreshableButton::GetStatus() {
+    return 0;
+}
+
+std::wstring RefreshableButton::GetText() {
+    return _controller->IsEnabled() ? std::wstring(L"VIE") : std::wstring(L"ENG");
+}
+
+std::wstring RefreshableButton::GetTooltipString() {
+    if (_controller->GetBlocked() == EngineController::BlockedKind::Blocked) {
+        return std::wstring(L"Paused");
+    } else {
+        return _controller->IsEnabled() ? std::wstring(L"Vietnamese") : std::wstring(L"English");
+    }
+}
+
+HRESULT RefreshableButton::Refresh() {
     HRESULT hr;
 
-    hr = _button->NotifyUpdate(TF_LBI_ICON);
+    hr = _button->NotifyUpdate(TF_LBI_ICON | TF_LBI_TEXT | TF_LBI_TOOLTIP);
     HRESULT_CHECK_RETURN(hr, L"%s", L"button->NotifyUpdate failed");
-
-    return hr;
-}
-
-DWORD IndicatorButton::GetStatus() {
-    return 0;
-}
-
-std::wstring IndicatorButton::GetText() {
-    return _controller->IsEnabled() ? std::wstring(L"VIE") : std::wstring(L"ENG");
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// LangBarButton
-////////////////////////////////////////////////////////////////////////////////
-
-HRESULT LangBarButton::OnClick(_In_ TfLBIClick click, _In_ POINT pt, __RPC__in const RECT* area) {
-    if (click == TF_LBI_CLK_LEFT) {
-        return _controller->ToggleUserEnabled();
-    } else if (click == TF_LBI_CLK_RIGHT) {
-        int itemId = PopMenu(pt, area);
-        if (itemId) {
-            return OnMenuSelectAll(itemId, _controller);
-        }
-    }
-    return S_OK;
-}
-
-HRESULT LangBarButton::InitMenu(__RPC__in_opt ITfMenu* menu) {
-    if (!menu) {
-        return E_INVALIDARG;
-    }
-    CopyTfMenu(menu);
-    return S_OK;
-}
-
-HRESULT LangBarButton::OnMenuSelect(_In_ UINT id) {
-    return OnMenuSelectAll(id, _controller);
-}
-
-HRESULT LangBarButton::GetIcon(__RPC__deref_out_opt HICON* hicon) {
-    // Windows docs is a liar, icons are mandatory
-    if (!Globals::DllInstance) {
-        DBG_DPRINT(L"%s", L"cannot obtain instance");
-        return E_FAIL;
-    }
-
-    DWORD light = GetSystemLightTheme();
-    if (_controller->GetBlocked() == EngineController::BlockedKind::Blocked) {
-        *hicon = static_cast<HICON>(LoadImage(Globals::DllInstance, MAKEINTRESOURCE(light ? IDI_ICONXL : IDI_ICONXD), IMAGE_ICON, 16, 16, 0));
-    } else if (_controller->IsEnabled()) {
-        *hicon = static_cast<HICON>(LoadImage(Globals::DllInstance, MAKEINTRESOURCE(light ? IDI_ICONVL : IDI_ICONVD), IMAGE_ICON, 16, 16, 0));
-    } else {
-        *hicon = static_cast<HICON>(LoadImage(Globals::DllInstance, MAKEINTRESOURCE(light ? IDI_ICONEL : IDI_ICONED), IMAGE_ICON, 16, 16, 0));
-    }
-    return *hicon ? S_OK : E_FAIL;
-}
-
-DWORD LangBarButton::GetStatus() {
-    return 0;
-}
-
-std::wstring LangBarButton::GetText() {
-    return _controller->IsEnabled() ? std::wstring(L"VIE") : std::wstring(L"ENG");
-}
-
-HRESULT LangBarButton::Refresh() {
-    HRESULT hr;
-
-    hr = _button->NotifyUpdate(TF_LBI_ICON);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_button->NotifyUpdate failed");
 
     return hr;
 }

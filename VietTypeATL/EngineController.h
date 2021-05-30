@@ -10,8 +10,7 @@
 
 namespace VietType {
 
-class IndicatorButton;
-class LangBarButton;
+class RefreshableButton;
 class CompositionManager;
 class EngineController;
 class SettingsDialog;
@@ -85,8 +84,8 @@ private:
     SinkAdvisor<ITfCompartmentEventSink> _openCloseCompartmentEventSink;
 
     // unique_ptr is not necessary but used just to break include cycle
-    std::unique_ptr<IndicatorButton> _indicatorButton;
-    std::unique_ptr<LangBarButton> _langBarButton;
+    std::unique_ptr<RefreshableButton> _indicatorButton;
+    std::unique_ptr<RefreshableButton> _langBarButton;
 
     CComPtr<EngineSettingsController> _settings;
 

@@ -14,6 +14,7 @@ public:
     virtual HRESULT GetIcon(__RPC__deref_out_opt HICON* hicon) = 0;
     virtual DWORD GetStatus() = 0;
     virtual std::wstring GetText() = 0;
+    virtual std::wstring GetTooltipString() = 0;
 };
 
 class LanguageBarButton :

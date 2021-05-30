@@ -17,7 +17,16 @@ public:
     RefreshableButton& operator=(const RefreshableButton&) = delete;
     ~RefreshableButton() = default;
 
-    virtual HRESULT Refresh() = 0;
+    virtual HRESULT Refresh();
+
+    // Inherited via ILanguageBarCallbacks
+    virtual HRESULT OnClick(_In_ TfLBIClick click, _In_ POINT pt, __RPC__in const RECT* area) override;
+    virtual HRESULT InitMenu(__RPC__in_opt ITfMenu* menu) override;
+    virtual HRESULT OnMenuSelect(_In_ UINT id) override;
+    virtual HRESULT GetIcon(__RPC__deref_out_opt HICON* hicon) override;
+    virtual DWORD GetStatus() override;
+    virtual std::wstring GetText() override;
+    virtual std::wstring GetTooltipString() override;
 
     // ensure that langbar init does not read engine state
     _Check_return_ HRESULT Initialize(
@@ -35,44 +44,6 @@ protected:
     CComPtr<LanguageBarButton> _button;
 
     CComPtr<ITfLangBarItemMgr> _langBarItemMgr;
-};
-
-class IndicatorButton : public RefreshableButton {
-public:
-    IndicatorButton() = default;
-    IndicatorButton(const IndicatorButton&) = delete;
-    IndicatorButton& operator=(const IndicatorButton&) = delete;
-    ~IndicatorButton() = default;
-
-    // Inherited via ILanguageBarCallbacks
-    virtual HRESULT OnClick(_In_ TfLBIClick click, _In_ POINT pt, __RPC__in const RECT* area) override;
-    virtual HRESULT InitMenu(__RPC__in_opt ITfMenu* menu) override;
-    virtual HRESULT OnMenuSelect(_In_ UINT id) override;
-    virtual HRESULT GetIcon(__RPC__deref_out_opt HICON* hicon) override;
-    virtual DWORD GetStatus() override;
-    virtual std::wstring GetText() override;
-
-    // Inherited via RefreshableButton
-    virtual HRESULT Refresh() override;
-};
-
-class LangBarButton : public RefreshableButton {
-public:
-    LangBarButton() = default;
-    LangBarButton(const LangBarButton&) = delete;
-    LangBarButton& operator=(const LangBarButton&) = delete;
-    ~LangBarButton() = default;
-
-    // Inherited via ILanguageBarCallbacks
-    virtual HRESULT OnClick(_In_ TfLBIClick click, _In_ POINT pt, __RPC__in const RECT* area) override;
-    virtual HRESULT InitMenu(__RPC__in_opt ITfMenu* menu) override;
-    virtual HRESULT OnMenuSelect(_In_ UINT id) override;
-    virtual HRESULT GetIcon(__RPC__deref_out_opt HICON* hicon) override;
-    virtual DWORD GetStatus() override;
-    virtual std::wstring GetText() override;
-
-    // Inherited via RefreshableButton
-    virtual HRESULT Refresh() override;
 };
 
 }

@@ -62,10 +62,6 @@ STDMETHODIMP LanguageBarButton::Show(_In_ BOOL fShow) {
     return E_NOTIMPL;
 }
 
-STDMETHODIMP LanguageBarButton::GetTooltipString(__RPC__deref_out_opt BSTR* pbstrToolTip) {
-    return E_NOTIMPL;
-}
-
 STDMETHODIMP LanguageBarButton::OnClick(_In_ TfLBIClick click, _In_ POINT pt, __RPC__in const RECT* prcArea) {
     if (_callbacks) {
         return _callbacks->OnClick(click, pt, prcArea);
@@ -102,7 +98,18 @@ STDMETHODIMP LanguageBarButton::GetIcon(__RPC__deref_out_opt HICON* phIcon) {
 }
 
 STDMETHODIMP LanguageBarButton::GetText(__RPC__deref_out_opt BSTR* pbstrText) {
+    if (!pbstrText) {
+        return E_INVALIDARG;
+    }
     *pbstrText = SysAllocString(_callbacks->GetText().c_str());
+    return *pbstrText ? S_OK : E_OUTOFMEMORY;
+}
+
+STDMETHODIMP LanguageBarButton::GetTooltipString(__RPC__deref_out_opt BSTR* pbstrText) {
+    if (!pbstrText) {
+        return E_INVALIDARG;
+    }
+    *pbstrText = SysAllocString(_callbacks->GetTooltipString().c_str());
     return *pbstrText ? S_OK : E_OUTOFMEMORY;
 }
 
