@@ -58,11 +58,27 @@ _Check_return_ HRESULT EngineSettingsController::Initialize(
         [this] { return LoadSettings(); });
     HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(_tc_accept_dd) failed");
 
+    hr = CreateInitialize(
+        &_tc_backspace_invalid,
+        HKEY_CURRENT_USER,
+        Globals::ConfigKeyName.c_str(),
+        L"backspace_invalid",
+        threadMgr,
+        clientid,
+        GUID_TelexConfigCompartment,
+        false,
+        [this] { return LoadSettings(); });
+    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(_tc_backspace_invalid) failed");
+
     return S_OK;
 }
 
 HRESULT EngineSettingsController::Uninitialize() {
     HRESULT hr;
+
+    hr = _tc_backspace_invalid->Uninitialize();
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_backspace_invalid->Uninitialize failed");
+    _tc_backspace_invalid.Release();
 
     hr = _tc_accept_dd->Uninitialize();
     HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_accept_dd->Uninitialize failed");
@@ -94,9 +110,11 @@ HRESULT EngineSettingsController::LoadSettings() {
     hr = _tc_accept_dd->GetValueOrWriteback(&accept_dd, _ec->GetEngine().GetConfig().accept_separate_dd);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_accept_dd->GetValueOrWriteback failed");
 
-    DBG_DPRINT(L"loading settings default=%ld oa_uy=%ld accept_dd=%ld", default_enabled, oa_uy_tone1, accept_dd);
+    DWORD backspace_invalid = true;
+    hr = _tc_backspace_invalid->GetValueOrWriteback(&backspace_invalid, _ec->GetEngine().GetConfig().backspaced_word_stays_invalid);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_backspace_invalid->GetValueOrWriteback failed");
 
-    auto cfg = _ec->GetEngine().GetConfig();
+    auto cfg(_ec->GetEngine().GetConfig());
     cfg.oa_uy_tone1 = static_cast<bool>(oa_uy_tone1);
     cfg.accept_separate_dd = static_cast<bool>(accept_dd);
     _ec->GetEngine().SetConfig(cfg);
@@ -108,6 +126,8 @@ HRESULT EngineSettingsController::CommitSettings(const SettingsDialog& dlg) {
     HRESULT hr;
     _ec->GetEngine().SetConfig(dlg.GetConfig().TelexConfig);
 
+    hr = _tc_backspace_invalid->SetValue(static_cast<DWORD>(dlg.GetConfig().TelexConfig.backspaced_word_stays_invalid));
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_backspace_invalid->SetValue failed");
     hr = _default_enabled->SetValue(static_cast<DWORD>(dlg.GetConfig().DefaultEnabled));
     hr = _tc_oa_uy_tone1->SetValue(static_cast<DWORD>(dlg.GetConfig().TelexConfig.oa_uy_tone1));
     HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_oa_uy_tone1->SetValue failed");

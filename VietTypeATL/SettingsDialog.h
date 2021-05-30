@@ -66,6 +66,13 @@ private:
     template <>
     bool& Property<IDC_SETTINGS_DEFAULT_ENABLED>();
 
+    template <>
+    struct propType<IDC_SETTINGS_BACKSPACE_INVALID> {
+        using type = bool;
+    };
+    template <>
+    bool& Property<IDC_SETTINGS_BACKSPACE_INVALID>();
+
 private:
     SettingsDialogData _data;
 };

@@ -114,8 +114,10 @@ HRESULT KeyHandlerEditSession::Commit(_In_ TfEditCookie ec) {
     HRESULT hr;
 
     if (_compositionManager->IsComposing()) {
+#ifndef NDEBUG
         auto txstate = _controller->GetEngine().Commit();
         assert(txstate == Telex::TelexStates::Committed || txstate == Telex::TelexStates::CommittedInvalid);
+#endif
         auto str = _controller->GetEngine().Retrieve();
         hr = _compositionManager->SetCompositionText(ec, &str[0], static_cast<LONG>(str.length()));
         DBG_HRESULT_CHECK(hr, L"%s", L"_compositionManager->EnsureCompositionText failed");

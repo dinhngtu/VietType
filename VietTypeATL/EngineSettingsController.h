@@ -40,6 +40,7 @@ private:
     CComPtr<RegistrySetting<DWORD>> _default_enabled;
     CComPtr<RegistrySetting<DWORD>> _tc_oa_uy_tone1;
     CComPtr<RegistrySetting<DWORD>> _tc_accept_dd;
+    CComPtr<RegistrySetting<DWORD>> _tc_backspace_invalid;
 };
 
 }
