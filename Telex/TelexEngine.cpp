@@ -28,7 +28,7 @@ static wchar_t ToUpper(_In_ wchar_t c) {
         return uc;
     }
     // Latin-1 Supplement
-    if (c >= L'\xc0' && c <= L'\xde') {
+    if (c >= L'\xe0' && c <= L'\xfe') {
         return uc;
     }
     uc = c & ~1;
@@ -48,7 +48,7 @@ static wchar_t ToLower(_In_ wchar_t c) {
     if (lc >= L'a' && lc <= L'z') {
         return lc;
     }
-    if (c >= L'\xe0' && c <= L'\xfe') {
+    if (c >= L'\xc0' && c <= L'\xde') {
         return lc;
     }
     lc = c | 1;

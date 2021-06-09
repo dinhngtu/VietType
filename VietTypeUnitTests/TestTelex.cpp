@@ -133,6 +133,34 @@ public:
         Assert::AreEqual(L"A", e.Retrieve().c_str());
     }
 
+    TEST_METHOD(TestTypingUpAai_1) {
+        TestValidWord(L"\xc2n", L"AAn");
+    }
+
+    TEST_METHOD(TestTypingUpAai_2) {
+        TestValidWord(L"\xc2n", L"Aan");
+    }
+
+    TEST_METHOD(TestTypingUpDdi_1) {
+        TestValidWord(L"\x110i", L"DDi");
+    }
+
+    TEST_METHOD(TestTypingUpDdi_2) {
+        TestValidWord(L"\x110i", L"Ddi");
+    }
+
+    TEST_METHOD(TestTypingUpAasn_1) {
+        TestValidWord(L"\x1ea4n", L"AASn");
+    }
+
+    TEST_METHOD(TestTypingUpAasn_2) {
+        TestValidWord(L"\x1ea4n", L"Aasn");
+    }
+
+    TEST_METHOD(TestTypingUpAasn_3) {
+        TestValidWord(L"\x1ea4n", L"AAsn");
+    }
+
     // backspace
 
     TEST_METHOD(TestEmptyBackspace) {
