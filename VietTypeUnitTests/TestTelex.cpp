@@ -272,6 +272,14 @@ public:
         TestValidWord(L"ngu\x1ea9y", L"nguayar");
     }
 
+    TEST_METHOD(TestTypingLuuw) {
+        TestValidWord(L"l\x1b0u", L"luuw");
+    }
+
+    TEST_METHOD(TestTypingHuouw) {
+        TestValidWord(L"h\x1b0\x1a1u", L"huouw");
+    }
+
     // peek tests
 
     TEST_METHOD(TestPeekDd) {
