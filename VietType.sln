@@ -9,8 +9,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VietTypeATL", "VietTypeATL\
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "VietTypeSetup", "VietTypeSetup\VietTypeSetup.wixproj", "{8882E9D2-7670-4906-98F5-60A147BF5ECA}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VietTypeRegistrar", "VietTypeRegistrar\VietTypeRegistrar.vcxproj", "{21FE5325-5162-4B68-9D65-397FC99D82B1}"
-EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "VietTypeSetupBootstrapper", "VietTypeSetupBootstrapper\VietTypeSetupBootstrapper.wixproj", "{1139CE87-C648-4D3C-8F2A-61AB9D04C396}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VietTypeUnitTests", "VietTypeUnitTests\VietTypeUnitTests.vcxproj", "{3F698192-164B-4E9D-91FD-DDD623C1C98C}"
@@ -55,10 +53,6 @@ Global
 		{8882E9D2-7670-4906-98F5-60A147BF5ECA}.Release|Win32.Build.0 = Release|x86
 		{8882E9D2-7670-4906-98F5-60A147BF5ECA}.Release|x64.ActiveCfg = Release|x64
 		{8882E9D2-7670-4906-98F5-60A147BF5ECA}.Release|x64.Build.0 = Release|x64
-		{21FE5325-5162-4B68-9D65-397FC99D82B1}.Debug|Win32.ActiveCfg = Debug|Win32
-		{21FE5325-5162-4B68-9D65-397FC99D82B1}.Debug|x64.ActiveCfg = Debug|x64
-		{21FE5325-5162-4B68-9D65-397FC99D82B1}.Release|Win32.ActiveCfg = Release|Win32
-		{21FE5325-5162-4B68-9D65-397FC99D82B1}.Release|x64.ActiveCfg = Release|x64
 		{1139CE87-C648-4D3C-8F2A-61AB9D04C396}.Debug|Win32.ActiveCfg = Debug|x86
 		{1139CE87-C648-4D3C-8F2A-61AB9D04C396}.Debug|x64.ActiveCfg = Debug|x86
 		{1139CE87-C648-4D3C-8F2A-61AB9D04C396}.Release|Win32.ActiveCfg = Release|x86

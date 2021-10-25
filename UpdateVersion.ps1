@@ -20,9 +20,6 @@ $hNew = `
 #define FILEVERSION_TUPLE $($fileVersion[0]),$($fileVersion[1]),$($fileVersion[2]),$($fileVersion[3])
 #define FILEVERSION_TEXT "$($fileVersion[0]).$($fileVersion[1]).$($fileVersion[2]).$($fileVersion[3])"
 
-#define REGISTRAR_FILEVERSION_TUPLE $($registrarFileVersion[0]),$($registrarFileVersion[1]),$($registrarFileVersion[2]),$($registrarFileVersion[3])
-#define REGISTRAR_FILEVERSION_TEXT "$($registrarFileVersion[0]).$($registrarFileVersion[1]).$($registrarFileVersion[2]).$($registrarFileVersion[3])"
-
 #define PRODUCTVERSION_TUPLE $($productVersion[0]),$($productVersion[1]),$($productVersion[2]),$($productVersion[3])
 #define PRODUCTVERSION_TEXT "$($productVersion[0]).$($productVersion[1]).$($productVersion[2]).$($productVersion[3])"
 
