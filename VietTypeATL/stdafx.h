@@ -38,6 +38,7 @@
 #include <algorithm>
 #include <iterator>
 #include <optional>
+#include <sstream>
 
 #include <strsafe.h>
 #include <msctf.h>
