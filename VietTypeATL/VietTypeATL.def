@@ -8,3 +8,10 @@ EXPORTS
     DllRegisterServer PRIVATE
     DllUnregisterServer PRIVATE
     DllInstall PRIVATE
+    RunSetSettingsKeyAclW
+    RunRegisterProfilesW
+    RunUnregisterProfilesW
+    RunRegisterCategoriesW
+    RunUnregisterCategoriesW
+    RunActivateProfilesW
+    RunDeactivateProfilesW

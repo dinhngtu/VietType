@@ -24,6 +24,29 @@ static std::vector<GUID> SupportedCategories = {
     GUID_TFCAT_DISPLAYATTRIBUTEPROVIDER, // display attributes for composition
 };
 
+extern "C" typedef HRESULT(__cdecl* funtype)();
+
+static void ShowRunError(HWND hWnd, HRESULT hr) {
+    MessageBoxW(hWnd, L"VietType registration error", L"VietType registration error", MB_ICONERROR | MB_OK);
+}
+
+static void DoRunFunction(funtype fun, HWND hWnd, HINSTANCE hInst, LPWSTR lpszCmdLine, int nCmdShow) {
+    HRESULT hr;
+    if (!VietType::Globals::DllInstance) {
+        VietType::Globals::DllInstance = hInst;
+    }
+    hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+    if (FAILED(hr)) {
+        ShowRunError(hWnd, hr);
+    } else {
+        hr = fun();
+        if (FAILED(hr)) {
+            ShowRunError(hWnd, hr);
+        }
+        CoUninitialize();
+    }
+}
+
 // allow ALL APPLICATION PACKAGES permissions to query/set value, otherwise we can't change config from within IME
 extern "C" __declspec(dllexport) HRESULT __cdecl SetSettingsKeyAcl() {
     LSTATUS err;
@@ -85,6 +108,10 @@ extern "C" __declspec(dllexport) HRESULT __cdecl SetSettingsKeyAcl() {
     return S_OK;
 }
 
+extern "C" __declspec(dllexport) void CALLBACK RunSetSettingsKeyAclW(HWND hWnd, HINSTANCE hInst, LPWSTR lpszCmdLine, int nCmdShow) {
+    DoRunFunction(SetSettingsKeyAcl, hWnd, hInst, lpszCmdLine, nCmdShow);
+}
+
 extern "C" __declspec(dllexport) HRESULT __cdecl RegisterProfiles() {
     HRESULT hr;
 
@@ -127,6 +154,10 @@ extern "C" __declspec(dllexport) HRESULT __cdecl RegisterProfiles() {
     return S_OK;
 }
 
+extern "C" __declspec(dllexport) void CALLBACK RunRegisterProfilesW(HWND hWnd, HINSTANCE hInst, LPWSTR lpszCmdLine, int nCmdShow) {
+    DoRunFunction(RegisterProfiles, hWnd, hInst, lpszCmdLine, nCmdShow);
+}
+
 extern "C" __declspec(dllexport) HRESULT __cdecl UnregisterProfiles() {
     HRESULT hr;
 
@@ -143,6 +174,10 @@ extern "C" __declspec(dllexport) HRESULT __cdecl UnregisterProfiles() {
     return S_OK;
 }
 
+extern "C" __declspec(dllexport) void CALLBACK RunUnregisterProfilesW(HWND hWnd, HINSTANCE hInst, LPWSTR lpszCmdLine, int nCmdShow) {
+    DoRunFunction(UnregisterProfiles, hWnd, hInst, lpszCmdLine, nCmdShow);
+}
+
 extern "C" __declspec(dllexport) HRESULT __cdecl RegisterCategories() {
     HRESULT hr;
 
@@ -157,6 +192,10 @@ extern "C" __declspec(dllexport) HRESULT __cdecl RegisterCategories() {
     }
 
     return S_OK;
+}
+
+extern "C" __declspec(dllexport) void CALLBACK RunRegisterCategoriesW(HWND hWnd, HINSTANCE hInst, LPWSTR lpszCmdLine, int nCmdShow) {
+    DoRunFunction(RegisterCategories, hWnd, hInst, lpszCmdLine, nCmdShow);
 }
 
 extern "C" __declspec(dllexport) HRESULT __cdecl UnregisterCategories() {
@@ -186,6 +225,10 @@ extern "C" __declspec(dllexport) HRESULT __cdecl UnregisterCategories() {
     return S_OK;
 }
 
+extern "C" __declspec(dllexport) void CALLBACK RunUnregisterCategoriesW(HWND hWnd, HINSTANCE hInst, LPWSTR lpszCmdLine, int nCmdShow) {
+    DoRunFunction(UnregisterCategories, hWnd, hInst, lpszCmdLine, nCmdShow);
+}
+
 extern "C" __declspec(dllexport) HRESULT __cdecl ActivateProfiles() {
     HRESULT hr;
 
@@ -207,6 +250,10 @@ extern "C" __declspec(dllexport) HRESULT __cdecl ActivateProfiles() {
     return S_OK;
 }
 
+extern "C" __declspec(dllexport) void CALLBACK RunActivateProfilesW(HWND hWnd, HINSTANCE hInst, LPWSTR lpszCmdLine, int nCmdShow) {
+    DoRunFunction(ActivateProfiles, hWnd, hInst, lpszCmdLine, nCmdShow);
+}
+
 extern "C" __declspec(dllexport) HRESULT __cdecl DeactivateProfiles() {
     HRESULT hr;
 
@@ -223,4 +270,8 @@ extern "C" __declspec(dllexport) HRESULT __cdecl DeactivateProfiles() {
         TF_IPPMF_DISABLEPROFILE);
 
     return S_OK;
+}
+
+extern "C" __declspec(dllexport) void CALLBACK RunDeactivateProfilesW(HWND hWnd, HINSTANCE hInst, LPWSTR lpszCmdLine, int nCmdShow) {
+    DoRunFunction(DeactivateProfiles, hWnd, hInst, lpszCmdLine, nCmdShow);
 }
