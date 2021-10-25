@@ -48,7 +48,7 @@ static void DoRunFunction(funtype fun, HWND hWnd, HINSTANCE hInst, LPWSTR lpszCm
 }
 
 // allow ALL APPLICATION PACKAGES permissions to query/set value, otherwise we can't change config from within IME
-extern "C" __declspec(dllexport) HRESULT __cdecl SetSettingsKeyAcl() {
+static HRESULT SetSettingsKeyAcl() {
     LSTATUS err;
 
     CRegKey key;
@@ -112,7 +112,7 @@ extern "C" __declspec(dllexport) void CALLBACK RunSetSettingsKeyAclW(HWND hWnd, 
     DoRunFunction(SetSettingsKeyAcl, hWnd, hInst, lpszCmdLine, nCmdShow);
 }
 
-extern "C" __declspec(dllexport) HRESULT __cdecl RegisterProfiles() {
+static HRESULT RegisterProfiles() {
     HRESULT hr;
 
     if (!VietType::Globals::DllInstance) {
@@ -158,7 +158,7 @@ extern "C" __declspec(dllexport) void CALLBACK RunRegisterProfilesW(HWND hWnd, H
     DoRunFunction(RegisterProfiles, hWnd, hInst, lpszCmdLine, nCmdShow);
 }
 
-extern "C" __declspec(dllexport) HRESULT __cdecl UnregisterProfiles() {
+static HRESULT UnregisterProfiles() {
     HRESULT hr;
 
     CComPtr<ITfInputProcessorProfileMgr> profileMgr;
@@ -178,7 +178,7 @@ extern "C" __declspec(dllexport) void CALLBACK RunUnregisterProfilesW(HWND hWnd,
     DoRunFunction(UnregisterProfiles, hWnd, hInst, lpszCmdLine, nCmdShow);
 }
 
-extern "C" __declspec(dllexport) HRESULT __cdecl RegisterCategories() {
+static HRESULT RegisterCategories() {
     HRESULT hr;
 
     CComPtr<ITfCategoryMgr> categoryMgr;
@@ -198,7 +198,7 @@ extern "C" __declspec(dllexport) void CALLBACK RunRegisterCategoriesW(HWND hWnd,
     DoRunFunction(RegisterCategories, hWnd, hInst, lpszCmdLine, nCmdShow);
 }
 
-extern "C" __declspec(dllexport) HRESULT __cdecl UnregisterCategories() {
+static HRESULT UnregisterCategories() {
     HRESULT hr;
 
     CComPtr<ITfCategoryMgr> categoryMgr;
@@ -229,7 +229,7 @@ extern "C" __declspec(dllexport) void CALLBACK RunUnregisterCategoriesW(HWND hWn
     DoRunFunction(UnregisterCategories, hWnd, hInst, lpszCmdLine, nCmdShow);
 }
 
-extern "C" __declspec(dllexport) HRESULT __cdecl ActivateProfiles() {
+static HRESULT ActivateProfiles() {
     HRESULT hr;
 
     hr = SetSettingsKeyAcl();
@@ -254,7 +254,7 @@ extern "C" __declspec(dllexport) void CALLBACK RunActivateProfilesW(HWND hWnd, H
     DoRunFunction(ActivateProfiles, hWnd, hInst, lpszCmdLine, nCmdShow);
 }
 
-extern "C" __declspec(dllexport) HRESULT __cdecl DeactivateProfiles() {
+static HRESULT DeactivateProfiles() {
     HRESULT hr;
 
     CComPtr<ITfInputProcessorProfileMgr> profileMgr;
