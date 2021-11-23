@@ -1,4 +1,4 @@
-name: MSBuild
+name: test
 
 on: [push]
 
@@ -31,23 +31,3 @@ jobs:
 
       - name: Run tests
         run: vstest.console.exe ${{matrix.platform}}/${{matrix.configuration}}/VietTypeUnitTests.dll
-
-  build:
-    runs-on: windows-latest
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Add MSBuild to PATH
-        uses: microsoft/setup-msbuild@v1
-
-      - name: Build Win32
-        run: msbuild -m -target:VietTypeSetup:Rebuild -p:Configuration=Release -p:Platform=Win32 .
-
-      - name: Build x64
-        run: msbuild -m -target:VietTypeSetup:Rebuild -p:Configuration=Release -p:Platform=x64 .
-
-      - name: Upload a Build Artifact
-        uses: actions/upload-artifact@v2.2.1
-        with:
-          path: VietTypeSetup/bin/Release/*.msi
