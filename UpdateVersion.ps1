@@ -2,7 +2,7 @@ param([switch] $Force)
 
 $vcsFile = "VersionVCS.h"
 $vcsOld = Get-Content -ErrorAction Ignore -Raw $vcsFile
-$vcsRev = git describe --tags --dirty --always
+$vcsRev = git describe --tags --long --dirty --always
 $vcsNew = "#pragma once`n`n#define VCS_REVISION L""$vcsRev""`n"
 if ($Force -or ($vcsOld -ne $vcsNew)) {
     echo "Updating revision: $vcsRev"
