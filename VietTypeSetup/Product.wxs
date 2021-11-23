@@ -4,16 +4,16 @@ SPDX-License-Identifier: GPL-3.0-only
 -->
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
   <?include Version.wxi ?>
-  
+
   <Product
     Id="*"
     Name="VietType"
     Language="!(bind.fileLanguage.VietTypeATL32.dll)"
     Version="$(var.productVersion)"
     Manufacturer="Dinh Ngoc Tu"
-    UpgradeCode="e00ac838-881d-4301-aac5-0a723bb0b0ef">
-    
-    <Package InstallerVersion="400" Compressed="yes" InstallScope="perMachine" Comments="$(var.vcsRev)" />
+    UpgradeCode="{E00AC838-881D-4301-AAC5-0A723BB0B0EF}">
+
+    <Package InstallerVersion="400" Compressed="yes" InstallScope="perMachine" Comments="Ver-$(var.productVersion)_Rev-$(var.vcsRev)" />
 
     <MajorUpgrade
       DowngradeErrorMessage="A newer version of [ProductName] is already installed."
@@ -63,7 +63,7 @@ SPDX-License-Identifier: GPL-3.0-only
       <Custom Action="UnregisterCategories" After="UnregisterCategoriesRollback">REMOVE OR REINSTALL</Custom>
     </InstallExecuteSequence>
   </Product>
-  
+
   <!-- ################################################################################ -->
   <!-- install paths -->
 
@@ -83,23 +83,22 @@ SPDX-License-Identifier: GPL-3.0-only
 
   <Fragment>
     <ComponentGroup Id="ProductComponents">
-      <!-- Component Id is required, else Wix can't generate class registration entries -->
       <Component Id="VietTypeATL32.dll" Win64="no" Directory="INSTALLFOLDER">
-        <File Id="VietTypeATL32.dll" Source="$(var.SolutionDir)\Win32\$(var.Configuration)\VietTypeATL32.dll" Name="VietTypeATL32.dll">
+        <File Source="$(var.SolutionDir)\Win32\$(var.Configuration)\VietTypeATL32.dll">
           <Class Id="{C0DD01A1-0DEB-454B-8B42-D22CED1B4B23}" Context="InprocServer32" Description="VietType" ThreadingModel="apartment" />
         </File>
       </Component>
 
       <?if $(var.Platform) = x64 ?>
       <Component Id="VietTypeATL64.dll" Win64="yes" Directory="INSTALLFOLDER64">
-        <File Id="VietTypeATL64.dll" Source="$(var.SolutionDir)\x64\$(var.Configuration)\VietTypeATL64.dll" Name="VietTypeATL64.dll">
+        <File Source="$(var.SolutionDir)\x64\$(var.Configuration)\VietTypeATL64.dll">
           <Class Id="{C0DD01A1-0DEB-454B-8B42-D22CED1B4B23}" Context="InprocServer32" Description="VietType" ThreadingModel="apartment" />
         </File>
       </Component>
       <?endif ?>
 
       <Component Win64="no" Directory="INSTALLFOLDER">
-        <File Source="$(var.SolutionDir)\LICENSE" Name="LICENSE" />
+        <File Source="$(var.SolutionDir)\LICENSE" DefaultLanguage="1033" DefaultVersion="$(var.productVersion)" />
       </Component>
     </ComponentGroup>
   </Fragment>
@@ -132,12 +131,14 @@ SPDX-License-Identifier: GPL-3.0-only
   <Fragment>
     <ComponentGroup Id="DebugSymbols">
       <Component Win64="no" Directory="INSTALLFOLDER">
-        <File Source="$(var.SolutionDir)\Win32\$(var.Configuration)\VietTypeATL32.pdb" Name="VietTypeATL32.pdb" />
+        <File Source="$(var.SolutionDir)\Win32\$(var.Configuration)\VietTypeATL32.pdb"
+              DefaultLanguage="!(bind.fileLanguage.VietTypeATL32.dll)" DefaultVersion="!(bind.fileVersion.VietTypeATL32.dll)" />
       </Component>
 
       <?if $(var.Platform) = x64 ?>
       <Component Win64="yes" Directory="INSTALLFOLDER64">
-        <File Source="$(var.SolutionDir)\x64\$(var.Configuration)\VietTypeATL64.pdb" Name="VietTypeATL64.pdb" />
+        <File Source="$(var.SolutionDir)\x64\$(var.Configuration)\VietTypeATL64.pdb"
+              DefaultLanguage="!(bind.fileLanguage.VietTypeATL32.dll)" DefaultVersion="!(bind.fileVersion.VietTypeATL64.dll)" />
       </Component>
       <?endif ?>
     </ComponentGroup>
