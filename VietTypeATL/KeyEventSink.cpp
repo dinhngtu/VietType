@@ -16,6 +16,7 @@
 #include "EditSessions.h"
 #include "CompositionManager.h"
 #include "EngineController.h"
+#include "EngineSettingsController.h"
 #include "Utilities.h"
 
 namespace VietType {
@@ -76,7 +77,13 @@ STDMETHODIMP KeyEventSink::OnTestKeyDown(
         WINERROR_GLE_RETURN_HRESULT(L"%s", L"GetKeyboardState failed");
     }
 
-    *pfEaten = Telex::IsKeyEaten(_compositionManager->IsComposing(), wParam, lParam, _keyState);
+    if (wParam == VK_BACK && !_compositionManager->IsComposing() &&
+        !((_keyState[VK_CONTROL] & 0x80) || (_keyState[VK_MENU] & 0x80) || (_keyState[VK_LWIN] & 0x80) ||
+          (_keyState[VK_RWIN] & 0x80))) {
+        *pfEaten = TRUE;
+    } else {
+        *pfEaten = Telex::IsKeyEaten(_compositionManager->IsComposing(), wParam, lParam, _keyState);
+    }
 
     // break off the composition early at OnTestKeyDown on an uneaten key
     if (!*pfEaten && _compositionManager->IsComposing()) {
@@ -121,13 +128,31 @@ STDMETHODIMP KeyEventSink::OnKeyDown(
         WINERROR_GLE_RETURN_HRESULT(L"%s", L"GetKeyboardState failed");
     }
 
-    *pfEaten = Telex::IsKeyEaten(_compositionManager->IsComposing(), wParam, lParam, _keyState);
+    if (wParam == VK_BACK && !_compositionManager->IsComposing() &&
+        !((_keyState[VK_CONTROL] & 0x80) || (_keyState[VK_MENU] & 0x80) || (_keyState[VK_LWIN] & 0x80) ||
+          (_keyState[VK_RWIN] & 0x80))) {
+        DWORD backconvert = 0;
+        hr = _controller->GetSettings()->IsBackconvertOnBackspace(&backconvert);
+        if (FAILED(hr)) {
+            *pfEaten = FALSE;
+            HRESULT_CHECK_RETURN(hr, L"%s", L"IsBackconvertOnBackspace failed");
+        }
+        *pfEaten = !!backconvert;
+    } else {
+        *pfEaten = Telex::IsKeyEaten(_compositionManager->IsComposing(), wParam, lParam, _keyState);
+    }
 
     DBG_DPRINT(L"OnKeyDown wParam = %lx %s", wParam, *pfEaten ? L"eaten" : L"not eaten");
 
     if (*pfEaten || _compositionManager->IsComposing()) {
-        hr = CallKeyEdit(pic, wParam, lParam, _keyState);
-        HRESULT_CHECK_RETURN(hr, L"%s", L"CallKeyEdit failed");
+        if (wParam == VK_BACK) {
+            hr = CompositionManager::RequestEditSession(
+                EditSessions::EditSurroundingWord, _compositionManager, pic, _controller.p, 1);
+            HRESULT_CHECK_RETURN(hr, L"%s", L"RequestEditSession failed");
+        } else {
+            hr = CallKeyEdit(pic, wParam, lParam, _keyState);
+            HRESULT_CHECK_RETURN(hr, L"%s", L"CallKeyEdit failed");
+        }
     }
 
     return S_OK;

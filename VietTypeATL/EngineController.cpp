@@ -179,6 +179,10 @@ _Check_return_ HRESULT EngineController::GetOpenClose(_Out_ long* openclose) {
     return _openCloseCompartment.GetValue(openclose);
 }
 
+EngineSettingsController* EngineController::GetSettings() const {
+    return _settings;
+}
+
 SettingsDialog EngineController::CreateSettingsDialog() {
     HRESULT hr;
     DWORD defaultEnabled, backconvertOnBackspace;

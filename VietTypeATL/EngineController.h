@@ -57,6 +57,7 @@ public:
 
     _Check_return_ HRESULT GetOpenClose(_Out_ long* openclose);
 
+    EngineSettingsController* GetSettings() const;
     SettingsDialog CreateSettingsDialog();
     HRESULT CommitSettings(const SettingsDialog& dlg);
 
