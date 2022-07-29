@@ -24,10 +24,6 @@ namespace VietType {
 static const GUID GUID_KeyEventSink_PreservedKey_Toggle = { 0x8cc27cf8, 0x93d2, 0x416c, { 0xb1, 0xa3, 0x66, 0x82, 0x7f, 0x54, 0x24, 0x4a } };
 static const TF_PRESERVEDKEY PK_Toggle = { VK_OEM_3, TF_MOD_ALT }; // Alt-`
 
-// {C5A067B1-D0EF-43C3-80F7-8DB23B56A8FA}
-static const GUID GUID_KeyEventSink_PreservedKey_ToggleJA = { 0xc5a067b1, 0xd0ef, 0x43c3, { 0x80, 0xf7, 0x8d, 0xb2, 0x3b, 0x56, 0xa8, 0xfa } };
-static const TF_PRESERVEDKEY PK_ToggleJA = { VK_KANJI, TF_MOD_IGNORE_ALL_MODIFIER }; // for Japanese langid
-
 // {FAC88DBE-E799-474B-9A8C-1449CAA38348}
 static const GUID GUID_KeyEventSink_PreservedKey_EditBack = { 0xfac88dbe, 0xe799, 0x474b, { 0x9a, 0x8c, 0x14, 0x49, 0xca, 0xa3, 0x83, 0x48 } };
 static const TF_PRESERVEDKEY PK_EditBack = { VK_LEFT, TF_MOD_ALT };
@@ -151,7 +147,7 @@ STDMETHODIMP KeyEventSink::OnKeyUp(_In_ ITfContext* pic, _In_ WPARAM wParam, _In
 STDMETHODIMP KeyEventSink::OnPreservedKey(_In_ ITfContext* pic, _In_ REFGUID rguid, _Out_ BOOL* pfEaten) {
     HRESULT hr;
 
-    if (GUID_KeyEventSink_PreservedKey_Toggle == rguid || GUID_KeyEventSink_PreservedKey_ToggleJA == rguid) {
+    if (GUID_KeyEventSink_PreservedKey_Toggle == rguid) {
         *pfEaten = TRUE;
         _controller->GetEngine().Reset();
         hr = _compositionManager->EndComposition();
@@ -194,14 +190,9 @@ _Check_return_ HRESULT KeyEventSink::Initialize(
     hr = _keystrokeMgr->AdviseKeyEventSink(_clientid, this, TRUE);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_keystrokeMgr->AdviseKeyEventSink failed");
 
-    if (Globals::TextServiceLangId == MAKELANGID(LANG_JAPANESE, SUBLANG_JAPANESE_JAPAN)) {
-        hr = _keystrokeMgr->PreserveKey(_clientid, GUID_KeyEventSink_PreservedKey_ToggleJA, &PK_ToggleJA, NULL, 0);
-        DBG_HRESULT_CHECK(hr, L"%s", L"_keystrokeMgr->PreserveKey failed for JA");
-    } else {
-        hr = _keystrokeMgr->PreserveKey(_clientid, GUID_KeyEventSink_PreservedKey_Toggle, &PK_Toggle, NULL, 0);
-        // probably not fatal
-        DBG_HRESULT_CHECK(hr, L"%s", L"_keystrokeMgr->PreserveKey failed");
-    }
+    hr = _keystrokeMgr->PreserveKey(_clientid, GUID_KeyEventSink_PreservedKey_Toggle, &PK_Toggle, NULL, 0);
+    // probably not fatal
+    DBG_HRESULT_CHECK(hr, L"%s", L"_keystrokeMgr->PreserveKey failed");
 
     return S_OK;
 }
@@ -209,13 +200,8 @@ _Check_return_ HRESULT KeyEventSink::Initialize(
 HRESULT KeyEventSink::Uninitialize() {
     HRESULT hr;
 
-    if (Globals::TextServiceLangId == MAKELANGID(LANG_JAPANESE, SUBLANG_JAPANESE_JAPAN)) {
-        hr = _keystrokeMgr->UnpreserveKey(GUID_KeyEventSink_PreservedKey_Toggle, &PK_ToggleJA);
-        DBG_HRESULT_CHECK(hr, L"%s", L"_keystrokeMgr->UnpreserveKey failed for JA");
-    } else {
-        hr = _keystrokeMgr->UnpreserveKey(GUID_KeyEventSink_PreservedKey_Toggle, &PK_Toggle);
-        DBG_HRESULT_CHECK(hr, L"%s", L"_keystrokeMgr->UnpreserveKey failed");
-    }
+    hr = _keystrokeMgr->UnpreserveKey(GUID_KeyEventSink_PreservedKey_Toggle, &PK_Toggle);
+    DBG_HRESULT_CHECK(hr, L"%s", L"_keystrokeMgr->UnpreserveKey failed");
 
     hr = _keystrokeMgr->UnadviseKeyEventSink(_clientid);
     DBG_HRESULT_CHECK(hr, L"%s", L"_keystrokeMgr->UnadviseKeyEventSink failed");
