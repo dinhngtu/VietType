@@ -64,9 +64,10 @@ STDMETHODIMP KeyEventSink::OnSetFocus(_In_ BOOL fForeground) {
     return S_OK;
 }
 
-STDMETHODIMP KeyEventSink::OnTestKeyDown(
-    _In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten) {
+HRESULT KeyEventSink::OnKeyDownCommon(
+    _In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten, _Out_ BOOL* isBackconvert) {
     HRESULT hr;
+    *isBackconvert = FALSE;
 
     if (!_controller->IsEnabled()) {
         *pfEaten = FALSE;
@@ -80,10 +81,29 @@ STDMETHODIMP KeyEventSink::OnTestKeyDown(
     if (wParam == VK_BACK && !_compositionManager->IsComposing() &&
         !((_keyState[VK_CONTROL] & 0x80) || (_keyState[VK_MENU] & 0x80) || (_keyState[VK_LWIN] & 0x80) ||
           (_keyState[VK_RWIN] & 0x80))) {
-        *pfEaten = TRUE;
-    } else {
+        DWORD backconvert = 0;
+        hr = _controller->GetSettings()->IsBackconvertOnBackspace(&backconvert);
+        if (SUCCEEDED(hr)) {
+            *pfEaten = !!backconvert;
+            *isBackconvert = *pfEaten;
+        } else {
+            *pfEaten = FALSE;
+            DBG_HRESULT_CHECK(hr, L"%s", L"IsBackconvertOnBackspace failed");
+        }
+    }
+
+    if (!*isBackconvert) {
         *pfEaten = Telex::IsKeyEaten(_compositionManager->IsComposing(), wParam, lParam, _keyState);
     }
+
+    return S_OK;
+}
+
+STDMETHODIMP KeyEventSink::OnTestKeyDown(
+    _In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten) {
+    BOOL isBackconvert;
+    HRESULT hr = OnKeyDownCommon(pic, wParam, lParam, pfEaten, &isBackconvert);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"OnKeyDownCommon failed");
 
     // break off the composition early at OnTestKeyDown on an uneaten key
     if (!*pfEaten && _compositionManager->IsComposing()) {
@@ -117,35 +137,14 @@ STDMETHODIMP KeyEventSink::OnTestKeyUp(
 
 STDMETHODIMP KeyEventSink::OnKeyDown(
     _In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten) {
-    HRESULT hr;
-
-    if (!_controller->IsEnabled()) {
-        *pfEaten = FALSE;
-        return S_OK;
-    }
-
-    if (!GetKeyboardState(_keyState)) {
-        WINERROR_GLE_RETURN_HRESULT(L"%s", L"GetKeyboardState failed");
-    }
-
-    if (wParam == VK_BACK && !_compositionManager->IsComposing() &&
-        !((_keyState[VK_CONTROL] & 0x80) || (_keyState[VK_MENU] & 0x80) || (_keyState[VK_LWIN] & 0x80) ||
-          (_keyState[VK_RWIN] & 0x80))) {
-        DWORD backconvert = 0;
-        hr = _controller->GetSettings()->IsBackconvertOnBackspace(&backconvert);
-        if (FAILED(hr)) {
-            *pfEaten = FALSE;
-            HRESULT_CHECK_RETURN(hr, L"%s", L"IsBackconvertOnBackspace failed");
-        }
-        *pfEaten = !!backconvert;
-    } else {
-        *pfEaten = Telex::IsKeyEaten(_compositionManager->IsComposing(), wParam, lParam, _keyState);
-    }
+    BOOL isBackconvert;
+    HRESULT hr = OnKeyDownCommon(pic, wParam, lParam, pfEaten, &isBackconvert);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"OnKeyDownCommon failed");
 
     DBG_DPRINT(L"OnKeyDown wParam = %lx %s", wParam, *pfEaten ? L"eaten" : L"not eaten");
 
     if (*pfEaten || _compositionManager->IsComposing()) {
-        if (wParam == VK_BACK) {
+        if (isBackconvert) {
             hr = CompositionManager::RequestEditSession(
                 EditSessions::EditSurroundingWord, _compositionManager, pic, _controller.p, 1);
             HRESULT_CHECK_RETURN(hr, L"%s", L"RequestEditSession failed");
