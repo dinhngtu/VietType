@@ -21,12 +21,14 @@
 namespace VietType {
 
 // {8CC27CF8-93D2-416C-B1A3-66827F54244A}
-static const GUID GUID_KeyEventSink_PreservedKey_Toggle = { 0x8cc27cf8, 0x93d2, 0x416c, { 0xb1, 0xa3, 0x66, 0x82, 0x7f, 0x54, 0x24, 0x4a } };
-static const TF_PRESERVEDKEY PK_Toggle = { VK_OEM_3, TF_MOD_ALT }; // Alt-`
+static const GUID GUID_KeyEventSink_PreservedKey_Toggle = {
+    0x8cc27cf8, 0x93d2, 0x416c, {0xb1, 0xa3, 0x66, 0x82, 0x7f, 0x54, 0x24, 0x4a}};
+static const TF_PRESERVEDKEY PK_Toggle = {VK_OEM_3, TF_MOD_ALT}; // Alt-`
 
 // {FAC88DBE-E799-474B-9A8C-1449CAA38348}
-static const GUID GUID_KeyEventSink_PreservedKey_EditBack = { 0xfac88dbe, 0xe799, 0x474b, { 0x9a, 0x8c, 0x14, 0x49, 0xca, 0xa3, 0x83, 0x48 } };
-static const TF_PRESERVEDKEY PK_EditBack = { VK_BACK, TF_MOD_ALT };
+static const GUID GUID_KeyEventSink_PreservedKey_EditBack = {
+    0xfac88dbe, 0xe799, 0x474b, {0x9a, 0x8c, 0x14, 0x49, 0xca, 0xa3, 0x83, 0x48}};
+static const TF_PRESERVEDKEY PK_EditBack = {VK_BACK, TF_MOD_ALT};
 
 STDMETHODIMP KeyEventSink::OnSetFocus(_In_ BOOL fForeground) {
     HRESULT hr;
@@ -61,7 +63,8 @@ STDMETHODIMP KeyEventSink::OnSetFocus(_In_ BOOL fForeground) {
     return S_OK;
 }
 
-STDMETHODIMP KeyEventSink::OnTestKeyDown(_In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten) {
+STDMETHODIMP KeyEventSink::OnTestKeyDown(
+    _In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten) {
     HRESULT hr;
 
     if (!_controller->IsEnabled()) {
@@ -73,11 +76,7 @@ STDMETHODIMP KeyEventSink::OnTestKeyDown(_In_ ITfContext* pic, _In_ WPARAM wPara
         WINERROR_GLE_RETURN_HRESULT(L"%s", L"GetKeyboardState failed");
     }
 
-    *pfEaten = Telex::IsKeyEaten(
-        _compositionManager->IsComposing(),
-        wParam,
-        lParam,
-        _keyState);
+    *pfEaten = Telex::IsKeyEaten(_compositionManager->IsComposing(), wParam, lParam, _keyState);
 
     // break off the composition early at OnTestKeyDown on an uneaten key
     if (!*pfEaten && _compositionManager->IsComposing()) {
@@ -88,7 +87,8 @@ STDMETHODIMP KeyEventSink::OnTestKeyDown(_In_ ITfContext* pic, _In_ WPARAM wPara
     return S_OK;
 }
 
-STDMETHODIMP KeyEventSink::OnTestKeyUp(_In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten) {
+STDMETHODIMP KeyEventSink::OnTestKeyUp(
+    _In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten) {
     if (!_controller->IsEnabled()) {
         *pfEaten = FALSE;
         return S_OK;
@@ -100,11 +100,7 @@ STDMETHODIMP KeyEventSink::OnTestKeyUp(_In_ ITfContext* pic, _In_ WPARAM wParam,
             WINERROR_GLE_RETURN_HRESULT(L"%s", L"GetKeyboardState failed");
         }
 
-        *pfEaten = Telex::IsKeyEaten(
-            _compositionManager->IsComposing(),
-            wParam,
-            lParam,
-            _keyState);
+        *pfEaten = Telex::IsKeyEaten(_compositionManager->IsComposing(), wParam, lParam, _keyState);
     } else {
         *pfEaten = FALSE;
     }
@@ -112,7 +108,8 @@ STDMETHODIMP KeyEventSink::OnTestKeyUp(_In_ ITfContext* pic, _In_ WPARAM wParam,
     return S_OK;
 }
 
-STDMETHODIMP KeyEventSink::OnKeyDown(_In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten) {
+STDMETHODIMP KeyEventSink::OnKeyDown(
+    _In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten) {
     HRESULT hr;
 
     if (!_controller->IsEnabled()) {
@@ -124,11 +121,7 @@ STDMETHODIMP KeyEventSink::OnKeyDown(_In_ ITfContext* pic, _In_ WPARAM wParam, _
         WINERROR_GLE_RETURN_HRESULT(L"%s", L"GetKeyboardState failed");
     }
 
-    *pfEaten = Telex::IsKeyEaten(
-        _compositionManager->IsComposing(),
-        wParam,
-        lParam,
-        _keyState);
+    *pfEaten = Telex::IsKeyEaten(_compositionManager->IsComposing(), wParam, lParam, _keyState);
 
     DBG_DPRINT(L"OnKeyDown wParam = %lx %s", wParam, *pfEaten ? L"eaten" : L"not eaten");
 
@@ -158,11 +151,7 @@ STDMETHODIMP KeyEventSink::OnPreservedKey(_In_ ITfContext* pic, _In_ REFGUID rgu
     } else if (GUID_KeyEventSink_PreservedKey_EditBack == rguid) {
         *pfEaten = TRUE;
         hr = CompositionManager::RequestEditSession(
-            EditSessions::EditSurroundingWord,
-            _compositionManager,
-            pic,
-            _controller.p,
-            0);
+            EditSessions::EditSurroundingWord, _compositionManager, pic, _controller.p, 0);
         HRESULT_CHECK_RETURN(hr, L"%s", L"CompositionManager::RequestEditSession failed");
     } else {
         *pfEaten = FALSE;
@@ -220,7 +209,8 @@ HRESULT KeyEventSink::Uninitialize() {
     return S_OK;
 }
 
-HRESULT KeyEventSink::CallKeyEdit(_In_ ITfContext* context, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_reads_(256) const BYTE* keyState) {
+HRESULT KeyEventSink::CallKeyEdit(
+    _In_ ITfContext* context, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_reads_(256) const BYTE* keyState) {
     HRESULT hr;
 
     CComPtr<KeyHandlerEditSession> keyHandlerEditSession;
@@ -232,4 +222,4 @@ HRESULT KeyEventSink::CallKeyEdit(_In_ ITfContext* context, _In_ WPARAM wParam, 
     return S_OK;
 }
 
-}
+} // namespace VietType

@@ -11,9 +11,11 @@
 namespace VietType {
 
 // {B31B741B-63CE-413A-9B5A-D2B69C695A78}
-static const GUID GUID_SettingsCompartment_Toggle = { 0xb31b741b, 0x63ce, 0x413a, { 0x9b, 0x5a, 0xd2, 0xb6, 0x9c, 0x69, 0x5a, 0x78 } };
+static const GUID GUID_SettingsCompartment_Toggle = {
+    0xb31b741b, 0x63ce, 0x413a, {0x9b, 0x5a, 0xd2, 0xb6, 0x9c, 0x69, 0x5a, 0x78}};
 // {CCA3D390-EF1A-4DE4-B2FF-B6BC76D68C3B}
-static const GUID GUID_LanguageBarButton_Item = { 0xcca3d390, 0xef1a, 0x4de4,{ 0xb2, 0xff, 0xb6, 0xbc, 0x76, 0xd6, 0x8c, 0x3b } };
+static const GUID GUID_LanguageBarButton_Item = {
+    0xcca3d390, 0xef1a, 0x4de4, {0xb2, 0xff, 0xb6, 0xbc, 0x76, 0xd6, 0x8c, 0x3b}};
 
 STDMETHODIMP EngineController::OnChange(__RPC__in REFGUID rguid) {
     HRESULT hr;
@@ -33,9 +35,7 @@ STDMETHODIMP EngineController::OnChange(__RPC__in REFGUID rguid) {
 }
 
 _Check_return_ HRESULT EngineController::Initialize(
-    _In_ const std::shared_ptr<Telex::TelexEngine>& engine,
-    _In_ ITfThreadMgr* threadMgr,
-    _In_ TfClientId clientid) {
+    _In_ const std::shared_ptr<Telex::TelexEngine>& engine, _In_ ITfThreadMgr* threadMgr, _In_ TfClientId clientid) {
 
     HRESULT hr;
 
@@ -50,7 +50,8 @@ _Check_return_ HRESULT EngineController::Initialize(
     HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(_settings) failed");
 
     // GUID_SettingsCompartment_Toggle is global
-    hr = CreateInitialize(&_enabled, threadMgr, clientid, GUID_SettingsCompartment_Toggle, true, [this] { return UpdateStates(); });
+    hr = CreateInitialize(
+        &_enabled, threadMgr, clientid, GUID_SettingsCompartment_Toggle, true, [this] { return UpdateStates(); });
     HRESULT_CHECK_RETURN(hr, L"%s", L"_enabled->Initialize failed");
 #ifdef _DEBUG
     long dbgEnabled = 0;
@@ -154,7 +155,7 @@ HRESULT EngineController::ToggleUserEnabled() {
     HRESULT_CHECK_RETURN(hr, L"%s", L"_enabled->SetValue failed");
     hr = UpdateStates();
     HRESULT_CHECK_RETURN(hr, L"%s", L"UpdateEnabled failed");
-    
+
     return S_OK;
 }
 
@@ -263,4 +264,4 @@ HRESULT EngineController::UninitLanguageBar() {
     return S_OK;
 }
 
-}
+} // namespace VietType

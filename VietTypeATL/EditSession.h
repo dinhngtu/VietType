@@ -7,11 +7,9 @@
 namespace VietType {
 
 template <typename... Args>
-class EditSession :
-    public CComObjectRootEx<CComSingleThreadModel>,
-    public ITfEditSession {
+class EditSession : public CComObjectRootEx<CComSingleThreadModel>, public ITfEditSession {
 public:
-    using callback_type = HRESULT(*)(TfEditCookie ec, Args... args);
+    using callback_type = HRESULT (*)(TfEditCookie ec, Args... args);
 
     EditSession() = default;
     EditSession(const EditSession&) = delete;
@@ -20,7 +18,7 @@ public:
 
     DECLARE_NOT_AGGREGATABLE(EditSession)
     BEGIN_COM_MAP(EditSession)
-        COM_INTERFACE_ENTRY(ITfEditSession)
+    COM_INTERFACE_ENTRY(ITfEditSession)
     END_COM_MAP()
     DECLARE_PROTECT_FINAL_CONSTRUCT()
 
@@ -46,4 +44,4 @@ private:
     std::tuple<Args...> _args;
 };
 
-}
+} // namespace VietType

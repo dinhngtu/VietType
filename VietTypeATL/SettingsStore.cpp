@@ -33,5 +33,5 @@ HRESULT UninitializeSink(_In_ CompartmentBase& compartment, _In_ SinkAdvisor<ITf
     return S_OK;
 }
 
-}
-}
+} // namespace SettingsStore
+} // namespace VietType

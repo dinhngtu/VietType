@@ -10,9 +10,7 @@ namespace VietType {
 class CompositionManager;
 class EngineController;
 
-class TextEditSink :
-    public CComObjectRootEx<CComSingleThreadModel>,
-    public ITfTextEditSink {
+class TextEditSink : public CComObjectRootEx<CComSingleThreadModel>, public ITfTextEditSink {
 public:
     TextEditSink() = default;
     TextEditSink(const TextEditSink&) = delete;
@@ -21,15 +19,17 @@ public:
 
     DECLARE_NOT_AGGREGATABLE(TextEditSink)
     BEGIN_COM_MAP(TextEditSink)
-        COM_INTERFACE_ENTRY(ITfTextEditSink)
+    COM_INTERFACE_ENTRY(ITfTextEditSink)
     END_COM_MAP()
     DECLARE_PROTECT_FINAL_CONSTRUCT()
 
 public:
     // Inherited via ITfTextEditSink
-    virtual STDMETHODIMP OnEndEdit(__RPC__in_opt ITfContext* pic, _In_ TfEditCookie ecReadOnly, __RPC__in_opt ITfEditRecord* pEditRecord) override;
+    virtual STDMETHODIMP OnEndEdit(
+        __RPC__in_opt ITfContext* pic, _In_ TfEditCookie ecReadOnly, __RPC__in_opt ITfEditRecord* pEditRecord) override;
 
-    _Check_return_ HRESULT Initialize(_In_ ITfDocumentMgr* documentMgr, _In_ CompositionManager* compMgr, _In_ EngineController* controller);
+    _Check_return_ HRESULT
+    Initialize(_In_ ITfDocumentMgr* documentMgr, _In_ CompositionManager* compMgr, _In_ EngineController* controller);
     HRESULT Uninitialize();
 
 private:
@@ -39,4 +39,4 @@ private:
     CComPtr<ITfContext> _editContext;
 };
 
-}
+} // namespace VietType

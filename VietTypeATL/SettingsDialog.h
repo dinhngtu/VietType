@@ -35,7 +35,8 @@ public:
     const SettingsDialogData& GetConfig() const;
 
 private:
-    static INT_PTR CALLBACK SettingsDialogProc(_In_ HWND hwndDlg, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam);
+    static INT_PTR CALLBACK
+    SettingsDialogProc(_In_ HWND hwndDlg, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam);
 
     // template Property<resource ID> for typesafe configuration storage
     // define the data type of the property in propType like the examples
@@ -85,4 +86,4 @@ private:
     SettingsDialogData _data;
 };
 
-}
+} // namespace VietType

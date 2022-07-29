@@ -8,9 +8,7 @@ namespace VietType {
 
 extern const std::tuple<GUID, std::wstring, TF_DISPLAYATTRIBUTE> ComposingAttributeData;
 
-class DisplayAttributeInfo :
-    public CComObjectRootEx<CComSingleThreadModel>,
-    public ITfDisplayAttributeInfo {
+class DisplayAttributeInfo : public CComObjectRootEx<CComSingleThreadModel>, public ITfDisplayAttributeInfo {
 public:
     DisplayAttributeInfo() = default;
     DisplayAttributeInfo(const DisplayAttributeInfo&) = delete;
@@ -19,7 +17,7 @@ public:
 
     DECLARE_NOT_AGGREGATABLE(DisplayAttributeInfo)
     BEGIN_COM_MAP(DisplayAttributeInfo)
-        COM_INTERFACE_ENTRY(ITfDisplayAttributeInfo)
+    COM_INTERFACE_ENTRY(ITfDisplayAttributeInfo)
     END_COM_MAP()
     DECLARE_PROTECT_FINAL_CONSTRUCT()
 
@@ -35,10 +33,10 @@ public:
     HRESULT Initialize(_In_ const GUID& guid, _In_ std::wstring description, _In_ TF_DISPLAYATTRIBUTE attr);
 
 private:
-    GUID _guid = { 0 };
+    GUID _guid = {0};
     std::wstring _description;
     TF_DISPLAYATTRIBUTE _attr = TF_DISPLAYATTRIBUTE();
     TF_DISPLAYATTRIBUTE _attrOrig = TF_DISPLAYATTRIBUTE();
 };
 
-}
+} // namespace VietType

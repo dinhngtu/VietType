@@ -10,7 +10,8 @@
 namespace VietType {
 namespace Telex {
 
-enum ResposTransitions {
+enum ResposTransitions
+{
     ResposExpunged = -1,
     ResposTransitionC1 = -2,
     ResposTransitionV = -3,
@@ -164,7 +165,8 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
         _cases.push_back(ccase);
         _respos.push_back(_respos_current++);
 
-    } else if (_c1 == L"d" && c == L'd' && ((_config.accept_separate_dd && _c1 == L"d") || (!_v.size() && !_c2.size()))) {
+    } else if (
+        _c1 == L"d" && c == L'd' && ((_config.accept_separate_dd && _c1 == L"d") || (!_v.size() && !_c2.size()))) {
         // only used for 'dd'
         // relaxed constraint: !_v.size()
         _c1 = L"\x111";
@@ -625,7 +627,7 @@ bool TelexEngine::FindTable(_Out_ map_iterator* it) const {
 bool TelexEngine::GetTonePos(_In_ bool predict, _Out_ VInfo* vinfo) const {
     map_iterator it;
     auto found = FindTable(&it);
-    VInfo retinfo = { 0 };
+    VInfo retinfo = {0};
     if (found) {
         retinfo = it->second;
     } else if (predict) {
@@ -676,5 +678,5 @@ bool TelexEngine::CheckInvariants() const {
     return true;
 }
 
-}
-}
+} // namespace Telex
+} // namespace VietType

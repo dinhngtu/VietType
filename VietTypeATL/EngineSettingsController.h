@@ -10,10 +10,8 @@ namespace VietType {
 class EngineController;
 class SettingsDialog;
 
-class EngineSettingsController :
-    public CComObjectRootEx<CComSingleThreadModel> {
+class EngineSettingsController : public CComObjectRootEx<CComSingleThreadModel> {
 public:
-
     EngineSettingsController() = default;
     EngineSettingsController(const EngineSettingsController&) = delete;
     EngineSettingsController& operator=(const EngineSettingsController&) = delete;
@@ -24,10 +22,8 @@ public:
     END_COM_MAP()
     DECLARE_PROTECT_FINAL_CONSTRUCT()
 
-    _Check_return_ HRESULT Initialize(
-        _In_ EngineController* ec,
-        _In_ ITfThreadMgr* threadMgr,
-        _In_ TfClientId clientid);
+    _Check_return_ HRESULT
+    Initialize(_In_ EngineController* ec, _In_ ITfThreadMgr* threadMgr, _In_ TfClientId clientid);
     HRESULT Uninitialize();
 
     HRESULT LoadSettings();
@@ -45,4 +41,4 @@ private:
     CComPtr<RegistrySetting<DWORD>> _backconvert_on_backspace;
 };
 
-}
+} // namespace VietType

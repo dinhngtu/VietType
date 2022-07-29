@@ -7,9 +7,7 @@
 
 namespace VietType {
 
-class CompositionManager :
-    public CComObjectRootEx<CComSingleThreadModel>,
-    public ITfCompositionSink {
+class CompositionManager : public CComObjectRootEx<CComSingleThreadModel>, public ITfCompositionSink {
 public:
     CompositionManager() = default;
     CompositionManager(const CompositionManager&) = delete;
@@ -18,17 +16,22 @@ public:
 
     DECLARE_NOT_AGGREGATABLE(CompositionManager)
     BEGIN_COM_MAP(CompositionManager)
-        COM_INTERFACE_ENTRY(ITfCompositionSink)
+    COM_INTERFACE_ENTRY(ITfCompositionSink)
     END_COM_MAP()
     DECLARE_PROTECT_FINAL_CONSTRUCT()
 
     // Inherited via ITfCompositionSink
-    virtual STDMETHODIMP OnCompositionTerminated(_In_ TfEditCookie ecWrite, __RPC__in_opt ITfComposition* pComposition) override;
+    virtual STDMETHODIMP OnCompositionTerminated(
+        _In_ TfEditCookie ecWrite, __RPC__in_opt ITfComposition* pComposition) override;
 
-    _Check_return_ HRESULT Initialize(_In_ TfClientId clientid, _In_ ITfDisplayAttributeInfo* composingAttribute, _In_ bool comless);
+    _Check_return_ HRESULT
+    Initialize(_In_ TfClientId clientid, _In_ ITfDisplayAttributeInfo* composingAttribute, _In_ bool comless);
     HRESULT Uninitialize();
 
-    HRESULT RequestEditSession(_In_ ITfEditSession* session, _In_ ITfContext* context, _In_ DWORD flags = TF_ES_ASYNCDONTCARE | TF_ES_READWRITE);
+    HRESULT RequestEditSession(
+        _In_ ITfEditSession* session,
+        _In_ ITfContext* context,
+        _In_ DWORD flags = TF_ES_ASYNCDONTCARE | TF_ES_READWRITE);
     HRESULT StartComposition(_In_ ITfContext* pContext);
     HRESULT EndComposition();
     bool IsComposing() const;
@@ -52,7 +55,8 @@ public:
 
     template <typename... Args>
     static HRESULT RequestEditSession(
-        _In_ HRESULT(*callback)(TfEditCookie ec, CompositionManager* compositionManager, ITfContext* context, Args... args),
+        _In_ HRESULT (*callback)(
+            TfEditCookie ec, CompositionManager* compositionManager, ITfContext* context, Args... args),
         _In_ CompositionManager* compositionManager,
         // required to call RequestEditSession
         _In_ ITfContext* context,
@@ -69,7 +73,8 @@ public:
         HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(&session) failed");
 
         HRESULT hrSession;
-        hr = context->RequestEditSession(compositionManager->_clientid, session, TF_ES_ASYNCDONTCARE | TF_ES_READWRITE, &hrSession);
+        hr = context->RequestEditSession(
+            compositionManager->_clientid, session, TF_ES_ASYNCDONTCARE | TF_ES_READWRITE, &hrSession);
         HRESULT_CHECK_RETURN(hr, L"%s", L"context->RequestEditSession failed");
 
         return S_OK;
@@ -77,7 +82,8 @@ public:
 
     template <typename... Args>
     static _Check_return_ HRESULT RequestEditSessionEx(
-        _In_ HRESULT(*callback)(TfEditCookie ec, CompositionManager* compositionManager, ITfContext* context, Args... args),
+        _In_ HRESULT (*callback)(
+            TfEditCookie ec, CompositionManager* compositionManager, ITfContext* context, Args... args),
         _In_ CompositionManager* compositionManager,
         // required to call RequestEditSession
         _In_ ITfContext* context,
@@ -111,7 +117,8 @@ private:
         /* RequestEditSession */ _In_ CompositionManager* instance,
         /* RequestEditSession */ _In_ ITfContext* context);
 
-    HRESULT SetRangeDisplayAttribute(_In_ TfEditCookie ec, _In_ ITfContext* context, _In_ ITfRange* range, _In_ ITfDisplayAttributeInfo* attr);
+    HRESULT SetRangeDisplayAttribute(
+        _In_ TfEditCookie ec, _In_ ITfContext* context, _In_ ITfRange* range, _In_ ITfDisplayAttributeInfo* attr);
     HRESULT ClearRangeDisplayAttribute(_In_ TfEditCookie ec, _In_ ITfContext* context, _In_ ITfRange* range);
 
 private:
@@ -122,4 +129,4 @@ private:
     CComPtr<ITfDisplayAttributeInfo> _composingAttribute;
 };
 
-}
+} // namespace VietType

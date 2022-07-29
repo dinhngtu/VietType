@@ -27,7 +27,8 @@ STDMETHODIMP ThreadMgrEventSink::OnUninitDocumentMgr(__RPC__in_opt ITfDocumentMg
     return E_NOTIMPL;
 }
 
-STDMETHODIMP ThreadMgrEventSink::OnSetFocus(__RPC__in_opt ITfDocumentMgr* pdimFocus, __RPC__in_opt ITfDocumentMgr* pdimPrevFocus) {
+STDMETHODIMP ThreadMgrEventSink::OnSetFocus(
+    __RPC__in_opt ITfDocumentMgr* pdimFocus, __RPC__in_opt ITfDocumentMgr* pdimPrevFocus) {
     HRESULT hr;
 
     DBG_DPRINT(L"pdimFocus = %p", pdimFocus);
@@ -97,4 +98,4 @@ HRESULT ThreadMgrEventSink::Uninitialize() {
     return hr;
 }
 
-}
+} // namespace VietType

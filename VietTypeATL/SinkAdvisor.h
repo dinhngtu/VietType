@@ -28,7 +28,8 @@ public:
     SinkAdvisor& operator=(const SinkAdvisor&) = delete;
 
     virtual ~SinkAdvisor() {
-        if (IsAdvised()) Unadvise();
+        if (IsAdvised())
+            Unadvise();
     }
 
     bool IsAdvised() {
@@ -38,8 +39,10 @@ public:
     HRESULT Advise(_In_ IUnknown* source, _In_ SinkInterface* sink) {
         HRESULT hr;
 
-        if (!source || !sink) return E_INVALIDARG;
-        if (IsAdvised()) return E_UNEXPECTED;
+        if (!source || !sink)
+            return E_INVALIDARG;
+        if (IsAdvised())
+            return E_UNEXPECTED;
 
         CComPtr<ITfSource> src;
         hr = source->QueryInterface(&src);
@@ -47,9 +50,7 @@ public:
             return hr;
         }
 
-        hr = src->AdviseSink(__uuidof(SinkInterface),
-            sink,
-            &cookie_);
+        hr = src->AdviseSink(__uuidof(SinkInterface), sink, &cookie_);
         if (FAILED(hr)) {
             cookie_ = TF_INVALID_COOKIE;
             return hr;
@@ -59,7 +60,8 @@ public:
     }
 
     HRESULT Unadvise() {
-        if (!IsAdvised()) return E_UNEXPECTED;
+        if (!IsAdvised())
+            return E_UNEXPECTED;
 
         HRESULT hr = source_->UnadviseSink(cookie_);
         cookie_ = TF_INVALID_COOKIE;
@@ -81,7 +83,8 @@ public:
     SingleSinkAdvisor& operator=(const SingleSinkAdvisor&) = delete;
 
     virtual ~SingleSinkAdvisor() {
-        if (IsAdvised()) Unadvise();
+        if (IsAdvised())
+            Unadvise();
     }
 
     bool IsAdvised() {
@@ -93,7 +96,8 @@ public:
 
         if (!source || !client_id || !sink)
             return E_INVALIDARG;
-        if (IsAdvised()) return E_UNEXPECTED;
+        if (IsAdvised())
+            return E_UNEXPECTED;
 
         CComPtr<ITfSourceSingle> src;
         hr = source->QueryInterface(&src);
@@ -101,9 +105,9 @@ public:
             return hr;
         }
 
-        hr = src->AdviseSingleSink(
-            client_id, __uuidof(SinkInterface), sink);
-        if (FAILED(hr)) return hr;
+        hr = src->AdviseSingleSink(client_id, __uuidof(SinkInterface), sink);
+        if (FAILED(hr))
+            return hr;
 
         source_ = src;
         client_id_ = client_id;
@@ -111,10 +115,10 @@ public:
     }
 
     HRESULT Unadvise() {
-        if (!IsAdvised()) return E_UNEXPECTED;
+        if (!IsAdvised())
+            return E_UNEXPECTED;
 
-        HRESULT hr = source_->UnadviseSingleSink(
-            client_id_, __uuidof(SinkInterface));
+        HRESULT hr = source_->UnadviseSingleSink(client_id_, __uuidof(SinkInterface));
         source_.Release();
         client_id_ = TF_CLIENTID_NULL;
         return hr;

@@ -62,7 +62,9 @@ const generic_map_type<std::wstring, std::wstring> transitions_w = {
     {L"oa", L"o\x103"},
     {L"oi", L"\x1a1i"},
     {L"u", L"\x1b0"},
-    {L"ua", L"\x1b0""a"},
+    {L"ua",
+     L"\x1b0"
+     "a"},
     {L"ui", L"\x1b0i"},
     {L"uo", L"u\x1a1"},
     {L"uu", L"\x1b0u"},
@@ -199,7 +201,7 @@ const generic_map_type<std::wstring, VInfo> valid_v = {
     {L"u\xf4i", {1, C2Mode::NoC2}},      // uôi
     {L"u\x1a1", {1, C2Mode::NoC2}},      // uơ
                                          // "uya" cannot be accented
-    {L"\x1b0\x61", {0, C2Mode::NoC2}},      // ưa
+    {L"\x1b0\x61", {0, C2Mode::NoC2}},   // ưa
     {L"\x1b0i", {0, C2Mode::NoC2}},      // ưi
     {L"\x1b0\x1a1i", {1, C2Mode::NoC2}}, // ươi
     {L"\x1b0\x1a1u", {1, C2Mode::NoC2}}, // ươu
@@ -221,7 +223,7 @@ const generic_map_type<std::wstring, VInfo> valid_v_q = {
     {L"uay", {1, C2Mode::NoC2}},
     {L"ue", {1, C2Mode::Either}},
     {L"ui", {1, C2Mode::NoC2}},
-    {L"u\xf4", {1, C2Mode::MustC2}}, // uô
+    {L"u\xf4", {1, C2Mode::MustC2}},  // uô
     {L"u\x1a1", {1, C2Mode::NoC2}},   // uơ
     {L"u\x103", {1, C2Mode::MustC2}}, // uă
 };
@@ -251,7 +253,7 @@ const generic_map_type<std::wstring, VInfo> valid_v_gi = {
     {L"e", {0, C2Mode::NoC2}},
     {L"\xea", {0, C2Mode::MustC2}}, // ê
     {L"o", {0, C2Mode::Either}},
-    {L"\xf4", {0, C2Mode::Either}}, // ô
+    {L"\xf4", {0, C2Mode::Either}},  // ô
     {L"\x1a1", {0, C2Mode::Either}}, // ơ
     {L"u", {0, C2Mode::MustC2}},
     {L"\x1b0", {0, C2Mode::Either}}, // ư
@@ -297,74 +299,21 @@ const generic_map_type<std::wstring, VInfo> valid_v_oa_uy = {
 };
 
 const generic_map_type<wchar_t, std::wstring> backconversions = {
-    { L'\xe0', L"af" },
-    { L'\xe1', L"as" },
-    { L'\xe2', L"aa" },
-    { L'\xe3', L"ax" },
-    { L'\xe8', L"ef" },
-    { L'\xe9', L"es" },
-    { L'\xea', L"ee" },
-    { L'\xec', L"if" },
-    { L'\xed', L"is" },
-    { L'\xf2', L"of" },
-    { L'\xf3', L"os" },
-    { L'\xf4', L"oo" },
-    { L'\xf5', L"ox" },
-    { L'\xf9', L"uf" },
-    { L'\xfa', L"us" },
-    { L'\xfd', L"ys" },
-    { L'\x103', L"aw" },
-    { L'\x111', L"dd" },
-    { L'\x129', L"ix" },
-    { L'\x169', L"ux" },
-    { L'\x1a1', L"ow" },
-    { L'\x1b0', L"uw" },
-    { L'\x1ea1', L"aj" },
-    { L'\x1ea3', L"ar" },
-    { L'\x1ea5', L"aas" },
-    { L'\x1ea7', L"aaf" },
-    { L'\x1ea9', L"aar" },
-    { L'\x1eab', L"aax" },
-    { L'\x1ead', L"aaj" },
-    { L'\x1eaf', L"aws" },
-    { L'\x1eb1', L"awf" },
-    { L'\x1eb3', L"awr" },
-    { L'\x1eb5', L"awx" },
-    { L'\x1eb7', L"awj" },
-    { L'\x1eb9', L"ej" },
-    { L'\x1ebb', L"er" },
-    { L'\x1ebd', L"ex" },
-    { L'\x1ebf', L"ees" },
-    { L'\x1ec1', L"eef" },
-    { L'\x1ec3', L"eer" },
-    { L'\x1ec5', L"eex" },
-    { L'\x1ec7', L"eej" },
-    { L'\x1ec9', L"ir" },
-    { L'\x1ecb', L"ij" },
-    { L'\x1ecd', L"oj" },
-    { L'\x1ecf', L"or" },
-    { L'\x1ed1', L"oos" },
-    { L'\x1ed3', L"oof" },
-    { L'\x1ed5', L"oor" },
-    { L'\x1ed7', L"oox" },
-    { L'\x1ed9', L"ooj" },
-    { L'\x1edb', L"ows" },
-    { L'\x1edd', L"owf" },
-    { L'\x1edf', L"owr" },
-    { L'\x1ee1', L"owx" },
-    { L'\x1ee3', L"owj" },
-    { L'\x1ee5', L"uj" },
-    { L'\x1ee7', L"ur" },
-    { L'\x1ee9', L"uws" },
-    { L'\x1eeb', L"uwf" },
-    { L'\x1eed', L"uwr" },
-    { L'\x1eef', L"uwx" },
-    { L'\x1ef1', L"uwj" },
-    { L'\x1ef3', L"yf" },
-    { L'\x1ef5', L"yj" },
-    { L'\x1ef7', L"yr" },
-    { L'\x1ef9', L"yx" },
+    {L'\xe0', L"af"},    {L'\xe1', L"as"},    {L'\xe2', L"aa"},    {L'\xe3', L"ax"},    {L'\xe8', L"ef"},
+    {L'\xe9', L"es"},    {L'\xea', L"ee"},    {L'\xec', L"if"},    {L'\xed', L"is"},    {L'\xf2', L"of"},
+    {L'\xf3', L"os"},    {L'\xf4', L"oo"},    {L'\xf5', L"ox"},    {L'\xf9', L"uf"},    {L'\xfa', L"us"},
+    {L'\xfd', L"ys"},    {L'\x103', L"aw"},   {L'\x111', L"dd"},   {L'\x129', L"ix"},   {L'\x169', L"ux"},
+    {L'\x1a1', L"ow"},   {L'\x1b0', L"uw"},   {L'\x1ea1', L"aj"},  {L'\x1ea3', L"ar"},  {L'\x1ea5', L"aas"},
+    {L'\x1ea7', L"aaf"}, {L'\x1ea9', L"aar"}, {L'\x1eab', L"aax"}, {L'\x1ead', L"aaj"}, {L'\x1eaf', L"aws"},
+    {L'\x1eb1', L"awf"}, {L'\x1eb3', L"awr"}, {L'\x1eb5', L"awx"}, {L'\x1eb7', L"awj"}, {L'\x1eb9', L"ej"},
+    {L'\x1ebb', L"er"},  {L'\x1ebd', L"ex"},  {L'\x1ebf', L"ees"}, {L'\x1ec1', L"eef"}, {L'\x1ec3', L"eer"},
+    {L'\x1ec5', L"eex"}, {L'\x1ec7', L"eej"}, {L'\x1ec9', L"ir"},  {L'\x1ecb', L"ij"},  {L'\x1ecd', L"oj"},
+    {L'\x1ecf', L"or"},  {L'\x1ed1', L"oos"}, {L'\x1ed3', L"oof"}, {L'\x1ed5', L"oor"}, {L'\x1ed7', L"oox"},
+    {L'\x1ed9', L"ooj"}, {L'\x1edb', L"ows"}, {L'\x1edd', L"owf"}, {L'\x1edf', L"owr"}, {L'\x1ee1', L"owx"},
+    {L'\x1ee3', L"owj"}, {L'\x1ee5', L"uj"},  {L'\x1ee7', L"ur"},  {L'\x1ee9', L"uws"}, {L'\x1eeb', L"uwf"},
+    {L'\x1eed', L"uwr"}, {L'\x1eef', L"uwx"}, {L'\x1ef1', L"uwj"}, {L'\x1ef3', L"yf"},  {L'\x1ef5', L"yj"},
+    {L'\x1ef7', L"yr"},  {L'\x1ef9', L"yx"},
 };
 
-}
-}
+} // namespace Telex
+} // namespace VietType

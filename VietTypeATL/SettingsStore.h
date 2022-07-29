@@ -36,11 +36,10 @@ struct regType<DWORD> {
     }
 };
 
-}
+} // namespace SettingsStore
 
 template <typename T>
-class NotifiedSetting :
-    public ITfCompartmentEventSink {
+class NotifiedSetting : public ITfCompartmentEventSink {
 public:
     using callback_type = std::function<HRESULT()>;
 
@@ -62,18 +61,16 @@ public:
     }
 
 protected:
-    GUID _guidCompartment = { 0 };
+    GUID _guidCompartment = {0};
     callback_type _callback = [] { return S_OK; };
 };
 
 template <typename T>
-class RegistrySetting :
-    public CComObjectRootEx<CComSingleThreadModel>,
-    public NotifiedSetting<T> {
+class RegistrySetting : public CComObjectRootEx<CComSingleThreadModel>, public NotifiedSetting<T> {
 public:
     DECLARE_NOT_AGGREGATABLE(RegistrySetting)
     BEGIN_COM_MAP(RegistrySetting)
-        COM_INTERFACE_ENTRY(ITfCompartmentEventSink)
+    COM_INTERFACE_ENTRY(ITfCompartmentEventSink)
     END_COM_MAP()
     DECLARE_PROTECT_FINAL_CONSTRUCT()
 
@@ -128,7 +125,8 @@ public:
         if (guidNotifyCompartment == GUID_NULL) {
             return S_OK;
         } else {
-            return SettingsStore::InitializeSink(punk, clientid, guidNotifyCompartment, _notifyCompartment, _notifyCompartmentEventSink, this, global);
+            return SettingsStore::InitializeSink(
+                punk, clientid, guidNotifyCompartment, _notifyCompartment, _notifyCompartmentEventSink, this, global);
         }
     }
 
@@ -148,13 +146,11 @@ private:
 };
 
 template <typename T>
-class CachedCompartmentSetting :
-    public CComObjectRootEx<CComSingleThreadModel>,
-    public NotifiedSetting<T> {
+class CachedCompartmentSetting : public CComObjectRootEx<CComSingleThreadModel>, public NotifiedSetting<T> {
 public:
     DECLARE_NOT_AGGREGATABLE(CachedCompartmentSetting)
     BEGIN_COM_MAP(CachedCompartmentSetting)
-        COM_INTERFACE_ENTRY(ITfCompartmentEventSink)
+    COM_INTERFACE_ENTRY(ITfCompartmentEventSink)
     END_COM_MAP()
     DECLARE_PROTECT_FINAL_CONSTRUCT()
 
@@ -202,9 +198,10 @@ public:
 
         _guidCompartment = guidDataCompartment;
         _callback_chain = callback;
-        _callback = [this] { return CachingCallback();  };
+        _callback = [this] { return CachingCallback(); };
 
-        return SettingsStore::InitializeSink(punk, clientid, guidDataCompartment, _dataCompartment, _dataCompartmentEventSink, this, global);
+        return SettingsStore::InitializeSink(
+            punk, clientid, guidDataCompartment, _dataCompartment, _dataCompartmentEventSink, this, global);
     }
 
     HRESULT Uninitialize() {
@@ -229,4 +226,4 @@ private:
     SinkAdvisor<ITfCompartmentEventSink> _dataCompartmentEventSink;
 };
 
-}
+} // namespace VietType

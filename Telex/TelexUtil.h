@@ -7,7 +7,8 @@
 namespace VietType {
 namespace Telex {
 
-enum class CharTypes : int {
+enum class CharTypes : int
+{
     Uncategorized = 0,
     Commit = 1 << 0,
     ForceCommit = 1 << 1,
@@ -47,5 +48,5 @@ constexpr inline CharTypes& operator&=(CharTypes lhs, CharTypes rhs) {
 CharTypes ClassifyCharacter(_In_ wchar_t c);
 Tones GetTone(_In_ wchar_t c);
 
-}
-}
+} // namespace Telex
+} // namespace VietType

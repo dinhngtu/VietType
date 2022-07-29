@@ -72,5 +72,5 @@ _Check_return_ HRESULT GetVirtualDocumentContext(_In_ ITfContext* context, _COM_
     return S_OK;
 }
 
-}
-}
+} // namespace VirtualDocument
+} // namespace VietType

@@ -16,11 +16,10 @@ class EngineController;
 class SettingsDialog;
 class EngineSettingsController;
 
-class EngineController :
-    public CComObjectRootEx<CComSingleThreadModel>,
-    public ITfCompartmentEventSink {
+class EngineController : public CComObjectRootEx<CComSingleThreadModel>, public ITfCompartmentEventSink {
 public:
-    enum class BlockedKind {
+    enum class BlockedKind
+    {
         // don't change enable setting
         Free,
         // don't change enable setting, but also completely block the engine
@@ -34,7 +33,7 @@ public:
 
     DECLARE_NOT_AGGREGATABLE(EngineController)
     BEGIN_COM_MAP(EngineController)
-        COM_INTERFACE_ENTRY(ITfCompartmentEventSink)
+    COM_INTERFACE_ENTRY(ITfCompartmentEventSink)
     END_COM_MAP()
     DECLARE_PROTECT_FINAL_CONSTRUCT()
 
@@ -42,9 +41,7 @@ public:
     virtual STDMETHODIMP OnChange(__RPC__in REFGUID rguid) override;
 
     _Check_return_ HRESULT Initialize(
-        _In_ const std::shared_ptr<Telex::TelexEngine>& engine,
-        _In_ ITfThreadMgr* threadMgr,
-        _In_ TfClientId clientid);
+        _In_ const std::shared_ptr<Telex::TelexEngine>& engine, _In_ ITfThreadMgr* threadMgr, _In_ TfClientId clientid);
     HRESULT Uninitialize();
 
     Telex::TelexEngine& GetEngine();
@@ -92,4 +89,4 @@ private:
     BlockedKind _blocked = BlockedKind::Free;
 };
 
-}
+} // namespace VietType

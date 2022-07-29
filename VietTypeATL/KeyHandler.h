@@ -9,9 +9,7 @@ namespace VietType {
 class CompositionManager;
 class EngineController;
 
-class KeyHandlerEditSession :
-    public CComObjectRootEx<CComSingleThreadModel>,
-    public ITfEditSession {
+class KeyHandlerEditSession : public CComObjectRootEx<CComSingleThreadModel>, public ITfEditSession {
 public:
     KeyHandlerEditSession() = default;
     KeyHandlerEditSession(const KeyHandlerEditSession&) = delete;
@@ -20,7 +18,7 @@ public:
 
     DECLARE_NOT_AGGREGATABLE(KeyHandlerEditSession)
     BEGIN_COM_MAP(KeyHandlerEditSession)
-        COM_INTERFACE_ENTRY(ITfEditSession)
+    COM_INTERFACE_ENTRY(ITfEditSession)
     END_COM_MAP()
     DECLARE_PROTECT_FINAL_CONSTRUCT()
 
@@ -50,4 +48,4 @@ private:
     CComPtr<EngineController> _controller;
 };
 
-}
+} // namespace VietType

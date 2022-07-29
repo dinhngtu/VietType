@@ -17,7 +17,8 @@ public:
     _Ret_maybenull_ ITfCompartment* GetCompartment();
     _Check_return_ HRESULT GetCompartmentSource(_COM_Outptr_ ITfSource** ppSource);
 
-    _Check_return_ HRESULT Initialize(_In_ IUnknown* punk, _In_ TfClientId clientid, _In_ const GUID& guidCompartment, _In_ bool global = false);
+    _Check_return_ HRESULT Initialize(
+        _In_ IUnknown* punk, _In_ TfClientId clientid, _In_ const GUID& guidCompartment, _In_ bool global = false);
     HRESULT Uninitialize();
 
 protected:
@@ -87,4 +88,4 @@ struct CompartmentBase::variantInfo<long> {
     }
 };
 
-}
+} // namespace VietType

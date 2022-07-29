@@ -20,5 +20,5 @@ extern const std::wstring ConfigKeyName;
 
 extern const LANGID TextServiceLangId;
 
-}
-}
+} // namespace Globals
+} // namespace VietType

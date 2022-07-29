@@ -11,13 +11,13 @@ namespace EditSessions {
 // workaround for annoying IntelliSense error when the full enum name is used in a macro
 using BlockedKind = EngineController::BlockedKind;
 
-#define EB_HRESULT_CHECK_COMMIT(hr, controller, fmt, msg) \
-    do { \
-        if (FAILED(hr)) { \
-            DPRINT(L"HRESULT error %lx: " fmt, hr, msg); \
-            controller->SetBlocked(BlockedKind::Free); \
-            return hr; \
-        } \
+#define EB_HRESULT_CHECK_COMMIT(hr, controller, fmt, msg)                                                              \
+    do {                                                                                                               \
+        if (FAILED(hr)) {                                                                                              \
+            DPRINT(L"HRESULT error %lx: " fmt, hr, msg);                                                               \
+            controller->SetBlocked(BlockedKind::Free);                                                                 \
+            return hr;                                                                                                 \
+        }                                                                                                              \
     } while (0);
 
 HRESULT EditBlocked(
@@ -132,5 +132,5 @@ commit:
     return hr;
 }
 
-}
-}
+} // namespace EditSessions
+} // namespace VietType

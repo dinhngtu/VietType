@@ -23,7 +23,8 @@ HRESULT IsContextEmpty(_In_ ITfContext* context, _In_ TfClientId clientid, _Out_
     return hr;
 }
 
-HRESULT OnNewContext(_In_ ITfContext *context, _In_ CompositionManager* compositionManager, _In_ EngineController* controller) {
+HRESULT OnNewContext(
+    _In_ ITfContext* context, _In_ CompositionManager* compositionManager, _In_ EngineController* controller) {
     HRESULT hr;
 
     bool isempty;
@@ -46,14 +47,11 @@ HRESULT OnNewContext(_In_ ITfContext *context, _In_ CompositionManager* composit
             (st.dwStaticFlags & TF_SS_DISJOINTSEL) ? L'D' : L'_',
             (st.dwStaticFlags & TF_SS_REGIONS) ? L'R' : L'_',
             (st.dwStaticFlags & TF_SS_TRANSITORY) ? L'T' : L'_');
-    } else DBG_HRESULT_CHECK(hr, L"%s", L"context->GetStatus failed");
+    } else
+        DBG_HRESULT_CHECK(hr, L"%s", L"context->GetStatus failed");
 #endif
 
-    hr = CompositionManager::RequestEditSession(
-        EditSessions::EditBlocked,
-        compositionManager,
-        context,
-        controller);
+    hr = CompositionManager::RequestEditSession(EditSessions::EditBlocked, compositionManager, context, controller);
     if (FAILED(hr)) {
         DBG_HRESULT_CHECK(hr, L"%s", L"CompositionManager::RequestEditSession failed");
         controller->SetBlocked(EngineController::BlockedKind::Free);
@@ -62,4 +60,4 @@ HRESULT OnNewContext(_In_ ITfContext *context, _In_ CompositionManager* composit
     return S_OK;
 }
 
-}
+} // namespace VietType

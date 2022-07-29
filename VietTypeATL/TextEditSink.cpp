@@ -6,13 +6,15 @@
 
 namespace VietType {
 
-STDMETHODIMP TextEditSink::OnEndEdit(__RPC__in_opt ITfContext* pic, _In_ TfEditCookie ecReadOnly, __RPC__in_opt ITfEditRecord* pEditRecord) {
+STDMETHODIMP TextEditSink::OnEndEdit(
+    __RPC__in_opt ITfContext* pic, _In_ TfEditCookie ecReadOnly, __RPC__in_opt ITfEditRecord* pEditRecord) {
     DBG_DPRINT(L"%s", L"");
 
     return S_OK;
 }
 
-_Check_return_ HRESULT TextEditSink::Initialize(_In_ ITfDocumentMgr* documentMgr, _In_ CompositionManager* compMgr, _In_ EngineController* controller) {
+_Check_return_ HRESULT TextEditSink::Initialize(
+    _In_ ITfDocumentMgr* documentMgr, _In_ CompositionManager* compMgr, _In_ EngineController* controller) {
     HRESULT hr;
 
     _compMgr = compMgr;
@@ -58,4 +60,4 @@ HRESULT TextEditSink::Uninitialize() {
     return S_OK;
 }
 
-}
+} // namespace VietType

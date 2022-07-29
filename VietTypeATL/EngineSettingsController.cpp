@@ -7,14 +7,14 @@
 namespace VietType {
 
 // {B2FBD2E7-922F-4996-BE77-21085B91A8F0}
-static const GUID GUID_DefaultEnabledCompartment = { 0xb2fbd2e7, 0x922f, 0x4996, { 0xbe, 0x77, 0x21, 0x8, 0x5b, 0x91, 0xa8, 0xf0 } };
+static const GUID GUID_DefaultEnabledCompartment = {
+    0xb2fbd2e7, 0x922f, 0x4996, {0xbe, 0x77, 0x21, 0x8, 0x5b, 0x91, 0xa8, 0xf0}};
 // {57335895-0C34-40BA-83F7-72E90A39C222}
-static const GUID GUID_TelexConfigCompartment = { 0x57335895, 0xc34, 0x40ba, { 0x83, 0xf7, 0x72, 0xe9, 0xa, 0x39, 0xc2, 0x22 } };
+static const GUID GUID_TelexConfigCompartment = {
+    0x57335895, 0xc34, 0x40ba, {0x83, 0xf7, 0x72, 0xe9, 0xa, 0x39, 0xc2, 0x22}};
 
 _Check_return_ HRESULT EngineSettingsController::Initialize(
-    _In_ EngineController* ec,
-    _In_ ITfThreadMgr* threadMgr,
-    _In_ TfClientId clientid) {
+    _In_ EngineController* ec, _In_ ITfThreadMgr* threadMgr, _In_ TfClientId clientid) {
     HRESULT hr;
 
     _ec = ec;
@@ -127,7 +127,8 @@ HRESULT EngineSettingsController::LoadSettings() {
     cfg.accept_separate_dd = static_cast<bool>(accept_dd);
 
     DWORD backspace_invalid = true;
-    hr = _tc_backspace_invalid->GetValueOrWriteback(&backspace_invalid, _ec->GetEngine().GetConfig().backspaced_word_stays_invalid);
+    hr = _tc_backspace_invalid->GetValueOrWriteback(
+        &backspace_invalid, _ec->GetEngine().GetConfig().backspaced_word_stays_invalid);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_backspace_invalid->GetValueOrWriteback failed");
     cfg.backspaced_word_stays_invalid = static_cast<bool>(backspace_invalid);
 
@@ -165,4 +166,4 @@ _Check_return_ HRESULT EngineSettingsController::IsBackconvertOnBackspace(_Out_ 
     return _backconvert_on_backspace->GetValueOrWriteback(pde, 0);
 }
 
-}
+} // namespace VietType

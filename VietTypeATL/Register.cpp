@@ -17,10 +17,10 @@
 
 static std::vector<GUID> SupportedCategories = {
     GUID_TFCAT_TIP_KEYBOARD,
-    GUID_TFCAT_TIPCAP_UIELEMENTENABLED, // UI-less
-    GUID_TFCAT_TIPCAP_COMLESS, // Google says this is required for WoW apps
-    GUID_TFCAT_TIPCAP_IMMERSIVESUPPORT, // store apps?
-    GUID_TFCAT_TIPCAP_SYSTRAYSUPPORT, // systray on win8+?
+    GUID_TFCAT_TIPCAP_UIELEMENTENABLED,  // UI-less
+    GUID_TFCAT_TIPCAP_COMLESS,           // Google says this is required for WoW apps
+    GUID_TFCAT_TIPCAP_IMMERSIVESUPPORT,  // store apps?
+    GUID_TFCAT_TIPCAP_SYSTRAYSUPPORT,    // systray on win8+?
     GUID_TFCAT_DISPLAYATTRIBUTEPROVIDER, // display attributes for composition
 };
 
@@ -110,7 +110,8 @@ static HRESULT SetSettingsKeyAcl() {
     return S_OK;
 }
 
-extern "C" __declspec(dllexport) void CALLBACK RunSetSettingsKeyAclW(HWND hWnd, HINSTANCE hInst, LPWSTR lpszCmdLine, int nCmdShow) {
+extern "C" __declspec(dllexport) void CALLBACK
+    RunSetSettingsKeyAclW(HWND hWnd, HINSTANCE hInst, LPWSTR lpszCmdLine, int nCmdShow) {
     DoRunFunction(SetSettingsKeyAcl, hWnd, hInst, lpszCmdLine, nCmdShow);
 }
 
@@ -122,7 +123,7 @@ static HRESULT RegisterProfiles() {
         return E_UNEXPECTED;
     }
 
-    WCHAR dllPath[MAX_PATH] = { 0 };
+    WCHAR dllPath[MAX_PATH] = {0};
 
     auto dllPathLength = GetModuleFileName(VietType::Globals::DllInstance, dllPath, MAX_PATH);
     if (dllPathLength == 0) {
@@ -156,7 +157,8 @@ static HRESULT RegisterProfiles() {
     return S_OK;
 }
 
-extern "C" __declspec(dllexport) void CALLBACK RunRegisterProfilesW(HWND hWnd, HINSTANCE hInst, LPWSTR lpszCmdLine, int nCmdShow) {
+extern "C" __declspec(dllexport) void CALLBACK
+    RunRegisterProfilesW(HWND hWnd, HINSTANCE hInst, LPWSTR lpszCmdLine, int nCmdShow) {
     DoRunFunction(RegisterProfiles, hWnd, hInst, lpszCmdLine, nCmdShow);
 }
 
@@ -176,7 +178,8 @@ static HRESULT UnregisterProfiles() {
     return S_OK;
 }
 
-extern "C" __declspec(dllexport) void CALLBACK RunUnregisterProfilesW(HWND hWnd, HINSTANCE hInst, LPWSTR lpszCmdLine, int nCmdShow) {
+extern "C" __declspec(dllexport) void CALLBACK
+    RunUnregisterProfilesW(HWND hWnd, HINSTANCE hInst, LPWSTR lpszCmdLine, int nCmdShow) {
     DoRunFunction(UnregisterProfiles, hWnd, hInst, lpszCmdLine, nCmdShow);
 }
 
@@ -189,14 +192,16 @@ static HRESULT RegisterCategories() {
 
     for (const auto& cat : SupportedCategories) {
         DBG_DPRINT(L"registering " GUID_WFORMAT, GUID_COMPONENTS(cat));
-        hr = categoryMgr->RegisterCategory(VietType::Globals::CLSID_TextService, cat, VietType::Globals::CLSID_TextService);
+        hr = categoryMgr->RegisterCategory(
+            VietType::Globals::CLSID_TextService, cat, VietType::Globals::CLSID_TextService);
         HRESULT_CHECK_RETURN(hr, L"%s", L"categoryMgr->RegisterCategory failed");
     }
 
     return S_OK;
 }
 
-extern "C" __declspec(dllexport) void CALLBACK RunRegisterCategoriesW(HWND hWnd, HINSTANCE hInst, LPWSTR lpszCmdLine, int nCmdShow) {
+extern "C" __declspec(dllexport) void CALLBACK
+    RunRegisterCategoriesW(HWND hWnd, HINSTANCE hInst, LPWSTR lpszCmdLine, int nCmdShow) {
     DoRunFunction(RegisterCategories, hWnd, hInst, lpszCmdLine, nCmdShow);
 }
 
@@ -211,13 +216,14 @@ static HRESULT UnregisterCategories() {
     hr = categoryMgr->EnumCategoriesInItem(VietType::Globals::CLSID_TextService, &registeredCategories);
     HRESULT_CHECK_RETURN(hr, L"%s", L"categoryMgr->EnumCategoriesInItem failed");
 
-    GUID cat = { 0 };
+    GUID cat = {0};
     ULONG fetched = 0;
     while (1) {
         hr = registeredCategories->Next(1, &cat, &fetched);
         if (hr == S_OK) {
             DBG_DPRINT(L"unregistering " GUID_WFORMAT, GUID_COMPONENTS(cat));
-            hr = categoryMgr->UnregisterCategory(VietType::Globals::CLSID_TextService, cat, VietType::Globals::CLSID_TextService);
+            hr = categoryMgr->UnregisterCategory(
+                VietType::Globals::CLSID_TextService, cat, VietType::Globals::CLSID_TextService);
             HRESULT_CHECK_RETURN(hr, L"%s", L"categoryMgr->UnregisterCategory failed");
         } else {
             break;
@@ -227,7 +233,8 @@ static HRESULT UnregisterCategories() {
     return S_OK;
 }
 
-extern "C" __declspec(dllexport) void CALLBACK RunUnregisterCategoriesW(HWND hWnd, HINSTANCE hInst, LPWSTR lpszCmdLine, int nCmdShow) {
+extern "C" __declspec(dllexport) void CALLBACK
+    RunUnregisterCategoriesW(HWND hWnd, HINSTANCE hInst, LPWSTR lpszCmdLine, int nCmdShow) {
     DoRunFunction(UnregisterCategories, hWnd, hInst, lpszCmdLine, nCmdShow);
 }
 
@@ -252,7 +259,8 @@ static HRESULT ActivateProfiles() {
     return S_OK;
 }
 
-extern "C" __declspec(dllexport) void CALLBACK RunActivateProfilesW(HWND hWnd, HINSTANCE hInst, LPWSTR lpszCmdLine, int nCmdShow) {
+extern "C" __declspec(dllexport) void CALLBACK
+    RunActivateProfilesW(HWND hWnd, HINSTANCE hInst, LPWSTR lpszCmdLine, int nCmdShow) {
     DoRunFunction(ActivateProfiles, hWnd, hInst, lpszCmdLine, nCmdShow);
 }
 
@@ -274,6 +282,7 @@ static HRESULT DeactivateProfiles() {
     return S_OK;
 }
 
-extern "C" __declspec(dllexport) void CALLBACK RunDeactivateProfilesW(HWND hWnd, HINSTANCE hInst, LPWSTR lpszCmdLine, int nCmdShow) {
+extern "C" __declspec(dllexport) void CALLBACK
+    RunDeactivateProfilesW(HWND hWnd, HINSTANCE hInst, LPWSTR lpszCmdLine, int nCmdShow) {
     DoRunFunction(DeactivateProfiles, hWnd, hInst, lpszCmdLine, nCmdShow);
 }

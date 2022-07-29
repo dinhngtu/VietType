@@ -21,12 +21,13 @@ namespace Telex {
 
 // Committed|CommittedInvalid -> Valid (Reset)
 
-enum class TelexStates {
-    Valid, // valid word, can accept more chars but cannot get result
-    Invalid, // invalid word but can still accept more chars
-    Committed, // valid, tones have been applied, cannot accept any more chars (must get result or Reset)
+enum class TelexStates
+{
+    Valid,            // valid word, can accept more chars but cannot get result
+    Invalid,          // invalid word but can still accept more chars
+    Committed,        // valid, tones have been applied, cannot accept any more chars (must get result or Reset)
     CommittedInvalid, // invalid, cannot accept any more chars
-    TxError = -1, // can never be a state, returned when PushChar encounters an error
+    TxError = -1,     // can never be a state, returned when PushChar encounters an error
 };
 
 struct TelexConfig {
@@ -87,12 +88,12 @@ private:
 
 private:
     using map_iterator = generic_map_type<std::wstring, VInfo>::const_iterator;
-    bool FindTable(_Out_ map_iterator *it) const;
-    bool GetTonePos(_In_ bool predict, _Out_ VInfo *vinfo) const;
+    bool FindTable(_Out_ map_iterator* it) const;
+    bool GetTonePos(_In_ bool predict, _Out_ VInfo* vinfo) const;
 
 private:
     bool CheckInvariants() const;
 };
 
-}
-}
+} // namespace Telex
+} // namespace VietType

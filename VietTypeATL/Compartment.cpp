@@ -22,7 +22,8 @@ _Check_return_ HRESULT CompartmentBase::GetCompartmentSource(_COM_Outptr_ ITfSou
     return _compartment->QueryInterface(ppSource);
 }
 
-_Check_return_ HRESULT CompartmentBase::Initialize(_In_ IUnknown* punk, _In_ TfClientId clientid, _In_ const GUID& guidCompartment, _In_ bool global) {
+_Check_return_ HRESULT CompartmentBase::Initialize(
+    _In_ IUnknown* punk, _In_ TfClientId clientid, _In_ const GUID& guidCompartment, _In_ bool global) {
     HRESULT hr;
 
     CComPtr<ITfCompartmentMgr> compartmentMgr;
@@ -75,4 +76,4 @@ HRESULT CompartmentBase::Uninitialize() {
     return S_OK;
 }
 
-}
+} // namespace VietType

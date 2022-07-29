@@ -39,11 +39,12 @@ public:
     HRESULT Uninitialize();
 
 protected:
-    // RefreshableButtons are owned by EngineController, so we don't want to hold an owning reference to EngineController here
+    // RefreshableButtons are owned by EngineController, so we don't want to hold an owning reference to
+    // EngineController here
     EngineController* _controller = nullptr;
     CComPtr<LanguageBarButton> _button;
 
     CComPtr<ITfLangBarItemMgr> _langBarItemMgr;
 };
 
-}
+} // namespace VietType

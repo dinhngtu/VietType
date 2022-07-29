@@ -11,9 +11,7 @@ class CompositionManager;
 class EngineController;
 class TextEditSink;
 
-class ThreadMgrEventSink :
-    public CComObjectRootEx<CComSingleThreadModel>,
-    public ITfThreadMgrEventSink {
+class ThreadMgrEventSink : public CComObjectRootEx<CComSingleThreadModel>, public ITfThreadMgrEventSink {
 public:
     ThreadMgrEventSink() = default;
     ThreadMgrEventSink(const ThreadMgrEventSink&) = delete;
@@ -22,7 +20,7 @@ public:
 
     DECLARE_NOT_AGGREGATABLE(ThreadMgrEventSink)
     BEGIN_COM_MAP(ThreadMgrEventSink)
-        COM_INTERFACE_ENTRY(ITfThreadMgrEventSink)
+    COM_INTERFACE_ENTRY(ITfThreadMgrEventSink)
     END_COM_MAP()
     DECLARE_PROTECT_FINAL_CONSTRUCT()
 
@@ -30,7 +28,8 @@ public:
     // Inherited via ITfThreadMgrEventSink
     virtual STDMETHODIMP OnInitDocumentMgr(__RPC__in_opt ITfDocumentMgr* pdim) override;
     virtual STDMETHODIMP OnUninitDocumentMgr(__RPC__in_opt ITfDocumentMgr* pdim) override;
-    virtual STDMETHODIMP OnSetFocus(__RPC__in_opt ITfDocumentMgr* pdimFocus, __RPC__in_opt ITfDocumentMgr* pdimPrevFocus) override;
+    virtual STDMETHODIMP OnSetFocus(
+        __RPC__in_opt ITfDocumentMgr* pdimFocus, __RPC__in_opt ITfDocumentMgr* pdimPrevFocus) override;
     virtual STDMETHODIMP OnPushContext(__RPC__in_opt ITfContext* pic) override;
     virtual STDMETHODIMP OnPopContext(__RPC__in_opt ITfContext* pic) override;
 
@@ -48,4 +47,4 @@ private:
     CComPtr<ITfDocumentMgr> _docMgrFocus;
 };
 
-}
+} // namespace VietType

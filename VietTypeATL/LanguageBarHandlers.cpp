@@ -86,7 +86,8 @@ static HRESULT CopyTfMenu(_In_ ITfMenu* menu) {
 
         mii.cch++;
         mii.fMask = MIIM_BITMAP | MIIM_CHECKMARKS | MIIM_FTYPE | MIIM_ID | MIIM_STATE | MIIM_STRING;
-        // the vector used here can't outlive the copy function, that's why the function has to do the item addition by itself
+        // the vector used here can't outlive the copy function, that's why the function has to do the item addition by
+        // itself
         std::vector<WCHAR> buf(mii.cch);
         mii.dwTypeData = &buf[0];
         if (!GetMenuItemInfo(trayMenu, i, TRUE, &mii)) {
@@ -113,15 +114,8 @@ static HRESULT CopyTfMenu(_In_ ITfMenu* menu) {
         }
 
         // hbmpMask is not supposed to be NULL here but it still works anyway so we suppress the warning
-#pragma warning(suppress: 6387)
-        hr = menu->AddMenuItem(
-            mii.wID,
-            tfFlags,
-            tfBitmap.get(),
-            NULL,
-            &buf[0],
-            static_cast<ULONG>(buf.size()),
-            NULL);
+#pragma warning(suppress : 6387)
+        hr = menu->AddMenuItem(mii.wID, tfFlags, tfBitmap.get(), NULL, &buf[0], static_cast<ULONG>(buf.size()), NULL);
         DBG_HRESULT_CHECK(hr, L"%s", L"menu->AddMenuItem failed");
     }
 
@@ -162,18 +156,15 @@ static HRESULT OnMenuSelectAll(_In_ UINT id, _In_ EngineController* controller) 
         }
 
         LPWSTR ptext = nullptr;
-        std::array<DWORD_PTR, 5> args = {
-            PRODUCTVERSION_TUPLE,
-            reinterpret_cast<DWORD_PTR>(VCS_REVISION)
-        };
+        std::array<DWORD_PTR, 5> args = {PRODUCTVERSION_TUPLE, reinterpret_cast<DWORD_PTR>(VCS_REVISION)};
         if (!FormatMessage(
-            FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_STRING | FORMAT_MESSAGE_ARGUMENT_ARRAY,
-            aboutFormatString,
-            0,
-            0,
-            reinterpret_cast<LPWSTR>(&ptext),
-            0,
-            reinterpret_cast<va_list*>(&args[0]))) {
+                FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_STRING | FORMAT_MESSAGE_ARGUMENT_ARRAY,
+                aboutFormatString,
+                0,
+                0,
+                reinterpret_cast<LPWSTR>(&ptext),
+                0,
+                reinterpret_cast<va_list*>(&args[0]))) {
             WINERROR_GLE_RETURN_HRESULT(L"%s", L"FormatMessage failed");
         }
 
@@ -190,7 +181,8 @@ static HRESULT OnMenuSelectAll(_In_ UINT id, _In_ EngineController* controller) 
 static DWORD GetSystemLightTheme() {
     CRegKey key;
     DWORD light = 0;
-    LSTATUS err = key.Open(HKEY_CURRENT_USER, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", KEY_QUERY_VALUE);
+    LSTATUS err = key.Open(
+        HKEY_CURRENT_USER, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", KEY_QUERY_VALUE);
     if (err == ERROR_SUCCESS) {
         err = key.QueryDWORDValue(L"SystemUsesLightTheme", light);
         if (err != ERROR_SUCCESS) {
@@ -218,13 +210,7 @@ _Check_return_ HRESULT RefreshableButton::Initialize(
     _controller = ec;
     _langBarItemMgr = langBarItemMgr;
 
-    hr = CreateInitialize(
-        &_button,
-        guidItem,
-        style,
-        sort,
-        description,
-        this);
+    hr = CreateInitialize(&_button, guidItem, style, sort, description, this);
     HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(&_button) failed");
     hr = _langBarItemMgr->AddItem(_button);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_langBarItemMgr->AddItem failed");
@@ -275,11 +261,14 @@ HRESULT RefreshableButton::GetIcon(__RPC__deref_out_opt HICON* hicon) {
 
     DWORD light = GetSystemLightTheme();
     if (_controller->GetBlocked() == EngineController::BlockedKind::Blocked) {
-        *hicon = static_cast<HICON>(LoadImage(Globals::DllInstance, MAKEINTRESOURCE(light ? IDI_ICONXL : IDI_ICONXD), IMAGE_ICON, 16, 16, 0));
+        *hicon = static_cast<HICON>(
+            LoadImage(Globals::DllInstance, MAKEINTRESOURCE(light ? IDI_ICONXL : IDI_ICONXD), IMAGE_ICON, 16, 16, 0));
     } else if (_controller->IsEnabled()) {
-        *hicon = static_cast<HICON>(LoadImage(Globals::DllInstance, MAKEINTRESOURCE(light ? IDI_ICONVL : IDI_ICONVD), IMAGE_ICON, 16, 16, 0));
+        *hicon = static_cast<HICON>(
+            LoadImage(Globals::DllInstance, MAKEINTRESOURCE(light ? IDI_ICONVL : IDI_ICONVD), IMAGE_ICON, 16, 16, 0));
     } else {
-        *hicon = static_cast<HICON>(LoadImage(Globals::DllInstance, MAKEINTRESOURCE(light ? IDI_ICONEL : IDI_ICONED), IMAGE_ICON, 16, 16, 0));
+        *hicon = static_cast<HICON>(
+            LoadImage(Globals::DllInstance, MAKEINTRESOURCE(light ? IDI_ICONEL : IDI_ICONED), IMAGE_ICON, 16, 16, 0));
     }
     return *hicon ? S_OK : E_FAIL;
 }
@@ -309,4 +298,4 @@ HRESULT RefreshableButton::Refresh() {
     return hr;
 }
 
-}
+} // namespace VietType

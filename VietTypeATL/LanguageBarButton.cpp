@@ -7,7 +7,8 @@ namespace VietType {
 // just a random number to identify the sink
 static const DWORD LanguageBarButtonCookie = 0x5a6fdd5e;
 
-STDMETHODIMP LanguageBarButton::AdviseSink(__RPC__in REFIID riid, __RPC__in_opt IUnknown* punk, __RPC__out DWORD* pdwCookie) {
+STDMETHODIMP LanguageBarButton::AdviseSink(
+    __RPC__in REFIID riid, __RPC__in_opt IUnknown* punk, __RPC__out DWORD* pdwCookie) {
     HRESULT hr;
 
     if (riid != IID_ITfLangBarItemSink) {
@@ -141,4 +142,4 @@ HRESULT LanguageBarButton::Uninitialize() {
     return S_OK;
 }
 
-}
+} // namespace VietType

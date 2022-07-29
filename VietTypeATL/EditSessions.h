@@ -24,5 +24,5 @@ HRESULT EditSurroundingWord(
     _In_ VietType::EngineController* controller,
     _In_ int ignore);
 
-}
-}
+} // namespace EditSessions
+} // namespace VietType

@@ -131,4 +131,4 @@ HRESULT KeyHandlerEditSession::Commit(_In_ TfEditCookie ec) {
     return S_OK;
 }
 
-}
+} // namespace VietType

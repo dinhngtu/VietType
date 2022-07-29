@@ -14,7 +14,8 @@
 
 namespace VietType {
 
-STDMETHODIMP CompositionManager::OnCompositionTerminated(_In_ TfEditCookie ecWrite, __RPC__in_opt ITfComposition* pComposition) {
+STDMETHODIMP CompositionManager::OnCompositionTerminated(
+    _In_ TfEditCookie ecWrite, __RPC__in_opt ITfComposition* pComposition) {
     HRESULT hr;
 
     DBG_DPRINT(L"ecWrite = %ld", ecWrite);
@@ -25,7 +26,8 @@ STDMETHODIMP CompositionManager::OnCompositionTerminated(_In_ TfEditCookie ecWri
     return S_OK;
 }
 
-_Check_return_ HRESULT CompositionManager::Initialize(_In_ TfClientId clientid, _In_ ITfDisplayAttributeInfo* composingAttribute, _In_ bool comless) {
+_Check_return_ HRESULT CompositionManager::Initialize(
+    _In_ TfClientId clientid, _In_ ITfDisplayAttributeInfo* composingAttribute, _In_ bool comless) {
     HRESULT hr;
 
     _clientid = clientid;
@@ -45,7 +47,8 @@ HRESULT CompositionManager::Uninitialize() {
     return S_OK;
 }
 
-HRESULT CompositionManager::RequestEditSession(_In_ ITfEditSession* session, _In_ ITfContext* context, _In_ DWORD flags) {
+HRESULT CompositionManager::RequestEditSession(
+    _In_ ITfEditSession* session, _In_ ITfContext* context, _In_ DWORD flags) {
     if (_clientid == TF_CLIENTID_NULL || !context) {
         DBG_DPRINT(L"%s", L"bad edit session request");
         return E_FAIL;
@@ -89,7 +92,7 @@ _Check_return_ HRESULT CompositionManager::GetRange(_COM_Outptr_ ITfRange** rang
     }
     HRESULT hr = _composition->GetRange(range);
     HRESULT_CHECK_RETURN_OUTPTR(hr, range, L"%s", L"_composition->GetRange failed");
-    
+
     return S_OK;
 }
 
@@ -129,7 +132,8 @@ HRESULT CompositionManager::StartCompositionNow(_In_ TfEditCookie ec, _In_ ITfCo
         DBG_HRESULT_CHECK(hr, L"%s", L"context->SetSelection failed");
 
         _context = context;
-    } else HRESULT_CHECK_RETURN(hr, L"%s", L"contextComposition->StartComposition failed");
+    } else
+        HRESULT_CHECK_RETURN(hr, L"%s", L"contextComposition->StartComposition failed");
 
     return S_OK;
 }
@@ -220,7 +224,8 @@ HRESULT CompositionManager::SetCompositionText(_In_ TfEditCookie ec, _In_z_ LPCW
     return S_OK;
 }
 
-HRESULT CompositionManager::EnsureCompositionText(_In_ TfEditCookie ec, _In_ ITfContext* context, _In_z_ LPCWSTR str, _In_ LONG length) {
+HRESULT CompositionManager::EnsureCompositionText(
+    _In_ TfEditCookie ec, _In_ ITfContext* context, _In_z_ LPCWSTR str, _In_ LONG length) {
     HRESULT hr;
 
     if (!_composition) {
@@ -231,7 +236,8 @@ HRESULT CompositionManager::EnsureCompositionText(_In_ TfEditCookie ec, _In_ ITf
     return SetCompositionText(ec, str, length);
 }
 
-HRESULT CompositionManager::SetRangeDisplayAttribute(_In_ TfEditCookie ec, _In_ ITfContext* context, _In_ ITfRange* range, _In_ ITfDisplayAttributeInfo* attr) {
+HRESULT CompositionManager::SetRangeDisplayAttribute(
+    _In_ TfEditCookie ec, _In_ ITfContext* context, _In_ ITfRange* range, _In_ ITfDisplayAttributeInfo* attr) {
     HRESULT hr;
 
     if (!_categoryMgr) {
@@ -265,7 +271,8 @@ HRESULT CompositionManager::SetRangeDisplayAttribute(_In_ TfEditCookie ec, _In_ 
     return S_OK;
 }
 
-HRESULT CompositionManager::ClearRangeDisplayAttribute(_In_ TfEditCookie ec, _In_ ITfContext* context, _In_ ITfRange* range) {
+HRESULT CompositionManager::ClearRangeDisplayAttribute(
+    _In_ TfEditCookie ec, _In_ ITfContext* context, _In_ ITfRange* range) {
     HRESULT hr;
 
     CComPtr<ITfProperty> prop;
@@ -278,12 +285,14 @@ HRESULT CompositionManager::ClearRangeDisplayAttribute(_In_ TfEditCookie ec, _In
     return S_OK;
 }
 
-HRESULT CompositionManager::_StartComposition(_In_ TfEditCookie ec, _In_ CompositionManager* instance, _In_ ITfContext* context) {
+HRESULT CompositionManager::_StartComposition(
+    _In_ TfEditCookie ec, _In_ CompositionManager* instance, _In_ ITfContext* context) {
     return instance->StartCompositionNow(ec, context);
 }
 
-HRESULT CompositionManager::_EndComposition(_In_ TfEditCookie ec, _In_ CompositionManager* instance, _In_ ITfContext* context) {
+HRESULT CompositionManager::_EndComposition(
+    _In_ TfEditCookie ec, _In_ CompositionManager* instance, _In_ ITfContext* context) {
     return instance->EndCompositionNow(ec);
 }
 
-}
+} // namespace VietType

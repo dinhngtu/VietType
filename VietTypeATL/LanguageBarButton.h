@@ -17,10 +17,9 @@ public:
     virtual std::wstring GetTooltipString() = 0;
 };
 
-class LanguageBarButton :
-    public CComObjectRootEx<CComSingleThreadModel>,
-    public ITfSource,
-    public ITfLangBarItemButton {
+class LanguageBarButton : public CComObjectRootEx<CComSingleThreadModel>,
+                          public ITfSource,
+                          public ITfLangBarItemButton {
 public:
     LanguageBarButton() = default;
     LanguageBarButton(const LanguageBarButton&) = delete;
@@ -29,14 +28,15 @@ public:
 
     DECLARE_NOT_AGGREGATABLE(LanguageBarButton)
     BEGIN_COM_MAP(LanguageBarButton)
-        COM_INTERFACE_ENTRY(ITfLangBarItemButton)
-        COM_INTERFACE_ENTRY(ITfLangBarItem)
-        COM_INTERFACE_ENTRY(ITfSource)
+    COM_INTERFACE_ENTRY(ITfLangBarItemButton)
+    COM_INTERFACE_ENTRY(ITfLangBarItem)
+    COM_INTERFACE_ENTRY(ITfSource)
     END_COM_MAP()
     DECLARE_PROTECT_FINAL_CONSTRUCT()
 
     // Inherited via ITfSource
-    virtual STDMETHODIMP AdviseSink(__RPC__in REFIID riid, __RPC__in_opt IUnknown* punk, __RPC__out DWORD* pdwCookie) override;
+    virtual STDMETHODIMP AdviseSink(
+        __RPC__in REFIID riid, __RPC__in_opt IUnknown* punk, __RPC__out DWORD* pdwCookie) override;
     virtual STDMETHODIMP UnadviseSink(_In_ DWORD dwCookie) override;
 
     // Inherited via ITfLangBarItemButton
@@ -60,7 +60,7 @@ public:
     HRESULT Uninitialize();
 
 private:
-    GUID _guidItem = { 0 };
+    GUID _guidItem = {0};
     DWORD _style = 0;
     ULONG _sort = 0;
     std::wstring _description;
@@ -69,4 +69,4 @@ private:
     CComPtr<ITfLangBarItemSink> _itemSink;
 };
 
-}
+} // namespace VietType

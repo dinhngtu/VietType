@@ -47,9 +47,7 @@ static CComPtr<EnumDisplayAttributeInfo> CreateAttributeStore() {
     }
 
     attr1->Initialize(
-        std::get<0>(ComposingAttributeData),
-        std::get<1>(ComposingAttributeData),
-        std::get<2>(ComposingAttributeData));
+        std::get<0>(ComposingAttributeData), std::get<1>(ComposingAttributeData), std::get<2>(ComposingAttributeData));
     CComPtr<ITfDisplayAttributeInfo> info1(attr1.p);
     assert(info1);
     ret->AddAttribute(info1);
@@ -64,7 +62,8 @@ STDMETHODIMP TextService::Activate(_In_ ITfThreadMgr* ptim, _In_ TfClientId tid)
 }
 
 STDMETHODIMP TextService::ActivateEx(_In_ ITfThreadMgr* ptim, _In_ TfClientId tid, _In_ DWORD dwFlags) {
-    DBG_DPRINT(L"h = %p, threadno = %ld, tid = %ld, flags = %lx", Globals::DllInstance, GetCurrentThreadId(), tid, dwFlags);
+    DBG_DPRINT(
+        L"h = %p, threadno = %ld, tid = %ld, flags = %lx", Globals::DllInstance, GetCurrentThreadId(), tid, dwFlags);
 
     HRESULT hr;
 
@@ -74,7 +73,8 @@ STDMETHODIMP TextService::ActivateEx(_In_ ITfThreadMgr* ptim, _In_ TfClientId ti
 
     _engine = std::make_shared<Telex::TelexEngine>(Telex::TelexConfig{});
 
-    hr = CreateInitialize(&_compositionManager, tid, attributeStore->GetAttribute(0), static_cast<bool>(dwFlags & TF_TMAE_COMLESS));
+    hr = CreateInitialize(
+        &_compositionManager, tid, attributeStore->GetAttribute(0), static_cast<bool>(dwFlags & TF_TMAE_COMLESS));
     HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(&_compositionManager) failed");
 
     hr = CreateInitialize(&_engineController, _engine, ptim, tid);
@@ -127,8 +127,9 @@ STDMETHODIMP TextService::EnumDisplayAttributeInfo(__RPC__deref_out_opt IEnumTfD
     return S_OK;
 }
 
-STDMETHODIMP TextService::GetDisplayAttributeInfo(__RPC__in REFGUID guid, __RPC__deref_out_opt ITfDisplayAttributeInfo** ppInfo) {
+STDMETHODIMP TextService::GetDisplayAttributeInfo(
+    __RPC__in REFGUID guid, __RPC__deref_out_opt ITfDisplayAttributeInfo** ppInfo) {
     return attributeStore->FindAttributeByGuid(guid, ppInfo);
 }
 
-}
+} // namespace VietType

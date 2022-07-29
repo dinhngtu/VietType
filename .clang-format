@@ -1,0 +1,12 @@
+BasedOnStyle: Microsoft
+BreakBeforeBraces: Attach
+NamespaceIndentation: None
+BinPackArguments: false
+BinPackParameters: false
+ColumnLimit: 120
+PointerAlignment: Left
+SortIncludes: false
+AlignAfterOpenBracket: AlwaysBreak
+Cpp11BracedListStyle: true
+AccessModifierOffset: -4
+AlwaysBreakTemplateDeclarations: Yes
