@@ -26,7 +26,7 @@ static const TF_PRESERVEDKEY PK_Toggle = { VK_OEM_3, TF_MOD_ALT }; // Alt-`
 
 // {FAC88DBE-E799-474B-9A8C-1449CAA38348}
 static const GUID GUID_KeyEventSink_PreservedKey_EditBack = { 0xfac88dbe, 0xe799, 0x474b, { 0x9a, 0x8c, 0x14, 0x49, 0xca, 0xa3, 0x83, 0x48 } };
-static const TF_PRESERVEDKEY PK_EditBack = { VK_LEFT, TF_MOD_ALT };
+static const TF_PRESERVEDKEY PK_EditBack = { VK_BACK, TF_MOD_ALT };
 
 STDMETHODIMP KeyEventSink::OnSetFocus(_In_ BOOL fForeground) {
     HRESULT hr;
@@ -194,11 +194,17 @@ _Check_return_ HRESULT KeyEventSink::Initialize(
     // probably not fatal
     DBG_HRESULT_CHECK(hr, L"%s", L"_keystrokeMgr->PreserveKey failed");
 
+    hr = _keystrokeMgr->PreserveKey(_clientid, GUID_KeyEventSink_PreservedKey_EditBack, &PK_EditBack, NULL, 0);
+    DBG_HRESULT_CHECK(hr, L"%s", L"_keystrokeMgr->PreserveKey failed");
+
     return S_OK;
 }
 
 HRESULT KeyEventSink::Uninitialize() {
     HRESULT hr;
+
+    hr = _keystrokeMgr->UnpreserveKey(GUID_KeyEventSink_PreservedKey_EditBack, &PK_EditBack);
+    DBG_HRESULT_CHECK(hr, L"%s", L"_keystrokeMgr->UnpreserveKey failed");
 
     hr = _keystrokeMgr->UnpreserveKey(GUID_KeyEventSink_PreservedKey_Toggle, &PK_Toggle);
     DBG_HRESULT_CHECK(hr, L"%s", L"_keystrokeMgr->UnpreserveKey failed");
