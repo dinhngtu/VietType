@@ -46,6 +46,9 @@ public:
     HRESULT SetCompositionText(_In_ TfEditCookie ec, _In_z_ LPCWSTR str, _In_ LONG length);
     // this uses context to open a new edit session if there's no existing session
     HRESULT EnsureCompositionText(_In_ TfEditCookie ec, _In_ ITfContext* context, _In_z_ LPCWSTR str, _In_ LONG length);
+    HRESULT SetRangeDisplayAttribute(_In_ TfEditCookie ec, _In_ ITfContext* context, _In_ ITfRange* range) {
+        return this->SetRangeDisplayAttribute(ec, context, range, _composingAttribute);
+    }
 
     template <typename... Args>
     static HRESULT RequestEditSession(

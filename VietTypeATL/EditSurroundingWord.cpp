@@ -149,7 +149,7 @@ HRESULT EditSurroundingWord(
 
     std::array<WCHAR, SWF_MAXCHARS> buf;
     ULONG retrieved;
-    hr = rangeTest->GetText(ec, 0, &buf[0], SWF_MAXCHARS, &retrieved);
+    hr = rangeTest->GetText(ec, 0, &buf[0], shifted, &retrieved);
     HRESULT_CHECK_RETURN(hr, L"%s", L"rangeTest->GetText failed");
 
     LONG wordlen = 0;
@@ -190,6 +190,9 @@ HRESULT EditSurroundingWord(
         hr = composition->ShiftEnd(ec, range);
         HRESULT_CHECK_RETURN(hr, L"%s", L"composition->ShiftEnd failed");
     }
+
+    hr = compositionManager->SetRangeDisplayAttribute(ec, context, range);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"SetRangeDisplayAttribute failed");
 
     // move selection to end
     hr = compositionManager->MoveCaretToEnd(ec);
