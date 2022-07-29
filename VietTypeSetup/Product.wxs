@@ -48,9 +48,6 @@ SPDX-License-Identifier: GPL-3.0-only
     <SetProperty Id="UnregisterProfiles" Value='"[%SystemRoot]\System32\rundll32.exe" "[#VietTypeATL32.dll]",RunUnregisterProfiles' After="CostFinalize" Sequence="execute" />
     <SetProperty Id="UnregisterProfilesRollback" Value='"[%SystemRoot]\System32\rundll32.exe" "[#VietTypeATL32.dll]",RunRegisterProfiles' After="CostFinalize" Sequence="execute" />
 
-    <SetProperty Id="ActivateProfiles" Value='"[%SystemRoot]\System32\rundll32.exe" "[#VietTypeATL32.dll]",RunActivateProfiles' After="CostFinalize" Sequence="execute" />
-    <SetProperty Id="DeactivateProfiles" Value='"[%SystemRoot]\System32\rundll32.exe" "[#VietTypeATL32.dll]",RunDeactivateProfiles' After="CostFinalize" Sequence="execute" />
-
     <InstallExecuteSequence>
       <Custom Action="RegisterCategoriesRollback" After="InstallFiles">(NOT Installed) OR REINSTALL</Custom>
       <Custom Action="RegisterCategories" After="RegisterCategoriesRollback">(NOT Installed) OR REINSTALL</Custom>
@@ -157,9 +154,5 @@ SPDX-License-Identifier: GPL-3.0-only
     <CustomAction Id="RegisterProfilesRollback" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="rollback" />
     <CustomAction Id="UnregisterProfiles" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="deferred" />
     <CustomAction Id="UnregisterProfilesRollback" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="rollback" />
-
-    <CustomAction Id="ActivateProfiles" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="yes" Execute="deferred" Return="ignore" />
-    <!-- since DeactivateProfiles is called during uninstall, we should use ignore instead of asyncNoWait -->
-    <CustomAction Id="DeactivateProfiles" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="yes" Execute="deferred" Return="ignore" />
   </Fragment>
 </Wix>
