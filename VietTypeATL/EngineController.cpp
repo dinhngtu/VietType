@@ -180,15 +180,21 @@ _Check_return_ HRESULT EngineController::GetOpenClose(_Out_ long* openclose) {
 
 SettingsDialog EngineController::CreateSettingsDialog() {
     HRESULT hr;
-    DWORD defaultEnabled;
+    DWORD defaultEnabled, backconvertOnBackspace;
 
     hr = _settings->IsDefaultEnabled(&defaultEnabled);
     if (FAILED(hr)) {
         defaultEnabled = 0;
-        HRESULT_CHECK(hr, L"%s", L"_default_enabled->GetValueOrWriteback failed");
+        HRESULT_CHECK(hr, L"%s", L"IsDefaultEnabled failed");
     }
 
-    return SettingsDialog(defaultEnabled, _engine->GetConfig());
+    hr = _settings->IsBackconvertOnBackspace(&backconvertOnBackspace);
+    if (FAILED(hr)) {
+        backconvertOnBackspace = 0;
+        HRESULT_CHECK(hr, L"%s", L"IsBackconvertOnBackspace failed");
+    }
+
+    return SettingsDialog(defaultEnabled, backconvertOnBackspace, _engine->GetConfig());
 }
 
 HRESULT EngineController::CommitSettings(const SettingsDialog& dlg) {

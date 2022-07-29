@@ -34,6 +34,7 @@ public:
     HRESULT CommitSettings(const SettingsDialog& dlg);
 
     _Check_return_ HRESULT IsDefaultEnabled(_Out_ DWORD* pde) const;
+    _Check_return_ HRESULT IsBackconvertOnBackspace(_Out_ DWORD* pde) const;
 
 private:
     EngineController* _ec = nullptr;
@@ -41,6 +42,7 @@ private:
     CComPtr<RegistrySetting<DWORD>> _tc_oa_uy_tone1;
     CComPtr<RegistrySetting<DWORD>> _tc_accept_dd;
     CComPtr<RegistrySetting<DWORD>> _tc_backspace_invalid;
+    CComPtr<RegistrySetting<DWORD>> _backconvert_on_backspace;
 };
 
 }

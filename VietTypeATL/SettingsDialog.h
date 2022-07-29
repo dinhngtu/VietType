@@ -18,6 +18,7 @@ namespace VietType {
 
 struct SettingsDialogData {
     bool DefaultEnabled = false;
+    bool BackconvertOnBackspace = false;
     Telex::TelexConfig TelexConfig;
 };
 
@@ -28,7 +29,7 @@ public:
     SettingsDialog& operator=(const SettingsDialog&) = delete;
     ~SettingsDialog() = default;
 
-    explicit SettingsDialog(DWORD defaultEnabled, const Telex::TelexConfig& telexConfig);
+    explicit SettingsDialog(DWORD defaultEnabled, DWORD backconvertOnBackspace, const Telex::TelexConfig& telexConfig);
 
     _Check_return_ HRESULT ShowDialog(_Out_ INT_PTR* result);
     const SettingsDialogData& GetConfig() const;
@@ -72,6 +73,13 @@ private:
     };
     template <>
     bool& Property<IDC_SETTINGS_BACKSPACE_INVALID>();
+
+    template <>
+    struct propType<IDC_SETTINGS_BACKCONVERT_ON_BACKSPACE> {
+        using type = bool;
+    };
+    template <>
+    bool& Property<IDC_SETTINGS_BACKCONVERT_ON_BACKSPACE>();
 
 private:
     SettingsDialogData _data;

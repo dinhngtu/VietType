@@ -4,8 +4,9 @@
 
 namespace VietType {
 
-SettingsDialog::SettingsDialog(DWORD defaultEnabled, const Telex::TelexConfig& telexConfig) {
+SettingsDialog::SettingsDialog(DWORD defaultEnabled, DWORD backconvertOnBackspace, const Telex::TelexConfig& telexConfig) {
     _data.DefaultEnabled = defaultEnabled;
+    _data.BackconvertOnBackspace = backconvertOnBackspace;
     _data.TelexConfig = telexConfig;
 }
 
@@ -51,6 +52,7 @@ INT_PTR CALLBACK SettingsDialog::SettingsDialogProc(_In_ HWND hwndDlg, _In_ UINT
         CheckDlgButton(hwndDlg, IDC_SETTINGS_OA_UY, instance->Property<IDC_SETTINGS_OA_UY>() ? BST_CHECKED : BST_UNCHECKED);
         CheckDlgButton(hwndDlg, IDC_SETTINGS_ACCEPT_DD, instance->Property<IDC_SETTINGS_ACCEPT_DD>() ? BST_CHECKED : BST_UNCHECKED);
         CheckDlgButton(hwndDlg, IDC_SETTINGS_BACKSPACE_INVALID, instance->Property<IDC_SETTINGS_BACKSPACE_INVALID>() ? BST_CHECKED : BST_UNCHECKED);
+        CheckDlgButton(hwndDlg, IDC_SETTINGS_BACKCONVERT_ON_BACKSPACE, instance->Property<IDC_SETTINGS_BACKCONVERT_ON_BACKSPACE>() ? BST_CHECKED : BST_UNCHECKED);
 
         return TRUE;
 
@@ -62,6 +64,7 @@ INT_PTR CALLBACK SettingsDialog::SettingsDialogProc(_In_ HWND hwndDlg, _In_ UINT
             instance->Property<IDC_SETTINGS_OA_UY>() = IsDlgButtonChecked(hwndDlg, IDC_SETTINGS_OA_UY) != BST_UNCHECKED;
             instance->Property<IDC_SETTINGS_ACCEPT_DD>() = IsDlgButtonChecked(hwndDlg, IDC_SETTINGS_ACCEPT_DD) != BST_UNCHECKED;
             instance->Property<IDC_SETTINGS_BACKSPACE_INVALID>() = IsDlgButtonChecked(hwndDlg, IDC_SETTINGS_BACKSPACE_INVALID) != BST_UNCHECKED;
+            instance->Property<IDC_SETTINGS_BACKCONVERT_ON_BACKSPACE>() = IsDlgButtonChecked(hwndDlg, IDC_SETTINGS_BACKCONVERT_ON_BACKSPACE) != BST_UNCHECKED;
 
             instance = nullptr;
             EndDialog(hwndDlg, IDOK);
@@ -94,6 +97,11 @@ bool& SettingsDialog::Property<IDC_SETTINGS_DEFAULT_ENABLED>() {
 template <>
 bool& SettingsDialog::Property<IDC_SETTINGS_BACKSPACE_INVALID>() {
     return _data.TelexConfig.backspaced_word_stays_invalid;
+}
+
+template <>
+bool& SettingsDialog::Property<IDC_SETTINGS_BACKCONVERT_ON_BACKSPACE>() {
+    return _data.BackconvertOnBackspace;
 }
 
 }

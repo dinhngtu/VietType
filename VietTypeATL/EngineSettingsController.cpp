@@ -28,11 +28,16 @@ _Check_return_ HRESULT EngineSettingsController::Initialize(
         clientid,
         GUID_DefaultEnabledCompartment);
     HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(_default_enabled) failed");
-#ifdef _DEBUG
-    DWORD def;
-    HRESULT hrDef = _default_enabled->GetValue(&def);
-    DBG_DPRINT(L"hr = %ld, def = %ld", hrDef, def);
-#endif // _DEBUG
+
+    hr = CreateInitialize(
+        &_backconvert_on_backspace,
+        HKEY_CURRENT_USER,
+        Globals::ConfigKeyName.c_str(),
+        L"backconvert_on_backspace",
+        threadMgr,
+        clientid,
+        GUID_DefaultEnabledCompartment);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(_backconvert_on_backspace) failed");
 
     hr = CreateInitialize(
         &_tc_oa_uy_tone1,
@@ -88,6 +93,10 @@ HRESULT EngineSettingsController::Uninitialize() {
     HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_oa_uy_tone1->Uninitialize failed");
     _tc_oa_uy_tone1.Release();
 
+    hr = _backconvert_on_backspace->Uninitialize();
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_backconvert_on_backspace->Uninitialize failed");
+    _backconvert_on_backspace.Release();
+
     hr = _default_enabled->Uninitialize();
     HRESULT_CHECK_RETURN(hr, L"%s", L"_default_enabled->Uninitialize failed");
     _default_enabled.Release();
@@ -102,6 +111,10 @@ HRESULT EngineSettingsController::LoadSettings() {
     DWORD default_enabled;
     hr = this->IsDefaultEnabled(&default_enabled);
     HRESULT_CHECK_RETURN(hr, L"%s", L"this->IsDefaultEnabled failed");
+
+    DWORD backconvert_enabled;
+    hr = this->IsBackconvertOnBackspace(&backconvert_enabled);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"this->IsBackconvertEnabled failed");
 
     DWORD oa_uy_tone1 = true;
     hr = _tc_oa_uy_tone1->GetValueOrWriteback(&oa_uy_tone1, _ec->GetEngine().GetConfig().oa_uy_tone1);
@@ -129,6 +142,9 @@ HRESULT EngineSettingsController::CommitSettings(const SettingsDialog& dlg) {
 
     // non-telexconfig
     hr = _default_enabled->SetValue(static_cast<DWORD>(dlg.GetConfig().DefaultEnabled));
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_default_enabled->SetValue failed");
+    hr = _backconvert_on_backspace->SetValue(static_cast<DWORD>(dlg.GetConfig().BackconvertOnBackspace));
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_default_enabled->SetValue failed");
 
     // telexconfig
     hr = _tc_backspace_invalid->SetValue(static_cast<DWORD>(dlg.GetConfig().TelexConfig.backspaced_word_stays_invalid));
@@ -143,6 +159,10 @@ HRESULT EngineSettingsController::CommitSettings(const SettingsDialog& dlg) {
 
 _Check_return_ HRESULT EngineSettingsController::IsDefaultEnabled(_Out_ DWORD* pde) const {
     return _default_enabled->GetValueOrWriteback(pde, 0);
+}
+
+_Check_return_ HRESULT EngineSettingsController::IsBackconvertOnBackspace(_Out_ DWORD* pde) const {
+    return _backconvert_on_backspace->GetValueOrWriteback(pde, 0);
 }
 
 }
