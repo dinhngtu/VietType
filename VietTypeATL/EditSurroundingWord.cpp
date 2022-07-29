@@ -99,7 +99,6 @@ HRESULT EditSurroundingWord(
     HRESULT_CHECK_RETURN(hr, L"%s", L"rangeTest->GetText failed");
 
     LONG wordlen = 0;
-    // start from retrieved - 2 to ignore a character, therefore emulating the backspace
     for (int i = retrieved - 1 - ignore; i >= 0; i--) {
         if (IsVietnameseCharacter(buf[i])) {
             // allowed char, can continue
