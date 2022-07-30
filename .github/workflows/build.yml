@@ -23,7 +23,25 @@ jobs:
       - name: Build x64
         run: msbuild -m -target:VietTypeSetup:Rebuild -p:Configuration=Release -p:Platform=x64 .
 
+      - name: Fetch VCRedist
+        shell: powershell
+        run: |
+          $ErrorActionPreference = "Stop"
+          Invoke-WebRequest -Uri "https://aka.ms/vs/17/release/vc_redist.x86.exe" -OutFile VietTypeBundle/vc_redist.x86.exe
+          if ((Get-AuthenticodeSignature VietTypeBundle/vc_redist.x86.exe).Status -ne "Valid") {
+            throw "Invalid VCRedist signature"
+          }
+          Invoke-WebRequest -Uri "https://aka.ms/vs/17/release/vc_redist.x64.exe" -OutFile VietTypeBundle/vc_redist.x64.exe
+          if ((Get-AuthenticodeSignature VietTypeBundle/vc_redist.x64.exe).Status -ne "Valid") {
+            throw "Invalid VCRedist signature"
+          }
+
+      - name: Build setup bundle
+        run: msbuild -m -target:VietTypeBundle:Rebuild -p:Configuration=Release -p:Platform=x64 .
+
       - name: Upload a Build Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
-          path: VietTypeSetup/bin/Release/*.msi
+          path: |
+            VietTypeSetup/bin/Release/*.msi
+            VietTypeBundle/bin/Release/*.exe
