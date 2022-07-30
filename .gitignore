@@ -16,3 +16,4 @@ TestRelease/
 VietTypeATL/VersionVCS.h
 VietTypeATL/VersionNumbers.h
 VietTypeSetup/Version.wxi
+VietTypeBundle/*.exe

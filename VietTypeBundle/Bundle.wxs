@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+SPDX-License-Identifier: GPL-3.0-only
+-->
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:bal="http://schemas.microsoft.com/wix/BalExtension">
+  <?include $(var.SolutionDir)\VietTypeSetup\Version.wxi ?>
+
+  <Bundle
+    Name="VietType"
+    Version="$(var.productVersion)"
+    Manufacturer="Dinh Ngoc Tu"
+    UpgradeCode="86e52e95-ecaa-4785-831f-ba7e605e109d">
+
+    <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
+      <bal:WixStandardBootstrapperApplication
+        LicenseFile="$(var.SolutionDir)\LICENSE.rtf"
+        SuppressOptionsUI="yes" />
+    </BootstrapperApplicationRef>
+
+    <Chain>
+      <ExePackage
+        SourceFile="vc_redist.x86.exe"
+        InstallCommand="/install /quiet /norestart"
+        PerMachine="yes"
+        Permanent="yes" />
+      <ExePackage
+        SourceFile="vc_redist.x64.exe"
+        InstallCondition="VersionNT64"
+        InstallCommand="/install /quiet /norestart"
+        PerMachine="yes"
+        Permanent="yes" />
+      <MsiPackage
+        SourceFile="$(var.SolutionDir)\VietTypeSetup\bin\$(var.Configuration)\VietTypeSetupx86.msi"
+        InstallCondition="NOT VersionNT64" />
+      <MsiPackage
+        SourceFile="$(var.SolutionDir)\VietTypeSetup\bin\$(var.Configuration)\VietTypeSetupx64.msi"
+        InstallCondition="VersionNT64" />
+    </Chain>
+  </Bundle>
+</Wix>
