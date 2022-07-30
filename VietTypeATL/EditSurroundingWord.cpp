@@ -51,22 +51,13 @@ static bool IsSeparatorCharacter(WCHAR c) {
     return false;
 }
 
-HRESULT EditSurroundingWord(
+static HRESULT DoEditSurroundingWord(
     _In_ TfEditCookie ec,
     _In_ CompositionManager* compositionManager,
     _In_ ITfContext* context,
     _In_ EngineController* controller,
     _In_ int ignore) {
-
     HRESULT hr;
-
-    DBG_DPRINT(L"ec = %ld", ec);
-
-    if (compositionManager->IsComposing()) {
-        return S_OK;
-    }
-    hr = compositionManager->StartCompositionNow(ec, context);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_compositionManager->StartComposition failed");
 
     CComPtr<ITfContext> ppic;
     hr = VirtualDocument::GetVirtualDocumentContext(context, &ppic);
@@ -91,12 +82,20 @@ HRESULT EditSurroundingWord(
     hr = rangeTest->ShiftStart(ec, -SWF_MAXCHARS, &shifted, &haltcond);
     HRESULT_CHECK_RETURN(hr, L"%s", L"rangeTest->ShiftStart failed");
 
+    if (!shifted) {
+        return E_NOTIMPL;
+    }
+
     // find word boundary
 
     std::array<WCHAR, SWF_MAXCHARS> buf;
     ULONG retrieved;
     hr = rangeTest->GetText(ec, 0, &buf[0], shifted, &retrieved);
     HRESULT_CHECK_RETURN(hr, L"%s", L"rangeTest->GetText failed");
+
+    if (!retrieved) {
+        return E_NOTIMPL;
+    }
 
     LONG wordlen = 0;
     for (int i = retrieved - 1 - ignore; i >= 0; i--) {
@@ -159,6 +158,38 @@ HRESULT EditSurroundingWord(
     }
 
     return S_OK;
+}
+
+HRESULT EditSurroundingWord(
+    _In_ TfEditCookie ec,
+    _In_ CompositionManager* compositionManager,
+    _In_ ITfContext* context,
+    _In_ EngineController* controller,
+    _In_ int ignore) {
+
+    HRESULT hr;
+
+    DBG_DPRINT(L"backconvert ec = %ld", ec);
+
+    if (compositionManager->IsComposing()) {
+        return S_OK;
+    }
+
+    Compartment<long> compBackconvert;
+    hr = compBackconvert.Initialize(context, compositionManager->GetClientId(), Globals::GUID_Compartment_Backconvert);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"compBackconvert.Initialize failed");
+    hr = compBackconvert.SetValue(-1);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"compBackconvert.SetValue failed");
+
+    hr = compositionManager->StartCompositionNow(ec, context);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_compositionManager->StartComposition failed");
+
+    hr = DoEditSurroundingWord(ec, compositionManager, context, controller, ignore);
+    if (FAILED(hr)) {
+        DBG_HRESULT_CHECK(hr, L"%s", L"DoEditSurroundingWord failed");
+        compositionManager->EndCompositionNow(ec);
+    }
+    return hr;
 }
 
 } // namespace EditSessions

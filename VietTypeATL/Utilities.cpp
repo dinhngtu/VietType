@@ -35,6 +35,14 @@ HRESULT OnNewContext(
         return S_OK;
     }
 
+    Compartment<long> compBackconvert;
+    hr = compBackconvert.Initialize(context, compositionManager->GetClientId(), Globals::GUID_Compartment_Backconvert);
+    if (SUCCEEDED(hr)) {
+        compBackconvert.SetValue(0);
+    } else {
+        DBG_HRESULT_CHECK(hr, L"%s", L"compBackconvert.Initialize failed");
+    }
+
 #ifdef _DEBUG
     TF_STATUS st;
     hr = context->GetStatus(&st);
