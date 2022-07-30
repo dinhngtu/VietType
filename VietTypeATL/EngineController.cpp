@@ -122,7 +122,6 @@ _Check_return_ HRESULT EngineController::IsUserEnabled(_Out_ long* penabled) con
         defaultEnabled = 0;
         HRESULT_CHECK(hr, L"%s", L"_default_enabled->GetValueOrWriteback failed");
     }
-    DBG_DPRINT(L"default enabled %ld", defaultEnabled);
 
     hr = _enabled->GetValueOrWriteback(penabled, static_cast<LONG>(defaultEnabled));
     if (*penabled != 0 && *penabled != -1) {
@@ -131,7 +130,6 @@ _Check_return_ HRESULT EngineController::IsUserEnabled(_Out_ long* penabled) con
         *penabled = defaultEnabled == 0 ? 0 : -1;
         DBG_HRESULT_CHECK(_enabled->SetValue(*penabled), L"%s", L"_enabled reset failed");
     }
-    DBG_DPRINT(L"getting enabled with writeback hr = %ld enabled = %ld", hr, *penabled);
     return hr;
 }
 

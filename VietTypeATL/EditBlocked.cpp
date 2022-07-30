@@ -28,7 +28,7 @@ HRESULT EditBlocked(
 
     HRESULT hr;
 
-    DBG_DPRINT(L"ec = %ld", ec);
+    DBG_DPRINT(L"EditBlocked ec = %ld", ec);
 
     // check GUID_COMPARTMENT_KEYBOARD_OPENCLOSE from EngineController
 

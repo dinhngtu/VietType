@@ -11,7 +11,7 @@ STDMETHODIMP KeyHandlerEditSession::DoEditSession(_In_ TfEditCookie ec) {
     if (!_compositionManager) {
         return E_FAIL;
     }
-    DBG_DPRINT(L"ec = %ld", ec);
+    DBG_DPRINT(L"KeyHandler ec = %ld", ec);
 
     HRESULT hr;
 
