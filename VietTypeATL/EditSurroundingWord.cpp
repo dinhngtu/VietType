@@ -112,8 +112,8 @@ static HRESULT DoEditSurroundingWord(
 
 #pragma warning(push)
 #pragma warning(disable : 26451)
-    if (wordlen < 1 ||
-        (static_cast<ULONG>(wordlen) < retrieved && !IsSeparatorCharacter(buf.at(retrieved - wordlen - 1L - ignore)))) {
+    if (wordlen < 1 || (static_cast<ULONG>(wordlen + 1) < retrieved &&
+                        !IsSeparatorCharacter(buf.at(retrieved - wordlen - 1L - ignore)))) {
 #pragma warning(pop)
         // no word, or word is not bordered by separator character
         hr = compositionManager->EndCompositionNow(ec);
