@@ -116,9 +116,7 @@ static HRESULT DoEditSurroundingWord(
                         !IsSeparatorCharacter(buf.at(retrieved - wordlen - 1L - ignore)))) {
 #pragma warning(pop)
         // no word, or word is not bordered by separator character
-        hr = compositionManager->EndCompositionNow(ec);
-        HRESULT_CHECK_RETURN(hr, L"%s", L"compositionManager->EndCompositionNow failed");
-        return S_OK;
+        return E_FAIL;
     }
 
     CComPtr<ITfComposition> composition(compositionManager->GetComposition());
@@ -129,12 +127,14 @@ static HRESULT DoEditSurroundingWord(
     hr = composition->ShiftStart(ec, range);
     HRESULT_CHECK_RETURN(hr, L"%s", L"composition->ShiftStart failed");
 
+    /*
     if (ignore) {
         hr = range->ShiftEnd(ec, -ignore, &shifted, &haltcond);
         HRESULT_CHECK_RETURN(hr, L"%s", L"range->ShiftEnd failed");
         hr = composition->ShiftEnd(ec, range);
         HRESULT_CHECK_RETURN(hr, L"%s", L"composition->ShiftEnd failed");
     }
+    */
 
     hr = compositionManager->SetRangeDisplayAttribute(ec, context, range);
     HRESULT_CHECK_RETURN(hr, L"%s", L"SetRangeDisplayAttribute failed");
@@ -150,11 +150,12 @@ static HRESULT DoEditSurroundingWord(
     controller->GetEngine().Backconvert(std::wstring(&buf[static_cast<size_t>(retrieved - wordlen - ignore)], wordlen));
 #pragma warning(pop)
 
+    auto displayText = controller->GetEngine().Peek();
+    compositionManager->SetCompositionText(ec, displayText.c_str(), displayText.length());
+
     if (controller->GetEngine().GetState() == Telex::TelexStates::TxError) {
-        // force-terminate the composition
         controller->GetEngine().Reset();
-        hr = compositionManager->EndCompositionNow(ec);
-        HRESULT_CHECK_RETURN(hr, L"%s", L"compositionManager->EndCompositionNow failed");
+        return E_FAIL;
     }
 
     return S_OK;
@@ -188,6 +189,7 @@ HRESULT EditSurroundingWord(
     if (FAILED(hr)) {
         DBG_HRESULT_CHECK(hr, L"%s", L"DoEditSurroundingWord failed");
         compositionManager->EndCompositionNow(ec);
+        DBG_HRESULT_CHECK(hr, L"%s", L"compositionManager->EndCompositionNow failed");
     }
     return hr;
 }
