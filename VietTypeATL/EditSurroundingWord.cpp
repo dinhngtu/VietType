@@ -10,21 +10,21 @@ namespace EditSessions {
 
 static const long SWF_MAXCHARS = 9; // "nghiêng" + 1 for the padding + 1 for max ignore
 
-static const std::unordered_set<WCHAR> vietnamesechars_notaz = {
-    L'\xe0',   L'\xc0',   L'\xe1',   L'\xc1',   L'\xe2',   L'\xc2',   L'\xe3',   L'\xc3',   L'\xe8',   L'\xc8',
-    L'\xe9',   L'\xc9',   L'\xea',   L'\xca',   L'\xec',   L'\xcc',   L'\xed',   L'\xcd',   L'\xf2',   L'\xd2',
-    L'\xf3',   L'\xd3',   L'\xf4',   L'\xd4',   L'\xf5',   L'\xd5',   L'\xf9',   L'\xd9',   L'\xfa',   L'\xda',
-    L'\xfd',   L'\xdd',   L'\x103',  L'\x102',  L'\x111',  L'\x110',  L'\x129',  L'\x128',  L'\x169',  L'\x168',
-    L'\x1a1',  L'\x1a0',  L'\x1b0',  L'\x1af',  L'\x1ea1', L'\x1ea0', L'\x1ea3', L'\x1ea2', L'\x1ea5', L'\x1ea4',
-    L'\x1ea7', L'\x1ea6', L'\x1ea9', L'\x1ea8', L'\x1eab', L'\x1eaa', L'\x1ead', L'\x1eac', L'\x1eaf', L'\x1eae',
-    L'\x1eb1', L'\x1eb0', L'\x1eb3', L'\x1eb2', L'\x1eb5', L'\x1eb4', L'\x1eb7', L'\x1eb6', L'\x1eb9', L'\x1eb8',
-    L'\x1ebb', L'\x1eba', L'\x1ebd', L'\x1ebc', L'\x1ebf', L'\x1ebe', L'\x1ec1', L'\x1ec0', L'\x1ec3', L'\x1ec2',
-    L'\x1ec5', L'\x1ec4', L'\x1ec7', L'\x1ec6', L'\x1ec9', L'\x1ec8', L'\x1ecb', L'\x1eca', L'\x1ecd', L'\x1ecc',
-    L'\x1ecf', L'\x1ece', L'\x1ed1', L'\x1ed0', L'\x1ed3', L'\x1ed2', L'\x1ed5', L'\x1ed4', L'\x1ed7', L'\x1ed6',
-    L'\x1ed9', L'\x1ed8', L'\x1edb', L'\x1eda', L'\x1edd', L'\x1edc', L'\x1edf', L'\x1ede', L'\x1ee1', L'\x1ee0',
-    L'\x1ee3', L'\x1ee2', L'\x1ee5', L'\x1ee4', L'\x1ee7', L'\x1ee6', L'\x1ee9', L'\x1ee8', L'\x1eeb', L'\x1eea',
-    L'\x1eed', L'\x1eec', L'\x1eef', L'\x1eee', L'\x1ef1', L'\x1ef0', L'\x1ef3', L'\x1ef2', L'\x1ef5', L'\x1ef4',
-    L'\x1ef7', L'\x1ef6', L'\x1ef9', L'\x1ef8',
+static const std::vector<WCHAR> vietnamesechars_notaz = {
+    L'\xc0',   L'\xc1',   L'\xc2',   L'\xc3',   L'\xc8',   L'\xc9',   L'\xca',   L'\xcc',   L'\xcd',   L'\xd2',
+    L'\xd3',   L'\xd4',   L'\xd5',   L'\xd9',   L'\xda',   L'\xdd',   L'\xe0',   L'\xe1',   L'\xe2',   L'\xe3',
+    L'\xe8',   L'\xe9',   L'\xea',   L'\xec',   L'\xed',   L'\xf2',   L'\xf3',   L'\xf4',   L'\xf5',   L'\xf9',
+    L'\xfa',   L'\xfd',   L'\x102',  L'\x103',  L'\x110',  L'\x111',  L'\x128',  L'\x129',  L'\x168',  L'\x169',
+    L'\x1a0',  L'\x1a1',  L'\x1af',  L'\x1b0',  L'\x1ea0', L'\x1ea1', L'\x1ea2', L'\x1ea3', L'\x1ea4', L'\x1ea5',
+    L'\x1ea6', L'\x1ea7', L'\x1ea8', L'\x1ea9', L'\x1eaa', L'\x1eab', L'\x1eac', L'\x1ead', L'\x1eae', L'\x1eaf',
+    L'\x1eb0', L'\x1eb1', L'\x1eb2', L'\x1eb3', L'\x1eb4', L'\x1eb5', L'\x1eb6', L'\x1eb7', L'\x1eb8', L'\x1eb9',
+    L'\x1eba', L'\x1ebb', L'\x1ebc', L'\x1ebd', L'\x1ebe', L'\x1ebf', L'\x1ec0', L'\x1ec1', L'\x1ec2', L'\x1ec3',
+    L'\x1ec4', L'\x1ec5', L'\x1ec6', L'\x1ec7', L'\x1ec8', L'\x1ec9', L'\x1eca', L'\x1ecb', L'\x1ecc', L'\x1ecd',
+    L'\x1ece', L'\x1ecf', L'\x1ed0', L'\x1ed1', L'\x1ed2', L'\x1ed3', L'\x1ed4', L'\x1ed5', L'\x1ed6', L'\x1ed7',
+    L'\x1ed8', L'\x1ed9', L'\x1eda', L'\x1edb', L'\x1edc', L'\x1edd', L'\x1ede', L'\x1edf', L'\x1ee0', L'\x1ee1',
+    L'\x1ee2', L'\x1ee3', L'\x1ee4', L'\x1ee5', L'\x1ee6', L'\x1ee7', L'\x1ee8', L'\x1ee9', L'\x1eea', L'\x1eeb',
+    L'\x1eec', L'\x1eed', L'\x1eee', L'\x1eef', L'\x1ef0', L'\x1ef1', L'\x1ef2', L'\x1ef3', L'\x1ef4', L'\x1ef5',
+    L'\x1ef6', L'\x1ef7', L'\x1ef8', L'\x1ef9', WCHAR_MAX,
 };
 
 static bool IsVietnameseCharacter(WCHAR c) {
@@ -33,8 +33,8 @@ static bool IsVietnameseCharacter(WCHAR c) {
     } else if (c >= L'A' && c <= L'Z') {
         return true;
     } else {
-        auto tcit = vietnamesechars_notaz.find(c);
-        return tcit != vietnamesechars_notaz.end();
+        // std::lower_bound should never fail here thanks to WCHAR_MAX
+        return c == *std::lower_bound(vietnamesechars_notaz.begin(), vietnamesechars_notaz.end(), c);
     }
 }
 
