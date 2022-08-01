@@ -24,7 +24,11 @@ jobs:
         uses: microsoft/setup-msbuild@v1
 
       - name: Setup VSTest.console.exe
-        uses: darenm/Setup-VSTest@v1.1.1
+        shell: powershell
+        run: |
+          $ErrorActionPreference = "Stop"
+          $vs = & "${Env:ProgramFiles(x86)}/Microsoft Visual Studio/Installer/vswhere.exe" -latest -property installationPath
+          Add-Content $Env:GITHUB_PATH "$vs/Common7/IDE/CommonExtensions/Microsoft/TestWindow"
 
       - name: Build unit tests
         run: msbuild.exe -m -target:VietTypeUnitTests:Rebuild -p:Configuration=${{matrix.configuration}} -p:Platform=${{matrix.platform}} .
