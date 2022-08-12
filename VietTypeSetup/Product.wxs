@@ -20,16 +20,16 @@ SPDX-License-Identifier: GPL-3.0-only
       Schedule="afterInstallInitialize" />
     <MediaTemplate EmbedCab="yes" />
 
-    <Feature Id="ProductFeature" Title="VietType" Level="1" Absent="disallow" AllowAdvertise="no">
+    <Feature Id="ProductFeature" Title="VietType" Absent="disallow" AllowAdvertise="no">
       <ComponentGroupRef Id="ProductComponents" />
       <ComponentGroupRef Id="ShortcutComponents" />
     </Feature>
 
-    <Feature Id="DebugSymbolsFeature" Title="Debug symbols" Level="10" AllowAdvertise="no">
+    <Feature Id="DebugSymbolsFeature" Title="Debug symbols" AllowAdvertise="no">
       <ComponentGroupRef Id="DebugSymbols" />
     </Feature>
 
-    <UIRef Id="WixUI_FeatureTree" />
+    <UIRef Id="WixUI_Minimal" />
     <WixVariable Id="WixUILicenseRtf" Value="$(var.SolutionDir)\LICENSE.rtf" />
 
     <Condition Message="VietType is only compatible with Windows 8 and newer.">Installed OR (VersionNT >= 602)</Condition>
