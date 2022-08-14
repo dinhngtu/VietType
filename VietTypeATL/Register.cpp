@@ -49,7 +49,7 @@ static void DoRunFunction(funtype fun, HWND hWnd, HINSTANCE hInst, LPWSTR lpszCm
     }
 }
 
-// allow ALL APPLICATION PACKAGES permissions to query/set value, otherwise we can't change config from within IME
+// allow ALL APPLICATION PACKAGES permissions to query value
 static HRESULT SetSettingsKeyAcl() {
     LSTATUS err;
 
@@ -80,18 +80,24 @@ static HRESULT SetSettingsKeyAcl() {
         WINERROR_GLE_RETURN_HRESULT(L"%s", L"CreateWellKnownSid failed");
     }
 
-    EXPLICIT_ACCESS ea;
-    ea.grfAccessPermissions = KEY_QUERY_VALUE | KEY_SET_VALUE;
-    ea.grfAccessMode = GRANT_ACCESS;
-    ea.grfInheritance = NO_INHERITANCE;
-    ea.Trustee.pMultipleTrustee = nullptr;
-    ea.Trustee.MultipleTrusteeOperation = NO_MULTIPLE_TRUSTEE;
-    ea.Trustee.TrusteeForm = TRUSTEE_IS_SID;
-    ea.Trustee.TrusteeType = TRUSTEE_IS_WELL_KNOWN_GROUP;
-    ea.Trustee.ptstrName = reinterpret_cast<LPWCH>(&sid[0]);
+    std::array<EXPLICIT_ACCESS, 2> ea{};
+
+    ea[0].grfAccessPermissions = KEY_ALL_ACCESS;
+    ea[0].grfAccessMode = REVOKE_ACCESS;
+    ea[0].grfInheritance = NO_INHERITANCE;
+    ea[0].Trustee.TrusteeForm = TRUSTEE_IS_SID;
+    ea[0].Trustee.TrusteeType = TRUSTEE_IS_WELL_KNOWN_GROUP;
+    ea[0].Trustee.ptstrName = reinterpret_cast<LPWCH>(&sid[0]);
+
+    ea[1].grfAccessPermissions = KEY_QUERY_VALUE;
+    ea[1].grfAccessMode = GRANT_ACCESS;
+    ea[1].grfInheritance = NO_INHERITANCE;
+    ea[1].Trustee.TrusteeForm = TRUSTEE_IS_SID;
+    ea[1].Trustee.TrusteeType = TRUSTEE_IS_WELL_KNOWN_GROUP;
+    ea[1].Trustee.ptstrName = reinterpret_cast<LPWCH>(&sid[0]);
 
     PACL pNewAcl;
-    err = SetEntriesInAcl(1, &ea, dacl, &pNewAcl);
+    err = SetEntriesInAcl(ea.size(), ea.data(), dacl, &pNewAcl);
     WINERROR_CHECK_RETURN_HRESULT(err, L"%s", L"SetEntriesInAcl failed");
     std::unique_ptr<ACL, decltype(&LocalFree)> newAcl(pNewAcl, &LocalFree);
 
