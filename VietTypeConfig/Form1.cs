@@ -1,11 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace VietTypeConfig {
@@ -27,6 +20,15 @@ namespace VietTypeConfig {
             if (DialogResult == DialogResult.OK && settings != null) {
                 Settings.SaveSettings(settings);
             }
+        }
+
+        private void btnAbout_Click(object sender, EventArgs e) {
+            var message = $"VietType {Version.ProductVersion} ({Version.VcsRevision})\n" +
+                "Copyright © 2018 Dinh Ngoc Tu.\n" +
+                "VietType is free software, licensed under the GNU General Public License. " +
+                "VietType is distributed WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY " +
+                "or FITNESS FOR A PARTICULAR PURPOSE.See the included LICENSE file for more details.";
+            MessageBox.Show(message, "About VietType", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }
