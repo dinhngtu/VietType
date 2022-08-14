@@ -3,7 +3,6 @@
 #include "LanguageBarHandlers.h"
 #include "EngineController.h"
 #include "Version.h"
-#include "SettingsDialog.h"
 
 namespace VietType {
 
@@ -126,22 +125,6 @@ static HRESULT OnMenuSelectAll(_In_ UINT id, _In_ EngineController* controller) 
     switch (id) {
     case 0:
         return S_OK;
-
-    case ID_TRAY_OPTIONS: {
-        HRESULT hr;
-        if (!controller) {
-            return E_INVALIDARG;
-        }
-        auto dlg = controller->CreateSettingsDialog();
-        INT_PTR result;
-        hr = dlg.ShowDialog(&result);
-        HRESULT_CHECK_RETURN(hr, L"%s", L"dlg.ShowDialog failed");
-        if (result == IDOK) {
-            hr = controller->CommitSettings(dlg);
-            HRESULT_CHECK_RETURN(hr, L"%s", L"controller->CommitSettings failed");
-        }
-        break;
-    }
 
     case ID_TRAY_ABOUT: {
         LPCWSTR aboutFormatString = nullptr;

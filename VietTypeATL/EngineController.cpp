@@ -5,7 +5,6 @@
 #include "CompositionManager.h"
 #include "EditSessions.h"
 #include "Compartment.h"
-#include "SettingsDialog.h"
 #include "EngineSettingsController.h"
 
 namespace VietType {
@@ -179,29 +178,6 @@ _Check_return_ HRESULT EngineController::GetOpenClose(_Out_ long* openclose) {
 
 EngineSettingsController* EngineController::GetSettings() const {
     return _settings;
-}
-
-SettingsDialog EngineController::CreateSettingsDialog() {
-    HRESULT hr;
-    DWORD defaultEnabled, backconvertOnBackspace;
-
-    hr = _settings->IsDefaultEnabled(&defaultEnabled);
-    if (FAILED(hr)) {
-        defaultEnabled = 0;
-        HRESULT_CHECK(hr, L"%s", L"IsDefaultEnabled failed");
-    }
-
-    hr = _settings->IsBackconvertOnBackspace(&backconvertOnBackspace);
-    if (FAILED(hr)) {
-        backconvertOnBackspace = 0;
-        HRESULT_CHECK(hr, L"%s", L"IsBackconvertOnBackspace failed");
-    }
-
-    return SettingsDialog(defaultEnabled, backconvertOnBackspace, _engine->GetConfig());
-}
-
-HRESULT EngineController::CommitSettings(const SettingsDialog& dlg) {
-    return _settings->CommitSettings(dlg);
 }
 
 HRESULT EngineController::UpdateStates() {

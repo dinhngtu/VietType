@@ -299,7 +299,6 @@
     <ClCompile Include="LanguageBarButton.cpp" />
     <ClCompile Include="LanguageBarHandlers.cpp" />
     <ClCompile Include="Register.cpp" />
-    <ClCompile Include="SettingsDialog.cpp" />
     <ClCompile Include="SettingsStore.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -349,7 +348,6 @@
     <ClInclude Include="LanguageBarHandlers.h" />
     <ClInclude Include="SettingsStore.h" />
     <ClInclude Include="Resource.h" />
-    <ClInclude Include="SettingsDialog.h" />
     <ClInclude Include="SinkAdvisor.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />

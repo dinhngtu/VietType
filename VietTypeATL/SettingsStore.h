@@ -91,6 +91,16 @@ public:
         }
         return err;
     }
+    _Check_return_ HRESULT GetValueOrDefault(_Out_ T* val, const T& defaultValue) {
+        auto err = SettingsStore::regType<T>::QueryValue(_key, _valueName.c_str(), *val);
+        if (err != ERROR_SUCCESS) {
+            if (err == ERROR_SUCCESS) {
+                *val = defaultValue;
+            }
+            return err;
+        }
+        return err;
+    }
     virtual HRESULT SetValue(const T& val) override {
         HRESULT hr;
         LSTATUS err;
@@ -111,6 +121,7 @@ public:
         _In_ HKEY hkeyParent,
         _In_ std::wstring keyName,
         _In_ std::wstring valueName,
+        _In_ DWORD samDesired,
         _In_ IUnknown* punk,
         _In_ TfClientId clientid,
         _In_ const GUID& guidNotifyCompartment,
@@ -119,7 +130,7 @@ public:
         _valueName = valueName;
         _callback = callback;
 
-        auto err = _key.Create(hkeyParent, keyName.c_str(), nullptr, 0, KEY_QUERY_VALUE | KEY_SET_VALUE);
+        auto err = _key.Create(hkeyParent, keyName.c_str(), nullptr, 0, samDesired);
         WINERROR_CHECK_RETURN_HRESULT(err, L"%s", L"_key.Create failed");
 
         if (guidNotifyCompartment == GUID_NULL) {

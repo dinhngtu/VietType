@@ -2,7 +2,6 @@
 
 #include "EngineSettingsController.h"
 #include "EngineController.h"
-#include "SettingsDialog.h"
 
 namespace VietType {
 
@@ -24,6 +23,7 @@ _Check_return_ HRESULT EngineSettingsController::Initialize(
         HKEY_CURRENT_USER,
         Globals::ConfigKeyName.c_str(),
         L"default_enabled",
+        KEY_QUERY_VALUE,
         threadMgr,
         clientid,
         GUID_DefaultEnabledCompartment);
@@ -34,6 +34,7 @@ _Check_return_ HRESULT EngineSettingsController::Initialize(
         HKEY_CURRENT_USER,
         Globals::ConfigKeyName.c_str(),
         L"backconvert_on_backspace",
+        KEY_QUERY_VALUE,
         threadMgr,
         clientid,
         GUID_DefaultEnabledCompartment);
@@ -44,6 +45,7 @@ _Check_return_ HRESULT EngineSettingsController::Initialize(
         HKEY_CURRENT_USER,
         Globals::ConfigKeyName.c_str(),
         L"oa_uy_tone1",
+        KEY_QUERY_VALUE,
         threadMgr,
         clientid,
         GUID_TelexConfigCompartment,
@@ -56,6 +58,7 @@ _Check_return_ HRESULT EngineSettingsController::Initialize(
         HKEY_CURRENT_USER,
         Globals::ConfigKeyName.c_str(),
         L"accept_dd",
+        KEY_QUERY_VALUE,
         threadMgr,
         clientid,
         GUID_TelexConfigCompartment,
@@ -68,6 +71,7 @@ _Check_return_ HRESULT EngineSettingsController::Initialize(
         HKEY_CURRENT_USER,
         Globals::ConfigKeyName.c_str(),
         L"backspace_invalid",
+        KEY_QUERY_VALUE,
         threadMgr,
         clientid,
         GUID_TelexConfigCompartment,
@@ -117,17 +121,17 @@ HRESULT EngineSettingsController::LoadSettings() {
     HRESULT_CHECK_RETURN(hr, L"%s", L"this->IsBackconvertEnabled failed");
 
     DWORD oa_uy_tone1 = true;
-    hr = _tc_oa_uy_tone1->GetValueOrWriteback(&oa_uy_tone1, _ec->GetEngine().GetConfig().oa_uy_tone1);
+    hr = _tc_oa_uy_tone1->GetValueOrDefault(&oa_uy_tone1, _ec->GetEngine().GetConfig().oa_uy_tone1);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_oa_uy_tone1->GetValueOrWriteback failed");
     cfg.oa_uy_tone1 = static_cast<bool>(oa_uy_tone1);
 
     DWORD accept_dd = true;
-    hr = _tc_accept_dd->GetValueOrWriteback(&accept_dd, _ec->GetEngine().GetConfig().accept_separate_dd);
+    hr = _tc_accept_dd->GetValueOrDefault(&accept_dd, _ec->GetEngine().GetConfig().accept_separate_dd);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_accept_dd->GetValueOrWriteback failed");
     cfg.accept_separate_dd = static_cast<bool>(accept_dd);
 
     DWORD backspace_invalid = true;
-    hr = _tc_backspace_invalid->GetValueOrWriteback(
+    hr = _tc_backspace_invalid->GetValueOrDefault(
         &backspace_invalid, _ec->GetEngine().GetConfig().backspaced_word_stays_invalid);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_backspace_invalid->GetValueOrWriteback failed");
     cfg.backspaced_word_stays_invalid = static_cast<bool>(backspace_invalid);
@@ -137,33 +141,12 @@ HRESULT EngineSettingsController::LoadSettings() {
     return S_OK;
 }
 
-HRESULT EngineSettingsController::CommitSettings(const SettingsDialog& dlg) {
-    HRESULT hr;
-    _ec->GetEngine().SetConfig(dlg.GetConfig().TelexConfig);
-
-    // non-telexconfig
-    hr = _default_enabled->SetValue(static_cast<DWORD>(dlg.GetConfig().DefaultEnabled));
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_default_enabled->SetValue failed");
-    hr = _backconvert_on_backspace->SetValue(static_cast<DWORD>(dlg.GetConfig().BackconvertOnBackspace));
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_default_enabled->SetValue failed");
-
-    // telexconfig
-    hr = _tc_backspace_invalid->SetValue(static_cast<DWORD>(dlg.GetConfig().TelexConfig.backspaced_word_stays_invalid));
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_backspace_invalid->SetValue failed");
-    hr = _tc_oa_uy_tone1->SetValue(static_cast<DWORD>(dlg.GetConfig().TelexConfig.oa_uy_tone1));
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_oa_uy_tone1->SetValue failed");
-    hr = _tc_accept_dd->SetValue(static_cast<DWORD>(dlg.GetConfig().TelexConfig.accept_separate_dd));
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_accept_dd->SetValue failed");
-
-    return S_OK;
-}
-
 _Check_return_ HRESULT EngineSettingsController::IsDefaultEnabled(_Out_ DWORD* pde) const {
-    return _default_enabled->GetValueOrWriteback(pde, 0);
+    return _default_enabled->GetValueOrDefault(pde, 0);
 }
 
 _Check_return_ HRESULT EngineSettingsController::IsBackconvertOnBackspace(_Out_ DWORD* pde) const {
-    return _backconvert_on_backspace->GetValueOrWriteback(pde, 0);
+    return _backconvert_on_backspace->GetValueOrDefault(pde, 0);
 }
 
 } // namespace VietType
