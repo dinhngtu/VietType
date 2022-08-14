@@ -4,19 +4,15 @@
 //
 #define IDS_PROJNAME                    100
 #define IDR_VIETTYPEATL                 101
-#define IDS_ABOUTSTRING                 101
 #define IDS_VIETTYPE_DESCRIPTION        102
 #define IDR_TEXTSERVICE                 106
 #define IDI_IMELOGO                     202
-#define IDR_MENU_TRAY                   213
 #define IDI_ICONED                      220
 #define IDI_ICONEL                      221
 #define IDI_ICONVD                      222
 #define IDI_ICONVL                      223
 #define IDI_ICONXD                      224
 #define IDI_ICONXL                      225
-#define ID_TRAY_ABOUT                   32771
-#define ID_TRAY_OPTIONS                 32772
 
 // Next default values for new objects
 // 

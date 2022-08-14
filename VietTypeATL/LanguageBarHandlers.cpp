@@ -31,136 +31,6 @@ private:
     UNIQUE_HANDLE_DECL(HMENU, DestroyMenu) _menu;
 };
 
-static SharedMenu GetSharedMenu() {
-    if (!Globals::DllInstance) {
-        DBG_DPRINT(L"%s", L"cannot obtain instance");
-        return SharedMenu(NULL);
-    }
-    HMENU menu = LoadMenu(Globals::DllInstance, MAKEINTRESOURCE(IDR_MENU_TRAY));
-    if (!menu) {
-        WINERROR_PRINT(GetLastError(), L"%s", L"GetSharedMenu failed");
-        return SharedMenu(NULL);
-    }
-    return SharedMenu(menu);
-}
-
-static int PopMenu(POINT pt, const RECT* area) {
-    auto menu = GetSharedMenu();
-    if (!menu) {
-        DBG_DPRINT(L"%s", L"load menu failed");
-        return 0;
-    }
-    auto trayMenu = menu.GetTrayMenu();
-    if (!trayMenu) {
-        DBG_DPRINT(L"%s", L"load tray menu failed");
-        return 0;
-    }
-    UINT flags = TPM_NONOTIFY | TPM_RETURNCMD;
-    if (GetSystemMetrics(SM_MENUDROPALIGNMENT)) {
-        flags |= TPM_RIGHTALIGN;
-    }
-    int itemId = TrackPopupMenuEx(trayMenu, flags, pt.x, pt.y, /* doesn't matter */ GetFocus(), NULL);
-    return itemId;
-}
-
-static HRESULT CopyTfMenu(_In_ ITfMenu* menu) {
-    HRESULT hr;
-
-    auto menuSource = GetSharedMenu();
-    if (!menuSource) {
-        return E_FAIL;
-    }
-    auto trayMenu = menuSource.GetTrayMenu();
-    if (!trayMenu) {
-        return E_FAIL;
-    }
-    for (int i = 0; i < GetMenuItemCount(trayMenu); i++) {
-        MENUITEMINFO mii;
-        mii.cbSize = sizeof(MENUITEMINFO);
-        mii.dwTypeData = NULL;
-        mii.fMask = MIIM_STRING;
-        if (!GetMenuItemInfo(trayMenu, i, TRUE, &mii)) {
-            WINERROR_GLE_RETURN_HRESULT(L"%s", L"GetMenuItemInfo failed");
-        }
-
-        mii.cch++;
-        mii.fMask = MIIM_BITMAP | MIIM_CHECKMARKS | MIIM_FTYPE | MIIM_ID | MIIM_STATE | MIIM_STRING;
-        // the vector used here can't outlive the copy function, that's why the function has to do the item addition by
-        // itself
-        std::vector<WCHAR> buf(mii.cch);
-        mii.dwTypeData = &buf[0];
-        if (!GetMenuItemInfo(trayMenu, i, TRUE, &mii)) {
-            WINERROR_GLE_RETURN_HRESULT(L"%s", L"GetMenuItemInfo failed");
-        }
-
-        DWORD tfFlags = 0;
-        if (mii.fState & MFS_CHECKED) {
-            tfFlags |= TF_LBMENUF_CHECKED;
-        }
-        if (mii.fType & MFT_SEPARATOR) {
-            tfFlags |= TF_LBMENUF_SEPARATOR;
-        }
-        if (mii.fType & MFT_RADIOCHECK) {
-            tfFlags |= TF_LBMENUF_RADIOCHECKED;
-        }
-        if (mii.fState & MFS_GRAYED) {
-            tfFlags |= TF_LBMENUF_GRAYED;
-        }
-
-        auto tfBitmap = UNIQUE_HANDLE(static_cast<HBITMAP>(NULL), DeleteObject);
-        if (mii.hbmpItem && mii.hbmpItem != reinterpret_cast<HBITMAP>(-1)) {
-            tfBitmap.reset(static_cast<HBITMAP>(CopyImage(mii.hbmpItem, IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE)));
-        }
-
-        // hbmpMask is not supposed to be NULL here but it still works anyway so we suppress the warning
-#pragma warning(suppress : 6387)
-        hr = menu->AddMenuItem(mii.wID, tfFlags, tfBitmap.get(), NULL, &buf[0], static_cast<ULONG>(buf.size()), NULL);
-        DBG_HRESULT_CHECK(hr, L"%s", L"menu->AddMenuItem failed");
-    }
-
-    return S_OK;
-}
-
-static HRESULT OnMenuSelectAll(_In_ UINT id, _In_ EngineController* controller) {
-    switch (id) {
-    case 0:
-        return S_OK;
-
-    case ID_TRAY_ABOUT: {
-        LPCWSTR aboutFormatString = nullptr;
-        // LoadString will return a read-only pointer to the loaded resource string, no need to free
-        if (!LoadString(Globals::DllInstance, IDS_ABOUTSTRING, reinterpret_cast<LPWSTR>(&aboutFormatString), 0)) {
-            WINERROR_GLE_RETURN_HRESULT(L"%s", L"LoadString failed");
-        }
-        assert(aboutFormatString);
-        if (!aboutFormatString) {
-            DBG_DPRINT(L"%s", L"cannot get aboutFormatString");
-            return E_FAIL;
-        }
-
-        LPWSTR ptext = nullptr;
-        std::array<DWORD_PTR, 5> args = {PRODUCTVERSION_TUPLE, reinterpret_cast<DWORD_PTR>(VCS_REVISION)};
-        if (!FormatMessage(
-                FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_STRING | FORMAT_MESSAGE_ARGUMENT_ARRAY,
-                aboutFormatString,
-                0,
-                0,
-                reinterpret_cast<LPWSTR>(&ptext),
-                0,
-                reinterpret_cast<va_list*>(&args[0]))) {
-            WINERROR_GLE_RETURN_HRESULT(L"%s", L"FormatMessage failed");
-        }
-
-        auto text = UNIQUE_HANDLE(ptext, LocalFree);
-        if (!MessageBox(NULL, text.get(), Globals::TextServiceDescription.c_str(), MB_OK | MB_ICONINFORMATION)) {
-            WINERROR_GLE_RETURN_HRESULT(L"%s", L"MessageBox failed");
-        }
-        break;
-    }
-    }
-    return S_OK;
-}
-
 static DWORD GetSystemLightTheme() {
     CRegKey key;
     DWORD light = 0;
@@ -214,25 +84,16 @@ HRESULT RefreshableButton::Uninitialize() {
 HRESULT RefreshableButton::OnClick(_In_ TfLBIClick click, _In_ POINT pt, __RPC__in const RECT* area) {
     if (click == TF_LBI_CLK_LEFT) {
         return _controller->ToggleUserEnabled();
-    } else if (click == TF_LBI_CLK_RIGHT) {
-        int itemId = PopMenu(pt, area);
-        if (itemId) {
-            return OnMenuSelectAll(itemId, _controller);
-        }
     }
     return S_OK;
 }
 
 HRESULT RefreshableButton::InitMenu(__RPC__in_opt ITfMenu* menu) {
-    if (!menu) {
-        return E_INVALIDARG;
-    }
-    CopyTfMenu(menu);
     return S_OK;
 }
 
 HRESULT RefreshableButton::OnMenuSelect(_In_ UINT id) {
-    return OnMenuSelectAll(id, _controller);
+    return S_OK;
 }
 
 HRESULT RefreshableButton::GetIcon(__RPC__deref_out_opt HICON* hicon) {
