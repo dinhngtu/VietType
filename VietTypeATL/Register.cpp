@@ -97,7 +97,7 @@ static HRESULT SetSettingsKeyAcl() {
     ea[1].Trustee.ptstrName = reinterpret_cast<LPWCH>(&sid[0]);
 
     PACL pNewAcl;
-    err = SetEntriesInAcl(ea.size(), ea.data(), dacl, &pNewAcl);
+    err = SetEntriesInAcl(static_cast<ULONG>(ea.size()), ea.data(), dacl, &pNewAcl);
     WINERROR_CHECK_RETURN_HRESULT(err, L"%s", L"SetEntriesInAcl failed");
     std::unique_ptr<ACL, decltype(&LocalFree)> newAcl(pNewAcl, &LocalFree);
 

@@ -25,6 +25,7 @@
         private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
             this.cbDefaultEnabled = new System.Windows.Forms.CheckBox();
+            this.settingsBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.cbOaUy = new System.Windows.Forms.CheckBox();
             this.cbAcceptDd = new System.Windows.Forms.CheckBox();
             this.cbBackspaceInvalid = new System.Windows.Forms.CheckBox();
@@ -32,7 +33,6 @@
             this.btnOK = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnAbout = new System.Windows.Forms.Button();
-            this.settingsBindingSource = new System.Windows.Forms.BindingSource(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.settingsBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
@@ -46,6 +46,10 @@
             this.cbDefaultEnabled.TabIndex = 0;
             this.cbDefaultEnabled.Text = "Enabled by de&fault";
             this.cbDefaultEnabled.UseVisualStyleBackColor = true;
+            // 
+            // settingsBindingSource
+            // 
+            this.settingsBindingSource.DataSource = typeof(VietTypeConfig.Settings);
             // 
             // cbOaUy
             // 
@@ -123,10 +127,6 @@
             this.btnAbout.UseVisualStyleBackColor = true;
             this.btnAbout.Click += new System.EventHandler(this.btnAbout_Click);
             // 
-            // settingsBindingSource
-            // 
-            this.settingsBindingSource.DataSource = typeof(VietTypeConfig.Settings);
-            // 
             // Form1
             // 
             this.AcceptButton = this.btnOK;
@@ -144,6 +144,7 @@
             this.Controls.Add(this.cbDefaultEnabled);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "Form1";
             this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;

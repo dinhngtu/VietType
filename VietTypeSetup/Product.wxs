@@ -86,11 +86,6 @@ SPDX-License-Identifier: GPL-3.0-only
         </File>
       </Component>
 
-      <Component Win64="no" Directory="INSTALLFOLDER">
-        <File Source="$(var.SolutionDir)\VietTypeConfig\bin\$(var.Configuration)\VietTypeConfig.exe" />
-        <Shortcut Id="ConfigShortcut" Directory="ShortcutFolder" Name="VietType Settings" WorkingDirectory="INSTALLFOLDER" Advertise="yes" />
-      </Component>
-
       <?if $(var.Platform) = x64 ?>
       <Component Id="VietTypeATL64.dll" Win64="yes" Directory="INSTALLFOLDER64">
         <File Source="$(var.SolutionDir)\x64\$(var.Configuration)\VietTypeATL64.dll">
@@ -98,6 +93,15 @@ SPDX-License-Identifier: GPL-3.0-only
         </File>
       </Component>
       <?endif ?>
+
+      <Component Win64="no" Directory="INSTALLFOLDER">
+        <File Source="$(var.SolutionDir)\VietTypeConfig\bin\$(var.Configuration)\VietTypeConfig.exe" />
+        <Shortcut Id="ConfigShortcut" Directory="ShortcutFolder" Name="VietType Settings" WorkingDirectory="INSTALLFOLDER" Advertise="yes" />
+      </Component>
+      <Component Win64="no" Directory="INSTALLFOLDER">
+        <File Source="$(var.SolutionDir)\VietTypeConfig\bin\$(var.Configuration)\VietTypeConfig.exe.config"
+              DefaultLanguage="!(bind.fileLanguage.VietTypeConfig.exe)" DefaultVersion="!(bind.fileVersion.VietTypeConfig.exe)" />
+      </Component>
 
       <Component Win64="no" Directory="INSTALLFOLDER">
         <File Source="$(var.SolutionDir)\LICENSE" DefaultLanguage="1033" DefaultVersion="$(var.productVersion)" />
