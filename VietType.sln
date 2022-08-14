@@ -1,13 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29102.190
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32804.467
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VietTypeTests", "VietTypeTests\VietTypeTests.vcxproj", "{78E8E578-91CC-468F-95DF-8BDE6A4CF76D}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VietTypeATL", "VietTypeATL\VietTypeATL.vcxproj", "{6CA483BD-B365-42DC-8AE6-7CFBD2014CBE}"
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "VietTypeSetup", "VietTypeSetup\VietTypeSetup.wixproj", "{8882E9D2-7670-4906-98F5-60A147BF5ECA}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E48868BF-C55D-41E4-9A25-85190BD57684} = {E48868BF-C55D-41E4-9A25-85190BD57684}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VietTypeUnitTests", "VietTypeUnitTests\VietTypeUnitTests.vcxproj", "{3F698192-164B-4E9D-91FD-DDD623C1C98C}"
 EndProject
@@ -20,11 +23,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		LICENSE = LICENSE
 		LICENSE.rtf = LICENSE.rtf
 		UpdateVersion.ps1 = UpdateVersion.ps1
+		UpdateVersionCs.ps1 = UpdateVersionCs.ps1
 		UpdateVersionWix.ps1 = UpdateVersionWix.ps1
 		Version.ps1 = Version.ps1
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Telex", "Telex\Telex.vcxproj", "{4C4CE742-99A9-40E7-B03A-68A3CBE0AE77}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VietTypeConfig", "VietTypeConfig\VietTypeConfig.csproj", "{E48868BF-C55D-41E4-9A25-85190BD57684}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -72,6 +78,14 @@ Global
 		{4C4CE742-99A9-40E7-B03A-68A3CBE0AE77}.Release|Win32.Build.0 = Release|Win32
 		{4C4CE742-99A9-40E7-B03A-68A3CBE0AE77}.Release|x64.ActiveCfg = Release|x64
 		{4C4CE742-99A9-40E7-B03A-68A3CBE0AE77}.Release|x64.Build.0 = Release|x64
+		{E48868BF-C55D-41E4-9A25-85190BD57684}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{E48868BF-C55D-41E4-9A25-85190BD57684}.Debug|Win32.Build.0 = Debug|Any CPU
+		{E48868BF-C55D-41E4-9A25-85190BD57684}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E48868BF-C55D-41E4-9A25-85190BD57684}.Debug|x64.Build.0 = Debug|Any CPU
+		{E48868BF-C55D-41E4-9A25-85190BD57684}.Release|Win32.ActiveCfg = Release|Any CPU
+		{E48868BF-C55D-41E4-9A25-85190BD57684}.Release|Win32.Build.0 = Release|Any CPU
+		{E48868BF-C55D-41E4-9A25-85190BD57684}.Release|x64.ActiveCfg = Release|Any CPU
+		{E48868BF-C55D-41E4-9A25-85190BD57684}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
