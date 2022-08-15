@@ -53,6 +53,8 @@ _Check_return_ HRESULT EngineController::Initialize(
     hr = CreateInitialize(
         &_systemNotify, threadMgr, clientid, GUID_SystemNotifyCompartment, true, [this] { return UpdateStates(); });
     DBG_HRESULT_CHECK(hr, L"%s", L"_systemNotify->Initialize failed");
+    // must cache defaultEnabled early since it's used right away
+    _settings->IsDefaultEnabled(&_defaultEnabled);
 
     // GUID_SettingsCompartment_Toggle is global
     hr = CreateInitialize(
