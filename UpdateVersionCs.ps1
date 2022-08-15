@@ -10,6 +10,8 @@ $csNew = `
 @"
 using System.Reflection;
 
+[assembly: AssemblyVersion("$productVersionText")]
+[assembly: AssemblyFileVersion("$productVersionText")]
 [assembly: AssemblyInformationalVersion("$productVersionText")]
 
 namespace VietTypeConfig {
