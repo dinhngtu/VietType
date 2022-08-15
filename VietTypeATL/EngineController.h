@@ -47,6 +47,8 @@ public:
     Telex::TelexEngine& GetEngine();
     const Telex::TelexEngine& GetEngine() const;
 
+    DWORD IsBackconvertOnBackspace();
+
     _Check_return_ HRESULT IsUserEnabled(_Out_ long* penabled) const;
     HRESULT ToggleUserEnabled();
 
@@ -84,6 +86,10 @@ private:
     std::unique_ptr<RefreshableButton> _langBarButton;
 
     CComPtr<EngineSettingsController> _settings;
+    // cached settings
+    DWORD _defaultEnabled;
+    DWORD _backconvertOnBackspace;
+    CComPtr<CompartmentNotifier> _systemNotify;
 
     BlockedKind _blocked = BlockedKind::Free;
 };

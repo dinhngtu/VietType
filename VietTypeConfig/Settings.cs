@@ -7,8 +7,7 @@ using System.ComponentModel;
 namespace VietTypeConfig {
     internal class Settings : INotifyPropertyChanged {
         private const string Subkey = "Software\\VietType";
-        private static readonly Guid GUID_SystemConfigCompartment = Guid.Parse("{B2FBD2E7-922F-4996-BE77-21085B91A8F0}");
-        private static readonly Guid GUID_TelexConfigCompartment = Guid.Parse("{57335895-0C34-40BA-83F7-72E90A39C222}");
+        private static readonly Guid GUID_SystemNotifyCompartment = Guid.Parse("{B2FBD2E7-922F-4996-BE77-21085B91A8F0}");
         private static readonly Guid CLSID_TF_ThreadMgr = Guid.Parse("{529a9e6b-6587-4f23-ab9e-9c7d683e3c50}");
 
         bool default_enabled = false;
@@ -114,15 +113,9 @@ namespace VietTypeConfig {
                 if (threadMgr.Activate(out uint tid) >= 0) {
                     try {
                         if (threadMgr.GetGlobalCompartment(out ITfCompartmentMgr globalMgr) >= 0 &&
-                            globalMgr.GetCompartment(GUID_SystemConfigCompartment, out ITfCompartment globalCompartment) >= 0) {
+                            globalMgr.GetCompartment(GUID_SystemNotifyCompartment, out ITfCompartment globalCompartment) >= 0) {
                             if (globalCompartment.GetValue(out object oldGlobal) >= 0) {
-                                globalCompartment.SetValue(tid, (oldGlobal as int? ?? 0) + 1);
-                            }
-                        }
-                        if (threadMgr.GetGlobalCompartment(out ITfCompartmentMgr telexMgr) >= 0 &&
-                            telexMgr.GetCompartment(GUID_TelexConfigCompartment, out ITfCompartment telexCompartment) >= 0) {
-                            if (telexCompartment.GetValue(out object oldTelex) >= 0) {
-                                telexCompartment.SetValue(tid, (oldTelex as int? ?? 0) + 1);
+                                globalCompartment.SetValue(tid, unchecked((oldGlobal as int? ?? 0) + 1));
                             }
                         }
                     } finally {

@@ -4,6 +4,7 @@
 
 #include "Common.h"
 #include "SettingsStore.h"
+#include "Telex.h"
 
 namespace VietType {
 
@@ -26,19 +27,24 @@ public:
     Initialize(_In_ EngineController* ec, _In_ ITfThreadMgr* threadMgr, _In_ TfClientId clientid);
     HRESULT Uninitialize();
 
-    HRESULT LoadSettings();
-    HRESULT CommitSettings(const SettingsDialog& dlg);
+    HRESULT LoadTelexSettings(Telex::TelexConfig& cfg);
 
-    _Check_return_ HRESULT IsDefaultEnabled(_Out_ DWORD* pde) const;
-    _Check_return_ HRESULT IsBackconvertOnBackspace(_Out_ DWORD* pde) const;
+    void IsDefaultEnabled(_Out_ DWORD* pde) const;
+    void IsBackconvertOnBackspace(_Out_ DWORD* pde) const;
 
 private:
     EngineController* _ec = nullptr;
+
+    // system settings
+
     CComPtr<RegistrySetting<DWORD>> _default_enabled;
+    CComPtr<RegistrySetting<DWORD>> _backconvert_on_backspace;
+
+    // telex settings
+
     CComPtr<RegistrySetting<DWORD>> _tc_oa_uy_tone1;
     CComPtr<RegistrySetting<DWORD>> _tc_accept_dd;
     CComPtr<RegistrySetting<DWORD>> _tc_backspace_invalid;
-    CComPtr<RegistrySetting<DWORD>> _backconvert_on_backspace;
 };
 
 } // namespace VietType

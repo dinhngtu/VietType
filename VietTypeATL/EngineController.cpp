@@ -15,6 +15,9 @@ static const GUID GUID_SettingsCompartment_Toggle = {
 // {CCA3D390-EF1A-4DE4-B2FF-B6BC76D68C3B}
 static const GUID GUID_LanguageBarButton_Item = {
     0xcca3d390, 0xef1a, 0x4de4, {0xb2, 0xff, 0xb6, 0xbc, 0x76, 0xd6, 0x8c, 0x3b}};
+// {B2FBD2E7-922F-4996-BE77-21085B91A8F0}
+static const GUID GUID_SystemNotifyCompartment = {
+    0xb2fbd2e7, 0x922f, 0x4996, {0xbe, 0x77, 0x21, 0x8, 0x5b, 0x91, 0xa8, 0xf0}};
 
 STDMETHODIMP EngineController::OnChange(__RPC__in REFGUID rguid) {
     HRESULT hr;
@@ -47,6 +50,9 @@ _Check_return_ HRESULT EngineController::Initialize(
     // init settings compartment & listener
     hr = CreateInitialize(&_settings, this, threadMgr, clientid);
     HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(_settings) failed");
+    hr = CreateInitialize(
+        &_systemNotify, threadMgr, clientid, GUID_SystemNotifyCompartment, true, [this] { return UpdateStates(); });
+    DBG_HRESULT_CHECK(hr, L"%s", L"_systemNotify->Initialize failed");
 
     // GUID_SettingsCompartment_Toggle is global
     hr = CreateInitialize(
@@ -91,6 +97,9 @@ HRESULT EngineController::Uninitialize() {
     DBG_HRESULT_CHECK(hr, L"%s", L"_enabled->Uninitialize failed");
     _enabled.Release();
 
+    hr = _systemNotify->Uninitialize();
+    DBG_HRESULT_CHECK(hr, L"%s", L"_systemNotify->Uninitialize failed");
+    _systemNotify.Release();
     hr = _settings->Uninitialize();
     DBG_HRESULT_CHECK(hr, L"%s", L"_settings->Uninitialize failed");
     _settings.Release();
@@ -112,21 +121,18 @@ const Telex::TelexEngine& EngineController::GetEngine() const {
     return *_engine;
 }
 
+DWORD EngineController::IsBackconvertOnBackspace() {
+    return _backconvertOnBackspace;
+}
+
 _Check_return_ HRESULT EngineController::IsUserEnabled(_Out_ long* penabled) const {
     HRESULT hr;
-    DWORD defaultEnabled;
 
-    hr = _settings->IsDefaultEnabled(&defaultEnabled);
-    if (FAILED(hr)) {
-        defaultEnabled = 0;
-        HRESULT_CHECK(hr, L"%s", L"_default_enabled->GetValueOrWriteback failed");
-    }
-
-    hr = _enabled->GetValueOrWriteback(penabled, static_cast<LONG>(defaultEnabled));
+    hr = _enabled->GetValueOrWriteback(penabled, static_cast<LONG>(_defaultEnabled));
     if (*penabled != 0 && *penabled != -1) {
-        DBG_DPRINT(L"resetting enabled from %ld to %ld", *penabled, defaultEnabled);
+        DBG_DPRINT(L"resetting enabled from %ld to %ld", *penabled, _defaultEnabled);
         // _enabled may contain garbage value, reset if it's the case
-        *penabled = defaultEnabled == 0 ? 0 : -1;
+        *penabled = _defaultEnabled == 0 ? 0 : -1;
         DBG_HRESULT_CHECK(_enabled->SetValue(*penabled), L"%s", L"_enabled reset failed");
     }
     return hr;
@@ -195,8 +201,16 @@ HRESULT EngineController::UpdateStates() {
 
     DBG_DPRINT(L"enabled = %ld, blocked = %d", enabled, static_cast<int>(_blocked));
 
-    hr = _settings->LoadSettings();
-    DBG_HRESULT_CHECK(hr, L"%s", L"_settings->LoadSettings failed");
+    _settings->IsDefaultEnabled(&_defaultEnabled);
+    _settings->IsBackconvertOnBackspace(&_backconvertOnBackspace);
+
+    Telex::TelexConfig cfg = GetEngine().GetConfig();
+    hr = _settings->LoadTelexSettings(cfg);
+    if (SUCCEEDED(hr)) {
+        GetEngine().SetConfig(cfg);
+    } else {
+        DBG_HRESULT_CHECK(hr, L"%s", L"_settings->LoadSettings failed");
+    }
 
     hr = _indicatorButton->Refresh();
     DBG_HRESULT_CHECK(hr, L"%s", L"_indicatorButton->Refresh failed");

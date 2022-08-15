@@ -5,13 +5,6 @@
 
 namespace VietType {
 
-// {B2FBD2E7-922F-4996-BE77-21085B91A8F0}
-static const GUID GUID_DefaultEnabledCompartment = {
-    0xb2fbd2e7, 0x922f, 0x4996, {0xbe, 0x77, 0x21, 0x8, 0x5b, 0x91, 0xa8, 0xf0}};
-// {57335895-0C34-40BA-83F7-72E90A39C222}
-static const GUID GUID_TelexConfigCompartment = {
-    0x57335895, 0xc34, 0x40ba, {0x83, 0xf7, 0x72, 0xe9, 0xa, 0x39, 0xc2, 0x22}};
-
 _Check_return_ HRESULT EngineSettingsController::Initialize(
     _In_ EngineController* ec, _In_ ITfThreadMgr* threadMgr, _In_ TfClientId clientid) {
     HRESULT hr;
@@ -25,8 +18,7 @@ _Check_return_ HRESULT EngineSettingsController::Initialize(
         L"default_enabled",
         KEY_QUERY_VALUE,
         threadMgr,
-        clientid,
-        GUID_DefaultEnabledCompartment);
+        clientid);
     HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(_default_enabled) failed");
 
     hr = CreateInitialize(
@@ -36,8 +28,7 @@ _Check_return_ HRESULT EngineSettingsController::Initialize(
         L"backconvert_on_backspace",
         KEY_QUERY_VALUE,
         threadMgr,
-        clientid,
-        GUID_DefaultEnabledCompartment);
+        clientid);
     HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(_backconvert_on_backspace) failed");
 
     hr = CreateInitialize(
@@ -47,10 +38,7 @@ _Check_return_ HRESULT EngineSettingsController::Initialize(
         L"oa_uy_tone1",
         KEY_QUERY_VALUE,
         threadMgr,
-        clientid,
-        GUID_TelexConfigCompartment,
-        false,
-        [this] { return LoadSettings(); });
+        clientid);
     HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(_tc_oa_uy_tone1) failed");
 
     hr = CreateInitialize(
@@ -60,10 +48,7 @@ _Check_return_ HRESULT EngineSettingsController::Initialize(
         L"accept_dd",
         KEY_QUERY_VALUE,
         threadMgr,
-        clientid,
-        GUID_TelexConfigCompartment,
-        false,
-        [this] { return LoadSettings(); });
+        clientid);
     HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(_tc_accept_dd) failed");
 
     hr = CreateInitialize(
@@ -73,10 +58,7 @@ _Check_return_ HRESULT EngineSettingsController::Initialize(
         L"backspace_invalid",
         KEY_QUERY_VALUE,
         threadMgr,
-        clientid,
-        GUID_TelexConfigCompartment,
-        false,
-        [this] { return LoadSettings(); });
+        clientid);
     HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(_tc_backspace_invalid) failed");
 
     return S_OK;
@@ -108,17 +90,8 @@ HRESULT EngineSettingsController::Uninitialize() {
     return S_OK;
 }
 
-HRESULT EngineSettingsController::LoadSettings() {
+HRESULT EngineSettingsController::LoadTelexSettings(Telex::TelexConfig& cfg) {
     HRESULT hr;
-    auto cfg(_ec->GetEngine().GetConfig());
-
-    DWORD default_enabled;
-    hr = this->IsDefaultEnabled(&default_enabled);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"this->IsDefaultEnabled failed");
-
-    DWORD backconvert_enabled;
-    hr = this->IsBackconvertOnBackspace(&backconvert_enabled);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"this->IsBackconvertEnabled failed");
 
     DWORD oa_uy_tone1 = true;
     hr = _tc_oa_uy_tone1->GetValueOrDefault(&oa_uy_tone1, _ec->GetEngine().GetConfig().oa_uy_tone1);
@@ -136,17 +109,15 @@ HRESULT EngineSettingsController::LoadSettings() {
     HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_backspace_invalid->GetValueOrWriteback failed");
     cfg.backspaced_word_stays_invalid = static_cast<bool>(backspace_invalid);
 
-    _ec->GetEngine().SetConfig(cfg);
-
     return S_OK;
 }
 
-_Check_return_ HRESULT EngineSettingsController::IsDefaultEnabled(_Out_ DWORD* pde) const {
-    return _default_enabled->GetValueOrDefault(pde, 0);
+void EngineSettingsController::IsDefaultEnabled(_Out_ DWORD* pde) const {
+    std::ignore = _default_enabled->GetValueOrDefault(pde, 0);
 }
 
-_Check_return_ HRESULT EngineSettingsController::IsBackconvertOnBackspace(_Out_ DWORD* pde) const {
-    return _backconvert_on_backspace->GetValueOrDefault(pde, 0);
+void EngineSettingsController::IsBackconvertOnBackspace(_Out_ DWORD* pde) const {
+    std::ignore = _backconvert_on_backspace->GetValueOrDefault(pde, 0);
 }
 
 } // namespace VietType
