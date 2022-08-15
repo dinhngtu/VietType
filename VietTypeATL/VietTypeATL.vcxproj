@@ -131,9 +131,10 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <RegisterOutput>false</RegisterOutput>
-      <AdditionalDependencies>Telex.lib;ucrt.lib;libvcruntime.lib;libcpmt.lib;atls.lib;msvcrt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Telex.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>libucrt.lib</IgnoreSpecificDefaultLibraries>
+      <AdditionalOptions>/defaultlib:ucrt.lib %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <PreBuildEvent>
       <Command>powershell.exe -nop -noni -executionpolicy bypass $(SolutionDir)\UpdateVersion.ps1</Command>
@@ -173,9 +174,10 @@
       <SubSystem>Windows</SubSystem>
       <ModuleDefinitionFile>.\VietTypeATL.def</ModuleDefinitionFile>
       <RegisterOutput>false</RegisterOutput>
-      <AdditionalDependencies>Telex.lib;ucrtd.lib;libvcruntimed.lib;libcpmtd.lib;atlsd.lib;msvcrtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Telex.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>libucrtd.lib</IgnoreSpecificDefaultLibraries>
+      <AdditionalOptions>/defaultlib:ucrtd.lib %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <PreBuildEvent>
       <Command>powershell.exe -nop -noni -executionpolicy bypass $(SolutionDir)\UpdateVersion.ps1</Command>
@@ -214,9 +216,10 @@
       <SubSystem>Windows</SubSystem>
       <ModuleDefinitionFile>.\VietTypeATL.def</ModuleDefinitionFile>
       <RegisterOutput>false</RegisterOutput>
-      <AdditionalDependencies>Telex.lib;ucrtd.lib;libvcruntimed.lib;libcpmtd.lib;atlsd.lib;msvcrtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Telex.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>libucrtd.lib</IgnoreSpecificDefaultLibraries>
+      <AdditionalOptions>/defaultlib:ucrtd.lib %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <PreBuildEvent>
       <Command>powershell.exe -nop -noni -executionpolicy bypass $(SolutionDir)\UpdateVersion.ps1</Command>
@@ -259,9 +262,10 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <RegisterOutput>false</RegisterOutput>
-      <AdditionalDependencies>Telex.lib;ucrt.lib;libvcruntime.lib;libcpmt.lib;atls.lib;msvcrt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Telex.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>libucrt.lib</IgnoreSpecificDefaultLibraries>
+      <AdditionalOptions>/defaultlib:ucrt.lib %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <PreBuildEvent>
       <Command>powershell.exe -nop -noni -executionpolicy bypass $(SolutionDir)\UpdateVersion.ps1</Command>
