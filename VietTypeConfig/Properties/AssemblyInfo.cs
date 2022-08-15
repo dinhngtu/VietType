@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-only
+
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;

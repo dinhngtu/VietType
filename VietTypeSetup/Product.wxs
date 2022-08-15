@@ -30,7 +30,7 @@ SPDX-License-Identifier: GPL-3.0-only
     </Feature>
 
     <UIRef Id="WixUI_Minimal" />
-    <WixVariable Id="WixUILicenseRtf" Value="$(var.SolutionDir)\LICENSE.rtf" />
+    <WixVariable Id="WixUILicenseRtf" Value="licembed.rtf" />
 
     <Condition Message="VietType is only compatible with Windows 8 and newer.">Installed OR (VersionNT >= 602)</Condition>
 
