@@ -2,7 +2,11 @@
 
 #include "Telex.h"
 
-static bool IsTranslatableKey(_In_ WPARAM wParam, _In_ LPARAM lParam) {
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#include <Windows.h>
+
+static bool IsTranslatableKey(_In_ uintptr_t wParam, _In_ intptr_t lParam) {
     if (wParam >= 65 && wParam <= 90) {
         return true;
     } else if (wParam == 219 || wParam == 221) {
@@ -12,7 +16,8 @@ static bool IsTranslatableKey(_In_ WPARAM wParam, _In_ LPARAM lParam) {
     return false;
 }
 
-bool VietType::Telex::IsEditKey(_In_ WPARAM wParam, _In_ LPARAM lParam, _In_reads_(256) const BYTE* keyState) {
+bool VietType::Telex::IsEditKey(
+    _In_ uintptr_t wParam, _In_ intptr_t lParam, _In_reads_(256) const unsigned char* keyState) {
     // only for edit keys that don't commit
     if ((keyState[VK_CONTROL] & 0x80) || (keyState[VK_MENU] & 0x80)) {
         return true;
@@ -27,7 +32,7 @@ bool VietType::Telex::IsEditKey(_In_ WPARAM wParam, _In_ LPARAM lParam, _In_read
 }
 
 bool VietType::Telex::IsKeyEaten(
-    _In_ bool isComposing, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_reads_(256) const BYTE* keyState) {
+    _In_ bool isComposing, _In_ uintptr_t wParam, _In_ intptr_t lParam, _In_reads_(256) const unsigned char* keyState) {
     if ((keyState[VK_CONTROL] & 0x80) || (keyState[VK_MENU] & 0x80) || (keyState[VK_LWIN] & 0x80) ||
         (keyState[VK_RWIN] & 0x80)) {
         // engine doesn't want modifiers
@@ -44,11 +49,11 @@ bool VietType::Telex::IsKeyEaten(
 
 VietType::Telex::TelexStates VietType::Telex::PushKey(
     _In_ VietType::Telex::TelexEngine& engine,
-    _In_ WPARAM wParam,
-    _In_ LPARAM lParam,
-    _In_reads_(256) const BYTE* keyState) {
+    _In_ uintptr_t wParam,
+    _In_ intptr_t lParam,
+    _In_reads_(256) const unsigned char* keyState) {
     if (IsTranslatableKey(wParam, lParam)) {
-        WCHAR c = 0;
+        wchar_t c = 0;
         if (ToUnicode((UINT)wParam, (lParam >> 16) & 0xff, keyState, &c, 1, 0) != 1) {
             assert(0);
             return VietType::Telex::TelexStates::TxError;
