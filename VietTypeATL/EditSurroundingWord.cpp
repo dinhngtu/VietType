@@ -151,7 +151,7 @@ static HRESULT DoEditSurroundingWord(
 #pragma warning(pop)
 
     auto displayText = controller->GetEngine().Peek();
-    compositionManager->SetCompositionText(ec, displayText.c_str(), displayText.length());
+    compositionManager->SetCompositionText(ec, displayText.c_str(), static_cast<LONG>(displayText.length()));
 
     if (controller->GetEngine().GetState() == Telex::TelexStates::TxError) {
         controller->GetEngine().Reset();

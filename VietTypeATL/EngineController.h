@@ -18,8 +18,7 @@ class EngineSettingsController;
 
 class EngineController : public CComObjectRootEx<CComSingleThreadModel>, public ITfCompartmentEventSink {
 public:
-    enum class BlockedKind
-    {
+    enum class BlockedKind {
         // don't change enable setting
         Free,
         // don't change enable setting, but also completely block the engine
@@ -87,8 +86,8 @@ private:
 
     CComPtr<EngineSettingsController> _settings;
     // cached settings
-    DWORD _defaultEnabled;
-    DWORD _backconvertOnBackspace;
+    DWORD _defaultEnabled = 0;
+    DWORD _backconvertOnBackspace = 0;
     CComPtr<CompartmentNotifier> _systemNotify;
 
     BlockedKind _blocked = BlockedKind::Free;

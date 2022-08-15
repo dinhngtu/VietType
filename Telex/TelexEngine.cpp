@@ -10,8 +10,7 @@
 namespace VietType {
 namespace Telex {
 
-enum ResposTransitions
-{
+enum ResposTransitions {
     ResposExpunged = -1,
     ResposTransitionC1 = -2,
     ResposTransitionV = -3,
@@ -627,7 +626,7 @@ bool TelexEngine::FindTable(_Out_ map_iterator* it) const {
 bool TelexEngine::GetTonePos(_In_ bool predict, _Out_ VInfo* vinfo) const {
     map_iterator it;
     auto found = FindTable(&it);
-    VInfo retinfo = {0};
+    VInfo retinfo = {0, C2Mode::Either};
     if (found) {
         retinfo = it->second;
     } else if (predict) {

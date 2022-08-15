@@ -7,8 +7,7 @@
 namespace VietType {
 namespace Telex {
 
-enum class CharTypes : int
-{
+enum class CharTypes : int {
     Uncategorized = 0,
     Commit = 1 << 0,
     ForceCommit = 1 << 1,
@@ -30,18 +29,8 @@ constexpr inline CharTypes operator|(CharTypes lhs, CharTypes rhs) {
     return static_cast<CharTypes>(static_cast<chartypes_t>(lhs) | static_cast<chartypes_t>(rhs));
 }
 
-constexpr inline CharTypes& operator|=(CharTypes lhs, CharTypes rhs) {
-    lhs = static_cast<CharTypes>(static_cast<chartypes_t>(lhs) | static_cast<chartypes_t>(rhs));
-    return lhs;
-}
-
 constexpr inline CharTypes operator&(CharTypes lhs, CharTypes rhs) {
     return static_cast<CharTypes>(static_cast<chartypes_t>(lhs) & static_cast<chartypes_t>(rhs));
-}
-
-constexpr inline CharTypes& operator&=(CharTypes lhs, CharTypes rhs) {
-    lhs = static_cast<CharTypes>(static_cast<chartypes_t>(lhs) & static_cast<chartypes_t>(rhs));
-    return lhs;
 }
 
 /// <summary>classifies lower characters only</summary>
