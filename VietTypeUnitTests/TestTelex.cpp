@@ -557,6 +557,13 @@ public:
         TelexEngine e(config1);
         TestInvalidWord(e, L"dodongf", L"dodongf");
     }
+
+    TEST_METHOD(TestConfigOaUy) {
+        auto config1 = config;
+        config1.oa_uy_tone1 = false;
+        TelexEngine e(config1);
+        TestValidWord(e, L"to\xe0n", L"toanf");
+    }
 };
 
 }

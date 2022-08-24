@@ -613,7 +613,7 @@ bool TelexEngine::FindTable(_Out_ map_iterator* it) const {
         *it = valid_v_gi.find(_v);
         return *it != valid_v_gi.end();
     } else {
-        if (!_config.oa_uy_tone1) {
+        if (!_c2.size() && !_config.oa_uy_tone1) {
             *it = valid_v_oa_uy.find(_v);
             if (*it != valid_v_oa_uy.end()) {
                 return true;
