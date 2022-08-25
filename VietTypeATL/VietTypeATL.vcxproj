@@ -367,7 +367,6 @@
     <ResourceCompile Include="VietTypeATL.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="cpp.hint" />
     <None Include="TextService.rgs" />
     <None Include="version.rci">
       <FileType>Text</FileType>

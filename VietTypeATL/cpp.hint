@@ -1,6 +1,0 @@
-#define DISALLOW_COPY(TypeName)
-#define DISALLOW_ASSIGN(TypeName)
-#define DISALLOW_COPY_AND_ASSIGN(TypeName)
-#define DISALLOW_IMPLICIT_CONSTRUCTORS(TypeName)
-#define UNIQUE_HANDLE_DECL(ptype, deleter)
-#define UNIQUE_HANDLE(value, deleter)

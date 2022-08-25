@@ -6,31 +6,6 @@
 
 namespace VietType {
 
-class SharedMenu {
-public:
-    SharedMenu() = delete;
-    SharedMenu(const SharedMenu&) = delete;
-    SharedMenu& operator=(const SharedMenu&) = delete;
-    ~SharedMenu() = default;
-
-    explicit SharedMenu(HMENU menu) : _menu(menu, DestroyMenu) {
-    }
-
-    HMENU GetTrayMenu() {
-        if (!_menu) {
-            return NULL;
-        }
-        return GetSubMenu(_menu.get(), 0);
-    }
-
-    operator bool() const {
-        return !!_menu;
-    }
-
-private:
-    UNIQUE_HANDLE_DECL(HMENU, DestroyMenu) _menu;
-};
-
 static DWORD GetSystemLightTheme() {
     CRegKey key;
     DWORD light = 0;

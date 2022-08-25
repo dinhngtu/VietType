@@ -98,14 +98,6 @@ void _errorprint(_In_ LPCWSTR func, _In_ int line, _In_ DWORD err, _In_ LPCWSTR 
 // converted to HRESULT
 #define WINERROR_GLE_RETURN_HRESULT(fmt, ...) WINERROR_CHECK_RETURN_HRESULT(GetLastError(), fmt, __VA_ARGS__)
 
-// UNIQUE_HANDLE's type
-// UNIQUE_HANDLE_DECL(HANDLE, CloseHandle) handle;
-#define UNIQUE_HANDLE_DECL(ptype, deleter) std::unique_ptr<std::remove_pointer<ptype>::type, decltype(&(deleter))>
-// close a handle, free a memory block, or release some other resource
-// auto handle = UNIQUE_HANDLE(CreateFile(...), CloseHandle);
-#define UNIQUE_HANDLE(value, deleter)                                                                                  \
-    std::unique_ptr<std::remove_pointer<decltype(value)>::type, decltype(&(deleter))>((value), &(deleter))
-
 #define GUID_WFORMAT L"%08lx-%04hx-%04hx-%02hhx%02hhx-%02hhx%02hhx%02hhx%02hhx%02hhx%02hhx"
 #define GUID_COMPONENTS(guid)                                                                                          \
     guid.Data1, guid.Data2, guid.Data3, guid.Data4[0], guid.Data4[1], guid.Data4[2], guid.Data4[3], guid.Data4[4],     \

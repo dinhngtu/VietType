@@ -196,7 +196,6 @@
     <None Include="TextService.rgs">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="cpp.hint" />
     <None Include="version.rci">
       <Filter>Resource Files</Filter>
     </None>
