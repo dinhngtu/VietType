@@ -1,4 +1,4 @@
-﻿namespace VietTypeConfig {
+namespace VietTypeConfig {
     partial class Form1 {
         /// <summary>
         /// Required designer variable.
@@ -38,11 +38,13 @@
             // 
             // cbDefaultEnabled
             // 
-            this.cbDefaultEnabled.AutoSize = true;
+            this.cbDefaultEnabled.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbDefaultEnabled.AutoEllipsis = true;
             this.cbDefaultEnabled.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.settingsBindingSource, "DefaultEnabled", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.cbDefaultEnabled.Location = new System.Drawing.Point(12, 12);
             this.cbDefaultEnabled.Name = "cbDefaultEnabled";
-            this.cbDefaultEnabled.Size = new System.Drawing.Size(114, 17);
+            this.cbDefaultEnabled.Size = new System.Drawing.Size(320, 17);
             this.cbDefaultEnabled.TabIndex = 0;
             this.cbDefaultEnabled.Text = "Enabled by de&fault";
             this.cbDefaultEnabled.UseVisualStyleBackColor = true;
@@ -53,50 +55,59 @@
             // 
             // cbOaUy
             // 
-            this.cbOaUy.AutoSize = true;
+            this.cbOaUy.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbOaUy.AutoEllipsis = true;
             this.cbOaUy.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.settingsBindingSource, "OaUy", true));
             this.cbOaUy.Location = new System.Drawing.Point(12, 35);
             this.cbOaUy.Name = "cbOaUy";
-            this.cbOaUy.Size = new System.Drawing.Size(198, 17);
+            this.cbOaUy.Size = new System.Drawing.Size(320, 17);
             this.cbOaUy.TabIndex = 1;
             this.cbOaUy.Text = "&Use \"oà\", \"uý\" instead of \"òa\", \"úy\"";
             this.cbOaUy.UseVisualStyleBackColor = true;
             // 
             // cbAcceptDd
             // 
-            this.cbAcceptDd.AutoSize = true;
+            this.cbAcceptDd.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbAcceptDd.AutoEllipsis = true;
             this.cbAcceptDd.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.settingsBindingSource, "AcceptDd", true));
             this.cbAcceptDd.Location = new System.Drawing.Point(12, 58);
             this.cbAcceptDd.Name = "cbAcceptDd";
-            this.cbAcceptDd.Size = new System.Drawing.Size(122, 17);
+            this.cbAcceptDd.Size = new System.Drawing.Size(320, 17);
             this.cbAcceptDd.TabIndex = 2;
             this.cbAcceptDd.Text = "Accept \'&d\' anywhere";
             this.cbAcceptDd.UseVisualStyleBackColor = true;
             // 
             // cbBackspaceInvalid
             // 
-            this.cbBackspaceInvalid.AutoSize = true;
+            this.cbBackspaceInvalid.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbBackspaceInvalid.AutoEllipsis = true;
             this.cbBackspaceInvalid.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.settingsBindingSource, "BackspaceInvalid", true));
             this.cbBackspaceInvalid.Location = new System.Drawing.Point(12, 81);
             this.cbBackspaceInvalid.Name = "cbBackspaceInvalid";
-            this.cbBackspaceInvalid.Size = new System.Drawing.Size(205, 17);
+            this.cbBackspaceInvalid.Size = new System.Drawing.Size(320, 17);
             this.cbBackspaceInvalid.TabIndex = 3;
             this.cbBackspaceInvalid.Text = "Backspaced &invalid word stays invalid";
             this.cbBackspaceInvalid.UseVisualStyleBackColor = true;
             // 
             // cbBackconvertOnBackspace
             // 
-            this.cbBackconvertOnBackspace.AutoSize = true;
+            this.cbBackconvertOnBackspace.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbBackconvertOnBackspace.AutoEllipsis = true;
             this.cbBackconvertOnBackspace.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.settingsBindingSource, "BackconvertOnBackspace", true));
             this.cbBackconvertOnBackspace.Location = new System.Drawing.Point(12, 104);
             this.cbBackconvertOnBackspace.Name = "cbBackconvertOnBackspace";
-            this.cbBackconvertOnBackspace.Size = new System.Drawing.Size(243, 17);
+            this.cbBackconvertOnBackspace.Size = new System.Drawing.Size(320, 17);
             this.cbBackconvertOnBackspace.TabIndex = 4;
             this.cbBackconvertOnBackspace.Text = "&Reconvert word on Backspace (Experimental)";
             this.cbBackconvertOnBackspace.UseVisualStyleBackColor = true;
             // 
             // btnOK
             // 
+            this.btnOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnOK.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.btnOK.Location = new System.Drawing.Point(176, 226);
             this.btnOK.Name = "btnOK";
@@ -108,6 +119,7 @@
             // 
             // btnCancel
             // 
+            this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.btnCancel.Location = new System.Drawing.Point(257, 226);
             this.btnCancel.Name = "btnCancel";
@@ -119,6 +131,7 @@
             // 
             // btnAbout
             // 
+            this.btnAbout.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnAbout.Location = new System.Drawing.Point(12, 226);
             this.btnAbout.Name = "btnAbout";
             this.btnAbout.Size = new System.Drawing.Size(75, 23);
@@ -153,7 +166,6 @@
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.settingsBindingSource)).EndInit();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
