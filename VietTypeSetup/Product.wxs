@@ -53,6 +53,8 @@ SPDX-License-Identifier: GPL-3.0-only
     <SetProperty Id="UnregisterProfilesRollback" Value='"[%SystemRoot]\System32\rundll32.exe" "[#VietTypeATL32.dll]",RunRegisterProfiles' After="CostFinalize" Sequence="execute" />
 
     <InstallExecuteSequence>
+      <ScheduleReboot After="InstallFinalize">ReplacedInUseFiles</ScheduleReboot>
+      
       <Custom Action="RegisterCategoriesRollback" After="InstallFiles">(NOT Installed) OR REINSTALL</Custom>
       <Custom Action="RegisterCategories" After="RegisterCategoriesRollback">(NOT Installed) OR REINSTALL</Custom>
       <Custom Action="RegisterProfilesRollback" After="RegisterCategories">(NOT Installed) OR REINSTALL</Custom>
