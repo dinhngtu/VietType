@@ -387,6 +387,10 @@ public:
         TestInvalidWord(L"XuOnWfWx", L"XuOnWfWx");
     }
 
+    TEST_METHOD(TestAllCapsNguoiwf) {
+        TestValidWord(L"NG\x1af\x1edcI", L"NGUOIWF");
+    }
+
     // caps repeat
 
     TEST_METHOD(TestCapsOSS) {

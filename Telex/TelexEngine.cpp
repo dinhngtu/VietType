@@ -31,6 +31,10 @@ static wchar_t ToUpper(_In_ wchar_t c) {
     if (c >= L'\xe0' && c <= L'\xfe') {
         return uc;
     }
+    // "uw" exception
+    if (c >= L'\x1af' && c <= L'\x1b0') {
+        return L'\x1af';
+    }
     uc = c & ~1;
     // Latin Extended-A/B
     if (c >= L'\x100' && c <= L'\x1bf') {
@@ -50,6 +54,10 @@ static wchar_t ToLower(_In_ wchar_t c) {
     }
     if (c >= L'\xc0' && c <= L'\xde') {
         return lc;
+    }
+    // "uw" exception
+    if (c >= L'\x1af' && c <= L'\x1b0') {
+        return L'\x1b0';
     }
     lc = c | 1;
     if (c >= L'\x100' && c <= L'\x1bf') {
