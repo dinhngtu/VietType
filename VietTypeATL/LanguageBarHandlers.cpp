@@ -79,15 +79,17 @@ HRESULT RefreshableButton::GetIcon(__RPC__deref_out_opt HICON* hicon) {
     }
 
     DWORD light = GetSystemLightTheme();
+    int iconx = GetSystemMetrics(SM_CXSMICON);
+    int icony = GetSystemMetrics(SM_CYSMICON);
     if (_controller->GetBlocked() == EngineController::BlockedKind::Blocked) {
-        *hicon = static_cast<HICON>(
-            LoadImage(Globals::DllInstance, MAKEINTRESOURCE(light ? IDI_ICONXL : IDI_ICONXD), IMAGE_ICON, 16, 16, 0));
+        *hicon = static_cast<HICON>(LoadImage(
+            Globals::DllInstance, MAKEINTRESOURCE(light ? IDI_ICONXL : IDI_ICONXD), IMAGE_ICON, iconx, icony, 0));
     } else if (_controller->IsEnabled()) {
-        *hicon = static_cast<HICON>(
-            LoadImage(Globals::DllInstance, MAKEINTRESOURCE(light ? IDI_ICONVL : IDI_ICONVD), IMAGE_ICON, 16, 16, 0));
+        *hicon = static_cast<HICON>(LoadImage(
+            Globals::DllInstance, MAKEINTRESOURCE(light ? IDI_ICONVL : IDI_ICONVD), IMAGE_ICON, iconx, icony, 0));
     } else {
-        *hicon = static_cast<HICON>(
-            LoadImage(Globals::DllInstance, MAKEINTRESOURCE(light ? IDI_ICONEL : IDI_ICONED), IMAGE_ICON, 16, 16, 0));
+        *hicon = static_cast<HICON>(LoadImage(
+            Globals::DllInstance, MAKEINTRESOURCE(light ? IDI_ICONEL : IDI_ICONED), IMAGE_ICON, iconx, icony, 0));
     }
     return *hicon ? S_OK : E_FAIL;
 }
