@@ -27,10 +27,7 @@ const GUID GUID_Compartment_Backconvert = {
 const std::wstring TextServiceDescription = L"VietType";
 extern const std::wstring ConfigKeyName = L"Software\\VietType";
 
-// with MAKELANGID(LANG_JAPANESE, SUBLANG_JAPANESE_JAPAN), the TIP configuration UI works correctly
-// without having to call SetLanguageProfileDisplayName
-// and TIP is correctly activated globally rather than per-app
-const LANGID TextServiceLangId = MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US);
+const LANGID TextServiceLangId = MAKELANGID(LANG_VIETNAMESE, SUBLANG_VIETNAMESE_VIETNAM);
 
 } // namespace Globals
 } // namespace VietType

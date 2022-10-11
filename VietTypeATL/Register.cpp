@@ -246,6 +246,16 @@ extern "C" __declspec(dllexport) void CALLBACK
 
 static HRESULT ActivateProfiles() {
     HRESULT hr;
+    LSTATUS err;
+
+    {
+        CRegKey key;
+        err = key.Create(HKEY_CURRENT_USER, L"Keyboard Layout\\Substitutes", nullptr, 0, KEY_SET_VALUE);
+        WINERROR_CHECK_RETURN_HRESULT(err, L"%s", L"key.Create(Keyboard Layout\\Substitutes) failed");
+
+        err = key.SetStringValue(L"0000042a", L"00000409");
+        WINERROR_CHECK_RETURN_HRESULT(err, L"%s", L"key.SetStringValue failed");
+    }
 
     hr = SetSettingsKeyAcl();
     HRESULT_CHECK_RETURN(hr, L"%s", L"SetSettingsKeyAcl failed");
@@ -272,6 +282,7 @@ extern "C" __declspec(dllexport) void CALLBACK
 
 static HRESULT DeactivateProfiles() {
     HRESULT hr;
+    LSTATUS err;
 
     CComPtr<ITfInputProcessorProfileMgr> profileMgr;
     hr = profileMgr.CoCreateInstance(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER);
@@ -284,6 +295,15 @@ static HRESULT DeactivateProfiles() {
         VietType::Globals::GUID_Profile,
         NULL,
         TF_IPPMF_DISABLEPROFILE);
+
+    {
+        CRegKey key;
+        err = key.Create(HKEY_CURRENT_USER, L"Keyboard Layout\\Substitutes", nullptr, 0, KEY_SET_VALUE);
+        WINERROR_CHECK_RETURN_HRESULT(err, L"%s", L"key.Create(Keyboard Layout\\Substitutes) failed");
+
+        err = key.DeleteValue(L"0000042a");
+        WINERROR_CHECK_RETURN_HRESULT(err, L"%s", L"key.SetStringValue failed");
+    }
 
     return S_OK;
 }
