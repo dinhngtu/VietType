@@ -10,14 +10,6 @@
 namespace VietType {
 namespace Telex {
 
-enum ResposTransitions {
-    ResposExpunged = -1,
-    ResposTransitionC1 = -2,
-    ResposTransitionV = -3,
-    ResposTransitionW = -4,
-    ResposTone = -5,
-};
-
 // case functions hardcode ranges of Vietnamese characters
 // the rest can be correctly transformed or not, doesn't matter
 

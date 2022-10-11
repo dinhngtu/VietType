@@ -39,6 +39,14 @@ struct TelexConfig {
     bool backspaced_word_stays_invalid = true;
 };
 
+enum ResposTransitions {
+    ResposExpunged = -1,
+    ResposTransitionC1 = -2,
+    ResposTransitionV = -3,
+    ResposTransitionW = -4,
+    ResposTone = -5,
+};
+
 class TelexEngine {
 public:
     explicit TelexEngine(_In_ struct TelexConfig config);
