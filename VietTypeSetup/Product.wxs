@@ -118,12 +118,12 @@ SPDX-License-Identifier: GPL-3.0-only
   <Fragment>
     <ComponentGroup Id="DebugCRTComponents">
       <Component Win64="no" Directory="INSTALLFOLDER">
-        <File Id="ucrtbasedx86.dll" Source="ucrtbasedx86.dll" Name="ucrtbased.dll" />
+        <File Id="ucrtbasedx86.dll" Source="$(var.SolutionDir)\Win32\$(var.Configuration)\ucrtbased.dll" />
       </Component>
 
       <?if $(var.Platform) = x64 ?>
       <Component Win64="yes" Directory="INSTALLFOLDER64">
-        <File Id="ucrtbasedx64.dll" Source="ucrtbasedx64.dll" Name="ucrtbased.dll" />
+        <File Id="ucrtbasedx64.dll" Source="$(var.SolutionDir)\x64\$(var.Configuration)\ucrtbased.dll" />
       </Component>
       <?endif ?>
     </ComponentGroup>
