@@ -25,6 +25,12 @@ SPDX-License-Identifier: GPL-3.0-only
       <ComponentGroupRef Id="ShortcutComponents" />
     </Feature>
 
+    <?if $(var.Configuration) = Debug ?>
+    <Feature Id="DebugCRTFeature" Title="Debug CRT" Absent="disallow" AllowAdvertise="no">
+      <ComponentGroupRef Id="DebugCRTComponents" />
+    </Feature>
+    <?endif ?>
+
     <Feature Id="ConfigFeature" Title="Configuration tool" AllowAdvertise="no">
       <ComponentGroupRef Id="ConfigComponents" />
     </Feature>
@@ -103,6 +109,23 @@ SPDX-License-Identifier: GPL-3.0-only
       <Component Win64="no" Directory="INSTALLFOLDER">
         <File Source="$(var.SolutionDir)\LICENSE" DefaultLanguage="1033" DefaultVersion="$(var.productVersion)" />
       </Component>
+    </ComponentGroup>
+  </Fragment>
+
+  <!-- ################################################################################ -->
+  <!-- debug CRT -->
+
+  <Fragment>
+    <ComponentGroup Id="DebugCRTComponents">
+      <Component Win64="no" Directory="INSTALLFOLDER">
+        <File Id="ucrtbasedx86.dll" Source="ucrtbasedx86.dll" Name="ucrtbased.dll" />
+      </Component>
+
+      <?if $(var.Platform) = x64 ?>
+      <Component Win64="yes" Directory="INSTALLFOLDER64">
+        <File Id="ucrtbasedx64.dll" Source="ucrtbasedx64.dll" Name="ucrtbased.dll" />
+      </Component>
+      <?endif ?>
     </ComponentGroup>
   </Fragment>
 
