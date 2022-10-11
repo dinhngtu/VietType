@@ -2,6 +2,7 @@
 
 #include "KeyHandler.h"
 #include "Telex.h"
+#include "KeyTranslator.h"
 #include "CompositionManager.h"
 #include "EngineController.h"
 
@@ -22,7 +23,7 @@ STDMETHODIMP KeyHandlerEditSession::DoEditSession(_In_ TfEditCookie ec) {
 
     if (_wParam == 0) {
         Commit(ec);
-    } else if (Telex::IsEditKey(_wParam, _lParam, _keyState)) {
+    } else if (IsEditKey(_wParam, _lParam, _keyState)) {
         DBG_DPRINT(L"%d not edit key, not eating", _wParam);
         // uneaten, ends composition
         _controller->GetEngine().Reset();
@@ -34,7 +35,7 @@ STDMETHODIMP KeyHandlerEditSession::DoEditSession(_In_ TfEditCookie ec) {
         hr = _compositionManager->SetCompositionText(ec, &str[0], static_cast<LONG>(str.length()));
         DBG_HRESULT_CHECK(hr, L"%s", L"_compositionManager->SetCompositionText failed");
         return _compositionManager->EndCompositionNow(ec);
-    } else if (Telex::IsKeyEaten(_compositionManager->IsComposing(), _wParam, _lParam, _keyState)) {
+    } else if (IsKeyEaten(_compositionManager->IsComposing(), _wParam, _lParam, _keyState)) {
         // eaten, updates composition
         ComposeKey(ec);
     } else if (_wParam == VK_SHIFT) {
@@ -75,7 +76,7 @@ HRESULT KeyHandlerEditSession::ComposeKey(_In_ TfEditCookie ec) {
 
     DBG_DPRINT(L"%s", L"");
 
-    switch (Telex::PushKey(_controller->GetEngine(), _wParam, _lParam, _keyState)) {
+    switch (PushKey(_controller->GetEngine(), _wParam, _lParam, _keyState)) {
     case Telex::TelexStates::Valid: {
         if (_controller->GetEngine().Count()) {
             auto str = _controller->GetEngine().Peek();

@@ -4,4 +4,3 @@
 
 #include "TelexUtil.h"
 #include "TelexEngine.h"
-#include "TelexKeyTranslator.h"

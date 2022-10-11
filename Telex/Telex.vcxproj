@@ -24,13 +24,11 @@
     <ClInclude Include="TelexData.h" />
     <ClInclude Include="TelexEngine.h" />
     <ClInclude Include="TelexInternal.h" />
-    <ClInclude Include="TelexKeyTranslator.h" />
     <ClInclude Include="TelexUtil.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TelexData.cpp" />
     <ClCompile Include="TelexEngine.cpp" />
-    <ClCompile Include="TelexKeyTranslator.cpp" />
     <ClCompile Include="TelexUtil.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

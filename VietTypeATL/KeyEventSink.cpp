@@ -12,6 +12,7 @@
 
 #include "KeyEventSink.h"
 #include "Telex.h"
+#include "KeyTranslator.h"
 #include "KeyHandler.h"
 #include "EditSessions.h"
 #include "CompositionManager.h"
@@ -104,7 +105,7 @@ finish:
     } else {
         hr = compBackconvert.SetValue(0);
         DBG_HRESULT_CHECK(hr, L"%s", L"compBackconvert reset failed");
-        *pfEaten = Telex::IsKeyEaten(_compositionManager->IsComposing(), wParam, lParam, _keyState);
+        *pfEaten = IsKeyEaten(_compositionManager->IsComposing(), wParam, lParam, _keyState);
     }
 
     return S_OK;
@@ -138,7 +139,7 @@ STDMETHODIMP KeyEventSink::OnTestKeyUp(
             WINERROR_GLE_RETURN_HRESULT(L"%s", L"GetKeyboardState failed");
         }
 
-        *pfEaten = Telex::IsKeyEaten(_compositionManager->IsComposing(), wParam, lParam, _keyState);
+        *pfEaten = IsKeyEaten(_compositionManager->IsComposing(), wParam, lParam, _keyState);
     } else {
         *pfEaten = FALSE;
     }

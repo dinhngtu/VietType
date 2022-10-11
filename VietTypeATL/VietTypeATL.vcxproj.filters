@@ -91,6 +91,9 @@
     <ClCompile Include="EngineSettingsController.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="KeyTranslator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -178,6 +181,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Define.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="KeyTranslator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

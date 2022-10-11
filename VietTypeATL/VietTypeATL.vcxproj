@@ -300,6 +300,7 @@
     <ClCompile Include="Globals.cpp" />
     <ClCompile Include="KeyEventSink.cpp" />
     <ClCompile Include="KeyHandler.cpp" />
+    <ClCompile Include="KeyTranslator.cpp" />
     <ClCompile Include="LanguageBarButton.cpp" />
     <ClCompile Include="LanguageBarHandlers.cpp" />
     <ClCompile Include="Register.cpp" />
@@ -348,6 +349,7 @@
     <ClInclude Include="Globals.h" />
     <ClInclude Include="KeyEventSink.h" />
     <ClInclude Include="KeyHandler.h" />
+    <ClInclude Include="KeyTranslator.h" />
     <ClInclude Include="LanguageBarButton.h" />
     <ClInclude Include="LanguageBarHandlers.h" />
     <ClInclude Include="SettingsStore.h" />
