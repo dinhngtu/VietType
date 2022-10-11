@@ -13,7 +13,7 @@ SPDX-License-Identifier: GPL-3.0-only
     Manufacturer="Dinh Ngoc Tu"
     UpgradeCode="{E00AC838-881D-4301-AAC5-0A723BB0B0EF}">
 
-    <Package InstallerVersion="400" Compressed="yes" InstallScope="perMachine" Comments="Ver-$(var.productVersion)_Rev-$(var.vcsRev)" />
+    <Package InstallerVersion="400" Compressed="yes" InstallScope="perMachine" Comments="$(var.Configuration) Ver-$(var.productVersion) Rev-$(var.vcsRev) $(var.Platform)" />
 
     <MajorUpgrade
       DowngradeErrorMessage="A newer version of [ProductName] is already installed."
