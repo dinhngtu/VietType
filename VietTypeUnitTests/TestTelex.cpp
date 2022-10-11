@@ -280,6 +280,16 @@ public:
         TestValidWord(L"h\x1b0\x1a1u", L"huouw");
     }
 
+    // irregular
+
+    TEST_METHOD(TestTypingQuoiws) {
+        TestValidWord(L"qu\x1edbi", L"quoiws");
+    }
+
+    TEST_METHOD(TestTypingDawks) {
+        TestValidWord(L"\x111\x1eafk", L"ddawks");
+    }
+
     // peek tests
 
     TEST_METHOD(TestPeekDd) {
