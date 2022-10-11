@@ -5,19 +5,29 @@ SPDX-License-Identifier: GPL-3.0-only
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
   <?include Version.wxi ?>
 
+  <?if $(var.Platform) = x86 ?>
+  <?define upgradeCode = "{9AD3C40D-774F-4150-829A-F69ED4BE5A59}" ?>
+  <?elseif $(var.Platform) = x64 ?>
+  <?define upgradeCode = "{E00AC838-881D-4301-AAC5-0A723BB0B0EF}" ?>
+  <?endif ?>
+
   <Product
     Id="*"
     Name="VietType"
     Language="!(bind.fileLanguage.VietTypeATL32.dll)"
     Version="$(var.productVersion)"
     Manufacturer="Dinh Ngoc Tu"
-    UpgradeCode="{E00AC838-881D-4301-AAC5-0A723BB0B0EF}">
+    UpgradeCode="$(var.upgradeCode)">
 
     <Package InstallerVersion="400" Compressed="yes" InstallScope="perMachine" Comments="$(var.Configuration) Ver-$(var.productVersion) Rev-$(var.vcsRev) $(var.Platform)" />
 
     <MajorUpgrade
       DowngradeErrorMessage="A newer version of [ProductName] is already installed."
       Schedule="afterInstallInitialize" />
+    <Upgrade Id="{E00AC838-881D-4301-AAC5-0A723BB0B0EF}">
+      <UpgradeVersion Maximum="$(var.productVersion)" Property="VIETTYPE_OLD_UPGRADE_CODE_DETECTED" MigrateFeatures="yes" />
+    </Upgrade>
+    
     <MediaTemplate EmbedCab="yes" />
 
     <Feature Id="ProductFeature" Title="VietType" Absent="disallow" AllowAdvertise="no">
