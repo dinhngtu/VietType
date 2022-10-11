@@ -419,7 +419,7 @@ TelexStates TelexEngine::Backspace() {
                 PushChar(buf[i]);
             }
         } else if (rp[i] == ResposTone) {
-            if (oldc1.size() + vinfo.tonepos < toDelete) {
+            if (static_cast<int>(oldc1.size()) + vinfo.tonepos < toDelete) {
                 PushChar(buf[i]);
             } else if (oldc1 == L"gi" && toDelete >= 2) {
                 PushChar(buf[i]);
