@@ -401,8 +401,8 @@
       <FilesToCopy Include="$(WindowsSdkDir)bin\$(TargetPlatformVersion)\$(PlatformTarget)\ucrt\ucrtbased.dll" />
     </ItemGroup>
     <Copy SourceFiles="@(FilesToCopy)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
-  </Target>
-  <Target Name="AfterClean" Condition="'$(Configuration)'=='Debug'">
-    <Delete Files="$(OutDir)ucrtbased.dll" />
+    <ItemGroup>
+      <FileWrites Include="$(OutDir)ucrtbased.dll" />
+    </ItemGroup>
   </Target>
 </Project>
