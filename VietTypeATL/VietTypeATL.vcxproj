@@ -396,13 +396,13 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
-  <Target Name="AfterBuild">
+  <Target Name="AfterBuild" Condition="'$(Configuration)'=='Debug'">
     <ItemGroup>
       <FilesToCopy Include="$(WindowsSdkDir)bin\$(TargetPlatformVersion)\$(PlatformTarget)\ucrt\ucrtbased.dll" />
     </ItemGroup>
     <Copy SourceFiles="@(FilesToCopy)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
   </Target>
-  <Target Name="Clean">
+  <Target Name="AfterClean" Condition="'$(Configuration)'=='Debug'">
     <Delete Files="$(OutDir)ucrtbased.dll" />
   </Target>
 </Project>
