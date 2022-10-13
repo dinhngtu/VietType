@@ -18,7 +18,7 @@
 #include "CompositionManager.h"
 #include "EngineController.h"
 #include "EngineSettingsController.h"
-#include "Utilities.h"
+#include "ContextUtilities.h"
 
 namespace VietType {
 

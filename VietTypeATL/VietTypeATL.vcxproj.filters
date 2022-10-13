@@ -76,7 +76,7 @@
     <ClCompile Include="Compartment.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Utilities.cpp">
+    <ClCompile Include="ContextUtilities.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="EditBlocked.cpp">
@@ -165,7 +165,7 @@
     <ClInclude Include="Compartment.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Utilities.h">
+    <ClInclude Include="ContextUtilities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ComUtils.h">

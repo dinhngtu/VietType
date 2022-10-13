@@ -15,7 +15,7 @@
 #include "EngineController.h"
 #include "TextEditSink.h"
 #include "EditSessions.h"
-#include "Utilities.h"
+#include "ContextUtilities.h"
 
 namespace VietType {
 
