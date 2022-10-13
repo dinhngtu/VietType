@@ -87,7 +87,7 @@ HRESULT EditBlocked(
     hr = context->GetSelection(ec, TF_DEFAULT_SELECTION, 1, &sel, &fetched);
     EB_HRESULT_CHECK_COMMIT(hr, controller, L"%s", L"context->GetSelection failed");
 
-    VARIANT var;
+    CComVariant var;
     hr = prop->GetValue(ec, sel.range, &var);
     EB_HRESULT_CHECK_COMMIT(hr, controller, L"%s", L"prop->GetValue failed");
 

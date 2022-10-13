@@ -31,7 +31,7 @@ _Check_return_ HRESULT GetVirtualDocumentMgr(_In_ ITfDocumentMgr* dim, _COM_Outp
         hr = tcMgr->GetCompartment(GUID_COMPARTMENT_TRANSITORYEXTENSION_PARENT, &transitoryCompartment);
         HRESULT_CHECK_RETURN_OUTPTR(hr, pdim, L"%s", L"tcMgr->GetCompartment failed");
 
-        VARIANT v;
+        CComVariant v;
         hr = transitoryCompartment->GetValue(&v);
         HRESULT_CHECK_RETURN_OUTPTR(hr, pdim, L"%s", L"transitoryCompartment->GetValue failed");
         if (v.vt != VT_UNKNOWN || !v.punkVal) {
@@ -41,7 +41,6 @@ _Check_return_ HRESULT GetVirtualDocumentMgr(_In_ ITfDocumentMgr* dim, _COM_Outp
         }
 
         hr = v.punkVal->QueryInterface(pdim);
-        VariantClear(&v);
         return hr;
     } else {
         *pdim = dim;

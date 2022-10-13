@@ -28,7 +28,7 @@ protected:
     template <typename T>
     struct variantInfo {
         static constexpr VARTYPE vartype = VT_ILLEGAL;
-        static constexpr T& accessor(VARIANT& v) = delete;
+        static constexpr T& accessor(CComVariant& v) = delete;
     };
 };
 
@@ -39,7 +39,7 @@ public:
     _Check_return_ _Success_(return == S_OK) HRESULT GetValue(_Out_ T* val) {
         HRESULT hr;
 
-        VARIANT v;
+        CComVariant v;
         hr = _compartment->GetValue(&v);
         if (hr == S_FALSE) {
             return S_FALSE;
@@ -56,8 +56,7 @@ public:
     HRESULT SetValue(const T& val) {
         HRESULT hr;
 
-        VARIANT v;
-        VariantInit(&v);
+        CComVariant v;
         v.vt = variantInfo<T>::vartype;
         variantInfo<T>::accessor(v) = val;
         hr = _compartment->SetValue(_clientid, &v);
@@ -83,7 +82,7 @@ public:
 template <>
 struct CompartmentBase::variantInfo<long> {
     static constexpr VARTYPE vartype = VT_I4;
-    static constexpr long& accessor(VARIANT& v) {
+    static constexpr long& accessor(CComVariant& v) {
         return v.lVal;
     }
 };
@@ -91,7 +90,7 @@ struct CompartmentBase::variantInfo<long> {
 template <>
 struct CompartmentBase::variantInfo<IUnknown*> {
     static constexpr VARTYPE vartype = VT_UNKNOWN;
-    static constexpr IUnknown*& accessor(VARIANT& v) {
+    static constexpr IUnknown*& accessor(CComVariant& v) {
         return v.punkVal;
     }
 };

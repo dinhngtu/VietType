@@ -46,7 +46,7 @@ _Check_return_ HRESULT CompartmentBase::Initialize(
 #ifdef _DEBUG
     if (global) {
         HRESULT dbgHr;
-        VARIANT v;
+        CComVariant v;
         dbgHr = _compartment->GetValue(&v);
         DBG_HRESULT_CHECK(dbgHr, L"%s", L"test _compartment->GetValue failed");
         DBG_DPRINT(L"created global compartment vartype=%u long=%ld", v.vt, v.lVal);

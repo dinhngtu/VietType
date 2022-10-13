@@ -260,11 +260,7 @@ HRESULT CompositionManager::SetRangeDisplayAttribute(
     hr = context->GetProperty(GUID_PROP_ATTRIBUTE, &prop);
     HRESULT_CHECK_RETURN(hr, L"%s", L"context->GetProperty failed");
 
-    VARIANT v;
-    VariantInit(&v);
-    v.vt = VT_I4;
-    v.lVal = atom;
-
+    CComVariant v = static_cast<int>(atom);
     hr = prop->SetValue(ec, range, &v);
     HRESULT_CHECK_RETURN(hr, L"%s", L"prop->SetValue failed");
 
