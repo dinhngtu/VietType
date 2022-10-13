@@ -61,7 +61,11 @@ static HRESULT DoEditSurroundingWord(
 
     CComPtr<ITfContext> ppic;
     hr = VirtualDocument::GetVirtualDocumentContext(context, &ppic);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"ThreadMgrEventSink::GetTransitoryParentContext failed");
+    DBG_HRESULT_CHECK(hr, L"%s", L"ThreadMgrEventSink::GetTransitoryParentContext failed");
+
+    if (!ppic) {
+        ppic = context;
+    }
 
     CComPtr<ITfRange> range;
     hr = compositionManager->GetRange(&range);

@@ -10,6 +10,6 @@ class CompositionManager;
 class EngineController;
 
 HRESULT OnNewContext(
-    _In_ ITfContext* context, _In_ CompositionManager* compositionManager, _In_ EngineController* controller);
+    _In_opt_ ITfContext* context, _In_ CompositionManager* compositionManager, _In_ EngineController* controller);
 
 } // namespace VietType

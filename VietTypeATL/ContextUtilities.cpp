@@ -24,7 +24,7 @@ static HRESULT IsContextEmpty(_In_ ITfContext* context, _In_ TfClientId clientid
 }
 
 HRESULT OnNewContext(
-    _In_ ITfContext* context, _In_ CompositionManager* compositionManager, _In_ EngineController* controller) {
+    _In_opt_ ITfContext* context, _In_ CompositionManager* compositionManager, _In_ EngineController* controller) {
     HRESULT hr;
 
     if (!context) {
@@ -40,6 +40,7 @@ HRESULT OnNewContext(
         return S_OK;
     }
 
+#ifdef _DEBUG
     TF_STATUS st;
     hr = context->GetStatus(&st);
     if (SUCCEEDED(hr)) {
@@ -54,6 +55,7 @@ HRESULT OnNewContext(
     } else {
         DBG_HRESULT_CHECK(hr, L"%s", L"context->GetStatus failed");
     }
+#endif
 
     Compartment<long> compBackconvert;
     hr = compBackconvert.Initialize(context, compositionManager->GetClientId(), Globals::GUID_Compartment_Backconvert);
