@@ -32,9 +32,6 @@ Nhấn chuột phải vào biểu tượng của VietType để hiện trình đ
 - Tại sao VietType ít tính năng vậy? Tại sao VietType không có các tính năng như gõ tắt, chuyển mã, v.v.? \
 Tôi thiết kế VietType để đáp ứng nhu cầu gõ tiếng Việt tối thiểu.
 
-- Tại sao khi gõ tiếng Việt bằng VietType thấy có gạch chân dưới từ đang gõ? \
-VietType sử dụng phương pháp nhập liệu được tích hợp trong Windows (Text Services Framework). Cách gõ từ này là giới hạn của Windows nên không thể thay đổi. Tuy nhiên, phương pháp nhập liệu này cũng cho phép VietType tương thích với hầu hết các ứng dụng chạy trên nền Windows.
-
 - Tôi có thể sao chép, sửa đổi hay bán lại phần mềm VietType hay không? \
 VietType là phần mềm tự do, bạn có thể cung cấp lại và/hoặc chỉnh sửa nó theo những điều khoản của Giấy phép Công cộng của GNU do Tổ chức Phần mềm Tự do công bố; phiên bản 3 của Giấy phép, hoặc bất kỳ một phiên bản sau đó (tuỳ sự lựa chọn của bạn). \
 Tóm tắt Giấy phép Công cộng GNU (tham khảo tập tin LICENSE đi kèm VietType để biết chính xác các điều khoản):
