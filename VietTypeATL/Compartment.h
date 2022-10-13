@@ -88,4 +88,12 @@ struct CompartmentBase::variantInfo<long> {
     }
 };
 
+template <>
+struct CompartmentBase::variantInfo<IUnknown*> {
+    static constexpr VARTYPE vartype = VT_UNKNOWN;
+    static constexpr IUnknown*& accessor(VARIANT& v) {
+        return v.punkVal;
+    }
+};
+
 } // namespace VietType
