@@ -27,35 +27,18 @@
 
 namespace VietType {
 
-static CComPtr<EnumDisplayAttributeInfo> CreateAttributeStore() {
-    HRESULT hr;
-
-    CComPtr<EnumDisplayAttributeInfo> ret;
-    hr = CreateInstance2(&ret);
-    if (FAILED(hr)) {
-        DBG_HRESULT_CHECK(hr, L"%s", L"CreateInstance2(&ret) failed");
-        ret = nullptr;
-        return ret;
-    }
-
-    CComPtr<DisplayAttributeInfo> attr1;
-    hr = CreateInstance2(&attr1);
-    if (FAILED(hr)) {
-        DBG_HRESULT_CHECK(hr, L"%s", L"CreateInstance2(&attr1) failed");
-        ret = nullptr;
-        return ret;
-    }
-
-    attr1->Initialize(
-        std::get<0>(ComposingAttributeData), std::get<1>(ComposingAttributeData), std::get<2>(ComposingAttributeData));
-    CComPtr<ITfDisplayAttributeInfo> info1(attr1.p);
-    assert(info1);
-    ret->AddAttribute(info1);
-
-    return ret;
-}
-
-static CComPtr<EnumDisplayAttributeInfo> attributeStore = CreateAttributeStore();
+static const std::tuple<GUID, std::wstring, TF_DISPLAYATTRIBUTE> ComposingAttributeData = std::make_tuple(
+    // {7AB7384D-F5C6-43F9-B13C-80DCC788EE1D}
+    GUID{0x7ab7384d, 0xf5c6, 0x43f9, {0xb1, 0x3c, 0x80, 0xdc, 0xc7, 0x88, 0xee, 0x1d}},
+    std::wstring(L"Composing"),
+    TF_DISPLAYATTRIBUTE{
+        {TF_CT_NONE, 0}, // text foreground
+        {TF_CT_NONE, 0}, // text background
+        TF_LS_DOT,       // underline style
+        FALSE,           // bold underline
+        {TF_CT_NONE, 0}, // underline color
+        TF_ATTR_INPUT    // attribute info
+    });
 
 STDMETHODIMP TextService::Activate(_In_ ITfThreadMgr* ptim, _In_ TfClientId tid) {
     return ActivateEx(ptim, tid, 0);
@@ -73,8 +56,20 @@ STDMETHODIMP TextService::ActivateEx(_In_ ITfThreadMgr* ptim, _In_ TfClientId ti
 
     _engine = std::make_shared<Telex::TelexEngine>(Telex::TelexConfig{});
 
+    hr = CreateInstance2(&_attributeStore);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&_attributeStore) failed");
+
+    CComPtr<DisplayAttributeInfo> composingAttrib;
     hr = CreateInitialize(
-        &_compositionManager, tid, attributeStore->GetAttribute(0), static_cast<bool>(dwFlags & TF_TMAE_COMLESS));
+        &composingAttrib,
+        std::get<0>(ComposingAttributeData),
+        std::get<1>(ComposingAttributeData),
+        std::get<2>(ComposingAttributeData));
+    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&attr1) failed");
+    _attributeStore->AddAttribute(composingAttrib);
+
+    hr = CreateInitialize(
+        &_compositionManager, tid, _attributeStore->GetAttribute(0), static_cast<bool>(dwFlags & TF_TMAE_COMLESS));
     HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(&_compositionManager) failed");
 
     hr = CreateInitialize(&_engineController, _engine, ptim, tid);
@@ -115,21 +110,23 @@ STDMETHODIMP TextService::Deactivate(void) {
     _compositionManager->Uninitialize();
     _compositionManager.Release();
 
+    _attributeStore.Release();
+
     return S_OK;
 }
 
 STDMETHODIMP TextService::EnumDisplayAttributeInfo(__RPC__deref_out_opt IEnumTfDisplayAttributeInfo** ppEnum) {
-    if (!attributeStore) {
+    if (!_attributeStore) {
         return E_FAIL;
     }
-    *ppEnum = attributeStore;
+    *ppEnum = _attributeStore;
     (*ppEnum)->AddRef();
     return S_OK;
 }
 
 STDMETHODIMP TextService::GetDisplayAttributeInfo(
     __RPC__in REFGUID guid, __RPC__deref_out_opt ITfDisplayAttributeInfo** ppInfo) {
-    return attributeStore->FindAttributeByGuid(guid, ppInfo);
+    return _attributeStore->FindAttributeByGuid(guid, ppInfo);
 }
 
 } // namespace VietType

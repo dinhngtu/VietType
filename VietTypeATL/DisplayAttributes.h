@@ -6,8 +6,6 @@
 
 namespace VietType {
 
-extern const std::tuple<GUID, std::wstring, TF_DISPLAYATTRIBUTE> ComposingAttributeData;
-
 class DisplayAttributeInfo : public CComObjectRootEx<CComSingleThreadModel>, public ITfDisplayAttributeInfo {
 public:
     DisplayAttributeInfo() = default;

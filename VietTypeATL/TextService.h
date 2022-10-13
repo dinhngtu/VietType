@@ -24,6 +24,7 @@ class ThreadMgrEventSink;
 class KeyEventSink;
 class CompositionManager;
 class EngineController;
+class EnumDisplayAttributeInfo;
 
 class ATL_NO_VTABLE TextService : public CComObjectRootEx<CComSingleThreadModel>,
                                   public CComCoClass<TextService, &VietType::Globals::CLSID_TextService>,
@@ -62,6 +63,8 @@ private:
     DWORD _activateFlags = 0;
 
     std::shared_ptr<Telex::TelexEngine> _engine;
+
+    CComPtr<VietType::EnumDisplayAttributeInfo> _attributeStore;
 
     CComPtr<ThreadMgrEventSink> _threadMgrEventSink;
     CComPtr<KeyEventSink> _keyEventSink;
