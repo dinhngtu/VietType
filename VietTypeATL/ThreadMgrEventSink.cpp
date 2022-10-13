@@ -44,11 +44,6 @@ STDMETHODIMP ThreadMgrEventSink::OnSetFocus(
     hr = _docMgrFocus->GetTop(&context);
     HRESULT_CHECK_RETURN(hr, L"%s", L"pdimFocus->GetTop failed");
 
-    if (!context) {
-        _controller->SetBlocked(EngineController::BlockedKind::Blocked);
-        return S_OK;
-    }
-
     hr = OnNewContext(context, _compositionManager, _controller);
     HRESULT_CHECK_RETURN(hr, L"%s", L"OnNewContext failed");
 

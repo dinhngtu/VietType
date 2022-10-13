@@ -8,7 +8,7 @@
 
 namespace VietType {
 
-HRESULT IsContextEmpty(_In_ ITfContext* context, _In_ TfClientId clientid, _Out_ bool* isempty) {
+static HRESULT IsContextEmpty(_In_ ITfContext* context, _In_ TfClientId clientid, _Out_ bool* isempty) {
     HRESULT hr;
 
     Compartment<long> compEmpty;
@@ -27,6 +27,11 @@ HRESULT OnNewContext(
     _In_ ITfContext* context, _In_ CompositionManager* compositionManager, _In_ EngineController* controller) {
     HRESULT hr;
 
+    if (!context) {
+        controller->SetBlocked(EngineController::BlockedKind::Blocked);
+        return S_OK;
+    }
+
     bool isempty;
     hr = IsContextEmpty(context, compositionManager->GetClientId(), &isempty);
     HRESULT_CHECK_RETURN(hr, L"%s", L"IsContextEmpty failed");
@@ -35,15 +40,6 @@ HRESULT OnNewContext(
         return S_OK;
     }
 
-    Compartment<long> compBackconvert;
-    hr = compBackconvert.Initialize(context, compositionManager->GetClientId(), Globals::GUID_Compartment_Backconvert);
-    if (SUCCEEDED(hr)) {
-        compBackconvert.SetValue(0);
-    } else {
-        DBG_HRESULT_CHECK(hr, L"%s", L"compBackconvert.Initialize failed");
-    }
-
-#ifdef _DEBUG
     TF_STATUS st;
     hr = context->GetStatus(&st);
     if (SUCCEEDED(hr)) {
@@ -55,9 +51,17 @@ HRESULT OnNewContext(
             (st.dwStaticFlags & TF_SS_DISJOINTSEL) ? L'D' : L'_',
             (st.dwStaticFlags & TF_SS_REGIONS) ? L'R' : L'_',
             (st.dwStaticFlags & TF_SS_TRANSITORY) ? L'T' : L'_');
-    } else
+    } else {
         DBG_HRESULT_CHECK(hr, L"%s", L"context->GetStatus failed");
-#endif
+    }
+
+    Compartment<long> compBackconvert;
+    hr = compBackconvert.Initialize(context, compositionManager->GetClientId(), Globals::GUID_Compartment_Backconvert);
+    if (SUCCEEDED(hr)) {
+        compBackconvert.SetValue(0);
+    } else {
+        DBG_HRESULT_CHECK(hr, L"%s", L"compBackconvert.Initialize failed");
+    }
 
     hr = CompositionManager::RequestEditSession(EditSessions::EditBlocked, compositionManager, context, controller);
     if (FAILED(hr)) {
