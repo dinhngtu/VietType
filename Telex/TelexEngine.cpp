@@ -188,9 +188,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
         // vowel parts (aeiouy)
         _v.push_back(c);
         auto before = _v.size();
-        auto it = transitions.find(_v);
-        if (it != transitions.end()) {
-            _v = it->second;
+        if (TransitionV(transitions)) {
             auto after = _v.size();
             // we don't yet take into account if _v grows in length due to the transition
             if (_keyBuffer.size() > 1 && _respos.back() == ResposTransitionV && c == ToLower(_keyBuffer.rbegin()[1])) {
@@ -227,22 +225,13 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
         }
 
     } else if (_c1 == L"q" && !_v.empty() && IS(cat, CharTypes::VowelW)) {
-        auto it = transitions_w_q.find(_v);
-        if (it != transitions_w_q.end()) {
-            _v = it->second;
+        if (TransitionV(transitions_w_q)) {
             if (!_c2.empty()) {
-                auto it2 = transitions_v_c2.find(_v);
-                if (it2 != transitions_v_c2.end()) {
-                    _v = it2->second;
-                }
+                TransitionV(transitions_v_c2);
             }
             _respos.push_back(ResposTransitionW);
         } else {
-            // pop back only if same char entered twice in a row
-            if (c == ToLower(_keyBuffer.rbegin()[1])) {
-                _keyBuffer.pop_back();
-            }
-            _state = TelexStates::Invalid;
+            InvalidateAndPopBack(c);
         }
         // 'w' always keeps V size constant, don't push case
 
@@ -251,18 +240,11 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
         if (it != transitions_w.end() && (_v != it->second || _c2.empty()) && _respos.back() != ResposTransitionW) {
             _v = it->second;
             if (!_c2.empty()) {
-                auto it2 = transitions_v_c2.find(_v);
-                if (it2 != transitions_v_c2.end()) {
-                    _v = it2->second;
-                }
+                TransitionV(transitions_v_c2);
             }
             _respos.push_back(ResposTransitionW);
         } else {
-            // pop back only if same char entered twice in a row
-            if (c == ToLower(_keyBuffer.rbegin()[1])) {
-                _keyBuffer.pop_back();
-            }
-            _state = TelexStates::Invalid;
+            InvalidateAndPopBack(c);
         }
         // 'w' always keeps V size constant, don't push case
 
@@ -280,19 +262,12 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
         } else {
             // the condition "_c1 == L"gi" || !_v.empty()" should ensure this already
             assert(_keyBuffer.length() > 1);
-            // pop back only if same char entered twice in a row
-            if (c == ToLower(_keyBuffer.rbegin()[1])) {
-                _keyBuffer.pop_back();
-            }
-            _state = TelexStates::Invalid;
+            InvalidateAndPopBack(c);
         }
 
     } else if (((_c1 == L"gi" && _v.empty()) || !_v.empty()) && _c2.empty() && IS(cat, CharTypes::ConsoC2)) {
         // word-ending consonants (cnpt)
-        auto it = transitions_v_c2.find(_v);
-        if (it != transitions_v_c2.end()) {
-            _v = it->second;
-        }
+        TransitionV(transitions_v_c2);
         _c2.push_back(c);
         _cases.push_back(ccase);
         _respos.push_back(_respos_current++);
@@ -312,11 +287,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
             _respos.push_back(ResposTone);
         } else {
             assert(_keyBuffer.length() > 1);
-            // pop back only if same char entered twice in a row
-            if (c == ToLower(_keyBuffer.rbegin()[1])) {
-                _keyBuffer.pop_back();
-            }
-            _state = TelexStates::Invalid;
+            InvalidateAndPopBack(c);
         }
 
     } else if (cat == CharTypes::Shorthand) {
@@ -329,6 +300,24 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
 
     assert(CheckInvariants());
     return _state;
+}
+
+bool TelexEngine::TransitionV(const generic_map_type<std::wstring, std::wstring>& source) {
+    auto it = source.find(_v);
+    if (it != source.end()) {
+        _v = it->second;
+        return true;
+    } else {
+        return false;
+    }
+}
+
+void TelexEngine::InvalidateAndPopBack(wchar_t c) {
+    // pop back only if same char entered twice in a row
+    if (c == ToLower(_keyBuffer.rbegin()[1])) {
+        _keyBuffer.pop_back();
+    }
+    _state = TelexStates::Invalid;
 }
 
 TelexStates TelexEngine::Backspace() {
