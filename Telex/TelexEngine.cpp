@@ -249,7 +249,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
 
     } else if (!_v.empty() && IS(cat, CharTypes::VowelW)) {
         auto it = transitions_w.find(_v);
-        if (it != transitions_w.end()) {
+        if (it != transitions_w.end() && (_v != it->second || _c2.empty()) && _respos.back() != ResposTransitionW) {
             _v = it->second;
             if (!_c2.empty()) {
                 auto it2 = transitions_v_c2.find(_v);

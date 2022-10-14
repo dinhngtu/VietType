@@ -69,6 +69,8 @@ const generic_map_type<std::wstring, std::wstring> transitions_w = {
     {L"uoi", L"\x1b0\x1a1i"},
     {L"uou", L"\x1b0\x1a1u"},
     {L"\x1b0o", L"\x1b0\x1a1"},
+    // identical transitions are ignored if the last "w" is typed immediately after V without repeating (e.g. "uwow")
+    {L"\x1b0\x1a1", L"\x1b0\x1a1"},
 };
 
 const generic_map_type<std::wstring, std::wstring> transitions_w_q = {
