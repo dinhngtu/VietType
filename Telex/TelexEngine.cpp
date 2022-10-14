@@ -158,14 +158,13 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
         _cases.push_back(ccase);
         _respos.push_back(_respos_current++);
 
-    } else if (!_c1.empty() && _v.empty() && _c1 == L"g" && c == L'i') {
+    } else if (_v.empty() && _c1 == L"g" && c == L'i') {
         // special treatment for 'gi'
         _c1.push_back(c);
         _cases.push_back(ccase);
         _respos.push_back(_respos_current++);
 
-    } else if (
-        _c1 == L"d" && c == L'd' && ((_config.accept_separate_dd && _c1 == L"d") || (_v.empty() && _c2.empty()))) {
+    } else if (_c1 == L"d" && c == L'd' && (_config.accept_separate_dd || (_v.empty() && _c2.empty()))) {
         // only used for 'dd'
         // relaxed constraint: _v.empty()
         _c1 = L"\x111";
