@@ -43,7 +43,7 @@ HRESULT OnNewContext(
 #ifdef _DEBUG
     TF_STATUS st;
     hr = context->GetStatus(&st);
-    if (SUCCEEDED(hr)) {
+    DBG_HRESULT_CHECK(hr, L"%s", L"context->GetStatus failed") else {
         DBG_DPRINT(
             L"d=%c%c%c s=%c%c%c",
             (st.dwDynamicFlags & TF_SD_LOADING) ? L'L' : L'_',
@@ -52,8 +52,6 @@ HRESULT OnNewContext(
             (st.dwStaticFlags & TF_SS_DISJOINTSEL) ? L'D' : L'_',
             (st.dwStaticFlags & TF_SS_REGIONS) ? L'R' : L'_',
             (st.dwStaticFlags & TF_SS_TRANSITORY) ? L'T' : L'_');
-    } else {
-        DBG_HRESULT_CHECK(hr, L"%s", L"context->GetStatus failed");
     }
 #endif
 

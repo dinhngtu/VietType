@@ -77,7 +77,9 @@ void _errorprint(_In_ LPCWSTR func, _In_ int line, _In_ DWORD err, _In_ LPCWSTR 
 #define DBG_HRESULT_CHECK HRESULT_CHECK_NOASSERT
 #else
 #define DBG_DPRINT(fmt, ...)
-#define DBG_HRESULT_CHECK(hr, fmt, ...)
+#define DBG_HRESULT_CHECK(hr, fmt, ...)                                                                                \
+    if (FAILED(hr)) {                                                                                                  \
+    }
 #endif
 
 // format win32 error and print formatted string to debugger output

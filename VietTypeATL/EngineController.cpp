@@ -208,10 +208,8 @@ HRESULT EngineController::UpdateStates() {
 
     Telex::TelexConfig cfg = GetEngine().GetConfig();
     hr = _settings->LoadTelexSettings(cfg);
-    if (SUCCEEDED(hr)) {
+    DBG_HRESULT_CHECK(hr, L"%s", L"_settings->LoadSettings failed") else {
         GetEngine().SetConfig(cfg);
-    } else {
-        DBG_HRESULT_CHECK(hr, L"%s", L"_settings->LoadSettings failed");
     }
 
     hr = _indicatorButton->Refresh();
