@@ -36,7 +36,7 @@ void _errorprint(_In_ LPCWSTR func, _In_ int line, _In_ DWORD err, _In_ LPCWSTR 
     }
 
     std::array<WCHAR, 512> buf;
-    StringCchPrintf(&buf[0], buf.size(), fmt, func, line, err, errmessage, args...);
+    StringCchPrintf(&buf[0], buf.size(), fmt, func, line, err, &errmessage[0], args...);
     OutputDebugString(&buf[0]);
 }
 
