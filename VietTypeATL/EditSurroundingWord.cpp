@@ -8,7 +8,7 @@
 namespace VietType {
 namespace EditSessions {
 
-static const long SWF_MAXCHARS = 9; // "nghiêng" + 1 for the padding + 1 for max ignore
+static const long SWF_MAXCHARS = 12; // "ngượng" + 1 for the padding + 1 for max ignore + 1 more just in case
 
 static const std::vector<WCHAR> vietnamesechars_notaz = {
     L'\xc0',   L'\xc1',   L'\xc2',   L'\xc3',   L'\xc8',   L'\xc9',   L'\xca',   L'\xcc',   L'\xcd',   L'\xd2',
