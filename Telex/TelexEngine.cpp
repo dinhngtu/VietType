@@ -153,39 +153,39 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
     if (cat == CharTypes::Uncategorized) {
         _state = TelexStates::Invalid;
 
-    } else if (!_c1.size() && !_v.size() && (IS(cat, CharTypes::ConsoC1) || IS(cat, CharTypes::ConsoContinue))) {
+    } else if (_c1.empty() && _v.empty() && (IS(cat, CharTypes::ConsoC1) || IS(cat, CharTypes::ConsoContinue))) {
         _c1.push_back(c);
         _cases.push_back(ccase);
         _respos.push_back(_respos_current++);
 
-    } else if (_c1.size() && !_v.size() && _c1 == L"g" && c == L'i') {
+    } else if (!_c1.empty() && _v.empty() && _c1 == L"g" && c == L'i') {
         // special treatment for 'gi'
         _c1.push_back(c);
         _cases.push_back(ccase);
         _respos.push_back(_respos_current++);
 
     } else if (
-        _c1 == L"d" && c == L'd' && ((_config.accept_separate_dd && _c1 == L"d") || (!_v.size() && !_c2.size()))) {
+        _c1 == L"d" && c == L'd' && ((_config.accept_separate_dd && _c1 == L"d") || (_v.empty() && _c2.empty()))) {
         // only used for 'dd'
-        // relaxed constraint: !_v.size()
+        // relaxed constraint: _v.empty()
         _c1 = L"\x111";
         _respos.push_back(ResposTransitionC1);
 
     } else if (_c1 == L"\x111" && c == L'd') {
         // only used for 'dd'
-        // relaxed constraint: !_v.size()
+        // relaxed constraint: _v.empty()
         if (_keyBuffer.size() > 1 && ToLower(_keyBuffer.rbegin()[1]) == L'd') {
             _keyBuffer.pop_back();
         }
         _state = TelexStates::Invalid;
 
-    } else if (!_v.size() && !_c2.size() && _c1 != L"gi" && IS(cat, CharTypes::ConsoC1)) {
+    } else if (_v.empty() && _c2.empty() && _c1 != L"gi" && IS(cat, CharTypes::ConsoC1)) {
         _c1.push_back(c);
         _cases.push_back(ccase);
         _respos.push_back(_respos_current++);
 
     } else if (IS(cat, CharTypes::Vowel)) {
-        // relaxed vowel position constraint: !_c2.size()
+        // relaxed vowel position constraint: _c2.empty()
         // vowel parts (aeiouy)
         _v.push_back(c);
         auto before = _v.size();
@@ -220,18 +220,18 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
                 _state = TelexStates::Invalid;
             }
             _respos.push_back(_respos_current++);
-            if (_c2.size()) {
+            if (!_c2.empty()) {
                 // in case there exists no transition when _c2 is already typed
                 // e.g. 'cace'
                 _state = TelexStates::Invalid;
             }
         }
 
-    } else if (_c1 == L"q" && _v.size() && IS(cat, CharTypes::VowelW)) {
+    } else if (_c1 == L"q" && !_v.empty() && IS(cat, CharTypes::VowelW)) {
         auto it = transitions_w_q.find(_v);
         if (it != transitions_w_q.end()) {
             _v = it->second;
-            if (_c2.size()) {
+            if (!_c2.empty()) {
                 auto it2 = transitions_v_c2.find(_v);
                 if (it2 != transitions_v_c2.end()) {
                     _v = it2->second;
@@ -247,11 +247,11 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
         }
         // 'w' always keeps V size constant, don't push case
 
-    } else if (_v.size() && IS(cat, CharTypes::VowelW)) {
+    } else if (!_v.empty() && IS(cat, CharTypes::VowelW)) {
         auto it = transitions_w.find(_v);
         if (it != transitions_w.end()) {
             _v = it->second;
-            if (_c2.size()) {
+            if (!_c2.empty()) {
                 auto it2 = transitions_v_c2.find(_v);
                 if (it2 != transitions_v_c2.end()) {
                     _v = it2->second;
@@ -267,19 +267,19 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
         }
         // 'w' always keeps V size constant, don't push case
 
-    } else if (!_c1.size() && !_v.size() && IS(cat, CharTypes::Tone) && IS(cat, CharTypes::Conso)) {
+    } else if (_c1.empty() && _v.empty() && IS(cat, CharTypes::Tone) && IS(cat, CharTypes::Conso)) {
         // ambiguous (rsx) -> first character
         _c1.push_back(c);
         _cases.push_back(ccase);
 
-    } else if ((_c1 == L"gi" || _v.size()) && IS(cat, CharTypes::Tone) && IS(cat, CharTypes::Conso)) {
+    } else if ((_c1 == L"gi" || !_v.empty()) && IS(cat, CharTypes::Tone) && IS(cat, CharTypes::Conso)) {
         // ambiguous (rsx) -> tone
         auto newtone = GetTone(c);
         if (newtone != _t) {
             _t = newtone;
             _respos.push_back(ResposTone);
         } else {
-            // the condition "_c1 == L"gi" || _v.size()" should ensure this already
+            // the condition "_c1 == L"gi" || !_v.empty()" should ensure this already
             assert(_keyBuffer.length() > 1);
             // pop back only if same char entered twice in a row
             if (c == ToLower(_keyBuffer.rbegin()[1])) {
@@ -288,7 +288,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
             _state = TelexStates::Invalid;
         }
 
-    } else if (((_c1 == L"gi" && !_v.size()) || _v.size()) && !_c2.size() && IS(cat, CharTypes::ConsoC2)) {
+    } else if (((_c1 == L"gi" && _v.empty()) || !_v.empty()) && _c2.empty() && IS(cat, CharTypes::ConsoC2)) {
         // word-ending consonants (cnpt)
         auto it = transitions_v_c2.find(_v);
         if (it != transitions_v_c2.end()) {
@@ -468,7 +468,7 @@ TelexStates TelexEngine::Commit() {
 
     // routine changes buffers from this point
 
-    if (vinfo.tonepos < 0 && _c1 == L"gi" && !_v.size()) {
+    if (vinfo.tonepos < 0 && _c1 == L"gi" && _v.empty()) {
         // fixup 'gi' by moving 'i' to _v
         _c1.pop_back();
         _v.push_back(L'i');
@@ -585,7 +585,7 @@ std::wstring TelexEngine::Peek() const {
     }
 
     // fixup 'gi' then apply tone
-    if (vinfo.tonepos < 0 && _c1 == L"gi" && !_v.size()) {
+    if (vinfo.tonepos < 0 && _c1 == L"gi" && _v.empty()) {
         vinfo.tonepos = (int)_c1.size() - 1;
         wchar_t vatpos = TranslateTone(_c1[vinfo.tonepos], _t);
         result[vinfo.tonepos] = vatpos;
