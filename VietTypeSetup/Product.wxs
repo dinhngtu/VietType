@@ -27,7 +27,7 @@ SPDX-License-Identifier: GPL-3.0-only
     <Upgrade Id="{E00AC838-881D-4301-AAC5-0A723BB0B0EF}">
       <UpgradeVersion Maximum="$(var.productVersion)" Property="VIETTYPE_OLD_UPGRADE_CODE_DETECTED" MigrateFeatures="yes" />
     </Upgrade>
-    
+
     <MediaTemplate EmbedCab="yes" />
 
     <Feature Id="ProductFeature" Title="VietType" Absent="disallow" AllowAdvertise="no">
@@ -49,7 +49,16 @@ SPDX-License-Identifier: GPL-3.0-only
       <ComponentGroupRef Id="DebugSymbols" />
     </Feature>
 
-    <UIRef Id="WixUI_Minimal" />
+    <UI>
+      <UIRef Id="WixUI_Minimal" />
+      <Publish
+        Dialog="ExitDialog"
+        Control="Finish"
+        Event="DoAction"
+        Value="ActivateProfilesAfterInstall">
+        WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed
+      </Publish>
+    </UI>
     <WixVariable Id="WixUILicenseRtf" Value="licembed.rtf" />
 
     <Condition Message="VietType is only compatible with Windows 8 and newer.">Installed OR (VersionNT >= 602)</Condition>
@@ -57,20 +66,10 @@ SPDX-License-Identifier: GPL-3.0-only
     <?if $(var.Platform) = x86 ?>
     <Condition Message="32-bit setup can only run on a 32-bit OS.">Installed OR (NOT VersionNT64)</Condition>
     <?endif ?>
-
-    <SetProperty Id="RegisterCategories" Value='"[%SystemRoot]\System32\rundll32.exe" "[#VietTypeATL32.dll]",RunRegisterCategories' After="CostFinalize" Sequence="execute" />
-    <SetProperty Id="RegisterCategoriesRollback" Value='"[%SystemRoot]\System32\rundll32.exe" "[#VietTypeATL32.dll]",RunUnregisterCategories' After="CostFinalize" Sequence="execute" />
-    <SetProperty Id="UnregisterCategories" Value='"[%SystemRoot]\System32\rundll32.exe" "[#VietTypeATL32.dll]",RunUnregisterCategories' After="CostFinalize" Sequence="execute" />
-    <SetProperty Id="UnregisterCategoriesRollback" Value='"[%SystemRoot]\System32\rundll32.exe" "[#VietTypeATL32.dll]",RunRegisterCategories' After="CostFinalize" Sequence="execute" />
-
-    <SetProperty Id="RegisterProfiles" Value='"[%SystemRoot]\System32\rundll32.exe" "[#VietTypeATL32.dll]",RunRegisterProfiles' After="CostFinalize" Sequence="execute" />
-    <SetProperty Id="RegisterProfilesRollback" Value='"[%SystemRoot]\System32\rundll32.exe" "[#VietTypeATL32.dll]",RunUnregisterProfiles' After="CostFinalize" Sequence="execute" />
-    <SetProperty Id="UnregisterProfiles" Value='"[%SystemRoot]\System32\rundll32.exe" "[#VietTypeATL32.dll]",RunUnregisterProfiles' After="CostFinalize" Sequence="execute" />
-    <SetProperty Id="UnregisterProfilesRollback" Value='"[%SystemRoot]\System32\rundll32.exe" "[#VietTypeATL32.dll]",RunRegisterProfiles' After="CostFinalize" Sequence="execute" />
-
+    
     <InstallExecuteSequence>
       <ScheduleReboot After="InstallFinalize">ReplacedInUseFiles</ScheduleReboot>
-      
+
       <Custom Action="RegisterCategoriesRollback" After="InstallFiles">(NOT Installed) OR REINSTALL</Custom>
       <Custom Action="RegisterCategories" After="RegisterCategoriesRollback">(NOT Installed) OR REINSTALL</Custom>
       <Custom Action="RegisterProfilesRollback" After="RegisterCategories">(NOT Installed) OR REINSTALL</Custom>
@@ -200,6 +199,16 @@ SPDX-License-Identifier: GPL-3.0-only
   <!-- custom actions -->
 
   <Fragment>
+    <SetProperty Id="RegisterCategories" Value='"[%SystemRoot]\System32\rundll32.exe" "[#VietTypeATL32.dll]",RunRegisterCategories' After="CostFinalize" Sequence="execute" />
+    <SetProperty Id="RegisterCategoriesRollback" Value='"[%SystemRoot]\System32\rundll32.exe" "[#VietTypeATL32.dll]",RunUnregisterCategories' After="CostFinalize" Sequence="execute" />
+    <SetProperty Id="UnregisterCategories" Value='"[%SystemRoot]\System32\rundll32.exe" "[#VietTypeATL32.dll]",RunUnregisterCategories' After="CostFinalize" Sequence="execute" />
+    <SetProperty Id="UnregisterCategoriesRollback" Value='"[%SystemRoot]\System32\rundll32.exe" "[#VietTypeATL32.dll]",RunRegisterCategories' After="CostFinalize" Sequence="execute" />
+
+    <SetProperty Id="RegisterProfiles" Value='"[%SystemRoot]\System32\rundll32.exe" "[#VietTypeATL32.dll]",RunRegisterProfiles' After="CostFinalize" Sequence="execute" />
+    <SetProperty Id="RegisterProfilesRollback" Value='"[%SystemRoot]\System32\rundll32.exe" "[#VietTypeATL32.dll]",RunUnregisterProfiles' After="CostFinalize" Sequence="execute" />
+    <SetProperty Id="UnregisterProfiles" Value='"[%SystemRoot]\System32\rundll32.exe" "[#VietTypeATL32.dll]",RunUnregisterProfiles' After="CostFinalize" Sequence="execute" />
+    <SetProperty Id="UnregisterProfilesRollback" Value='"[%SystemRoot]\System32\rundll32.exe" "[#VietTypeATL32.dll]",RunRegisterProfiles' After="CostFinalize" Sequence="execute" />
+
     <CustomAction Id="RegisterCategories" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="deferred" />
     <CustomAction Id="RegisterCategoriesRollback" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="rollback" />
     <CustomAction Id="UnregisterCategories" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="deferred" />
@@ -209,5 +218,18 @@ SPDX-License-Identifier: GPL-3.0-only
     <CustomAction Id="RegisterProfilesRollback" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="rollback" />
     <CustomAction Id="UnregisterProfiles" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="deferred" />
     <CustomAction Id="UnregisterProfilesRollback" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="rollback" />
+  </Fragment>
+
+  <!-- ################################################################################ -->
+  <!-- after install -->
+
+  <Fragment>
+    <DirectoryRef Id="TARGETDIR">
+      <Directory Id="SystemFolder" />
+    </DirectoryRef>
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Enable VietType now" />
+    <Property Id="Rundll32Path" Value="[%SystemRoot]\System32\rundll32.exe" />
+    <CustomAction Id="ActivateProfilesAfterInstall" Directory="SystemFolder" Impersonate="yes" ExeCommand='rundll32.exe "[#VietTypeATL32.dll]",RunActivateProfiles' />
   </Fragment>
 </Wix>
