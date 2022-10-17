@@ -4,6 +4,7 @@
 #include "CompositionManager.h"
 #include "EngineController.h"
 #include "VirtualDocument.h"
+#include "Telex.h"
 
 namespace VietType {
 namespace EditSessions {
