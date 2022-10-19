@@ -33,7 +33,7 @@ Nhấn chuột phải vào biểu tượng của VietType để hiện trình đ
 Tôi thiết kế VietType để đáp ứng nhu cầu gõ tiếng Việt tối thiểu.
 
 - Tôi có thể sao chép, sửa đổi hay bán lại phần mềm VietType hay không? \
-VietType là phần mềm tự do, bạn có thể cung cấp lại và/hoặc chỉnh sửa nó theo những điều khoản của Giấy phép Công cộng của GNU do Tổ chức Phần mềm Tự do công bố; phiên bản 3 của Giấy phép, hoặc bất kỳ một phiên bản sau đó (tuỳ sự lựa chọn của bạn). \
+VietType là phần mềm tự do, bạn có thể cung cấp lại và/hoặc chỉnh sửa nó theo những điều khoản của Giấy phép Công cộng GNU phiên bản 3 do Tổ chức Phần mềm Tự do công bố. \
 Tóm tắt Giấy phép Công cộng GNU (tham khảo tập tin LICENSE đi kèm VietType để biết chính xác các điều khoản):
   - Bạn được phép sử dụng, sửa đổi và lưu hành VietType và các phiên bản đã sửa đổi của VietType.
   - Khi lưu hành VietType hay các phiên bản đã sửa đổi của VietType:
