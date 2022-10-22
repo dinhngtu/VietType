@@ -177,15 +177,35 @@ HRESULT EditSurroundingWord(
 
     DBG_DPRINT(L"backconvert ec = %ld", ec);
 
-    if (compositionManager->IsComposing()) {
-        return S_OK;
-    }
-
     Compartment<long> compBackconvert;
     hr = compBackconvert.Initialize(context, compositionManager->GetClientId(), Globals::GUID_Compartment_Backconvert);
     HRESULT_CHECK_RETURN(hr, L"%s", L"compBackconvert.Initialize failed");
     hr = compBackconvert.SetValue(-1);
     HRESULT_CHECK_RETURN(hr, L"%s", L"compBackconvert.SetValue failed");
+
+    if (compositionManager->IsComposing()) {
+        return E_PENDING;
+    }
+
+    std::array<TF_SELECTION, 2> sel;
+    ULONG fetched;
+    hr = context->GetSelection(ec, 0, sel.size(), sel.data(), &fetched);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"context->GetSelection failed");
+
+    if (fetched > 1) {
+        for (ULONG i = 0; i < fetched; i++) {
+            sel[i].range->Release();
+        }
+        return E_FAIL;
+    } else if (fetched == 1) {
+        CComPtr<ITfRange> selRange;
+        selRange.Attach(sel[0].range);
+        BOOL selEmpty;
+        hr = selRange->IsEmpty(ec, &selEmpty);
+        if (FAILED(hr) || !selEmpty) {
+            return E_FAIL;
+        }
+    }
 
     hr = compositionManager->StartCompositionNow(ec, context);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_compositionManager->StartComposition failed");
@@ -196,6 +216,9 @@ HRESULT EditSurroundingWord(
         compositionManager->EndCompositionNow(ec);
         DBG_HRESULT_CHECK(hr, L"%s", L"compositionManager->EndCompositionNow failed");
     }
+
+    compBackconvert.SetValue(0);
+
     return hr;
 }
 
