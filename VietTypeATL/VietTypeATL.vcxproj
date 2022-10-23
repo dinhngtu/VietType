@@ -176,8 +176,6 @@
       <RegisterOutput>false</RegisterOutput>
       <AdditionalDependencies>Telex.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <IgnoreSpecificDefaultLibraries>libucrtd.lib</IgnoreSpecificDefaultLibraries>
-      <AdditionalOptions>/defaultlib:ucrtd.lib %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <PreBuildEvent>
       <Command>powershell.exe -nop -noni -executionpolicy bypass $(SolutionDir)\UpdateVersion.ps1</Command>
@@ -218,8 +216,6 @@
       <RegisterOutput>false</RegisterOutput>
       <AdditionalDependencies>Telex.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <IgnoreSpecificDefaultLibraries>libucrtd.lib</IgnoreSpecificDefaultLibraries>
-      <AdditionalOptions>/defaultlib:ucrtd.lib %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <PreBuildEvent>
       <Command>powershell.exe -nop -noni -executionpolicy bypass $(SolutionDir)\UpdateVersion.ps1</Command>
@@ -396,13 +392,4 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
-  <Target Name="AfterBuild" Condition="'$(Configuration)'=='Debug'">
-    <ItemGroup>
-      <FilesToCopy Include="$(WindowsSdkDir)bin\$(TargetPlatformVersion)\$(PlatformTarget)\ucrt\ucrtbased.dll" />
-    </ItemGroup>
-    <Copy SourceFiles="@(FilesToCopy)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
-    <ItemGroup>
-      <FileWrites Include="$(OutDir)ucrtbased.dll" />
-    </ItemGroup>
-  </Target>
 </Project>
