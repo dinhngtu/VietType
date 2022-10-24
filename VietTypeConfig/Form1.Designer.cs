@@ -25,7 +25,6 @@ namespace VietTypeConfig {
         private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
             this.cbDefaultEnabled = new System.Windows.Forms.CheckBox();
-            this.settingsBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.cbOaUy = new System.Windows.Forms.CheckBox();
             this.cbAcceptDd = new System.Windows.Forms.CheckBox();
             this.cbBackspaceInvalid = new System.Windows.Forms.CheckBox();
@@ -33,6 +32,9 @@ namespace VietTypeConfig {
             this.btnOK = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnAbout = new System.Windows.Forms.Button();
+            this.btnEnable = new System.Windows.Forms.Button();
+            this.settingsBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.settingsBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
@@ -42,16 +44,12 @@ namespace VietTypeConfig {
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cbDefaultEnabled.AutoEllipsis = true;
             this.cbDefaultEnabled.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.settingsBindingSource, "DefaultEnabled", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this.cbDefaultEnabled.Location = new System.Drawing.Point(12, 12);
+            this.cbDefaultEnabled.Location = new System.Drawing.Point(12, 51);
             this.cbDefaultEnabled.Name = "cbDefaultEnabled";
             this.cbDefaultEnabled.Size = new System.Drawing.Size(320, 17);
-            this.cbDefaultEnabled.TabIndex = 0;
-            this.cbDefaultEnabled.Text = "Enabled by de&fault";
+            this.cbDefaultEnabled.TabIndex = 1;
+            this.cbDefaultEnabled.Text = "Vietnamese mode by de&fault";
             this.cbDefaultEnabled.UseVisualStyleBackColor = true;
-            // 
-            // settingsBindingSource
-            // 
-            this.settingsBindingSource.DataSource = typeof(VietTypeConfig.Settings);
             // 
             // cbOaUy
             // 
@@ -59,10 +57,10 @@ namespace VietTypeConfig {
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cbOaUy.AutoEllipsis = true;
             this.cbOaUy.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.settingsBindingSource, "OaUy", true));
-            this.cbOaUy.Location = new System.Drawing.Point(12, 35);
+            this.cbOaUy.Location = new System.Drawing.Point(12, 74);
             this.cbOaUy.Name = "cbOaUy";
             this.cbOaUy.Size = new System.Drawing.Size(320, 17);
-            this.cbOaUy.TabIndex = 1;
+            this.cbOaUy.TabIndex = 2;
             this.cbOaUy.Text = "&Use \"oà\", \"uý\" instead of \"òa\", \"úy\"";
             this.cbOaUy.UseVisualStyleBackColor = true;
             // 
@@ -72,11 +70,11 @@ namespace VietTypeConfig {
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cbAcceptDd.AutoEllipsis = true;
             this.cbAcceptDd.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.settingsBindingSource, "AcceptDd", true));
-            this.cbAcceptDd.Location = new System.Drawing.Point(12, 58);
+            this.cbAcceptDd.Location = new System.Drawing.Point(12, 97);
             this.cbAcceptDd.Name = "cbAcceptDd";
             this.cbAcceptDd.Size = new System.Drawing.Size(320, 17);
-            this.cbAcceptDd.TabIndex = 2;
-            this.cbAcceptDd.Text = "Accept \'&d\' anywhere";
+            this.cbAcceptDd.TabIndex = 3;
+            this.cbAcceptDd.Text = "Accept \'d\' any&where";
             this.cbAcceptDd.UseVisualStyleBackColor = true;
             // 
             // cbBackspaceInvalid
@@ -85,10 +83,10 @@ namespace VietTypeConfig {
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cbBackspaceInvalid.AutoEllipsis = true;
             this.cbBackspaceInvalid.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.settingsBindingSource, "BackspaceInvalid", true));
-            this.cbBackspaceInvalid.Location = new System.Drawing.Point(12, 81);
+            this.cbBackspaceInvalid.Location = new System.Drawing.Point(12, 120);
             this.cbBackspaceInvalid.Name = "cbBackspaceInvalid";
             this.cbBackspaceInvalid.Size = new System.Drawing.Size(320, 17);
-            this.cbBackspaceInvalid.TabIndex = 3;
+            this.cbBackspaceInvalid.TabIndex = 4;
             this.cbBackspaceInvalid.Text = "Backspaced &invalid word stays invalid";
             this.cbBackspaceInvalid.UseVisualStyleBackColor = true;
             // 
@@ -98,10 +96,10 @@ namespace VietTypeConfig {
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cbBackconvertOnBackspace.AutoEllipsis = true;
             this.cbBackconvertOnBackspace.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.settingsBindingSource, "BackconvertOnBackspace", true));
-            this.cbBackconvertOnBackspace.Location = new System.Drawing.Point(12, 104);
+            this.cbBackconvertOnBackspace.Location = new System.Drawing.Point(12, 143);
             this.cbBackconvertOnBackspace.Name = "cbBackconvertOnBackspace";
             this.cbBackconvertOnBackspace.Size = new System.Drawing.Size(320, 17);
-            this.cbBackconvertOnBackspace.TabIndex = 4;
+            this.cbBackconvertOnBackspace.TabIndex = 5;
             this.cbBackconvertOnBackspace.Text = "&Reconvert word on Backspace (Experimental)";
             this.cbBackconvertOnBackspace.UseVisualStyleBackColor = true;
             // 
@@ -112,7 +110,7 @@ namespace VietTypeConfig {
             this.btnOK.Location = new System.Drawing.Point(176, 226);
             this.btnOK.Name = "btnOK";
             this.btnOK.Size = new System.Drawing.Size(75, 23);
-            this.btnOK.TabIndex = 5;
+            this.btnOK.TabIndex = 6;
             this.btnOK.Text = "OK";
             this.btnOK.UseVisualStyleBackColor = true;
             this.btnOK.Click += new System.EventHandler(this.CloseForm);
@@ -124,7 +122,7 @@ namespace VietTypeConfig {
             this.btnCancel.Location = new System.Drawing.Point(257, 226);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
-            this.btnCancel.TabIndex = 6;
+            this.btnCancel.TabIndex = 7;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.CloseForm);
@@ -135,10 +133,33 @@ namespace VietTypeConfig {
             this.btnAbout.Location = new System.Drawing.Point(12, 226);
             this.btnAbout.Name = "btnAbout";
             this.btnAbout.Size = new System.Drawing.Size(75, 23);
-            this.btnAbout.TabIndex = 7;
+            this.btnAbout.TabIndex = 8;
             this.btnAbout.Text = "A&bout...";
             this.btnAbout.UseVisualStyleBackColor = true;
             this.btnAbout.Click += new System.EventHandler(this.btnAbout_Click);
+            // 
+            // btnEnable
+            // 
+            this.btnEnable.Location = new System.Drawing.Point(12, 12);
+            this.btnEnable.Name = "btnEnable";
+            this.btnEnable.Size = new System.Drawing.Size(105, 23);
+            this.btnEnable.TabIndex = 0;
+            this.btnEnable.Text = "&Disable VietType";
+            this.btnEnable.UseVisualStyleBackColor = true;
+            this.btnEnable.Click += new System.EventHandler(this.btnEnable_Click);
+            // 
+            // settingsBindingSource
+            // 
+            this.settingsBindingSource.DataSource = typeof(VietTypeConfig.Settings);
+            // 
+            // label1
+            // 
+            this.label1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.label1.Location = new System.Drawing.Point(0, 42);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(344, 2);
+            this.label1.TabIndex = 9;
+            this.label1.Text = "label1";
             // 
             // Form1
             // 
@@ -147,6 +168,8 @@ namespace VietTypeConfig {
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnCancel;
             this.ClientSize = new System.Drawing.Size(344, 261);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.btnEnable);
             this.Controls.Add(this.btnAbout);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnOK);
@@ -180,6 +203,8 @@ namespace VietTypeConfig {
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.BindingSource settingsBindingSource;
         private System.Windows.Forms.Button btnAbout;
+        private System.Windows.Forms.Button btnEnable;
+        private System.Windows.Forms.Label label1;
     }
 }
 

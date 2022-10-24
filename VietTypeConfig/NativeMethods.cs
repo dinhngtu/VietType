@@ -37,4 +37,18 @@ namespace VietTypeConfig {
         int SetValue(uint tid, ref object value);
         int GetValue(out object value);
     }
+
+    internal static class VietTypeRegistrar {
+        public const int S_OK = 0;
+        public const int S_FALSE = 1;
+
+        [DllImport("VietTypeATL32.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern int ActivateProfiles();
+
+        [DllImport("VietTypeATL32.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern int DeactivateProfiles();
+
+        [DllImport("VietTypeATL32.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern int IsProfileActivated();
+    }
 }

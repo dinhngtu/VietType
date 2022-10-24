@@ -1,5 +1,8 @@
 using System;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
+
+using static VietTypeConfig.VietTypeRegistrar;
 
 namespace VietTypeConfig {
     public partial class Form1 : Form {
@@ -9,6 +12,7 @@ namespace VietTypeConfig {
 
         private void Form1_Load(object sender, EventArgs e) {
             settingsBindingSource.DataSource = Settings.LoadSettings();
+            UpdateEnabled();
         }
 
         private void CloseForm(object sender, EventArgs e) {
@@ -29,6 +33,25 @@ namespace VietTypeConfig {
                 "VietType is distributed WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY " +
                 "or FITNESS FOR A PARTICULAR PURPOSE.See the included LICENSE file for more details.";
             MessageBox.Show(message, "About VietType", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void UpdateEnabled() {
+            var activated = VietTypeRegistrar.IsProfileActivated();
+            btnEnable.Enabled = activated >= 0;
+            btnEnable.Text = (activated == S_OK) ? "&Disable VietType" : "&Enable VietType";
+        }
+
+        private void btnEnable_Click(object sender, EventArgs e) {
+            var activated = IsProfileActivated();
+            var action = (activated == S_OK) ? "disable" : "enable";
+            var result = (activated == S_OK) ? DeactivateProfiles() : ActivateProfiles();
+            if (result == S_OK) {
+                MessageBox.Show($"Successfully {action}d VietType. Switch to VietType in the language bar to start using it.", "VietType", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            } else {
+                var message = Marshal.GetExceptionForHR(result).Message;
+                MessageBox.Show($"Cannot {action} VietType: {message}", "VietType", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            UpdateEnabled();
         }
     }
 }
