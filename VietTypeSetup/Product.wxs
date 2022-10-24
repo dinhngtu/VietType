@@ -32,7 +32,6 @@ SPDX-License-Identifier: GPL-3.0-only
 
     <Feature Id="ProductFeature" Title="VietType" Absent="disallow" AllowAdvertise="no">
       <ComponentGroupRef Id="ProductComponents" />
-      <ComponentGroupRef Id="ShortcutComponents" />
     </Feature>
 
     <Feature Id="ConfigFeature" Title="Configuration tool" AllowAdvertise="no">
@@ -60,7 +59,7 @@ SPDX-License-Identifier: GPL-3.0-only
     <?if $(var.Platform) = x86 ?>
     <Condition Message="32-bit setup can only run on a 32-bit OS.">Installed OR (NOT VersionNT64)</Condition>
     <?endif ?>
-    
+
     <InstallExecuteSequence>
       <ScheduleReboot After="InstallFinalize">ReplacedInUseFiles</ScheduleReboot>
 
@@ -120,21 +119,8 @@ SPDX-License-Identifier: GPL-3.0-only
 
   <Fragment>
     <DirectoryRef Id="TARGETDIR">
-      <Directory Id="ProgramMenuFolder">
-        <Directory Id="ShortcutFolder" Name="VietType" />
-      </Directory>
+      <Directory Id="ProgramMenuFolder" />
     </DirectoryRef>
-  </Fragment>
-
-  <Fragment>
-    <ComponentGroup Id="ShortcutComponents" Directory="ShortcutFolder">
-      <Component>
-        <Shortcut Id="ActivateShortcut" Name="Enable VietType" Target="[%SystemRoot]\System32\rundll32.exe" Arguments='"[!VietTypeATL32.dll]",RunActivateProfiles' WorkingDirectory="INSTALLFOLDER" />
-        <Shortcut Id="DeactivateShortcut" Name="Disable VietType" Target="[%SystemRoot]\System32\rundll32.exe" Arguments='"[!VietTypeATL32.dll]",RunDeactivateProfiles' WorkingDirectory="INSTALLFOLDER" />
-        <RemoveFolder Id="CleanupShortcuts" On="uninstall" />
-        <RegistryValue Root="HKCU" Key="Software\VietType" Name="RegistrarShortcut" Type="integer" Value="1" KeyPath="yes" />
-      </Component>
-    </ComponentGroup>
   </Fragment>
 
   <!-- ################################################################################ -->
@@ -144,7 +130,7 @@ SPDX-License-Identifier: GPL-3.0-only
     <ComponentGroup Id="ConfigComponents">
       <Component Win64="no" Directory="INSTALLFOLDER">
         <File Source="$(var.SolutionDir)\VietTypeConfig\bin\$(var.Configuration)\VietTypeConfig.exe" />
-        <Shortcut Id="ConfigShortcut" Directory="ShortcutFolder" Name="VietType Settings" WorkingDirectory="INSTALLFOLDER" Advertise="yes" Icon="logo.ico">
+        <Shortcut Id="ConfigShortcut" Directory="ProgramMenuFolder" Name="VietType Settings" WorkingDirectory="INSTALLFOLDER" Advertise="yes" Icon="logo.ico">
           <Icon Id="logo.ico" SourceFile="$(var.SolutionDir)\VietTypeConfig\logo.ico" />
         </Shortcut>
       </Component>
