@@ -22,7 +22,11 @@ namespace VietTypeConfig {
         private void Form1_FormClosing(object sender, FormClosingEventArgs e) {
             var settings = settingsBindingSource.DataSource as Settings;
             if (DialogResult == DialogResult.OK && settings != null) {
-                Settings.SaveSettings(settings);
+                try {
+                    Settings.SaveSettings(settings);
+                } catch (Exception ex) {
+                    MessageBox.Show($"Cannot save settings: {ex.Message}", "VietType", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 
@@ -36,9 +40,14 @@ namespace VietTypeConfig {
         }
 
         private void UpdateEnabled() {
-            var activated = VietTypeRegistrar.IsProfileActivated();
-            btnEnable.Enabled = activated >= 0;
-            btnEnable.Text = (activated == S_OK) ? "&Disable VietType" : "&Enable VietType";
+            try {
+                var activated = VietTypeRegistrar.IsProfileActivated();
+                btnEnable.Enabled = activated >= 0;
+                btnEnable.Text = (activated == S_OK) ? "&Disable VietType" : "&Enable VietType";
+            } catch (Exception ex) {
+                btnEnable.Enabled = false;
+                MessageBox.Show($"Cannot find VietType library: {ex.Message}", "VietType", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void btnEnable_Click(object sender, EventArgs e) {

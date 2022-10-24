@@ -25,6 +25,7 @@ namespace VietTypeConfig {
         private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
             this.cbDefaultEnabled = new System.Windows.Forms.CheckBox();
+            this.settingsBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.cbOaUy = new System.Windows.Forms.CheckBox();
             this.cbAcceptDd = new System.Windows.Forms.CheckBox();
             this.cbBackspaceInvalid = new System.Windows.Forms.CheckBox();
@@ -33,7 +34,6 @@ namespace VietTypeConfig {
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnAbout = new System.Windows.Forms.Button();
             this.btnEnable = new System.Windows.Forms.Button();
-            this.settingsBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.settingsBindingSource)).BeginInit();
             this.SuspendLayout();
@@ -50,6 +50,10 @@ namespace VietTypeConfig {
             this.cbDefaultEnabled.TabIndex = 1;
             this.cbDefaultEnabled.Text = "Vietnamese mode by de&fault";
             this.cbDefaultEnabled.UseVisualStyleBackColor = true;
+            // 
+            // settingsBindingSource
+            // 
+            this.settingsBindingSource.DataSource = typeof(VietTypeConfig.Settings);
             // 
             // cbOaUy
             // 
@@ -144,13 +148,9 @@ namespace VietTypeConfig {
             this.btnEnable.Name = "btnEnable";
             this.btnEnable.Size = new System.Drawing.Size(105, 23);
             this.btnEnable.TabIndex = 0;
-            this.btnEnable.Text = "&Disable VietType";
+            this.btnEnable.Text = "&Enable VietType";
             this.btnEnable.UseVisualStyleBackColor = true;
             this.btnEnable.Click += new System.EventHandler(this.btnEnable_Click);
-            // 
-            // settingsBindingSource
-            // 
-            this.settingsBindingSource.DataSource = typeof(VietTypeConfig.Settings);
             // 
             // label1
             // 
