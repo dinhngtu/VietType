@@ -15,3 +15,6 @@ EXPORTS
     RunUnregisterCategoriesW
     RunActivateProfilesW
     RunDeactivateProfilesW
+    ActivateProfiles
+    DeactivateProfiles
+    IsProfileActivated

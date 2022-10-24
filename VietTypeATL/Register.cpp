@@ -244,7 +244,7 @@ extern "C" __declspec(dllexport) void CALLBACK
     DoRunFunction(UnregisterCategories, hWnd, hInst, lpszCmdLine, nCmdShow);
 }
 
-static HRESULT ActivateProfiles() {
+extern "C" __declspec(dllexport) HRESULT __cdecl ActivateProfiles() {
     HRESULT hr;
     LSTATUS err;
 
@@ -280,7 +280,7 @@ extern "C" __declspec(dllexport) void CALLBACK
     DoRunFunction(ActivateProfiles, hWnd, hInst, lpszCmdLine, nCmdShow);
 }
 
-static HRESULT DeactivateProfiles() {
+extern "C" __declspec(dllexport) HRESULT __cdecl DeactivateProfiles() {
     HRESULT hr;
     LSTATUS err;
 
@@ -311,4 +311,24 @@ static HRESULT DeactivateProfiles() {
 extern "C" __declspec(dllexport) void CALLBACK
     RunDeactivateProfilesW(HWND hWnd, HINSTANCE hInst, LPWSTR lpszCmdLine, int nCmdShow) {
     DoRunFunction(DeactivateProfiles, hWnd, hInst, lpszCmdLine, nCmdShow);
+}
+
+extern "C" __declspec(dllexport) HRESULT __cdecl IsProfileActivated() {
+    HRESULT hr;
+
+    CComPtr<ITfInputProcessorProfileMgr> profileMgr;
+    hr = profileMgr.CoCreateInstance(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"profileMgr.CoCreateInstance failed");
+
+    TF_INPUTPROCESSORPROFILE profile;
+    hr = profileMgr->GetProfile(
+        TF_PROFILETYPE_INPUTPROCESSOR,
+        VietType::Globals::TextServiceLangId,
+        VietType::Globals::CLSID_TextService,
+        VietType::Globals::GUID_Profile,
+        NULL,
+        &profile);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"profileMgr->GetProfile failed");
+
+    return (profile.dwFlags & TF_IPP_FLAG_ENABLED) ? S_OK : S_FALSE;
 }
