@@ -211,13 +211,13 @@ HRESULT EditSurroundingWord(
     HRESULT_CHECK_RETURN(hr, L"%s", L"_compositionManager->StartComposition failed");
 
     hr = DoEditSurroundingWord(ec, compositionManager, context, controller, ignore);
-    if (FAILED(hr)) {
+    if (SUCCEEDED(hr)) {
+        compBackconvert.SetValue(0);
+    } else {
         DBG_HRESULT_CHECK(hr, L"%s", L"DoEditSurroundingWord failed");
         compositionManager->EndCompositionNow(ec);
         DBG_HRESULT_CHECK(hr, L"%s", L"compositionManager->EndCompositionNow failed");
     }
-
-    compBackconvert.SetValue(0);
 
     return hr;
 }
