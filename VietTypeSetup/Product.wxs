@@ -173,8 +173,8 @@ SPDX-License-Identifier: GPL-3.0-only
     <ComponentGroup Id="ConfigComponents">
       <Component Win64="no" Directory="INSTALLFOLDER">
         <File Source="$(var.SolutionDir)\VietTypeConfig\bin\$(var.Configuration)\VietTypeConfig.exe" />
-        <Shortcut Id="ConfigShortcut" Directory="ProgramMenuFolder" Name="VietType Settings" WorkingDirectory="INSTALLFOLDER" Advertise="yes" Icon="logo.ico">
-          <Icon Id="logo.ico" SourceFile="$(var.SolutionDir)\VietTypeConfig\logo.ico" />
+        <Shortcut Id="ConfigShortcut" Directory="ProgramMenuFolder" Name="VietType Settings" WorkingDirectory="INSTALLFOLDER" Advertise="yes" Icon="logo.exe">
+          <Icon Id="logo.exe" SourceFile="$(var.SolutionDir)\VietTypeConfig\logo.ico" />
         </Shortcut>
       </Component>
       <Component Win64="no" Directory="INSTALLFOLDER">
