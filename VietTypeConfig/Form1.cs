@@ -52,13 +52,16 @@ namespace VietTypeConfig {
 
         private void btnEnable_Click(object sender, EventArgs e) {
             var activated = IsProfileActivated();
-            var action = (activated == S_OK) ? "disable" : "enable";
             var result = (activated == S_OK) ? DeactivateProfiles() : ActivateProfiles();
             if (result == S_OK) {
-                MessageBox.Show($"Successfully {action}d VietType. Switch to VietType in the language bar to start using it.", "VietType", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                if (activated == S_OK) {
+                    MessageBox.Show($"Successfully disabled VietType.", "VietType", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                } else {
+                    MessageBox.Show($"Successfully enabled VietType. Switch to VietType in the language bar to start using it.", "VietType", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             } else {
                 var message = Marshal.GetExceptionForHR(result).Message;
-                MessageBox.Show($"Cannot {action} VietType: {message}", "VietType", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Cannot configure VietType: {message}", "VietType", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             UpdateEnabled();
         }
