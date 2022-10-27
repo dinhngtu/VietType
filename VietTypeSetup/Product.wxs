@@ -11,6 +11,15 @@ SPDX-License-Identifier: GPL-3.0-only
   <?define upgradeCode = "{E00AC838-881D-4301-AAC5-0A723BB0B0EF}" ?>
   <?endif ?>
 
+  <?define CLSID_TextService                    = "{C0DD01A1-0DEB-454B-8B42-D22CED1B4B23}" ?>
+  <?define GUID_Profile                         = "{8D93D10A-203B-4C5F-A122-8898EF9C56F5}" ?>
+  <?define GUID_TFCAT_TIP_KEYBOARD              = "{34745C63-B2F0-4784-8B67-5E12C8701A31}" ?>
+  <?define GUID_TFCAT_TIPCAP_UIELEMENTENABLED   = "{49D2F9CF-1F5E-11D7-A6D3-00065B84435C}" ?>
+  <?define GUID_TFCAT_TIPCAP_COMLESS            = "{364215D9-75BC-11D7-A6EF-00065B84435C}" ?>
+  <?define GUID_TFCAT_TIPCAP_IMMERSIVESUPPORT   = "{13A016DF-560B-46CD-947A-4C3AF1E0E35D}" ?>
+  <?define GUID_TFCAT_TIPCAP_SYSTRAYSUPPORT     = "{25504FB4-7BAB-4BC1-9C69-CF81890F0EF5}" ?>
+  <?define GUID_TFCAT_DISPLAYATTRIBUTEPROVIDER  = "{046B8C80-1647-40F7-9B21-B93B81AABC1B}" ?>
+
   <Product
     Id="*"
     Name="VietType"
@@ -32,6 +41,7 @@ SPDX-License-Identifier: GPL-3.0-only
 
     <Feature Id="ProductFeature" Title="VietType" Absent="disallow" AllowAdvertise="no">
       <ComponentGroupRef Id="ProductComponents" />
+      <ComponentGroupRef Id="RegistrationComponents" />
     </Feature>
 
     <Feature Id="ConfigFeature" Title="Configuration tool" AllowAdvertise="no">
@@ -59,20 +69,6 @@ SPDX-License-Identifier: GPL-3.0-only
     <?if $(var.Platform) = x86 ?>
     <Condition Message="32-bit setup can only run on a 32-bit OS.">Installed OR (NOT VersionNT64)</Condition>
     <?endif ?>
-
-    <InstallExecuteSequence>
-      <ScheduleReboot After="InstallFinalize">ReplacedInUseFiles</ScheduleReboot>
-
-      <Custom Action="RegisterCategoriesRollback" After="InstallFiles">(NOT Installed) OR REINSTALL</Custom>
-      <Custom Action="RegisterCategories" After="RegisterCategoriesRollback">(NOT Installed) OR REINSTALL</Custom>
-      <Custom Action="RegisterProfilesRollback" After="RegisterCategories">(NOT Installed) OR REINSTALL</Custom>
-      <Custom Action="RegisterProfiles" After="RegisterProfilesRollback">(NOT Installed) OR REINSTALL</Custom>
-
-      <Custom Action="UnregisterProfilesRollback" After="InstallInitialize">REMOVE OR REINSTALL</Custom>
-      <Custom Action="UnregisterProfiles" After="UnregisterProfilesRollback">REMOVE OR REINSTALL</Custom>
-      <Custom Action="UnregisterCategoriesRollback" After="UnregisterProfiles">REMOVE OR REINSTALL</Custom>
-      <Custom Action="UnregisterCategories" After="UnregisterCategoriesRollback">REMOVE OR REINSTALL</Custom>
-    </InstallExecuteSequence>
   </Product>
 
   <!-- ################################################################################ -->
@@ -110,6 +106,43 @@ SPDX-License-Identifier: GPL-3.0-only
 
       <Component Win64="no" Directory="INSTALLFOLDER">
         <File Source="$(var.SolutionDir)\LICENSE" DefaultLanguage="1033" DefaultVersion="$(var.productVersion)" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+
+  <!-- ################################################################################ -->
+  <!-- text service registration -->
+
+  <Fragment>
+    <ComponentGroup Id="RegistrationComponents">
+      <Component Win64="no" Directory="INSTALLFOLDER">
+        <RegistryKey Root="HKLM" Key="SOFTWARE\Microsoft\CTF\TIP\$(var.CLSID_TextService)">
+          <RegistryKey Key="Category">
+            <RegistryKey Key="Category\$(var.GUID_TFCAT_TIP_KEYBOARD)\$(var.CLSID_TextService)" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" />
+            <RegistryKey Key="Category\$(var.GUID_TFCAT_TIPCAP_UIELEMENTENABLED)\$(var.CLSID_TextService)" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" />
+            <RegistryKey Key="Category\$(var.GUID_TFCAT_TIPCAP_COMLESS)\$(var.CLSID_TextService)" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" />
+            <RegistryKey Key="Category\$(var.GUID_TFCAT_TIPCAP_IMMERSIVESUPPORT)\$(var.CLSID_TextService)" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" />
+            <RegistryKey Key="Category\$(var.GUID_TFCAT_TIPCAP_SYSTRAYSUPPORT)\$(var.CLSID_TextService)" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" />
+            <RegistryKey Key="Category\$(var.GUID_TFCAT_DISPLAYATTRIBUTEPROVIDER)\$(var.CLSID_TextService)" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" />
+            <RegistryKey Key="Item\$(var.CLSID_TextService)">
+              <RegistryKey Key="$(var.GUID_TFCAT_TIP_KEYBOARD)" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" />
+              <RegistryKey Key="$(var.GUID_TFCAT_TIPCAP_UIELEMENTENABLED)" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" />
+              <RegistryKey Key="$(var.GUID_TFCAT_TIPCAP_COMLESS)" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" />
+              <RegistryKey Key="$(var.GUID_TFCAT_TIPCAP_IMMERSIVESUPPORT)" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" />
+              <RegistryKey Key="$(var.GUID_TFCAT_TIPCAP_SYSTRAYSUPPORT)" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" />
+              <RegistryKey Key="$(var.GUID_TFCAT_DISPLAYATTRIBUTEPROVIDER)" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" />
+            </RegistryKey>
+          </RegistryKey>
+
+          <!-- 0x0000042a = vi-VN -->
+          <RegistryKey Key="LanguageProfile\0x0000042a\$(var.GUID_Profile)">
+            <RegistryValue Type="string" Name="Description" Value="VietType" />
+            <RegistryValue Type="integer" Name="Enable" Value="0" />
+            <RegistryValue Type="string" Name="IconFile" Value="[#VietTypeATL32.dll]" />
+            <!-- -202 -->
+            <RegistryValue Type="integer" Name="IconIndex" Value="4294967094" />
+          </RegistryKey>
+        </RegistryKey>
       </Component>
     </ComponentGroup>
   </Fragment>
@@ -158,31 +191,6 @@ SPDX-License-Identifier: GPL-3.0-only
       </Component>
       <?endif ?>
     </ComponentGroup>
-  </Fragment>
-
-  <!-- ################################################################################ -->
-  <!-- custom actions -->
-
-  <Fragment>
-    <SetProperty Id="RegisterCategories" Value='"[%SystemRoot]\System32\rundll32.exe" "[#VietTypeATL32.dll]",RunRegisterCategories' After="CostFinalize" Sequence="execute" />
-    <SetProperty Id="RegisterCategoriesRollback" Value='"[%SystemRoot]\System32\rundll32.exe" "[#VietTypeATL32.dll]",RunUnregisterCategories' After="CostFinalize" Sequence="execute" />
-    <SetProperty Id="UnregisterCategories" Value='"[%SystemRoot]\System32\rundll32.exe" "[#VietTypeATL32.dll]",RunUnregisterCategories' After="CostFinalize" Sequence="execute" />
-    <SetProperty Id="UnregisterCategoriesRollback" Value='"[%SystemRoot]\System32\rundll32.exe" "[#VietTypeATL32.dll]",RunRegisterCategories' After="CostFinalize" Sequence="execute" />
-
-    <SetProperty Id="RegisterProfiles" Value='"[%SystemRoot]\System32\rundll32.exe" "[#VietTypeATL32.dll]",RunRegisterProfiles' After="CostFinalize" Sequence="execute" />
-    <SetProperty Id="RegisterProfilesRollback" Value='"[%SystemRoot]\System32\rundll32.exe" "[#VietTypeATL32.dll]",RunUnregisterProfiles' After="CostFinalize" Sequence="execute" />
-    <SetProperty Id="UnregisterProfiles" Value='"[%SystemRoot]\System32\rundll32.exe" "[#VietTypeATL32.dll]",RunUnregisterProfiles' After="CostFinalize" Sequence="execute" />
-    <SetProperty Id="UnregisterProfilesRollback" Value='"[%SystemRoot]\System32\rundll32.exe" "[#VietTypeATL32.dll]",RunRegisterProfiles' After="CostFinalize" Sequence="execute" />
-
-    <CustomAction Id="RegisterCategories" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="deferred" />
-    <CustomAction Id="RegisterCategoriesRollback" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="rollback" />
-    <CustomAction Id="UnregisterCategories" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="deferred" />
-    <CustomAction Id="UnregisterCategoriesRollback" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="rollback" />
-
-    <CustomAction Id="RegisterProfiles" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="deferred" />
-    <CustomAction Id="RegisterProfilesRollback" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="rollback" />
-    <CustomAction Id="UnregisterProfiles" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="deferred" />
-    <CustomAction Id="UnregisterProfilesRollback" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="rollback" />
   </Fragment>
 
   <!-- ################################################################################ -->
