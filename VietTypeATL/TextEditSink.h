@@ -17,6 +17,7 @@ public:
     TextEditSink& operator=(const TextEditSink&) = delete;
     ~TextEditSink() = default;
 
+    DECLARE_NO_REGISTRY()
     DECLARE_NOT_AGGREGATABLE(TextEditSink)
     BEGIN_COM_MAP(TextEditSink)
     COM_INTERFACE_ENTRY(ITfTextEditSink)

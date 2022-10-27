@@ -3,9 +3,7 @@
 // Used by VietTypeATL.rc
 //
 #define IDS_PROJNAME                    100
-#define IDR_VIETTYPEATL                 101
 #define IDS_VIETTYPE_DESCRIPTION        102
-#define IDR_TEXTSERVICE                 106
 #define IDI_IMELOGO                     202
 #define IDI_ICONED                      220
 #define IDI_ICONEL                      221

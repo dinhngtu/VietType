@@ -18,6 +18,7 @@ public:
     ThreadMgrEventSink& operator=(const ThreadMgrEventSink&) = delete;
     ~ThreadMgrEventSink() = default;
 
+    DECLARE_NO_REGISTRY()
     DECLARE_NOT_AGGREGATABLE(ThreadMgrEventSink)
     BEGIN_COM_MAP(ThreadMgrEventSink)
     COM_INTERFACE_ENTRY(ITfThreadMgrEventSink)

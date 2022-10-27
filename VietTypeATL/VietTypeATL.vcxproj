@@ -313,20 +313,6 @@
     <ClCompile Include="ThreadMgrEventSink.cpp" />
     <ClCompile Include="ContextUtilities.cpp" />
     <ClCompile Include="VietTypeATL.cpp" />
-    <ClCompile Include="VietTypeATL_i.c">
-      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
-      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsManaged>
-      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsManaged>
-      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsManaged>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="VirtualDocument.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -358,22 +344,16 @@
     <ClInclude Include="ThreadMgrEventSink.h" />
     <ClInclude Include="ContextUtilities.h" />
     <ClInclude Include="Version.h" />
-    <ClInclude Include="VietTypeATL_i.h" />
     <ClInclude Include="VirtualDocument.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="VietTypeATL.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="TextService.rgs" />
     <None Include="version.rci">
       <FileType>Text</FileType>
     </None>
     <None Include="VietTypeATL.def" />
-    <None Include="VietTypeATL.rgs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Midl Include="VietTypeATL.idl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\ED.ico" />

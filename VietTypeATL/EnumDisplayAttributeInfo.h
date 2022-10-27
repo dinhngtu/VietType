@@ -15,6 +15,7 @@ public:
     EnumDisplayAttributeInfo& operator=(const EnumDisplayAttributeInfo&) = delete;
     ~EnumDisplayAttributeInfo() = default;
 
+    DECLARE_NO_REGISTRY()
     DECLARE_NOT_AGGREGATABLE(EnumDisplayAttributeInfo)
     BEGIN_COM_MAP(EnumDisplayAttributeInfo)
     COM_INTERFACE_ENTRY(IEnumTfDisplayAttributeInfo)

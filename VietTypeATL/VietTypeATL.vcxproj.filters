@@ -28,9 +28,6 @@
     <ClCompile Include="dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VietTypeATL_i.c">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
     <ClCompile Include="TextService.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -107,9 +104,6 @@
     </ClInclude>
     <ClInclude Include="dllmain.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="VietTypeATL_i.h">
-      <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="TextService.h">
       <Filter>Header Files</Filter>
@@ -193,23 +187,12 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="VietTypeATL.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="VietTypeATL.def">
       <Filter>Source Files</Filter>
-    </None>
-    <None Include="TextService.rgs">
-      <Filter>Resource Files</Filter>
     </None>
     <None Include="version.rci">
       <Filter>Resource Files</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Midl Include="VietTypeATL.idl">
-      <Filter>Source Files</Filter>
-    </Midl>
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\logo.ico">

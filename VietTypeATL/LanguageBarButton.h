@@ -26,6 +26,7 @@ public:
     LanguageBarButton& operator=(const LanguageBarButton&) = delete;
     ~LanguageBarButton() = default;
 
+    DECLARE_NO_REGISTRY()
     DECLARE_NOT_AGGREGATABLE(LanguageBarButton)
     BEGIN_COM_MAP(LanguageBarButton)
     COM_INTERFACE_ENTRY(ITfLangBarItemButton)

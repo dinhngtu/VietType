@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "resource.h"
-#include "VietTypeATL_i.h"
 #include "dllmain.h"
 #include "Globals.h"
 

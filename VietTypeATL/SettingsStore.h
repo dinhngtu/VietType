@@ -67,6 +67,7 @@ protected:
 
 class CompartmentNotifier : public CComObjectRootEx<CComSingleThreadModel>, public NotifiedSetting<long> {
 public:
+    DECLARE_NO_REGISTRY()
     DECLARE_NOT_AGGREGATABLE(CompartmentNotifier)
     BEGIN_COM_MAP(CompartmentNotifier)
     COM_INTERFACE_ENTRY(ITfCompartmentEventSink)
@@ -119,6 +120,7 @@ private:
 template <typename T>
 class RegistrySetting : public CComObjectRootEx<CComSingleThreadModel> {
 public:
+    DECLARE_NO_REGISTRY()
     DECLARE_NOT_AGGREGATABLE(RegistrySetting)
     BEGIN_COM_MAP(RegistrySetting)
     END_COM_MAP()
@@ -182,6 +184,7 @@ private:
 template <typename T>
 class CachedCompartmentSetting : public CComObjectRootEx<CComSingleThreadModel>, public NotifiedSetting<T> {
 public:
+    DECLARE_NO_REGISTRY()
     DECLARE_NOT_AGGREGATABLE(CachedCompartmentSetting)
     BEGIN_COM_MAP(CachedCompartmentSetting)
     COM_INTERFACE_ENTRY(ITfCompartmentEventSink)

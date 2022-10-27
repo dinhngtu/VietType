@@ -16,6 +16,7 @@ public:
     EditSession& operator=(const EditSession&) = delete;
     ~EditSession() = default;
 
+    DECLARE_NO_REGISTRY()
     DECLARE_NOT_AGGREGATABLE(EditSession)
     BEGIN_COM_MAP(EditSession)
     COM_INTERFACE_ENTRY(ITfEditSession)

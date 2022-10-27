@@ -18,6 +18,7 @@ public:
     EngineSettingsController& operator=(const EngineSettingsController&) = delete;
     ~EngineSettingsController() = default;
 
+    DECLARE_NO_REGISTRY()
     DECLARE_NOT_AGGREGATABLE(EngineSettingsController)
     BEGIN_COM_MAP(EngineSettingsController)
     END_COM_MAP()

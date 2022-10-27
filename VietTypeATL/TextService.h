@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "VietTypeATL_i.h"
 #include "Common.h"
 
 #if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)
@@ -36,8 +35,7 @@ public:
     TextService& operator=(const TextService&) = delete;
     ~TextService() = default;
 
-    DECLARE_REGISTRY_RESOURCEID(IDR_TEXTSERVICE)
-
+    DECLARE_NO_REGISTRY()
     DECLARE_NOT_AGGREGATABLE(TextService)
     BEGIN_COM_MAP(TextService)
     COM_INTERFACE_ENTRY(ITfTextInputProcessor)

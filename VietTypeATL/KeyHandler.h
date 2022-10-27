@@ -16,6 +16,7 @@ public:
     KeyHandlerEditSession& operator=(const KeyHandlerEditSession&) = delete;
     ~KeyHandlerEditSession() = default;
 
+    DECLARE_NO_REGISTRY()
     DECLARE_NOT_AGGREGATABLE(KeyHandlerEditSession)
     BEGIN_COM_MAP(KeyHandlerEditSession)
     COM_INTERFACE_ENTRY(ITfEditSession)

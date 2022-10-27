@@ -13,6 +13,7 @@ public:
     DisplayAttributeInfo& operator=(const DisplayAttributeInfo&) = delete;
     ~DisplayAttributeInfo() = default;
 
+    DECLARE_NO_REGISTRY()
     DECLARE_NOT_AGGREGATABLE(DisplayAttributeInfo)
     BEGIN_COM_MAP(DisplayAttributeInfo)
     COM_INTERFACE_ENTRY(ITfDisplayAttributeInfo)

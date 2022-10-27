@@ -30,6 +30,7 @@ public:
     EngineController& operator=(const EngineController&) = delete;
     ~EngineController() = default;
 
+    DECLARE_NO_REGISTRY()
     DECLARE_NOT_AGGREGATABLE(EngineController)
     BEGIN_COM_MAP(EngineController)
     COM_INTERFACE_ENTRY(ITfCompartmentEventSink)

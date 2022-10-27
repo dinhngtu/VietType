@@ -14,6 +14,7 @@ public:
     CompositionManager& operator=(const CompositionManager&) = delete;
     ~CompositionManager() = default;
 
+    DECLARE_NO_REGISTRY()
     DECLARE_NOT_AGGREGATABLE(CompositionManager)
     BEGIN_COM_MAP(CompositionManager)
     COM_INTERFACE_ENTRY(ITfCompositionSink)
