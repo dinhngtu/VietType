@@ -101,16 +101,14 @@ SPDX-License-Identifier: GPL-3.0-only
   <Fragment>
     <ComponentGroup Id="ProductComponents">
       <Component Id="VietTypeATL32.dll" Win64="no" Directory="INSTALLFOLDER">
-        <File Source="$(var.SolutionDir)\Win32\$(var.Configuration)\VietTypeATL32.dll">
-          <Class Id="{C0DD01A1-0DEB-454B-8B42-D22CED1B4B23}" Context="InprocServer32" Description="VietType" ThreadingModel="apartment" />
-        </File>
+        <File Source="$(var.SolutionDir)\Win32\$(var.Configuration)\VietTypeATL32.dll" />
+        <Class Id="{C0DD01A1-0DEB-454B-8B42-D22CED1B4B23}" Context="InprocServer32" Description="VietType" ThreadingModel="apartment" Advertise="yes" />
       </Component>
 
       <?if $(var.Platform) = x64 ?>
       <Component Id="VietTypeATL64.dll" Win64="yes" Directory="INSTALLFOLDER64">
-        <File Source="$(var.SolutionDir)\x64\$(var.Configuration)\VietTypeATL64.dll">
-          <Class Id="{C0DD01A1-0DEB-454B-8B42-D22CED1B4B23}" Context="InprocServer32" Description="VietType" ThreadingModel="apartment" />
-        </File>
+        <File Source="$(var.SolutionDir)\x64\$(var.Configuration)\VietTypeATL64.dll" />
+        <Class Id="{C0DD01A1-0DEB-454B-8B42-D22CED1B4B23}" Context="InprocServer32" Description="VietType" ThreadingModel="apartment" Advertise="yes" />
       </Component>
       <?endif ?>
 
