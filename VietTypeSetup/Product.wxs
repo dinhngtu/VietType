@@ -31,11 +31,14 @@ SPDX-License-Identifier: GPL-3.0-only
     <Package InstallerVersion="400" Compressed="yes" InstallScope="perMachine" Comments="$(var.Configuration) Ver-$(var.productVersion) Rev-$(var.vcsRev) $(var.Platform)" />
 
     <MajorUpgrade
+      AllowSameVersionUpgrades="yes"
       DowngradeErrorMessage="A newer version of [ProductName] is already installed."
       Schedule="afterInstallInitialize" />
+    <?if $(var.Platform) = x86 ?>
     <Upgrade Id="{E00AC838-881D-4301-AAC5-0A723BB0B0EF}">
       <UpgradeVersion Maximum="$(var.productVersion)" Property="VIETTYPE_OLD_UPGRADE_CODE_DETECTED" MigrateFeatures="yes" />
     </Upgrade>
+    <?endif ?>
 
     <MediaTemplate EmbedCab="yes" />
 
@@ -52,7 +55,20 @@ SPDX-License-Identifier: GPL-3.0-only
       <ComponentGroupRef Id="DebugSymbols" />
     </Feature>
 
-    <UI>
+    <UIRef Id="VietTypeSetupUI" />
+
+    <Condition Message="VietType is only compatible with Windows 8 and newer.">Installed OR (VersionNT >= 602)</Condition>
+
+    <?if $(var.Platform) = x86 ?>
+    <Condition Message="32-bit setup can only run on a 32-bit OS.">Installed OR (NOT VersionNT64)</Condition>
+    <?endif ?>
+  </Product>
+
+  <!-- ################################################################################ -->
+  <!-- setup UI -->
+
+  <Fragment>
+    <UI Id="VietTypeSetupUI">
       <UIRef Id="WixUI_Minimal" />
       <Publish
         Dialog="ExitDialog"
@@ -63,13 +79,7 @@ SPDX-License-Identifier: GPL-3.0-only
       </Publish>
     </UI>
     <WixVariable Id="WixUILicenseRtf" Value="licembed.rtf" />
-
-    <Condition Message="VietType is only compatible with Windows 8 and newer.">Installed OR (VersionNT >= 602)</Condition>
-
-    <?if $(var.Platform) = x86 ?>
-    <Condition Message="32-bit setup can only run on a 32-bit OS.">Installed OR (NOT VersionNT64)</Condition>
-    <?endif ?>
-  </Product>
+  </Fragment>
 
   <!-- ################################################################################ -->
   <!-- install paths -->
