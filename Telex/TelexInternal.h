@@ -33,8 +33,8 @@ struct VInfo {
     C2Mode c2mode;
 };
 
-template <typename K, typename V> using generic_map_type = std::unordered_map<K, V>;
-template <typename T> using generic_set_type = std::unordered_set<T>;
+template <typename K, typename V> using generic_map_type = std::map<K, V>;
+template <typename T> using generic_set_type = std::set<T>;
 
 } // namespace Telex
 } // namespace VietType
