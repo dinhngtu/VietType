@@ -87,8 +87,11 @@ HRESULT EditBlocked(
     hr = context->GetSelection(ec, TF_DEFAULT_SELECTION, 1, &sel, &fetched);
     EB_HRESULT_CHECK_COMMIT(hr, controller, L"%s", L"context->GetSelection failed");
 
+    CComPtr<ITfRange> range;
+    range.Attach(sel.range);
+
     CComVariant var;
-    hr = prop->GetValue(ec, sel.range, &var);
+    hr = prop->GetValue(ec, range, &var);
     EB_HRESULT_CHECK_COMMIT(hr, controller, L"%s", L"prop->GetValue failed");
 
     if (var.vt != VT_UNKNOWN) {
