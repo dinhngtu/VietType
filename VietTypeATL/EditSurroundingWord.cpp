@@ -141,13 +141,6 @@ static HRESULT DoEditSurroundingWord(
     }
     */
 
-    hr = compositionManager->SetRangeDisplayAttribute(ec, context, range);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"SetRangeDisplayAttribute failed");
-
-    // move selection to end
-    hr = compositionManager->MoveCaretToEnd(ec);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"compositionManager->MoveCaretToEnd failed");
-
     // reinitialize engine with text
     controller->GetEngine().Reset();
 #pragma warning(push)
