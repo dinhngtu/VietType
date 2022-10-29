@@ -39,6 +39,7 @@ public:
 private:
     HRESULT ComposeKey(_In_ TfEditCookie ec);
     HRESULT Commit(_In_ TfEditCookie ec);
+    HRESULT SetCompositionLangid(_In_ TfEditCookie ec, _In_ WORD langid);
 
 private:
     CComPtr<CompositionManager> _compositionManager;

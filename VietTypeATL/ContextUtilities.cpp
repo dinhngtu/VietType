@@ -63,11 +63,44 @@ HRESULT OnNewContext(
         DBG_HRESULT_CHECK(hr, L"%s", L"compBackconvert.Initialize failed");
     }
 
+    hr = SetLangidRequest(context, compositionManager->GetClientId(), true);
+    DBG_HRESULT_CHECK(hr, L"%s", L"SetLangidRequest failed");
+
     hr = CompositionManager::RequestEditSession(EditSessions::EditBlocked, compositionManager, context, controller);
     if (FAILED(hr)) {
         DBG_HRESULT_CHECK(hr, L"%s", L"CompositionManager::RequestEditSession failed");
         controller->SetBlocked(EngineController::BlockedKind::Free);
     }
+
+    return S_OK;
+}
+
+HRESULT GetLangidRequest(_In_ ITfContext* pic, _In_ TfClientId clientId, _Out_ BOOL* result) {
+    HRESULT hr;
+
+    *result = FALSE;
+
+    Compartment<long> compNeedsSetLangid;
+    hr = compNeedsSetLangid.Initialize(pic, clientId, Globals::GUID_Compartment_NeedsSetLangid);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"compNeedsSetLangid.Initialize failed");
+
+    long val;
+    hr = compNeedsSetLangid.GetValue(&val);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"compNeedsSetLangid.GetValue failed");
+
+    *result = val == -1;
+    return S_OK;
+}
+
+HRESULT SetLangidRequest(_In_ ITfContext* pic, _In_ TfClientId clientId, _In_ bool needed) {
+    HRESULT hr;
+
+    Compartment<long> compNeedsSetLangid;
+    hr = compNeedsSetLangid.Initialize(pic, clientId, Globals::GUID_Compartment_NeedsSetLangid);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"compNeedsSetLangid.Initialize failed");
+
+    hr = compNeedsSetLangid.SetValue(needed ? -1 : 0);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"compNeedsSetLangid.SetValue failed");
 
     return S_OK;
 }

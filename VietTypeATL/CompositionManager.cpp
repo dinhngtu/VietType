@@ -150,14 +150,10 @@ HRESULT CompositionManager::EmptyCompositionText(_In_ TfEditCookie ec) {
     return S_OK;
 }
 
-HRESULT CompositionManager::MoveCaretToEnd(_In_ TfEditCookie ec) {
+HRESULT CompositionManager::MoveCaretToEnd(_In_ TfEditCookie ec, _In_ ITfRange* range) {
     HRESULT hr;
 
     if (_composition) {
-        CComPtr<ITfRange> range;
-        hr = _composition->GetRange(&range);
-        HRESULT_CHECK_RETURN(hr, L"%s", L"_composition->GetRange failed");
-
         CComPtr<ITfRange> rangeClone;
         hr = range->Clone(&rangeClone);
         HRESULT_CHECK_RETURN(hr, L"%s", L"range->Clone failed");
@@ -189,7 +185,7 @@ HRESULT CompositionManager::EndCompositionNow(_In_ TfEditCookie ec) {
         hr = ClearRangeDisplayAttribute(ec, _context, range);
         HRESULT_CHECK_RETURN(hr, L"%s", L"ClearRangeDisplayAttribute failed");
 
-        hr = MoveCaretToEnd(ec);
+        hr = MoveCaretToEnd(ec, range);
         DBG_HRESULT_CHECK(hr, L"%s", L"MoveCaretToEnd failed");
 
         hr = _composition->EndComposition(ec);
@@ -216,7 +212,7 @@ HRESULT CompositionManager::SetCompositionText(_In_ TfEditCookie ec, _In_z_ LPCW
         hr = SetRangeDisplayAttribute(ec, _context, range, _composingAttribute);
         HRESULT_CHECK_RETURN(hr, L"%s", L"SetRangeDisplayAttribute failed");
 
-        hr = MoveCaretToEnd(ec);
+        hr = MoveCaretToEnd(ec, range);
         DBG_HRESULT_CHECK(hr, L"%s", L"MoveCaretToEnd failed");
     }
 
@@ -260,6 +256,21 @@ HRESULT CompositionManager::SetRangeDisplayAttribute(
     HRESULT_CHECK_RETURN(hr, L"%s", L"context->GetProperty failed");
 
     CComVariant v = static_cast<int>(atom);
+    hr = prop->SetValue(ec, range, &v);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"prop->SetValue failed");
+
+    return S_OK;
+}
+
+HRESULT CompositionManager::SetRangeLangid(
+    _In_ TfEditCookie ec, _In_ ITfContext* context, _In_ ITfRange* range, _In_ WORD langid) {
+    HRESULT hr;
+
+    CComPtr<ITfProperty> prop;
+    hr = context->GetProperty(GUID_PROP_LANGID, &prop);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"context->GetProperty failed");
+
+    CComVariant v = static_cast<int>(langid);
     hr = prop->SetValue(ec, range, &v);
     HRESULT_CHECK_RETURN(hr, L"%s", L"prop->SetValue failed");
 

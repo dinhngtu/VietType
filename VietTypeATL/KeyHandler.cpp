@@ -71,6 +71,19 @@ HRESULT KeyHandlerEditSession::Uninitialize() {
     return S_OK;
 }
 
+HRESULT KeyHandlerEditSession::SetCompositionLangid(_In_ TfEditCookie ec, _In_ WORD langid) {
+    HRESULT hr;
+
+    CComPtr<ITfRange> range;
+    hr = _compositionManager->GetRange(&range);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_compositionManager->GetRange failed");
+
+    hr = _compositionManager->SetRangeLangid(ec, _context, range, langid);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_compositionManager->SetRangeLangid failed");
+
+    return S_OK;
+}
+
 HRESULT KeyHandlerEditSession::ComposeKey(_In_ TfEditCookie ec) {
     HRESULT hr;
 
@@ -82,6 +95,10 @@ HRESULT KeyHandlerEditSession::ComposeKey(_In_ TfEditCookie ec) {
             auto str = _controller->GetEngine().Peek();
             hr = _compositionManager->EnsureCompositionText(ec, _context, &str[0], static_cast<LONG>(str.length()));
             DBG_HRESULT_CHECK(hr, L"%s", L"_compositionManager->EnsureCompositionText failed");
+            if (SUCCEEDED(hr)) {
+                hr = SetCompositionLangid(ec, Globals::TextServiceLangId);
+                DBG_HRESULT_CHECK(hr, L"%s", L"SetCompositionLangid failed");
+            }
         } else {
             // backspace returns Valid on an empty buffer
             _controller->GetEngine().Reset();
@@ -99,6 +116,10 @@ HRESULT KeyHandlerEditSession::ComposeKey(_In_ TfEditCookie ec) {
         auto str = _controller->GetEngine().RetrieveRaw();
         hr = _compositionManager->EnsureCompositionText(ec, _context, &str[0], static_cast<LONG>(str.length()));
         DBG_HRESULT_CHECK(hr, L"%s", L"_compositionManager->EnsureCompositionText failed");
+        if (SUCCEEDED(hr)) {
+            hr = SetCompositionLangid(ec, GetUserDefaultLangID());
+            DBG_HRESULT_CHECK(hr, L"%s", L"SetCompositionLangid failed");
+        }
         break;
     }
 

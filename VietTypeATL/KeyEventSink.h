@@ -25,7 +25,12 @@ public:
     DECLARE_PROTECT_FINAL_CONSTRUCT()
 
     HRESULT OnKeyDownCommon(
-        _In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten, _Out_ BOOL* isBackconvert);
+        _In_ ITfContext* pic,
+        _In_ WPARAM wParam,
+        _In_ LPARAM lParam,
+        _Out_ BOOL* pfEaten,
+        _Out_ BOOL* isBackconvert,
+        _Out_ BOOL* needsSetLangid);
 
     // Inherited via ITfKeyEventSink
     virtual STDMETHODIMP OnSetFocus(_In_ BOOL fForeground) override;

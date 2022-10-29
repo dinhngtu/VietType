@@ -45,7 +45,7 @@ public:
 
     HRESULT StartCompositionNow(_In_ TfEditCookie ec, _In_ ITfContext* context);
     HRESULT EmptyCompositionText(_In_ TfEditCookie ec);
-    HRESULT MoveCaretToEnd(_In_ TfEditCookie ec);
+    HRESULT MoveCaretToEnd(_In_ TfEditCookie ec, _In_ ITfRange* range);
     HRESULT EndCompositionNow(_In_ TfEditCookie ec);
     HRESULT SetCompositionText(_In_ TfEditCookie ec, _In_z_ LPCWSTR str, _In_ LONG length);
     // this uses context to open a new edit session if there's no existing session
@@ -53,6 +53,7 @@ public:
     HRESULT SetRangeDisplayAttribute(_In_ TfEditCookie ec, _In_ ITfContext* context, _In_ ITfRange* range) {
         return this->SetRangeDisplayAttribute(ec, context, range, _composingAttribute);
     }
+    HRESULT SetRangeLangid(_In_ TfEditCookie ec, _In_ ITfContext* context, _In_ ITfRange* range, _In_ WORD langid);
 
     template <typename... Args>
     static HRESULT RequestEditSession(

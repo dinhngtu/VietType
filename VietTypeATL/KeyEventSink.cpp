@@ -66,17 +66,29 @@ STDMETHODIMP KeyEventSink::OnSetFocus(_In_ BOOL fForeground) {
 }
 
 HRESULT KeyEventSink::OnKeyDownCommon(
-    _In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten, _Out_ BOOL* isBackconvert) {
+    _In_ ITfContext* pic,
+    _In_ WPARAM wParam,
+    _In_ LPARAM lParam,
+    _Out_ BOOL* pfEaten,
+    _Out_ BOOL* isBackconvert,
+    _Out_ BOOL* needsSetLangid) {
     HRESULT hr;
     *isBackconvert = FALSE;
-
-    if (!_controller->IsEnabled()) {
-        *pfEaten = FALSE;
-        return S_OK;
-    }
+    *needsSetLangid = FALSE;
 
     if (!GetKeyboardState(_keyState)) {
         WINERROR_GLE_RETURN_HRESULT(L"%s", L"GetKeyboardState failed");
+    }
+
+    if (!_controller->IsEnabled()) {
+        *pfEaten = FALSE;
+        GetLangidRequest(pic, _compositionManager->GetClientId(), needsSetLangid);
+        if (*needsSetLangid) {
+            wchar_t c;
+            auto isTyping = ToUnicode(wParam, lParam, _keyState, &c, 1, 1 << 2) > 0;
+            *pfEaten = *needsSetLangid = isTyping;
+        }
+        return S_OK;
     }
 
     Compartment<long> compBackconvert;
@@ -113,8 +125,8 @@ finish:
 
 STDMETHODIMP KeyEventSink::OnTestKeyDown(
     _In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten) {
-    BOOL isBackconvert;
-    HRESULT hr = OnKeyDownCommon(pic, wParam, lParam, pfEaten, &isBackconvert);
+    BOOL isBackconvert, needsSetLangid;
+    HRESULT hr = OnKeyDownCommon(pic, wParam, lParam, pfEaten, &isBackconvert, &needsSetLangid);
     HRESULT_CHECK_RETURN(hr, L"%s", L"OnKeyDownCommon failed");
 
     // break off the composition early at OnTestKeyDown on an uneaten key
@@ -149,8 +161,8 @@ STDMETHODIMP KeyEventSink::OnTestKeyUp(
 
 STDMETHODIMP KeyEventSink::OnKeyDown(
     _In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten) {
-    BOOL isBackconvert;
-    HRESULT hr = OnKeyDownCommon(pic, wParam, lParam, pfEaten, &isBackconvert);
+    BOOL isBackconvert, needsSetLangid;
+    HRESULT hr = OnKeyDownCommon(pic, wParam, lParam, pfEaten, &isBackconvert, &needsSetLangid);
     HRESULT_CHECK_RETURN(hr, L"%s", L"OnKeyDownCommon failed");
 
     DBG_DPRINT(L"OnKeyDown wParam = %lx %s", wParam, *pfEaten ? L"eaten" : L"not eaten");
@@ -182,6 +194,20 @@ STDMETHODIMP KeyEventSink::OnKeyDown(
                     WINERROR_GLE_RETURN_HRESULT(L"%s", L"SendInput failed");
                 }
             }
+        } else if (needsSetLangid) {
+            HRESULT hrSession;
+            hr = CompositionManager::RequestEditSessionEx(
+                EditSessions::EditLangid,
+                _compositionManager,
+                pic,
+                TF_ES_SYNC | TF_ES_READWRITE,
+                &hrSession,
+                wParam,
+                lParam,
+                static_cast<const BYTE*>(&_keyState[0]),
+                _controller.p);
+            HRESULT_CHECK_RETURN(hr, L"%s", L"CompositionManager::RequestEditSession failed");
+            DBG_HRESULT_CHECK(hrSession, L"%s", L"EditSessions::SetLangid failed");
         } else {
             hr = CallKeyEdit(pic, wParam, lParam, _keyState);
             HRESULT_CHECK_RETURN(hr, L"%s", L"CallKeyEdit failed");
@@ -205,6 +231,8 @@ STDMETHODIMP KeyEventSink::OnPreservedKey(_In_ ITfContext* pic, _In_ REFGUID rgu
         DBG_HRESULT_CHECK(hr, L"%s", L"_compositionManager->EndComposition failed");
         hr = _controller->ToggleUserEnabled();
         DBG_HRESULT_CHECK(hr, L"%s", L"_engine->ToggleEnabled failed");
+        hr = SetLangidRequest(pic, _compositionManager->GetClientId(), true);
+        DBG_HRESULT_CHECK(hr, L"%s", L"SetLangidRequest failed");
 
     } else if (GUID_KeyEventSink_PreservedKey_EditBack == rguid) {
         *pfEaten = TRUE;

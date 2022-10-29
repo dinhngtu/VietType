@@ -24,5 +24,14 @@ HRESULT EditSurroundingWord(
     _In_ VietType::EngineController* controller,
     _In_ int ignore);
 
+HRESULT EditLangid(
+    _In_ TfEditCookie ec,
+    _In_ CompositionManager* compositionManager,
+    _In_ ITfContext* context,
+    _In_ WPARAM wParam,
+    _In_ LPARAM lParam,
+    _In_reads_(256) const BYTE* keyState,
+    _In_ EngineController* controller);
+
 } // namespace EditSessions
 } // namespace VietType
