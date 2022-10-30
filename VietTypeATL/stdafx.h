@@ -15,11 +15,15 @@
 
 #include "targetver.h"
 
+#define _ATL_ALL_WARNINGS
+
 #define _ATL_APARTMENT_THREADED
 
 #define _ATL_NO_AUTOMATIC_NAMESPACE
 
 #define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS // some CString constructors will be explicit
+
+#define _ATL_ENABLE_PTM_WARNING
 
 #define ATL_NO_ASSERT_ON_DESTROY_NONEXISTENT_WINDOW
 
