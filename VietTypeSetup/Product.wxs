@@ -12,6 +12,8 @@ SPDX-License-Identifier: GPL-3.0-only
   <?endif ?>
 
   <?define CLSID_TextService                    = "{C0DD01A1-0DEB-454B-8B42-D22CED1B4B23}" ?>
+  <?define IID_IVietTypeRegistrar               = "{05B4B2A2-8AC0-4A11-8F5C-268C4FD4AFAC}" ?>
+  <?define CLSID_VietTypeRegistrar              = "{F912E34C-E4CF-4C66-884C-2D54D28154DC}" ?>
   <?define GUID_Profile                         = "{8D93D10A-203B-4C5F-A122-8898EF9C56F5}" ?>
   <?define GUID_TFCAT_TIP_KEYBOARD              = "{34745C63-B2F0-4784-8B67-5E12C8701A31}" ?>
   <?define GUID_TFCAT_TIPCAP_UIELEMENTENABLED   = "{49D2F9CF-1F5E-11D7-A6D3-00065B84435C}" ?>
@@ -42,17 +44,17 @@ SPDX-License-Identifier: GPL-3.0-only
 
     <MediaTemplate EmbedCab="yes" />
 
-    <Feature Id="ProductFeature" Title="VietType" Absent="disallow" AllowAdvertise="no">
+    <Feature Id="ProductFeature" Title="VietType" Absent="disallow" AllowAdvertise="yes">
       <ComponentGroupRef Id="ProductComponents" />
       <ComponentGroupRef Id="RegistrationComponents" />
+
+      <Feature Id="DebugSymbolsFeature" Title="Debug symbols" AllowAdvertise="yes">
+        <ComponentGroupRef Id="DebugSymbols" />
+      </Feature>
     </Feature>
 
-    <Feature Id="ConfigFeature" Title="Configuration tool" AllowAdvertise="no">
+    <Feature Id="ConfigFeature" Title="Configuration tool" AllowAdvertise="yes">
       <ComponentGroupRef Id="ConfigComponents" />
-    </Feature>
-
-    <Feature Id="DebugSymbolsFeature" Title="Debug symbols" AllowAdvertise="no">
-      <ComponentGroupRef Id="DebugSymbols" />
     </Feature>
 
     <UIRef Id="VietTypeSetupUI" />
@@ -102,13 +104,19 @@ SPDX-License-Identifier: GPL-3.0-only
     <ComponentGroup Id="ProductComponents">
       <Component Id="VietTypeATL32.dll" Win64="no" Directory="INSTALLFOLDER">
         <File Source="$(var.SolutionDir)\Win32\$(var.Configuration)\VietTypeATL32.dll" />
-        <Class Id="{C0DD01A1-0DEB-454B-8B42-D22CED1B4B23}" Context="InprocServer32" Description="VietType" ThreadingModel="apartment" Advertise="yes" />
+        <Class Id="$(var.CLSID_TextService)" Context="InprocServer32" Description="VietType" ThreadingModel="apartment" Advertise="yes" />
+        <Class Id="$(var.CLSID_VietTypeRegistrar)" Context="InprocServer32" Description="VietType Registrar" ThreadingModel="apartment" Advertise="yes">
+          <Interface Id="$(var.IID_IVietTypeRegistrar)" Name="IVietTypeRegistrar" />
+        </Class>
       </Component>
 
       <?if $(var.Platform) = x64 ?>
       <Component Id="VietTypeATL64.dll" Win64="yes" Directory="INSTALLFOLDER64">
         <File Source="$(var.SolutionDir)\x64\$(var.Configuration)\VietTypeATL64.dll" />
-        <Class Id="{C0DD01A1-0DEB-454B-8B42-D22CED1B4B23}" Context="InprocServer32" Description="VietType" ThreadingModel="apartment" Advertise="yes" />
+        <Class Id="$(var.CLSID_TextService)" Context="InprocServer32" Description="VietType" ThreadingModel="apartment" Advertise="yes" />
+        <Class Id="$(var.CLSID_VietTypeRegistrar)" Context="InprocServer32" Description="VietType Registrar" ThreadingModel="apartment" Advertise="yes">
+          <Interface Id="$(var.IID_IVietTypeRegistrar)" Name="IVietTypeRegistrar" />
+        </Class>
       </Component>
       <?endif ?>
 
@@ -198,6 +206,12 @@ SPDX-License-Identifier: GPL-3.0-only
               DefaultLanguage="!(bind.fileLanguage.VietTypeATL32.dll)" DefaultVersion="!(bind.fileVersion.VietTypeATL64.dll)" />
       </Component>
       <?endif ?>
+
+      <Component Win64="no" Directory="INSTALLFOLDER">
+        <File Source="Symbols.rtf"
+              DefaultLanguage="!(bind.fileLanguage.VietTypeATL32.dll)" DefaultVersion="!(bind.fileVersion.VietTypeATL32.dll)" />
+        <Shortcut Id="SymbolsShortcut" Directory="ProgramMenuFolder" Name="VietType Symbols README" WorkingDirectory="INSTALLFOLDER" Advertise="yes" />
+      </Component>
     </ComponentGroup>
   </Fragment>
 

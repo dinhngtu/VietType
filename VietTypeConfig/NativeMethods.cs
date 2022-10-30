@@ -38,17 +38,17 @@ namespace VietTypeConfig {
         int GetValue(out object value);
     }
 
-    internal static class VietTypeRegistrar {
+    internal static class Constants {
         public const int S_OK = 0;
         public const int S_FALSE = 1;
+    }
 
-        [DllImport("VietTypeATL32.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern int ActivateProfiles();
-
-        [DllImport("VietTypeATL32.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern int DeactivateProfiles();
-
-        [DllImport("VietTypeATL32.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern int IsProfileActivated();
+    [ComImport]
+    [Guid("05B4B2A2-8AC0-4A11-8F5C-268C4FD4AFAC")]
+    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    internal interface IVietTypeRegistrar {
+        int ActivateProfiles();
+        int DeactivateProfiles();
+        int IsProfileActivated();
     }
 }

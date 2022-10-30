@@ -2,10 +2,16 @@ using System;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-using static VietTypeConfig.VietTypeRegistrar;
+using static VietTypeConfig.Constants;
 
 namespace VietTypeConfig {
     public partial class Form1 : Form {
+        private static readonly Guid CLSID_Registrar = Guid.Parse("{F912E34C-E4CF-4C66-884C-2D54D28154DC}");
+
+        readonly Lazy<IVietTypeRegistrar> registrar = new Lazy<IVietTypeRegistrar>(() => {
+            return Activator.CreateInstance(Type.GetTypeFromCLSID(CLSID_Registrar, true)) as IVietTypeRegistrar;
+        });
+
         public Form1() {
             InitializeComponent();
         }
@@ -41,7 +47,7 @@ namespace VietTypeConfig {
 
         private void UpdateEnabled() {
             try {
-                var activated = VietTypeRegistrar.IsProfileActivated();
+                var activated = registrar.Value.IsProfileActivated();
                 btnEnable.Enabled = activated >= 0;
                 btnEnable.Text = (activated == S_OK) ? "&Disable VietType" : "&Enable VietType";
             } catch (Exception ex) {
@@ -51,8 +57,8 @@ namespace VietTypeConfig {
         }
 
         private void btnEnable_Click(object sender, EventArgs e) {
-            var activated = IsProfileActivated();
-            var result = (activated == S_OK) ? DeactivateProfiles() : ActivateProfiles();
+            var activated = registrar.Value.IsProfileActivated();
+            var result = (activated == S_OK) ? registrar.Value.DeactivateProfiles() : registrar.Value.ActivateProfiles();
             if (result == S_OK) {
                 if (activated == S_OK) {
                     MessageBox.Show($"Successfully disabled VietType.", "VietType", MessageBoxButtons.OK, MessageBoxIcon.Information);

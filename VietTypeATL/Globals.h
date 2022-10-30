@@ -12,6 +12,8 @@ extern HINSTANCE DllInstance;
 extern const CLSID CLSID_TextService;
 extern const GUID GUID_Profile;
 
+extern const CLSID CLSID_VietTypeRegistrar;
+
 extern const GUID GUID_LBI_INPUTMODE;
 extern const GUID GUID_PROP_INPUTSCOPE;
 
