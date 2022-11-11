@@ -7,6 +7,7 @@
 #include <set>
 #include <unordered_set>
 #include <vector>
+#include <string>
 
 namespace VietType {
 namespace Telex {
