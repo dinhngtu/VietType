@@ -27,7 +27,6 @@ extern const generic_map_type<wchar_t, std::wstring> transitions_tones;
 extern const generic_set_type<std::wstring> valid_c1;
 extern const generic_map_type<std::wstring, VInfo> valid_v;    // value: accent position
 extern const generic_map_type<std::wstring, VInfo> valid_v_q;  // value: accent position
-extern const generic_map_type<std::wstring, VInfo> valid_v_qu; // value: accent position
 extern const generic_map_type<std::wstring, VInfo> valid_v_gi; // value: accent position
 extern const generic_map_type<std::wstring, bool> valid_c2;
 extern const generic_map_type<std::wstring, VInfo> valid_v_oa_uy;
