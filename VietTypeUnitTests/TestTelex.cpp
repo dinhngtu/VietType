@@ -232,6 +232,14 @@ public:
         TestValidWord(L"qu\xe9t", L"quets");
     }
 
+    TEST_METHOD(TestTypingQuauj) {
+        TestValidWord(L"qu\x1ea1u", L"quauj");
+    }
+
+    TEST_METHOD(TestTypingQuoj) {
+        TestValidWord(L"qu\x1ecd", L"quoj");
+    }
+
     TEST_METHOD(TestTypingDduwowcj) {
         TestValidWord(L"\x111\x1b0\x1ee3\x63", L"dduwowcj");
     }
