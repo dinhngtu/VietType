@@ -244,6 +244,14 @@ public:
         TestValidWord(L"\x111\x1b0\x1ee3\x63", L"dduwowcj");
     }
 
+    TEST_METHOD(TestTypingNguwoif) {
+        TestValidWord(L"ng\x1b0\x1eddi", L"nguwoif");
+    }
+
+    TEST_METHOD(TestTypingThuees) {
+        TestValidWord(L"thu\x1ebf", L"thuees");
+    }
+
     // test variations of 'gi'
 
     TEST_METHOD(TestTypingGif) {
@@ -266,12 +274,8 @@ public:
         TestValidWord(L"gi\x1eef""a", L"giuwax");
     }
 
-    TEST_METHOD(TestTypingNguwoif) {
-        TestValidWord(L"ng\x1b0\x1eddi", L"nguwoif");
-    }
-
-    TEST_METHOD(TestTypingThuees) {
-        TestValidWord(L"thu\x1ebf", L"thuees");
+    TEST_METHOD(TestTypingGiux) {
+        TestValidWord(L"gi\x169", L"giux");
     }
 
     // test 'aua' and similar transitions

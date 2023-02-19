@@ -241,7 +241,7 @@ const generic_map_type<std::wstring, VInfo> valid_v_gi = {
     {L"o", {0, C2Mode::Either}},
     {L"\xf4", {0, C2Mode::Either}},  // ô
     {L"\x1a1", {0, C2Mode::Either}}, // ơ
-    {L"u", {0, C2Mode::MustC2}},
+    {L"u", {0, C2Mode::Either}},
     {L"\x1b0", {0, C2Mode::Either}}, // ư
 
     {L"o\x103", {1, C2Mode::MustC2}},     // oă
