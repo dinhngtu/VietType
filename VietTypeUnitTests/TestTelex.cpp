@@ -240,6 +240,22 @@ public:
         TestValidWord(L"qu\x1ecd", L"quoj");
     }
 
+    TEST_METHOD(TestTypingQuitj) {
+        TestValidWord(L"qu\x1ecbt", L"quitj");
+    }
+
+    TEST_METHOD(TestTypingQueof) {
+        TestValidWord(L"qu\xe8o", L"queof");
+    }
+
+    TEST_METHOD(TestTypingQuowns) {
+        TestValidWord(L"qu\x1edbn", L"quowns");
+    }
+
+    TEST_METHOD(TestTypingQuwowns) {
+        TestValidWord(L"q\x1b0\x1edbn", L"quwowns");
+    }
+
     TEST_METHOD(TestTypingDduwowcj) {
         TestValidWord(L"\x111\x1b0\x1ee3\x63", L"dduwowcj");
     }
@@ -399,6 +415,10 @@ public:
 
     TEST_METHOD(TestCuwowwcj) {
         TestInvalidWord(L"cuwowcj", L"cuwowwcj");
+    }
+
+    TEST_METHOD(TestTypingQuwowwns) {
+        TestInvalidWord(L"quwowns", L"quwowwns");
     }
 
     // caps

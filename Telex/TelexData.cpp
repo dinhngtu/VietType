@@ -74,9 +74,11 @@ const generic_map_type<std::wstring, std::wstring> transitions_w = {
 };
 
 const generic_map_type<std::wstring, std::wstring> transitions_w_q = {
+    {L"u", L"\x1b0"},
     {L"ua", L"u\x103"},
     {L"uo", L"u\x1a1"},
     {L"uoi", L"u\x1a1i"},
+    {L"\x1b0\x1a1", L"\x1b0\x1a1"},
 };
 
 const generic_map_type<std::wstring, int> respos_w = {
@@ -94,6 +96,10 @@ const generic_map_type<std::wstring, int> respos_w = {
 
 const generic_map_type<std::wstring, std::wstring> transitions_v_c2 = {
     {L"u\x1a1", L"\x1b0\x1a1"},
+    {L"\x1b0o", L"\x1b0\x1a1"},
+};
+
+const generic_map_type<std::wstring, std::wstring> transitions_v_c2_q = {
     {L"\x1b0o", L"\x1b0\x1a1"},
 };
 
@@ -223,12 +229,14 @@ const generic_map_type<std::wstring, VInfo> valid_v_q = {
     {L"uau", {1, C2Mode::NoC2}}, // quạu
     {L"uay", {1, C2Mode::NoC2}},
     {L"ue", {1, C2Mode::Either}},
-    {L"ui", {1, C2Mode::NoC2}},
+    {L"ueo", {1, C2Mode::NoC2}},
+    {L"ui", {1, C2Mode::Either}},
     {L"uo", {1, C2Mode::NoC2}},       // quọ
     {L"u\xf4", {1, C2Mode::MustC2}},  // uô
-    {L"u\x1a1", {1, C2Mode::NoC2}},   // uơ
+    {L"u\x1a1", {1, C2Mode::Either}},   // uơ
     {L"u\x1a1i", {1, C2Mode::NoC2}},  // uơi
     {L"u\x103", {1, C2Mode::MustC2}}, // uă
+    {L"\x1b0\x1a1", {1, C2Mode::MustC2}},   // ươ
 };
 
 const generic_map_type<std::wstring, VInfo> valid_v_gi = {

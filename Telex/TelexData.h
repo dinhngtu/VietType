@@ -22,6 +22,7 @@ extern const generic_map_type<std::wstring, std::wstring> transitions_w_q;
 extern const generic_map_type<std::wstring, int> respos_w;
 
 extern const generic_map_type<std::wstring, std::wstring> transitions_v_c2;
+extern const generic_map_type<std::wstring, std::wstring> transitions_v_c2_q;
 extern const generic_map_type<wchar_t, std::wstring> transitions_tones;
 
 extern const generic_set_type<std::wstring> valid_c1;

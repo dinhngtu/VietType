@@ -224,21 +224,12 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
             }
         }
 
-    } else if (_c1 == L"q" && !_v.empty() && IS(cat, CharTypes::VowelW)) {
-        if (TransitionV(transitions_w_q)) {
-            if (!_c2.empty()) {
-                TransitionV(transitions_v_c2);
-            }
-            _respos.push_back(ResposTransitionW);
-        } else {
-            InvalidateAndPopBack(c);
-        }
-        // 'w' always keeps V size constant, don't push case
-
     } else if (!_v.empty() && IS(cat, CharTypes::VowelW)) {
-        auto it = transitions_w.find(_v);
-        if (it != transitions_w.end() && (_v != it->second || _c2.empty()) && _respos.back() != ResposTransitionW) {
-            _v = it->second;
+        auto tw = &transitions_w;
+        if (_c1 == L"q") {
+            tw = &transitions_w_q;
+        }
+        if (TransitionV(*tw, true)) {
             if (!_c2.empty()) {
                 TransitionV(transitions_v_c2);
             }
@@ -267,7 +258,11 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
 
     } else if (((_c1 == L"gi" && _v.empty()) || !_v.empty()) && _c2.empty() && IS(cat, CharTypes::ConsoC2)) {
         // word-ending consonants (cnpt)
-        TransitionV(transitions_v_c2);
+        if (_c1 == L"q") {
+            TransitionV(transitions_v_c2_q);
+        } else {
+            TransitionV(transitions_v_c2);
+        }
         _c2.push_back(c);
         _cases.push_back(ccase);
         _respos.push_back(_respos_current++);
@@ -302,9 +297,9 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
     return _state;
 }
 
-bool TelexEngine::TransitionV(const generic_map_type<std::wstring, std::wstring>& source) {
+bool TelexEngine::TransitionV(const generic_map_type<std::wstring, std::wstring>& source, bool w_mode) {
     auto it = source.find(_v);
-    if (it != source.end()) {
+    if (it != source.end() && (!w_mode || ((_v != it->second || _c2.empty()) && _respos.back() != ResposTransitionW))) {
         _v = it->second;
         return true;
     } else {
