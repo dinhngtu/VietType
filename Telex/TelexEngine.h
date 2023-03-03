@@ -22,11 +22,12 @@ namespace Telex {
 // Committed|CommittedInvalid -> Valid (Reset)
 
 enum class TelexStates {
-    Valid,            // valid word, can accept more chars but cannot get result
-    Invalid,          // invalid word but can still accept more chars
-    Committed,        // valid, tones have been applied, cannot accept any more chars (must get result or Reset)
-    CommittedInvalid, // invalid, cannot accept any more chars
-    TxError = -1,     // can never be a state, returned when PushChar encounters an error
+    Valid,             // valid word, can accept more chars but cannot get result
+    Invalid,           // invalid word but can still accept more chars
+    Committed,         // valid, tones have been applied, cannot accept any more chars (must get result or Reset)
+    CommittedInvalid,  // invalid, cannot accept any more chars
+    BackconvertFailed, // invalid, buffers are desynced, but can backspace
+    TxError = -1,      // can never be a state, returned when PushChar encounters an error
 };
 
 struct TelexConfig {
@@ -51,6 +52,8 @@ public:
     explicit TelexEngine(_In_ struct TelexConfig config);
     TelexEngine(const TelexEngine&) = delete;
     TelexEngine& operator=(const TelexEngine&) = delete;
+    TelexEngine(TelexEngine&&) = default;
+    TelexEngine& operator=(TelexEngine&&) = default;
 
     const TelexConfig& GetConfig() const;
     void SetConfig(const TelexConfig& config);

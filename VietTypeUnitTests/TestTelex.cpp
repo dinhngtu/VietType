@@ -582,6 +582,21 @@ public:
         Assert::AreEqual(L"TH\x1ebe", e.Peek().c_str());
     }
 
+    TEST_METHOD(TestBackconversionVirus) {
+        TelexEngine e(config);
+        AssertTelexStatesEqual(TelexStates::Invalid, e.Backconvert(L"virus"));
+        Assert::AreEqual(L"virus", e.Peek().c_str());
+    }
+
+    TEST_METHOD(TestBackconversionDdoonfCtrlW) {
+        TelexEngine e(config);
+        AssertTelexStatesEqual(TelexStates::BackconvertFailed, e.Backconvert(L"\x111\x1ed3nw"));
+        Assert::AreEqual(L"\x111\x1ed3nw", e.Peek().c_str());
+        e.Backspace();
+        Assert::AreEqual(L"\x111\x1ed3n", e.Peek().c_str());
+        AssertTelexStatesEqual(TelexStates::Valid, e.GetState());
+    }
+
     // test oa/oe/uy
 
     TEST_METHOD(TestTypingOaUy) {

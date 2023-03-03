@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
+#include <utility>
+
 #include "Common.h"
 #include "TelexEngine.h"
 #include "TelexData.h"
@@ -318,7 +320,14 @@ void TelexEngine::InvalidateAndPopBack(wchar_t c) {
 TelexStates TelexEngine::Backspace() {
     std::wstring buf(_keyBuffer);
 
-    if (_state == TelexStates::Invalid) {
+    if (_state == TelexStates::BackconvertFailed) {
+        _keyBuffer.pop_back();
+        TelexEngine emulate(GetConfig());
+        if (emulate.Backconvert(_keyBuffer) == TelexStates::Valid) {
+            *this = std::move(emulate);
+        }
+        return _state;
+    } else if (_state == TelexStates::Invalid) {
         Reset();
         if (buf.size()) {
             buf.pop_back();
@@ -409,7 +418,8 @@ TelexStates TelexEngine::Backspace() {
 }
 
 TelexStates TelexEngine::Commit() {
-    if (_state == TelexStates::Committed || _state == TelexStates::CommittedInvalid) {
+    if (_state == TelexStates::Committed || _state == TelexStates::CommittedInvalid ||
+        _state == TelexStates::BackconvertFailed) {
         return _state;
     }
 
@@ -472,7 +482,8 @@ TelexStates TelexEngine::Commit() {
 }
 
 TelexStates TelexEngine::ForceCommit() {
-    if (_state == TelexStates::Committed || _state == TelexStates::CommittedInvalid) {
+    if (_state == TelexStates::Committed || _state == TelexStates::CommittedInvalid ||
+        _state == TelexStates::BackconvertFailed) {
         return _state;
     }
 
@@ -505,6 +516,7 @@ TelexStates TelexEngine::Cancel() {
 }
 
 TelexStates TelexEngine::Backconvert(_In_ const std::wstring& s) {
+    bool found_backconversion = false;
     for (auto c : s) {
         if (c >= L'a' && c <= L'z') {
             PushChar(c);
@@ -523,7 +535,14 @@ TelexStates TelexEngine::Backconvert(_In_ const std::wstring& s) {
                     PushChar(backc);
                 }
             }
+            found_backconversion = true;
         }
+    }
+    if (found_backconversion && _state != TelexStates::Valid) {
+        _keyBuffer = s;
+        _state = TelexStates::BackconvertFailed;
+    } else if (_c1.size() + _v.size() + _c2.size() != s.size()) {
+        _state = TelexStates::Invalid;
     }
     return _state;
 }
@@ -533,7 +552,8 @@ TelexStates TelexEngine::GetState() const {
 }
 
 std::wstring TelexEngine::Retrieve() const {
-    if (_state == TelexStates::Invalid || _state == TelexStates::CommittedInvalid) {
+    if (_state == TelexStates::Invalid || _state == TelexStates::CommittedInvalid ||
+        _state == TelexStates::BackconvertFailed) {
         return RetrieveRaw();
     }
     std::wstring result(_c1);
@@ -548,7 +568,8 @@ std::wstring TelexEngine::RetrieveRaw() const {
 }
 
 std::wstring TelexEngine::Peek() const {
-    if (_state == TelexStates::Invalid) {
+    if (_state == TelexStates::Invalid || _state == TelexStates::CommittedInvalid ||
+        _state == TelexStates::BackconvertFailed) {
         return RetrieveRaw();
     }
 
@@ -643,7 +664,7 @@ bool TelexEngine::CheckInvariants() const {
     if (_state == TelexStates::TxError) {
         return false;
     }
-    if (_c1.size() + _v.size() + _c2.size() > _keyBuffer.size()) {
+    if (_state != TelexStates::BackconvertFailed && _c1.size() + _v.size() + _c2.size() > _keyBuffer.size()) {
         return false;
     }
     if (_state == TelexStates::Valid || _state == TelexStates::Committed) {
