@@ -30,7 +30,8 @@ STDMETHODIMP KeyHandlerEditSession::DoEditSession(_In_ TfEditCookie ec) {
         return _compositionManager->EndCompositionNow(ec);
     } else if (_wParam == VK_ESCAPE) {
         // eaten, revert and end composition
-        auto str = _controller->GetEngine().RetrieveRaw();
+        _controller->GetEngine().Cancel();
+        auto str = _controller->GetEngine().Retrieve();
         _controller->GetEngine().Reset();
         hr = _compositionManager->SetCompositionText(ec, &str[0], static_cast<LONG>(str.length()));
         DBG_HRESULT_CHECK(hr, L"%s", L"_compositionManager->SetCompositionText failed");
