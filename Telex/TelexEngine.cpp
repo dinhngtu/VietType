@@ -132,6 +132,7 @@ void TelexEngine::Reset() {
     _cases.clear();
     _respos.clear();
     _respos_current = 0;
+    _backconverted = false;
 }
 
 // remember to push into _cases when adding a new character
@@ -363,6 +364,7 @@ TelexStates TelexEngine::Backspace() {
     std::vector<int> rp(_respos);
     std::wstring oldc1(_c1);
     std::wstring oldv(_v);
+    bool oldBackconverted = _backconverted;
 
     auto toDelete = static_cast<int>(_c1.size() + _v.size() + _c2.size()) - 1;
 
@@ -413,6 +415,9 @@ TelexStates TelexEngine::Backspace() {
         }
     }
 
+    if (_keyBuffer.size()) {
+        _backconverted = oldBackconverted;
+    }
     assert(CheckInvariants());
     return _state;
 }
@@ -511,7 +516,13 @@ TelexStates TelexEngine::ForceCommit() {
 }
 
 TelexStates TelexEngine::Cancel() {
-    _state = TelexStates::CommittedInvalid;
+    if (_backconverted && _c1.size() + _v.size() + _c2.size() != _keyBuffer.size()) {
+        auto s = Peek();
+        _keyBuffer = s;
+        _state = TelexStates::BackconvertFailed;
+    } else {
+        _state = TelexStates::CommittedInvalid;
+    }
     return _state;
 }
 
@@ -544,6 +555,7 @@ TelexStates TelexEngine::Backconvert(_In_ const std::wstring& s) {
     } else if (_c1.size() + _v.size() + _c2.size() != s.size()) {
         _state = TelexStates::Invalid;
     }
+    _backconverted = true;
     return _state;
 }
 

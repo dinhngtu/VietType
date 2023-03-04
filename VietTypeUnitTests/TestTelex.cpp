@@ -592,9 +592,19 @@ public:
         TelexEngine e(config);
         AssertTelexStatesEqual(TelexStates::BackconvertFailed, e.Backconvert(L"\x111\x1ed3nw"));
         Assert::AreEqual(L"\x111\x1ed3nw", e.Peek().c_str());
-        e.Backspace();
+        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
         Assert::AreEqual(L"\x111\x1ed3n", e.Peek().c_str());
-        AssertTelexStatesEqual(TelexStates::Valid, e.GetState());
+        e.Cancel();
+        Assert::AreEqual(L"\x111\x1ed3n", e.Peek().c_str());
+        Assert::AreEqual(L"\x111\x1ed3n", e.Retrieve().c_str());
+    }
+
+    TEST_METHOD(TestBackconversionDdCtrlW) {
+        TelexEngine e(config);
+        AssertTelexStatesEqual(TelexStates::BackconvertFailed, e.Backconvert(L"\x111w"));
+        e.Backspace();
+        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+        AssertTelexStatesEqual(TelexStates::CommittedInvalid, e.Cancel());
     }
 
     // test oa/oe/uy

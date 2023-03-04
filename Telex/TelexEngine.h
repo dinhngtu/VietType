@@ -95,6 +95,7 @@ private:
     /// </summary>
     std::vector<int> _respos;
     int _respos_current = 0;
+    bool _backconverted = false;
 
 private:
     using map_iterator = generic_map_type<std::wstring, VInfo>::const_iterator;
