@@ -76,7 +76,7 @@ SPDX-License-Identifier: GPL-3.0-only
         Dialog="ExitDialog"
         Control="Finish"
         Event="DoAction"
-        Value="ActivateProfilesAfterInstall">
+        Value="OpenSettingsAfterInstall">
         WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed
       </Publish>
     </UI>
@@ -195,12 +195,9 @@ SPDX-License-Identifier: GPL-3.0-only
   <!-- after install -->
 
   <Fragment>
-    <DirectoryRef Id="TARGETDIR">
-      <Directory Id="SystemFolder" />
-    </DirectoryRef>
     <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
-    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Enable VietType now" />
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Open VietType Settings" />
     <Property Id="Rundll32Path" Value="[%SystemRoot]\System32\rundll32.exe" />
-    <CustomAction Id="ActivateProfilesAfterInstall" Directory="SystemFolder" Impersonate="yes" ExeCommand='rundll32.exe "[#VietTypeATL32.dll]",RunActivateProfiles' />
+    <CustomAction Id="OpenSettingsAfterInstall" Directory="INSTALLFOLDER" Impersonate="yes" ExeCommand="[#VietTypeConfig.exe]" />
   </Fragment>
 </Wix>
