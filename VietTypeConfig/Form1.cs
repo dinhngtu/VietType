@@ -51,19 +51,30 @@ namespace VietTypeConfig {
         }
 
         private void btnEnable_Click(object sender, EventArgs e) {
-            var activated = IsProfileActivated();
-            var result = (activated == S_OK) ? DeactivateProfiles() : ActivateProfiles();
+            Activate(IsProfileActivated() != S_OK);
+        }
+
+        private void Activate(bool newState) {
+            var result = newState ? ActivateProfiles() : DeactivateProfiles();
             if (result == S_OK) {
-                if (activated == S_OK) {
-                    MessageBox.Show($"Successfully disabled VietType.", "VietType", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                } else {
+                if (newState) {
                     MessageBox.Show($"Successfully enabled VietType. Switch to VietType in the language bar to start using it.", "VietType", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                } else {
+                    MessageBox.Show($"Successfully disabled VietType.", "VietType", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             } else {
                 var message = Marshal.GetExceptionForHR(result).Message;
                 MessageBox.Show($"Cannot configure VietType: {message}", "VietType", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             UpdateEnabled();
+        }
+
+        private void Form1_Shown(object sender, EventArgs e) {
+            if (IsProfileActivated() != S_OK) {
+                if (MessageBox.Show("VietType is not enabled. Enable it now?", "VietType", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) {
+                    Activate(true);
+                }
+            }
         }
     }
 }
