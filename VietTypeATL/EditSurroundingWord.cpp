@@ -11,7 +11,7 @@ namespace EditSessions {
 
 static const long SWF_MAXCHARS = 9; // "nghiêng" + 1 for the padding + 1 for max ignore
 
-static const std::vector<WCHAR> vietnamesechars_notaz = {
+static const std::array<WCHAR, 135> vietnamesechars_notaz = {
     L'\xc0',   L'\xc1',   L'\xc2',   L'\xc3',   L'\xc8',   L'\xc9',   L'\xca',   L'\xcc',   L'\xcd',   L'\xd2',
     L'\xd3',   L'\xd4',   L'\xd5',   L'\xd9',   L'\xda',   L'\xdd',   L'\xe0',   L'\xe1',   L'\xe2',   L'\xe3',
     L'\xe8',   L'\xe9',   L'\xea',   L'\xec',   L'\xed',   L'\xf2',   L'\xf3',   L'\xf4',   L'\xf5',   L'\xf9',
