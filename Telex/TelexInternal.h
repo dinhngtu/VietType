@@ -40,9 +40,7 @@ struct VInfo {
 
 template <typename K, typename V>
 struct twopair_less {
-    using key_type = K;
-    using value_type = V;
-    using pair_type = std::pair<key_type, value_type>;
+    using pair_type = std::pair<K, V>;
     static bool func(const pair_type& a, const pair_type& b) {
         return a.first < b.first;
     }
@@ -50,11 +48,38 @@ struct twopair_less {
 
 template <typename V>
 struct twopair_less<const wchar_t*, V> {
-    using key_type = const wchar_t*;
-    using value_type = V;
-    using pair_type = std::pair<key_type, value_type>;
+    using pair_type = std::pair<const wchar_t*, V>;
     static bool func(const pair_type& a, const pair_type& b) {
         return wcscmp(a.first, b.first) < 0;
+    }
+};
+
+template <typename V>
+struct one_less {
+    static bool func(const V& a, const V& b) {
+        assert(false);
+        return a.first < b.first;
+    }
+};
+
+template <>
+struct one_less<const wchar_t*> {
+    static bool func(const wchar_t* a, const wchar_t* b) {
+        return wcscmp(a, b) < 0;
+    }
+};
+
+template <typename K, typename V, typename KK>
+struct pair_less {
+    static bool func(const std::pair<K, V>& a, const KK& b) {
+        return a.first < b;
+    }
+};
+
+template <typename V, typename KK>
+struct pair_less<const wchar_t*, V, KK> {
+    static bool func(const std::pair<const wchar_t*, V>& a, const KK& b) {
+        return a.first < b;
     }
 };
 
@@ -71,7 +96,7 @@ struct VectorMap : public std::vector<std::pair<K, V>> {
     template <typename KK>
     const_iterator find(const KK& key) const {
         if (sorted) {
-            auto first = std::lower_bound(this->cbegin(), this->cend(), key, pair_less<KK>);
+            auto first = std::lower_bound(this->cbegin(), this->cend(), key, pair_less<K, V, KK>::func);
             if (first != this->cend() && first->first == key) {
                 return first;
             } else {
@@ -80,27 +105,6 @@ struct VectorMap : public std::vector<std::pair<K, V>> {
         } else {
             return std::find_if(this->cbegin(), this->cend(), [&](const auto& p) { return p.first == key; });
         }
-    }
-
-private:
-    template <typename KK>
-    static bool pair_less(const std::pair<K, V>& a, const KK& b) {
-        return a.first < b;
-    }
-};
-
-template <typename V>
-struct one_less {
-    static bool func(const V& a, const V& b) {
-        assert(false);
-        return a.first < b.first;
-    }
-};
-
-template <>
-struct one_less<const wchar_t*> {
-    static bool func(const wchar_t* a, const wchar_t* b) {
-        return wcscmp(a, b) < 0;
     }
 };
 

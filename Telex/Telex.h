@@ -2,5 +2,4 @@
 
 #pragma once
 
-#include "TelexUtil.h"
 #include "TelexEngine.h"

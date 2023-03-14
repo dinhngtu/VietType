@@ -5,12 +5,118 @@
 #include "Common.h"
 #include "TelexEngine.h"
 #include "TelexData.h"
-#include "TelexUtil.h"
 
 #define IS(cat, type) (static_cast<bool>((cat) & (type)))
 
 namespace VietType {
 namespace Telex {
+
+enum class CharTypes : int {
+    Uncategorized = 0,
+    Commit = 1 << 0,
+    ForceCommit = 1 << 1,
+    Backspace = 1 << 2,
+    Vowel = 1 << 3,
+    VowelW = 1 << 4,
+    // TODO: classification for vowel continue
+    Conso = 1 << 5,
+    ConsoC1 = 1 << 5 | 1 << 6,
+    ConsoC2 = 1 << 5 | 1 << 7,
+    ConsoContinue = 1 << 5 | 1 << 8,
+    Tone = 1 << 9,
+    Shorthand = 1 << 10,
+};
+
+constexpr inline CharTypes operator|(CharTypes lhs, CharTypes rhs) {
+    return static_cast<CharTypes>(
+        static_cast<std::underlying_type_t<CharTypes>>(lhs) | static_cast<std::underlying_type_t<CharTypes>>(rhs));
+}
+
+constexpr inline CharTypes operator&(CharTypes lhs, CharTypes rhs) {
+    return static_cast<CharTypes>(
+        static_cast<std::underlying_type_t<CharTypes>>(lhs) & static_cast<std::underlying_type_t<CharTypes>>(rhs));
+}
+
+static const CharTypes letterClasses[26] = {
+    CharTypes::Vowel,                                                // a
+    CharTypes::ConsoC1,                                              // b
+    CharTypes::ConsoC1 | CharTypes::ConsoC2,                         // c
+    CharTypes::ConsoC1 | CharTypes::ConsoContinue,                   // d
+    CharTypes::Vowel,                                                // e
+    CharTypes::Tone,                                                 // f
+    CharTypes::ConsoC1 | CharTypes::ConsoContinue,                   // g
+    CharTypes::ConsoC1 | CharTypes::ConsoContinue,                   // h
+    CharTypes::Vowel,                                                // i
+    CharTypes::Tone,                                                 // j
+    CharTypes::ConsoC1,                                              // k
+    CharTypes::ConsoC1,                                              // l
+    CharTypes::ConsoC1 | CharTypes::ConsoC2,                         // m
+    CharTypes::ConsoC1 | CharTypes::ConsoC2,                         // n
+    CharTypes::Vowel,                                                // o
+    CharTypes::ConsoC1 | CharTypes::ConsoC2,                         // p
+    CharTypes::ConsoC1,                                              // q
+    CharTypes::Tone | CharTypes::ConsoC1 | CharTypes::ConsoContinue, // r
+    CharTypes::Tone | CharTypes::ConsoC1 | CharTypes::ConsoContinue, // s
+    CharTypes::ConsoC1 | CharTypes::ConsoC2,                         // t
+    CharTypes::Vowel,                                                // u
+    CharTypes::ConsoC1,                                              // v
+    CharTypes::VowelW,                                               // w
+    CharTypes::Tone | CharTypes::ConsoC1,                            // x
+    CharTypes::Vowel,                                                // y
+    CharTypes::Tone,                                                 // z
+};
+
+static CharTypes ClassifyCharacter(_In_ wchar_t c) {
+    if (c >= L'a' && c <= L'z') {
+        return letterClasses[c - L'a'];
+    }
+    switch (c) {
+    case L'\b':
+        return CharTypes::Backspace;
+    case L'\0':
+        return CharTypes::ForceCommit;
+    case L'\t':
+    case L'\n':
+    case L'\r':
+    case L'|':
+    case L'~':
+        return CharTypes::Commit;
+    case L'[':
+    case L']':
+    case L'{':
+    case L'}':
+        return CharTypes::Shorthand;
+    }
+
+    if (c >= 32 && c <= 64) {
+        // ' ' to '@'
+        return CharTypes::Commit;
+    }
+    if (c >= 91 && c <= 96) {
+        return CharTypes::Commit;
+    }
+
+    return CharTypes::Uncategorized;
+}
+
+static Tones GetTone(_In_ wchar_t c) {
+    switch (c) {
+    case L'z':
+        return Tones::Z;
+    case L'f':
+        return Tones::F;
+    case L'j':
+        return Tones::J;
+    case L'r':
+        return Tones::R;
+    case L's':
+        return Tones::S;
+    case L'x':
+        return Tones::X;
+    default:
+        return Tones::Z;
+    }
+}
 
 // case functions hardcode ranges of Vietnamese characters
 // the rest can be correctly transformed or not, doesn't matter

@@ -24,12 +24,10 @@
     <ClInclude Include="TelexData.h" />
     <ClInclude Include="TelexEngine.h" />
     <ClInclude Include="TelexInternal.h" />
-    <ClInclude Include="TelexUtil.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TelexData.cpp" />
     <ClCompile Include="TelexEngine.cpp" />
-    <ClCompile Include="TelexUtil.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

@@ -27,9 +27,6 @@
     <ClInclude Include="TelexInternal.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TelexUtil.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -39,9 +36,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TelexEngine.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TelexUtil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

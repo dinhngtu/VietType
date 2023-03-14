@@ -102,7 +102,7 @@ const generic_map_type<const wchar_t*, std::wstring> transitions_v_c2_q = {
     {L"\x1b0o", L"\x1b0\x1a1"},
 };
 
-const sorted_map_type<wchar_t, std::wstring> transitions_tones = {
+const sorted_map_type<wchar_t, const wchar_t*> transitions_tones = {
     {L'a', L"a\xe0\x1ea1\x1ea3\xe1\xe3"},
     {L'e', L"e\xe8\x1eb9\x1ebb\xe9\x1ebd"},
     {L'i', L"i\xec\x1ecb\x1ec9\xed\x129"},
