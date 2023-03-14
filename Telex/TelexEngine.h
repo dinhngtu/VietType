@@ -102,6 +102,7 @@ private:
     bool FindTable(_Out_ map_iterator* it) const;
     bool GetTonePos(_In_ bool predict, _Out_ VInfo* vinfo) const;
     bool TransitionV(const generic_map_type<std::wstring, std::wstring>& source, bool w_mode = false);
+    bool TransitionV(const sorted_map_type<std::wstring, std::wstring>& source, bool w_mode = false);
     void InvalidateAndPopBack(wchar_t c);
 
 private:

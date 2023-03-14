@@ -228,11 +228,13 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
         }
 
     } else if (!_v.empty() && IS(cat, CharTypes::VowelW)) {
-        auto tw = &transitions_w;
+        bool tw;
         if (_c1 == L"q") {
-            tw = &transitions_w_q;
+            tw = TransitionV(transitions_w_q, true);
+        } else {
+            tw = TransitionV(transitions_w, true);
         }
-        if (TransitionV(*tw, true)) {
+        if (tw) {
             if (!_c2.empty()) {
                 TransitionV(transitions_v_c2);
             }
@@ -301,6 +303,16 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
 }
 
 bool TelexEngine::TransitionV(const generic_map_type<std::wstring, std::wstring>& source, bool w_mode) {
+    auto it = source.find(_v);
+    if (it != source.end() && (!w_mode || ((_v != it->second || _c2.empty()) && _respos.back() != ResposTransitionW))) {
+        _v = it->second;
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool TelexEngine::TransitionV(const sorted_map_type<std::wstring, std::wstring>& source, bool w_mode) {
     auto it = source.find(_v);
     if (it != source.end() && (!w_mode || ((_v != it->second || _c2.empty()) && _respos.back() != ResposTransitionW))) {
         _v = it->second;
