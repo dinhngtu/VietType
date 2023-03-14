@@ -7,7 +7,7 @@ namespace Telex {
 
 // maps that are too short are kept as generic
 
-const sorted_map_type<const wchar_t*, std::wstring> transitions = {
+const sorted_map_type<const wchar_t*, const wchar_t*> transitions = {
     {L"aa", L"\xe2"},     //
     {L"aua", L"\xe2u"},   // relaxed transformations
     {L"aya", L"\xe2y"},   // relaxed transformations
@@ -55,7 +55,7 @@ const sorted_map_type<const wchar_t*, int> respos = {
     {L"\x1b0\x1a1u", 0}, //
 };
 
-const sorted_map_type<const wchar_t*, std::wstring> transitions_w = {
+const sorted_map_type<const wchar_t*, const wchar_t*> transitions_w = {
     {L"a", L"\x103"},
     {L"o", L"\x1a1"},
     {L"oa", L"o\x103"},
@@ -72,7 +72,7 @@ const sorted_map_type<const wchar_t*, std::wstring> transitions_w = {
     {L"\x1b0\x1a1", L"\x1b0\x1a1"},
 };
 
-const generic_map_type<const wchar_t*, std::wstring> transitions_w_q = {
+const generic_map_type<const wchar_t*, const wchar_t*> transitions_w_q = {
     {L"u", L"\x1b0"},
     {L"ua", L"u\x103"},
     {L"uo", L"u\x1a1"},
@@ -93,12 +93,12 @@ const sorted_map_type<const wchar_t*, int> respos_w = {
     {L"\x1b0\x1a1i", 1},
 };
 
-const generic_map_type<const wchar_t*, std::wstring> transitions_v_c2 = {
+const generic_map_type<const wchar_t*, const wchar_t*> transitions_v_c2 = {
     {L"u\x1a1", L"\x1b0\x1a1"},
     {L"\x1b0o", L"\x1b0\x1a1"},
 };
 
-const generic_map_type<const wchar_t*, std::wstring> transitions_v_c2_q = {
+const generic_map_type<const wchar_t*, const wchar_t*> transitions_v_c2_q = {
     {L"\x1b0o", L"\x1b0\x1a1"},
 };
 
@@ -282,7 +282,7 @@ const generic_map_type<const wchar_t*, VInfo> valid_v_oa_uy = {
     {L"uy", {0, C2Mode::Either}},
 };
 
-const sorted_map_type<wchar_t, std::wstring> backconversions = {
+const sorted_map_type<wchar_t, const wchar_t*> backconversions = {
     {L'\xe0', L"af"},    {L'\xe1', L"as"},    {L'\xe2', L"aa"},    {L'\xe3', L"ax"},    {L'\xe8', L"ef"},
     {L'\xe9', L"es"},    {L'\xea', L"ee"},    {L'\xec', L"if"},    {L'\xed', L"is"},    {L'\xf2', L"of"},
     {L'\xf3', L"os"},    {L'\xf4', L"oo"},    {L'\xf5', L"ox"},    {L'\xf9', L"uf"},    {L'\xfa', L"us"},

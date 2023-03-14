@@ -11,7 +11,7 @@
 namespace VietType {
 namespace Telex {
 
-enum class CharTypes : int {
+enum class CharTypes : unsigned int {
     Uncategorized = 0,
     Commit = 1 << 0,
     ForceCommit = 1 << 1,
@@ -27,14 +27,12 @@ enum class CharTypes : int {
     Shorthand = 1 << 10,
 };
 
-constexpr inline CharTypes operator|(CharTypes lhs, CharTypes rhs) {
-    return static_cast<CharTypes>(
-        static_cast<std::underlying_type_t<CharTypes>>(lhs) | static_cast<std::underlying_type_t<CharTypes>>(rhs));
+constexpr CharTypes operator|(CharTypes lhs, CharTypes rhs) {
+    return static_cast<CharTypes>(static_cast<unsigned int>(lhs) | static_cast<unsigned int>(rhs));
 }
 
-constexpr inline CharTypes operator&(CharTypes lhs, CharTypes rhs) {
-    return static_cast<CharTypes>(
-        static_cast<std::underlying_type_t<CharTypes>>(lhs) & static_cast<std::underlying_type_t<CharTypes>>(rhs));
+constexpr CharTypes operator&(CharTypes lhs, CharTypes rhs) {
+    return static_cast<CharTypes>(static_cast<unsigned int>(lhs) & static_cast<unsigned int>(rhs));
 }
 
 static const CharTypes letterClasses[26] = {
@@ -408,7 +406,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
     return _state;
 }
 
-bool TelexEngine::TransitionV(const generic_map_type<const wchar_t*, std::wstring>& source, bool w_mode) {
+bool TelexEngine::TransitionV(const generic_map_type<const wchar_t*, const wchar_t*>& source, bool w_mode) {
     auto it = source.find(_v);
     if (it != source.end() && (!w_mode || ((_v != it->second || _c2.empty()) && _respos.back() != ResposTransitionW))) {
         _v = it->second;
@@ -418,7 +416,7 @@ bool TelexEngine::TransitionV(const generic_map_type<const wchar_t*, std::wstrin
     }
 }
 
-bool TelexEngine::TransitionV(const sorted_map_type<const wchar_t*, std::wstring>& source, bool w_mode) {
+bool TelexEngine::TransitionV(const sorted_map_type<const wchar_t*, const wchar_t*>& source, bool w_mode) {
     auto it = source.find(_v);
     if (it != source.end() && (!w_mode || ((_v != it->second || _c2.empty()) && _respos.back() != ResposTransitionW))) {
         _v = it->second;
@@ -654,14 +652,13 @@ TelexStates TelexEngine::Backconvert(_In_ const std::wstring& s) {
         } else {
             auto clow = ToLower(c);
             auto it = backconversions.find(clow);
-            if (c != clow) {
-                // c is upper
-                for (auto backc : it->second) {
-                    PushChar(ToUpper(backc));
-                }
-            } else {
-                for (auto backc : it->second) {
-                    PushChar(backc);
+            assert(it != backconversions.end());
+            for (auto backc = it->second; *backc; backc++) {
+                if (c != clow) {
+                    // c is upper
+                    PushChar(ToUpper(*backc));
+                } else {
+                    PushChar(*backc);
                 }
             }
             found_backconversion = true;
