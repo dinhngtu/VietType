@@ -198,6 +198,7 @@ SPDX-License-Identifier: GPL-3.0-only
     <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
     <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Open VietType Settings" />
     <Property Id="Rundll32Path" Value="[%SystemRoot]\System32\rundll32.exe" />
-    <CustomAction Id="OpenSettingsAfterInstall" Directory="INSTALLFOLDER" Impersonate="yes" ExeCommand="[#VietTypeConfig.exe]" />
+    <Property Id="WixShellExecTarget" Value="[#VietTypeConfig.exe]" />
+    <CustomAction Id="OpenSettingsAfterInstall" Impersonate="yes" BinaryKey="WixCA" DllEntry="WixShellExec" />
   </Fragment>
 </Wix>
