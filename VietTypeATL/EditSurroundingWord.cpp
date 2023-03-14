@@ -115,12 +115,15 @@ static HRESULT DoEditSurroundingWord(
 
     DBG_DPRINT(L"wordlen = %ld", wordlen);
 
-#pragma warning(push)
-#pragma warning(disable : 26451)
-    if (wordlen < 1 || (static_cast<ULONG>(wordlen + 1) < retrieved &&
-                        !IsSeparatorCharacter(buf.at(retrieved - wordlen - 1L - ignore)))) {
-#pragma warning(pop)
-        // no word, or word is not bordered by separator character
+    if (wordlen < 1) {
+        return E_FAIL;
+    }
+    if (retrieved == SWF_MAXCHARS && wordlen == retrieved - ignore && !IsSeparatorCharacter(buf[0])) {
+        return E_FAIL;
+    }
+    if (static_cast<ULONG>(wordlen + 1) < retrieved &&
+        !IsSeparatorCharacter(buf.at(retrieved - wordlen - 1L - ignore))) {
+        // word is not bordered by separator character
         return E_FAIL;
     }
 
