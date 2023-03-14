@@ -232,37 +232,34 @@ const sorted_map_type<const wchar_t*, VInfo> valid_v_q = {
     {L"\x1b0\x1a1", {1, C2Mode::MustC2}}, // ươ
 };
 
-const generic_map_type<const wchar_t*, VInfo> valid_v_gi = {
-    {L"", {-1, C2Mode::Either}},
-    {L"a", {0, C2Mode::Either}},
-    {L"\x103", {0, C2Mode::MustC2}}, // ă
-    {L"\xe2", {0, C2Mode::MustC2}},  // â
-    {L"e", {0, C2Mode::NoC2}},
-    {L"\xea", {0, C2Mode::MustC2}}, // ê
-    {L"o", {0, C2Mode::Either}},
-    {L"\xf4", {0, C2Mode::Either}},  // ô
-    {L"\x1a1", {0, C2Mode::Either}}, // ơ
-    {L"u", {0, C2Mode::Either}},
-    {L"\x1b0", {0, C2Mode::Either}}, // ư
-
+const sorted_map_type<const wchar_t*, VInfo> valid_v_gi = {
+    {L"", {-1, C2Mode::Either}},          //
+    {L"a", {0, C2Mode::Either}},          //
+    {L"ai", {0, C2Mode::NoC2}},           //
+    {L"ao", {0, C2Mode::NoC2}},           //
+    {L"au", {0, C2Mode::NoC2}},           //
+    {L"ay", {0, C2Mode::NoC2}},           //
+    {L"e", {0, C2Mode::NoC2}},            //
+    {L"eo", {0, C2Mode::NoC2}},           //
+    {L"o", {0, C2Mode::Either}},          //
+    {L"oi", {0, C2Mode::NoC2}},           //
     {L"o\x103", {1, C2Mode::MustC2}},     // oă
+    {L"u", {0, C2Mode::Either}},          //
+    {L"ua", {0, C2Mode::NoC2}},           // c2 either with qu
+    {L"ui", {0, C2Mode::NoC2}},           //
+    {L"\xe2", {0, C2Mode::MustC2}},       // â
+    {L"\xe2u", {0, C2Mode::NoC2}},        // âu
+    {L"\xe2y", {0, C2Mode::NoC2}},        // ây
+    {L"\xea", {0, C2Mode::MustC2}},       // ê
+    {L"\xeau", {0, C2Mode::NoC2}},        // êu
+    {L"\xf4", {0, C2Mode::Either}},       // ô
+    {L"\xf4i", {0, C2Mode::NoC2}},        // ôi
+    {L"\x103", {0, C2Mode::MustC2}},      // ă
+    {L"\x1a1", {0, C2Mode::Either}},      // ơ
+    {L"\x1a1i", {0, C2Mode::NoC2}},       // ơi
+    {L"\x1b0", {0, C2Mode::Either}},      // ư
+    {L"\x1b0\x61", {0, C2Mode::NoC2}},    // ưa
     {L"\x1b0\x1a1", {1, C2Mode::MustC2}}, // ươ
-
-    {L"ai", {0, C2Mode::NoC2}},
-    {L"ao", {0, C2Mode::NoC2}},
-    {L"au", {0, C2Mode::NoC2}},
-    {L"ay", {0, C2Mode::NoC2}},
-    {L"\xe2u", {0, C2Mode::NoC2}}, // âu
-    {L"\xe2y", {0, C2Mode::NoC2}}, // ây
-    {L"eo", {0, C2Mode::NoC2}},
-    {L"\xeau", {0, C2Mode::NoC2}}, // êu
-    {L"oi", {0, C2Mode::NoC2}},
-    {L"\xf4i", {0, C2Mode::NoC2}},  // ôi
-    {L"\x1a1i", {0, C2Mode::NoC2}}, // ơi
-    {L"ua", {0, C2Mode::NoC2}},     // c2 either with qu
-    {L"ui", {0, C2Mode::NoC2}},
-
-    {L"\x1b0\x61", {0, C2Mode::NoC2}}, // ưa
 };
 
 // bool is whether tones are restricted to s/j or not

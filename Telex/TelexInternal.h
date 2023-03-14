@@ -12,6 +12,7 @@
 #include <utility>
 #include <vector>
 #include <string>
+#include <cstring>
 #include <cassert>
 
 namespace VietType {
@@ -37,13 +38,33 @@ struct VInfo {
     C2Mode c2mode;
 };
 
+template <typename K, typename V>
+struct twopair_less {
+    using key_type = K;
+    using value_type = V;
+    using pair_type = std::pair<key_type, value_type>;
+    static bool func(const pair_type& a, const pair_type& b) {
+        return a.first < b.first;
+    }
+};
+
+template <typename V>
+struct twopair_less<const wchar_t*, V> {
+    using key_type = const wchar_t*;
+    using value_type = V;
+    using pair_type = std::pair<key_type, value_type>;
+    static bool func(const pair_type& a, const pair_type& b) {
+        return wcscmp(a.first, b.first) < 0;
+    }
+};
+
 template <typename K, typename V, bool sorted = false>
-struct ArrayMap : public std::vector<std::pair<K, V>> {
+struct VectorMap : public std::vector<std::pair<K, V>> {
     using const_iterator = typename std::vector<std::pair<K, V>>::const_iterator;
 
-    constexpr ArrayMap(std::initializer_list<std::pair<K, V>> o) : std::vector<std::pair<K, V>>(o) {
+    constexpr VectorMap(std::initializer_list<std::pair<K, V>> o) : std::vector<std::pair<K, V>>(o) {
         if (sorted) {
-            assert(std::is_sorted(this->cbegin(), this->cend(), twopair_less));
+            assert(std::is_sorted(this->cbegin(), this->cend(), twopair_less<K, V>::func));
         }
     }
 
@@ -66,19 +87,30 @@ private:
     static bool pair_less(const std::pair<K, V>& a, const KK& b) {
         return a.first < b;
     }
+};
 
-    static bool twopair_less(const std::pair<K, V>& a, const std::pair<K, V>& b) {
+template <typename V>
+struct one_less {
+    static bool func(const V& a, const V& b) {
+        assert(false);
         return a.first < b.first;
     }
 };
 
+template <>
+struct one_less<const wchar_t*> {
+    static bool func(const wchar_t* a, const wchar_t* b) {
+        return wcscmp(a, b) < 0;
+    }
+};
+
 template <typename K, bool sorted = false>
-struct ArraySet : public std::vector<K> {
+struct VectorSet : public std::vector<K> {
     using const_iterator = typename std::vector<K>::const_iterator;
 
-    constexpr ArraySet(std::initializer_list<K> o) : std::vector<K>(o) {
+    constexpr VectorSet(std::initializer_list<K> o) : std::vector<K>(o) {
         if (sorted) {
-            assert(std::is_sorted(this->cbegin(), this->cend()));
+            assert(std::is_sorted(this->cbegin(), this->cend(), one_less<K>::func));
         }
     }
 
@@ -98,13 +130,13 @@ struct ArraySet : public std::vector<K> {
 };
 
 template <typename K, typename V>
-using generic_map_type = ArrayMap<K, V, false>;
+using generic_map_type = VectorMap<K, V, false>;
 template <typename K, typename V>
-using sorted_map_type = ArrayMap<K, V, true>;
+using sorted_map_type = VectorMap<K, V, true>;
 template <typename T>
-using generic_set_type = ArraySet<T, false>;
+using generic_set_type = VectorSet<T, false>;
 template <typename T>
-using sorted_set_type = ArraySet<T, true>;
+using sorted_set_type = VectorSet<T, true>;
 
 } // namespace Telex
 } // namespace VietType

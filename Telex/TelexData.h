@@ -26,9 +26,9 @@ extern const generic_map_type<const wchar_t*, std::wstring> transitions_v_c2_q;
 extern const sorted_map_type<wchar_t, std::wstring> transitions_tones;
 
 extern const sorted_set_type<const wchar_t*> valid_c1;
-extern const sorted_map_type<const wchar_t*, VInfo> valid_v;     // value: accent position
-extern const sorted_map_type<const wchar_t*, VInfo> valid_v_q;   // value: accent position
-extern const generic_map_type<const wchar_t*, VInfo> valid_v_gi; // value: accent position
+extern const sorted_map_type<const wchar_t*, VInfo> valid_v;    // value: accent position
+extern const sorted_map_type<const wchar_t*, VInfo> valid_v_q;  // value: accent position
+extern const sorted_map_type<const wchar_t*, VInfo> valid_v_gi; // value: accent position
 extern const sorted_map_type<const wchar_t*, bool> valid_c2;
 extern const generic_map_type<const wchar_t*, VInfo> valid_v_oa_uy;
 extern const sorted_map_type<wchar_t, std::wstring> backconversions;
