@@ -27,6 +27,23 @@ static const GUID GUID_KeyEventSink_PreservedKey_Toggle = {
     0x8cc27cf8, 0x93d2, 0x416c, {0xb1, 0xa3, 0x66, 0x82, 0x7f, 0x54, 0x24, 0x4a}};
 static const TF_PRESERVEDKEY PK_Toggle = {VK_OEM_3, TF_MOD_ALT}; // Alt-`
 
+static HRESULT InjectBackspace() {
+    /*
+    CComPtr<ITfCompartmentMgr> tcMgr;
+    hr = pic->QueryInterface(&tcMgr);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"pic->QueryInterface failed");
+    */
+    INPUT inp[2];
+    ZeroMemory(inp, sizeof(inp));
+    inp[0].type = inp[1].type = INPUT_KEYBOARD;
+    inp[0].ki.wVk = inp[1].ki.wVk = VK_BACK;
+    inp[1].ki.dwFlags = KEYEVENTF_KEYUP;
+    if (!SendInput(ARRAYSIZE(inp), inp, sizeof(INPUT))) {
+        WINERROR_GLE_RETURN_HRESULT(L"%s", L"SendInput failed");
+    }
+    return S_OK;
+}
+
 STDMETHODIMP KeyEventSink::OnSetFocus(_In_ BOOL fForeground) {
     HRESULT hr;
 
@@ -60,10 +77,35 @@ STDMETHODIMP KeyEventSink::OnSetFocus(_In_ BOOL fForeground) {
     return S_OK;
 }
 
+/*
+ * onkey BS: "nuoc nha " B=-1, KES eats, calls ESW
+ * ESW saves word="nha", sets B=4, returns S_FALSE
+ * ESW result: KES sees ESW S_FALSE, sends BS
+ * onkey BS: "nuoc nha" B=3, KES sends BS
+ * onkey BS: "nuoc nh" B=2, KES sends BS
+ * onkey BS: "nuoc n" B=1, KES sends BS
+ * onkey BS: "nuoc " B=0, KES calls ESW
+ * ESW backconverts, creates composition
+ * "nuoc (nha)|"
+ * ESW successes, sets B=-1, KES completes
+ * ================================
+ * When to eat backspace? when B=-1 or B=0
+ * When to call ESW? when B=-1 or B=0
+ * When to inject BS?
+ *   KES injects BS when ESW S_FALSE or B>0
+ * When to reset compartment?
+ */
 HRESULT KeyEventSink::OnKeyDownCommon(
-    _In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten, _Out_ BOOL* isBackconvert) {
+    _In_ ITfContext* pic,
+    _In_ WPARAM wParam,
+    _In_ LPARAM lParam,
+    _Out_ BOOL* pfEaten,
+    _Out_ BOOL* needsESW,
+    _Out_ BOOL* needsBS) {
     HRESULT hr;
-    *isBackconvert = FALSE;
+    long valCompBS = -1;
+    *needsESW = FALSE;
+    *needsBS = FALSE;
 
     if (!_controller->IsEnabled()) {
         *pfEaten = FALSE;
@@ -84,22 +126,25 @@ HRESULT KeyEventSink::OnKeyDownCommon(
     if (wParam == VK_BACK && !_compositionManager->IsComposing() &&
         !((_keyState[VK_CONTROL] & 0x80) || (_keyState[VK_MENU] & 0x80) || (_keyState[VK_LWIN] & 0x80) ||
           (_keyState[VK_RWIN] & 0x80))) {
-        long backspacing;
-        hr = compBackconvert.GetValue(&backspacing);
+        hr = compBackconvert.GetValue(&valCompBS);
         if (FAILED(hr)) {
             DBG_HRESULT_CHECK(hr, L"%s", L"compBackconvert.GetValue failed");
             goto finish;
         }
 
-        *isBackconvert = _controller->IsBackconvertOnBackspace() && (backspacing != -1);
+        *needsESW = _controller->IsBackconvertOnBackspace() && (valCompBS == -1 || valCompBS == 0);
+        *needsBS = _controller->IsBackconvertOnBackspace() && (valCompBS > 0);
     }
 
 finish:
-    if (*isBackconvert) {
+    DPRINT(L"backspacing=%ld, needsESW=%d, needsBS=%d", valCompBS, *needsESW, *needsBS);
+    if (*needsESW) {
         *pfEaten = TRUE;
     } else {
-        hr = compBackconvert.SetValue(0);
-        DBG_HRESULT_CHECK(hr, L"%s", L"compBackconvert reset failed");
+        if (!needsBS) {
+            hr = compBackconvert.SetValue(-1);
+            DBG_HRESULT_CHECK(hr, L"%s", L"compBackconvert reset failed");
+        }
         *pfEaten = IsKeyEaten(_compositionManager->IsComposing(), wParam, lParam, _keyState);
     }
 
@@ -108,8 +153,8 @@ finish:
 
 STDMETHODIMP KeyEventSink::OnTestKeyDown(
     _In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten) {
-    BOOL isBackconvert;
-    HRESULT hr = OnKeyDownCommon(pic, wParam, lParam, pfEaten, &isBackconvert);
+    BOOL needsESW, needsBS;
+    HRESULT hr = OnKeyDownCommon(pic, wParam, lParam, pfEaten, &needsESW, &needsBS);
     HRESULT_CHECK_RETURN(hr, L"%s", L"OnKeyDownCommon failed");
 
     // break off the composition early at OnTestKeyDown on an uneaten key
@@ -144,14 +189,26 @@ STDMETHODIMP KeyEventSink::OnTestKeyUp(
 
 STDMETHODIMP KeyEventSink::OnKeyDown(
     _In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten) {
-    BOOL isBackconvert;
-    HRESULT hr = OnKeyDownCommon(pic, wParam, lParam, pfEaten, &isBackconvert);
+    BOOL needsESW, needsBS;
+    HRESULT hr = OnKeyDownCommon(pic, wParam, lParam, pfEaten, &needsESW, &needsBS);
     HRESULT_CHECK_RETURN(hr, L"%s", L"OnKeyDownCommon failed");
 
     DBG_DPRINT(L"OnKeyDown wParam = %lx %s", wParam, *pfEaten ? L"eaten" : L"not eaten");
 
-    if (*pfEaten || _compositionManager->IsComposing()) {
-        if (isBackconvert) {
+    if (needsBS) {
+        long backspacing;
+        Compartment<long> compBackconvert;
+        hr = compBackconvert.Initialize(pic, _compositionManager->GetClientId(), Globals::GUID_Compartment_Backconvert);
+        HRESULT_CHECK_RETURN(hr, L"%s", L"compBackconvert.Initialize failed");
+        hr = compBackconvert.GetValue(&backspacing);
+        HRESULT_CHECK_RETURN(hr, L"%s", L"compBackconvert.GetValue failed");
+        hr = compBackconvert.SetValue(backspacing - 1);
+        HRESULT_CHECK_RETURN(hr, L"%s", L"compBackconvert.SetValue failed");
+
+        DPRINT(L"%s", L"injecting backspace");
+        hr = InjectBackspace();
+    } else if (*pfEaten || _compositionManager->IsComposing()) {
+        if (needsESW) {
             HRESULT hrSession;
             hr = CompositionManager::RequestEditSessionEx(
                 EditSessions::EditSurroundingWord,
@@ -161,21 +218,9 @@ STDMETHODIMP KeyEventSink::OnKeyDown(
                 &hrSession,
                 _controller.p,
                 1);
-            if (FAILED(hr) || FAILED(hrSession)) {
-                DBG_DPRINT(L"%s", L"backspace SendInput fallback");
-
-                CComPtr<ITfCompartmentMgr> tcMgr;
-                hr = pic->QueryInterface(&tcMgr);
-                HRESULT_CHECK_RETURN(hr, L"%s", L"pic->QueryInterface failed");
-
-                INPUT inp[2];
-                ZeroMemory(inp, sizeof(inp));
-                inp[0].type = inp[1].type = INPUT_KEYBOARD;
-                inp[0].ki.wVk = inp[1].ki.wVk = VK_BACK;
-                inp[1].ki.dwFlags = KEYEVENTF_KEYUP;
-                if (!SendInput(ARRAYSIZE(inp), inp, sizeof(INPUT))) {
-                    WINERROR_GLE_RETURN_HRESULT(L"%s", L"SendInput failed");
-                }
+            if (FAILED(hr) || FAILED(hrSession) || hrSession == S_FALSE) {
+                HRESULT_CHECK(hrSession, L"%s", L"backspace SendInput fallback");
+                hr = InjectBackspace();
             }
         } else {
             hr = CallKeyEdit(pic, wParam, lParam, _keyState);

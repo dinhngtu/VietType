@@ -24,8 +24,13 @@ public:
     END_COM_MAP()
     DECLARE_PROTECT_FINAL_CONSTRUCT()
 
-    HRESULT OnKeyDownCommon(
-        _In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten, _Out_ BOOL* isBackconvert);
+    HRESULT KeyEventSink::OnKeyDownCommon(
+        _In_ ITfContext* pic,
+        _In_ WPARAM wParam,
+        _In_ LPARAM lParam,
+        _Out_ BOOL* pfEaten,
+        _Out_ BOOL* needsESW,
+        _Out_ BOOL* needsBS);
 
     // Inherited via ITfKeyEventSink
     virtual STDMETHODIMP OnSetFocus(_In_ BOOL fForeground) override;
