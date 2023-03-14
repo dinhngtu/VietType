@@ -98,11 +98,11 @@ private:
     bool _backconverted = false;
 
 private:
-    using map_iterator = generic_map_type<std::wstring, VInfo>::const_iterator;
+    using map_iterator = generic_map_type<const wchar_t*, VInfo>::const_iterator;
     bool FindTable(_Out_ map_iterator* it) const;
     bool GetTonePos(_In_ bool predict, _Out_ VInfo* vinfo) const;
-    bool TransitionV(const generic_map_type<std::wstring, std::wstring>& source, bool w_mode = false);
-    bool TransitionV(const sorted_map_type<std::wstring, std::wstring>& source, bool w_mode = false);
+    bool TransitionV(const generic_map_type<const wchar_t*, std::wstring>& source, bool w_mode = false);
+    bool TransitionV(const sorted_map_type<const wchar_t*, std::wstring>& source, bool w_mode = false);
     void InvalidateAndPopBack(wchar_t c);
 
 private:

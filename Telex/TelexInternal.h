@@ -47,9 +47,10 @@ struct ArrayMap : public std::vector<std::pair<K, V>> {
         }
     }
 
-    const_iterator find(const K& key) const {
+    template <typename KK>
+    const_iterator find(const KK& key) const {
         if (sorted) {
-            auto first = std::lower_bound(this->cbegin(), this->cend(), key, pair_less);
+            auto first = std::lower_bound(this->cbegin(), this->cend(), key, pair_less<KK>);
             if (first != this->cend() && first->first == key) {
                 return first;
             } else {
@@ -61,7 +62,8 @@ struct ArrayMap : public std::vector<std::pair<K, V>> {
     }
 
 private:
-    static bool pair_less(const std::pair<K, V>& a, const K& b) {
+    template <typename KK>
+    static bool pair_less(const std::pair<K, V>& a, const KK& b) {
         return a.first < b;
     }
 
@@ -80,7 +82,8 @@ struct ArraySet : public std::vector<K> {
         }
     }
 
-    const_iterator find(const K& key) const {
+    template <typename KK>
+    const_iterator find(const KK& key) const {
         if (sorted) {
             auto first = std::lower_bound(this->cbegin(), this->cend(), key);
             if (first != this->cend() && *first == key) {

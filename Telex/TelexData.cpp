@@ -7,7 +7,7 @@ namespace Telex {
 
 // maps that are too short are kept as generic
 
-const sorted_map_type<std::wstring, std::wstring> transitions = {
+const sorted_map_type<const wchar_t*, std::wstring> transitions = {
     {L"aa", L"\xe2"},     //
     {L"aua", L"\xe2u"},   // relaxed transformations
     {L"aya", L"\xe2y"},   // relaxed transformations
@@ -32,7 +32,7 @@ const sorted_map_type<std::wstring, std::wstring> transitions = {
     {L"\x1b0o", L"\x1b0\x1a1"},   // relaxed transformations
 };
 
-const sorted_map_type<std::wstring, int> respos = {
+const sorted_map_type<const wchar_t*, int> respos = {
     {L"i\xea", 1},       //
     {L"i\xeau", 1},      // relaxed transformations
     {L"uy\xea", 2},      //
@@ -55,7 +55,7 @@ const sorted_map_type<std::wstring, int> respos = {
     {L"\x1b0\x1a1u", 0}, //
 };
 
-const sorted_map_type<std::wstring, std::wstring> transitions_w = {
+const sorted_map_type<const wchar_t*, std::wstring> transitions_w = {
     {L"a", L"\x103"},
     {L"o", L"\x1a1"},
     {L"oa", L"o\x103"},
@@ -72,7 +72,7 @@ const sorted_map_type<std::wstring, std::wstring> transitions_w = {
     {L"\x1b0\x1a1", L"\x1b0\x1a1"},
 };
 
-const generic_map_type<std::wstring, std::wstring> transitions_w_q = {
+const generic_map_type<const wchar_t*, std::wstring> transitions_w_q = {
     {L"u", L"\x1b0"},
     {L"ua", L"u\x103"},
     {L"uo", L"u\x1a1"},
@@ -80,7 +80,7 @@ const generic_map_type<std::wstring, std::wstring> transitions_w_q = {
     {L"\x1b0\x1a1", L"\x1b0\x1a1"},
 };
 
-const sorted_map_type<std::wstring, int> respos_w = {
+const sorted_map_type<const wchar_t*, int> respos_w = {
     {L"o\x103", 1},
     {L"u\x103", 1},
     {L"u\x1a1", 1},
@@ -93,12 +93,12 @@ const sorted_map_type<std::wstring, int> respos_w = {
     {L"\x1b0\x1a1i", 1},
 };
 
-const generic_map_type<std::wstring, std::wstring> transitions_v_c2 = {
+const generic_map_type<const wchar_t*, std::wstring> transitions_v_c2 = {
     {L"u\x1a1", L"\x1b0\x1a1"},
     {L"\x1b0o", L"\x1b0\x1a1"},
 };
 
-const generic_map_type<std::wstring, std::wstring> transitions_v_c2_q = {
+const generic_map_type<const wchar_t*, std::wstring> transitions_v_c2_q = {
     {L"\x1b0o", L"\x1b0\x1a1"},
 };
 
@@ -117,7 +117,7 @@ const sorted_map_type<wchar_t, std::wstring> transitions_tones = {
     {L'\x1b0', L"\x1b0\x1eeb\x1ef1\x1eed\x1ee9\x1eef"},
 };
 
-const sorted_set_type<std::wstring> valid_c1 = {
+const sorted_set_type<const wchar_t*> valid_c1 = {
     L"",
     L"b",
     L"c",
@@ -149,7 +149,7 @@ const sorted_set_type<std::wstring> valid_c1 = {
     L"\x111",
 };
 
-const sorted_map_type<std::wstring, VInfo> valid_v = {
+const sorted_map_type<const wchar_t*, VInfo> valid_v = {
     {L"a", {0, C2Mode::Either}},
     {L"ai", {0, C2Mode::NoC2}},
     {L"ao", {0, C2Mode::NoC2}},
@@ -210,7 +210,7 @@ const sorted_map_type<std::wstring, VInfo> valid_v = {
     {L"\x1b0\x1a1u", {1, C2Mode::NoC2}},  // ươu
 };
 
-const sorted_map_type<std::wstring, VInfo> valid_v_q = {
+const sorted_map_type<const wchar_t*, VInfo> valid_v_q = {
     {L"ua", {1, C2Mode::Either}},         // c2 either with qu
     {L"uai", {1, C2Mode::NoC2}},          //
     {L"uao", {1, C2Mode::NoC2}},          //
@@ -232,7 +232,7 @@ const sorted_map_type<std::wstring, VInfo> valid_v_q = {
     {L"\x1b0\x1a1", {1, C2Mode::MustC2}}, // ươ
 };
 
-const generic_map_type<std::wstring, VInfo> valid_v_gi = {
+const generic_map_type<const wchar_t*, VInfo> valid_v_gi = {
     {L"", {-1, C2Mode::Either}},
     {L"a", {0, C2Mode::Either}},
     {L"\x103", {0, C2Mode::MustC2}}, // ă
@@ -266,7 +266,7 @@ const generic_map_type<std::wstring, VInfo> valid_v_gi = {
 };
 
 // bool is whether tones are restricted to s/j or not
-const sorted_map_type<std::wstring, bool> valid_c2 = {
+const sorted_map_type<const wchar_t*, bool> valid_c2 = {
     {L"", false},
     {L"c", true},
     {L"ch", true},
@@ -279,7 +279,7 @@ const sorted_map_type<std::wstring, bool> valid_c2 = {
     {L"t", true},
 };
 
-const generic_map_type<std::wstring, VInfo> valid_v_oa_uy = {
+const generic_map_type<const wchar_t*, VInfo> valid_v_oa_uy = {
     {L"oa", {0, C2Mode::Either}},
     {L"oe", {0, C2Mode::Either}},
     {L"uy", {0, C2Mode::Either}},

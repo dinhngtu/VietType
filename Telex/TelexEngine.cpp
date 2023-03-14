@@ -302,7 +302,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
     return _state;
 }
 
-bool TelexEngine::TransitionV(const generic_map_type<std::wstring, std::wstring>& source, bool w_mode) {
+bool TelexEngine::TransitionV(const generic_map_type<const wchar_t*, std::wstring>& source, bool w_mode) {
     auto it = source.find(_v);
     if (it != source.end() && (!w_mode || ((_v != it->second || _c2.empty()) && _respos.back() != ResposTransitionW))) {
         _v = it->second;
@@ -312,7 +312,7 @@ bool TelexEngine::TransitionV(const generic_map_type<std::wstring, std::wstring>
     }
 }
 
-bool TelexEngine::TransitionV(const sorted_map_type<std::wstring, std::wstring>& source, bool w_mode) {
+bool TelexEngine::TransitionV(const sorted_map_type<const wchar_t*, std::wstring>& source, bool w_mode) {
     auto it = source.find(_v);
     if (it != source.end() && (!w_mode || ((_v != it->second || _c2.empty()) && _respos.back() != ResposTransitionW))) {
         _v = it->second;
