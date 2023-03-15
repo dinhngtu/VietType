@@ -79,37 +79,6 @@ public:
     }
 };
 
-class StringCompartment : public CompartmentBase {
-public:
-    _Check_return_ _Success_(return == S_OK) HRESULT GetValue(_Out_ BSTR* val) {
-        HRESULT hr;
-
-        VARIANT v;
-        VariantInit(&v);
-        hr = _compartment->GetValue(&v);
-        if (hr == S_FALSE) {
-            return S_FALSE;
-        } else if (hr == S_OK) {
-            if (v.vt != VT_BSTR) {
-                return E_FAIL;
-            }
-            *val = v.bstrVal;
-        }
-
-        return hr;
-    }
-
-    HRESULT SetValue(const CComBSTR& val) {
-        HRESULT hr;
-
-        CComVariant v = val;
-        hr = _compartment->SetValue(_clientid, &v);
-        HRESULT_CHECK_RETURN(hr, L"%s", L"_compartment->SetValue failed");
-
-        return S_OK;
-    }
-};
-
 template <>
 struct CompartmentBase::variantInfo<long> {
     static constexpr VARTYPE vartype = VT_I4;

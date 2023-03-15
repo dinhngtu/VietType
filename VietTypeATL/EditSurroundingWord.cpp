@@ -52,25 +52,14 @@ static bool IsSeparatorCharacter(WCHAR c) {
     return false;
 }
 
-static const TF_HALTCOND haltcond = {
-    NULL,
-    TF_ANCHOR_START, // ignored
-    TF_HF_OBJECT,
-};
-
-static HRESULT DoMeasureSurroundingWord(
+static HRESULT DoEditSurroundingWord(
     _In_ TfEditCookie ec,
     _In_ CompositionManager* compositionManager,
     _In_ ITfContext* context,
     _In_ EngineController* controller,
-    _In_ ITfRange* range,
-    _In_ int ignore,
-    _Inout_ std::array<WCHAR, SWF_MAXCHARS>& buf,
-    _Out_ ULONG* _retrieved,
-    _Out_ LONG* _wordlen) {
+    _In_ int ignore) {
     HRESULT hr;
 
-    /*
     CComPtr<ITfContext> ppic;
     hr = VirtualDocument::GetVirtualDocumentContext(context, &ppic);
     DBG_HRESULT_CHECK(hr, L"%s", L"ThreadMgrEventSink::GetTransitoryParentContext failed");
@@ -82,13 +71,17 @@ static HRESULT DoMeasureSurroundingWord(
     CComPtr<ITfRange> range;
     hr = compositionManager->GetRange(&range);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_composition->GetRange failed");
-    */
 
     // shift current range backwards
 
     CComPtr<ITfRange> rangeTest;
     hr = range->Clone(&rangeTest);
     HRESULT_CHECK_RETURN(hr, L"%s", L"range->Clone failed");
+
+    TF_HALTCOND haltcond{
+        NULL,
+        TF_ANCHOR_START, // ignored
+        TF_HF_OBJECT};
 
     LONG shifted;
     hr = rangeTest->ShiftStart(ec, -SWF_MAXCHARS, &shifted, &haltcond);
@@ -99,6 +92,8 @@ static HRESULT DoMeasureSurroundingWord(
     }
 
     // find word boundary
+
+    std::array<WCHAR, SWF_MAXCHARS> buf;
     ULONG retrieved;
     hr = rangeTest->GetText(ec, 0, &buf[0], shifted, &retrieved);
     HRESULT_CHECK_RETURN(hr, L"%s", L"rangeTest->GetText failed");
@@ -132,24 +127,28 @@ static HRESULT DoMeasureSurroundingWord(
         return E_FAIL;
     }
 
-    *_retrieved = retrieved;
-    *_wordlen = wordlen;
-    return S_OK;
-}
-
-static HRESULT DoEditSurroundingWord(
-    _In_ TfEditCookie ec,
-    _In_ CompositionManager* compositionManager,
-    _In_ ITfContext* context,
-    _In_ EngineController* controller,
-    _In_ const std::wstring& word) {
     CComPtr<ITfComposition> composition(compositionManager->GetComposition());
+
+    // move composition to the word we found
+    hr = range->ShiftStart(ec, -wordlen - ignore, &shifted, &haltcond);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"range->ShiftStart failed");
+    hr = composition->ShiftStart(ec, range);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"composition->ShiftStart failed");
+
+    /*
+    if (ignore) {
+        hr = range->ShiftEnd(ec, -ignore, &shifted, &haltcond);
+        HRESULT_CHECK_RETURN(hr, L"%s", L"range->ShiftEnd failed");
+        hr = composition->ShiftEnd(ec, range);
+        HRESULT_CHECK_RETURN(hr, L"%s", L"composition->ShiftEnd failed");
+    }
+    */
 
     // reinitialize engine with text
     controller->GetEngine().Reset();
 #pragma warning(push)
 #pragma warning(disable : 26451)
-    controller->GetEngine().Backconvert(word);
+    controller->GetEngine().Backconvert(std::wstring(&buf[static_cast<size_t>(retrieved - wordlen - ignore)], wordlen));
 #pragma warning(pop)
 
     auto displayText = controller->GetEngine().Peek();
@@ -177,16 +176,8 @@ HRESULT EditSurroundingWord(
     Compartment<long> compBackconvert;
     hr = compBackconvert.Initialize(context, compositionManager->GetClientId(), Globals::GUID_Compartment_Backconvert);
     HRESULT_CHECK_RETURN(hr, L"%s", L"compBackconvert.Initialize failed");
-
-    long backspacing;
-    hr = compBackconvert.GetValue(&backspacing);
-    compBackconvert.SetValue(-2);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"compBackconvert.GetValue failed");
-
-    StringCompartment compBackconvertText;
-    hr = compBackconvertText.Initialize(
-        context, compositionManager->GetClientId(), Globals::GUID_Compartment_BackconvertText);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"compBackconvertText.Initialize failed");
+    hr = compBackconvert.SetValue(-1);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"compBackconvert.SetValue failed");
 
     if (compositionManager->IsComposing()) {
         return E_PENDING;
@@ -197,13 +188,13 @@ HRESULT EditSurroundingWord(
     hr = context->GetSelection(ec, 0, sel.size(), sel.data(), &fetched);
     HRESULT_CHECK_RETURN(hr, L"%s", L"context->GetSelection failed");
 
-    CComPtr<ITfRange> selRange;
     if (fetched > 1) {
         for (ULONG i = 0; i < fetched; i++) {
             sel[i].range->Release();
         }
         return E_FAIL;
     } else if (fetched == 1) {
+        CComPtr<ITfRange> selRange;
         selRange.Attach(sel[0].range);
         BOOL selEmpty;
         hr = selRange->IsEmpty(ec, &selEmpty);
@@ -212,40 +203,12 @@ HRESULT EditSurroundingWord(
         }
     }
 
-    if (backspacing == -1) {
-        std::array<WCHAR, SWF_MAXCHARS> buf{};
-        ULONG retrieved;
-        LONG wordlen;
-        hr = DoMeasureSurroundingWord(
-            ec, compositionManager, context, controller, selRange, ignore, buf, &retrieved, &wordlen);
-        if (FAILED(hr)) {
-            HRESULT_CHECK(hr, L"%s", L"DoMeasureSurroundingWord failed");
-            //compositionManager->EndCompositionNow(ec);
-            return hr;
-        }
-        compBackconvert.SetValue(wordlen + ignore);
-        compBackconvertText.SetValue(CComBSTR(wordlen, &buf[retrieved - wordlen - ignore]));
-        //compositionManager->EndCompositionNow(ec);
-        return S_FALSE;
-    }
-
-    CComBSTR bstr;
-    hr = compBackconvertText.GetValue(&bstr);
-    if (hr == S_FALSE) {
-        hr = E_FAIL;
-    }
-    HRESULT_CHECK_RETURN(hr, L"%s", L"compBackconvertText.GetValue failed");
-    if (!bstr.Length()) {
-        return E_FAIL;
-    }
-
     hr = compositionManager->StartCompositionNow(ec, context);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_compositionManager->StartComposition failed");
 
-    std::wstring word(bstr, bstr.Length());
-    hr = DoEditSurroundingWord(ec, compositionManager, context, controller, word);
+    hr = DoEditSurroundingWord(ec, compositionManager, context, controller, ignore);
     if (SUCCEEDED(hr)) {
-        compBackconvert.SetValue(-1);
+        compBackconvert.SetValue(0);
     } else {
         DBG_HRESULT_CHECK(hr, L"%s", L"DoEditSurroundingWord failed");
         compositionManager->EndCompositionNow(ec);

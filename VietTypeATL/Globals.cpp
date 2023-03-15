@@ -20,18 +20,9 @@ const GUID GUID_LBI_INPUTMODE = {0x2C77A81E, 0x41CC, 0x4178, {0xA3, 0xA7, 0x5F, 
 
 const GUID GUID_PROP_INPUTSCOPE = {0x1713dd5a, 0x68e7, 0x4a5b, {0x9a, 0xf6, 0x59, 0x2a, 0x59, 0x5c, 0x77, 0x8d}};
 
-/*
- * compBackconvert = -1 -> normal typing
- * compBackconvert = -2 -> backconvert edit session is actively editing
- * compBackconvert = n (n >= 0) -> needs n more backspaces
- */
 // {C36CF93E-2FE6-4132-92E5-7E7FB242D56D}
 const GUID GUID_Compartment_Backconvert = {
     0xc36cf93e, 0x2fe6, 0x4132, {0x92, 0xe5, 0x7e, 0x7f, 0xb2, 0x42, 0xd5, 0x6d}};
-
-// {F54B7E7D-053B-4EAA-9E89-C80107D4A9BE}
-const GUID GUID_Compartment_BackconvertText = {
-    0xf54b7e7d, 0x53b, 0x4eaa, {0x9e, 0x89, 0xc8, 0x1, 0x7, 0xd4, 0xa9, 0xbe}};
 
 const std::wstring TextServiceDescription = L"VietType";
 extern const std::wstring ConfigKeyName = L"Software\\VietType";
