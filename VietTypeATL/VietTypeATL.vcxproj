@@ -157,7 +157,6 @@
       <AdditionalIncludeDirectories>$(SolutionDir)Telex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
-      <ControlFlowGuard>Guard</ControlFlowGuard>
     </ClCompile>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -201,7 +200,6 @@
       <AdditionalIncludeDirectories>$(SolutionDir)Telex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
-      <ControlFlowGuard>Guard</ControlFlowGuard>
       <GuardEHContMetadata>true</GuardEHContMetadata>
     </ClCompile>
     <Midl>
