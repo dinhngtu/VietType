@@ -3,7 +3,7 @@
 #pragma once
 
 #include "Common.h"
-#include "TelexEngine.h"
+#include "Telex.h"
 
 namespace VietType {
 

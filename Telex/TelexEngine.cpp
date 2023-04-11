@@ -1,68 +1,15 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 #include <utility>
-
-#include "Common.h"
-#include "TelexEngine.h"
+#include <cassert>
+#include "Telex.h"
 #include "TelexData.h"
+#include "TelexEngine.h"
 
 #define IS(cat, type) (static_cast<bool>((cat) & (type)))
 
 namespace VietType {
 namespace Telex {
-
-enum class CharTypes : unsigned int {
-    Uncategorized = 0,
-    Commit = 1 << 0,
-    ForceCommit = 1 << 1,
-    Backspace = 1 << 2,
-    Vowel = 1 << 3,
-    VowelW = 1 << 4,
-    // TODO: classification for vowel continue
-    Conso = 1 << 5,
-    ConsoC1 = 1 << 5 | 1 << 6,
-    ConsoC2 = 1 << 5 | 1 << 7,
-    ConsoContinue = 1 << 5 | 1 << 8,
-    Tone = 1 << 9,
-    Shorthand = 1 << 10,
-};
-
-constexpr CharTypes operator|(CharTypes lhs, CharTypes rhs) {
-    return static_cast<CharTypes>(static_cast<unsigned int>(lhs) | static_cast<unsigned int>(rhs));
-}
-
-constexpr CharTypes operator&(CharTypes lhs, CharTypes rhs) {
-    return static_cast<CharTypes>(static_cast<unsigned int>(lhs) & static_cast<unsigned int>(rhs));
-}
-
-static const CharTypes letterClasses[26] = {
-    CharTypes::Vowel,                                                // a
-    CharTypes::ConsoC1,                                              // b
-    CharTypes::ConsoC1 | CharTypes::ConsoC2,                         // c
-    CharTypes::ConsoC1 | CharTypes::ConsoContinue,                   // d
-    CharTypes::Vowel,                                                // e
-    CharTypes::Tone,                                                 // f
-    CharTypes::ConsoC1 | CharTypes::ConsoContinue,                   // g
-    CharTypes::ConsoC1 | CharTypes::ConsoContinue,                   // h
-    CharTypes::Vowel,                                                // i
-    CharTypes::Tone,                                                 // j
-    CharTypes::ConsoC1,                                              // k
-    CharTypes::ConsoC1,                                              // l
-    CharTypes::ConsoC1 | CharTypes::ConsoC2,                         // m
-    CharTypes::ConsoC1 | CharTypes::ConsoC2,                         // n
-    CharTypes::Vowel,                                                // o
-    CharTypes::ConsoC1 | CharTypes::ConsoC2,                         // p
-    CharTypes::ConsoC1,                                              // q
-    CharTypes::Tone | CharTypes::ConsoC1 | CharTypes::ConsoContinue, // r
-    CharTypes::Tone | CharTypes::ConsoC1 | CharTypes::ConsoContinue, // s
-    CharTypes::ConsoC1 | CharTypes::ConsoC2,                         // t
-    CharTypes::Vowel,                                                // u
-    CharTypes::ConsoC1,                                              // v
-    CharTypes::VowelW,                                               // w
-    CharTypes::Tone | CharTypes::ConsoC1,                            // x
-    CharTypes::Vowel,                                                // y
-    CharTypes::Tone,                                                 // z
-};
 
 static CharTypes ClassifyCharacter(_In_ wchar_t c) {
     if (c >= L'a' && c <= L'z') {
@@ -207,6 +154,75 @@ static void ApplyCases(_In_ std::wstring& str, _In_ const std::vector<int>& case
     }
 }
 
+struct TelexEngineImpl {
+    template <typename T>
+    static bool TransitionV(TelexEngine& e, const T& source, bool w_mode = false) {
+        auto it = source.find(e._v);
+        if (it != source.end() &&
+            (!w_mode || ((e._v != it->second || e._c2.empty()) && e._respos.back() != ResposTransitionW))) {
+            e._v = it->second.str();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    static void InvalidateAndPopBack(TelexEngine& e, wchar_t c) {
+        // pop back only if same char entered twice in a row
+        if (c == ToLower(e._keyBuffer.rbegin()[1])) {
+            e._keyBuffer.pop_back();
+        }
+        e._state = TelexStates::Invalid;
+    }
+
+    static std::optional<std::pair<WConStr, VInfo>> FindTable(const TelexEngine& e) {
+        if (e._c1 == L"q") {
+            return valid_v_q.find_opt(e._v);
+        } else if (e._c1 == L"gi") {
+            return valid_v_gi.find_opt(e._v);
+        } else {
+            if (!e._c2.size() && !e._config.oa_uy_tone1) {
+                auto it = valid_v_oa_uy.find(e._v);
+                if (it != valid_v_oa_uy.end())
+                    return *it;
+            }
+            return valid_v.find_opt(e._v);
+        }
+    }
+
+    static bool GetTonePos(const TelexEngine& e, _In_ bool predict, _Out_ VInfo* vinfo) {
+        auto found = FindTable(e);
+        VInfo retinfo = {0, C2Mode::Either};
+        if (found) {
+            retinfo = found->second;
+        } else if (predict) {
+            // guess tone position if _v is not known
+            switch (e._v.size()) {
+            case 1:
+                retinfo.tonepos = 0;
+                retinfo.c2mode = C2Mode::Either;
+                break;
+            case 2:
+            case 3:
+                retinfo.tonepos = 1;
+                retinfo.c2mode = C2Mode::Either;
+                break;
+            default:
+                retinfo.tonepos = -1;
+                retinfo.c2mode = C2Mode::Either;
+                break;
+            }
+            if (e._c1 == L"q") {
+                // quick fix to prevent pushing tone character when backspacing to 'qu'
+                retinfo.tonepos = -1;
+                retinfo.c2mode = C2Mode::Either;
+            }
+        }
+        *vinfo = retinfo;
+        return found.has_value();
+    }
+};
+
 TelexEngine::TelexEngine(_In_ TelexConfig config) {
     _config = config;
     _keyBuffer.reserve(9);
@@ -295,7 +311,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
         // vowel parts (aeiouy)
         _v.push_back(c);
         auto before = _v.size();
-        if (TransitionV(transitions)) {
+        if (TelexEngineImpl::TransitionV(*this, transitions)) {
             auto after = _v.size();
             // we don't yet take into account if _v grows in length due to the transition
             if (_keyBuffer.size() > 1 && _respos.back() == ResposTransitionV && c == ToLower(_keyBuffer.rbegin()[1])) {
@@ -334,17 +350,17 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
     } else if (!_v.empty() && IS(cat, CharTypes::VowelW)) {
         bool tw;
         if (_c1 == L"q") {
-            tw = TransitionV(transitions_w_q, true);
+            tw = TelexEngineImpl::TransitionV(*this, transitions_w_q, true);
         } else {
-            tw = TransitionV(transitions_w, true);
+            tw = TelexEngineImpl::TransitionV(*this, transitions_w, true);
         }
         if (tw) {
             if (!_c2.empty()) {
-                TransitionV(transitions_v_c2);
+                TelexEngineImpl::TransitionV(*this, transitions_v_c2);
             }
             _respos.push_back(ResposTransitionW);
         } else {
-            InvalidateAndPopBack(c);
+            TelexEngineImpl::InvalidateAndPopBack(*this, c);
         }
         // 'w' always keeps V size constant, don't push case
 
@@ -362,15 +378,15 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
         } else {
             // the condition "_c1 == L"gi" || !_v.empty()" should ensure this already
             assert(_keyBuffer.length() > 1);
-            InvalidateAndPopBack(c);
+            TelexEngineImpl::InvalidateAndPopBack(*this, c);
         }
 
     } else if (((_c1 == L"gi" && _v.empty()) || !_v.empty()) && _c2.empty() && IS(cat, CharTypes::ConsoC2)) {
         // word-ending consonants (cnpt)
         if (_c1 == L"q") {
-            TransitionV(transitions_v_c2_q);
+            TelexEngineImpl::TransitionV(*this, transitions_v_c2_q);
         } else {
-            TransitionV(transitions_v_c2);
+            TelexEngineImpl::TransitionV(*this, transitions_v_c2);
         }
         _c2.push_back(c);
         _cases.push_back(ccase);
@@ -391,7 +407,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
             _respos.push_back(ResposTone);
         } else {
             assert(_keyBuffer.length() > 1);
-            InvalidateAndPopBack(c);
+            TelexEngineImpl::InvalidateAndPopBack(*this, c);
         }
 
     } else if (cat == CharTypes::Shorthand) {
@@ -404,34 +420,6 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
 
     assert(CheckInvariants());
     return _state;
-}
-
-bool TelexEngine::TransitionV(const generic_map_type<const wchar_t*, const wchar_t*>& source, bool w_mode) {
-    auto it = source.find(_v);
-    if (it != source.end() && (!w_mode || ((_v != it->second || _c2.empty()) && _respos.back() != ResposTransitionW))) {
-        _v = it->second;
-        return true;
-    } else {
-        return false;
-    }
-}
-
-bool TelexEngine::TransitionV(const sorted_map_type<const wchar_t*, const wchar_t*>& source, bool w_mode) {
-    auto it = source.find(_v);
-    if (it != source.end() && (!w_mode || ((_v != it->second || _c2.empty()) && _respos.back() != ResposTransitionW))) {
-        _v = it->second;
-        return true;
-    } else {
-        return false;
-    }
-}
-
-void TelexEngine::InvalidateAndPopBack(wchar_t c) {
-    // pop back only if same char entered twice in a row
-    if (c == ToLower(_keyBuffer.rbegin()[1])) {
-        _keyBuffer.pop_back();
-    }
-    _state = TelexStates::Invalid;
 }
 
 TelexStates TelexEngine::Backspace() {
@@ -463,7 +451,7 @@ TelexStates TelexEngine::Backspace() {
 
     // if cannot set tone like in Peek, treat this as invalid (but do not mark word as invalid for further correction)
     VInfo vinfo;
-    auto found = GetTonePos(false, &vinfo);
+    auto found = TelexEngineImpl::GetTonePos(*this, false, &vinfo);
     if (!found && _t != Tones::Z) {
         Reset();
         if (buf.size()) {
@@ -574,7 +562,7 @@ TelexStates TelexEngine::Commit() {
 
     // validate v and get tone position
     VInfo vinfo;
-    auto found = GetTonePos(false, &vinfo);
+    auto found = TelexEngineImpl::GetTonePos(*this, false, &vinfo);
     if (!found) {
         _state = TelexStates::CommittedInvalid;
         return _state;
@@ -619,7 +607,7 @@ TelexStates TelexEngine::ForceCommit() {
     }
 
     VInfo vinfo;
-    auto found = GetTonePos(false, &vinfo);
+    auto found = TelexEngineImpl::GetTonePos(*this, false, &vinfo);
     if (!found) {
         _state = TelexStates::CommittedInvalid;
         return _state;
@@ -653,12 +641,12 @@ TelexStates TelexEngine::Backconvert(_In_ const std::wstring& s) {
             auto clow = ToLower(c);
             auto it = backconversions.find(clow);
             assert(it != backconversions.end());
-            for (auto backc = it->second; *backc; backc++) {
+            for (auto backc : it->second) {
                 if (c != clow) {
                     // c is upper
-                    PushChar(ToUpper(*backc));
+                    PushChar(ToUpper(backc));
                 } else {
-                    PushChar(*backc);
+                    PushChar(backc);
                 }
             }
             found_backconversion = true;
@@ -704,7 +692,7 @@ std::wstring TelexEngine::Peek() const {
     result.append(_v);
 
     VInfo vinfo;
-    auto found = GetTonePos(false, &vinfo);
+    auto found = TelexEngineImpl::GetTonePos(*this, false, &vinfo);
     if (!found) {
         if (_t == Tones::Z) {
             result.append(_c2);
@@ -733,58 +721,6 @@ std::wstring TelexEngine::Peek() const {
 
 std::wstring::size_type TelexEngine::Count() const {
     return _keyBuffer.size();
-}
-
-bool TelexEngine::FindTable(_Out_ map_iterator* it) const {
-    if (_c1 == L"q") {
-        *it = valid_v_q.find(_v);
-        return *it != valid_v_q.end();
-    } else if (_c1 == L"gi") {
-        *it = valid_v_gi.find(_v);
-        return *it != valid_v_gi.end();
-    } else {
-        if (!_c2.size() && !_config.oa_uy_tone1) {
-            *it = valid_v_oa_uy.find(_v);
-            if (*it != valid_v_oa_uy.end()) {
-                return true;
-            }
-        }
-        *it = valid_v.find(_v);
-        return *it != valid_v.end();
-    }
-}
-
-bool TelexEngine::GetTonePos(_In_ bool predict, _Out_ VInfo* vinfo) const {
-    map_iterator it;
-    auto found = FindTable(&it);
-    VInfo retinfo = {0, C2Mode::Either};
-    if (found) {
-        retinfo = it->second;
-    } else if (predict) {
-        // guess tone position if _v is not known
-        switch (_v.size()) {
-        case 1:
-            retinfo.tonepos = 0;
-            retinfo.c2mode = C2Mode::Either;
-            break;
-        case 2:
-        case 3:
-            retinfo.tonepos = 1;
-            retinfo.c2mode = C2Mode::Either;
-            break;
-        default:
-            retinfo.tonepos = -1;
-            retinfo.c2mode = C2Mode::Either;
-            break;
-        }
-        if (_c1 == L"q") {
-            // quick fix to prevent pushing tone character when backspacing to 'qu'
-            retinfo.tonepos = -1;
-            retinfo.c2mode = C2Mode::Either;
-        }
-    }
-    *vinfo = retinfo;
-    return found;
 }
 
 bool TelexEngine::CheckInvariants() const {

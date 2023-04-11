@@ -21,22 +21,22 @@
     <ClInclude Include="TelexData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TelexMaps.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ConStr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="TelexEngine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="TelexInternal.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="TelexData.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="TelexEngine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
   </ItemGroup>
 </Project>

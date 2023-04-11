@@ -1,0 +1,8 @@
+#define MAKE_MAP(K, V, n, ...)
+#define MAKE_SET(K, V, n, ...)
+#define MAKE_SORTED_MAP(K, V, n, ...)
+#define MAKE_SORTED_SET(K, V, n, ...)
+#define P(a, b)
+#define P1(a, b)
+#define P2(a, b)
+#define VI(a, b)
