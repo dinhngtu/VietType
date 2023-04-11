@@ -40,8 +40,8 @@ public:
     // Inherited via ITfCompartmentEventSink
     virtual STDMETHODIMP OnChange(__RPC__in REFGUID rguid) override;
 
-    _Check_return_ HRESULT Initialize(
-        _In_ const std::shared_ptr<Telex::TelexEngine>& engine, _In_ ITfThreadMgr* threadMgr, _In_ TfClientId clientid);
+    _Check_return_ HRESULT
+    Initialize(_In_ Telex::TelexEngine* engine, _In_ ITfThreadMgr* threadMgr, _In_ TfClientId clientid);
     HRESULT Uninitialize();
 
     Telex::TelexEngine& GetEngine();
@@ -71,7 +71,7 @@ private:
 private:
     bool _initialized = false;
 
-    std::shared_ptr<Telex::TelexEngine> _engine;
+    Telex::TelexEngine* _engine = nullptr;
     CComPtr<ITfLangBarItemMgr> _langBarItemMgr;
 
     TfClientId _clientid = TF_CLIENTID_NULL;

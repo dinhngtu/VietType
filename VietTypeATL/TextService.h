@@ -60,7 +60,7 @@ private:
     TfClientId _clientId = TF_CLIENTID_NULL;
     DWORD _activateFlags = 0;
 
-    std::shared_ptr<Telex::TelexEngine> _engine;
+    std::unique_ptr<Telex::TelexEngine> _engine;
 
     CComPtr<VietType::EnumDisplayAttributeInfo> _attributeStore;
 

@@ -36,8 +36,8 @@ STDMETHODIMP EngineController::OnChange(__RPC__in REFGUID rguid) {
     return S_OK;
 }
 
-_Check_return_ HRESULT EngineController::Initialize(
-    _In_ const std::shared_ptr<Telex::TelexEngine>& engine, _In_ ITfThreadMgr* threadMgr, _In_ TfClientId clientid) {
+_Check_return_ HRESULT
+EngineController::Initialize(_In_ Telex::TelexEngine* engine, _In_ ITfThreadMgr* threadMgr, _In_ TfClientId clientid) {
 
     HRESULT hr;
 
@@ -110,7 +110,7 @@ HRESULT EngineController::Uninitialize() {
     DBG_HRESULT_CHECK(hr, L"%s", L"UninitLanguageBar failed");
 
     _langBarItemMgr.Release();
-    _engine.reset();
+    _engine = nullptr;
 
     return S_OK;
 }

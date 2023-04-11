@@ -54,7 +54,7 @@ STDMETHODIMP TextService::ActivateEx(_In_ ITfThreadMgr* ptim, _In_ TfClientId ti
     _clientId = tid;
     _activateFlags = dwFlags;
 
-    _engine = std::make_shared<Telex::TelexEngine>(Telex::TelexConfig{});
+    _engine = std::make_unique<Telex::TelexEngine>(Telex::TelexConfig{});
 
     hr = CreateInstance2(&_attributeStore);
     HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&_attributeStore) failed");
@@ -72,7 +72,7 @@ STDMETHODIMP TextService::ActivateEx(_In_ ITfThreadMgr* ptim, _In_ TfClientId ti
         &_compositionManager, tid, _attributeStore->GetAttribute(0), static_cast<bool>(dwFlags & TF_TMAE_COMLESS));
     HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(&_compositionManager) failed");
 
-    hr = CreateInitialize(&_engineController, _engine, ptim, tid);
+    hr = CreateInitialize(&_engineController, _engine.get(), ptim, tid);
     HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(&_engineController) failed");
 
     long enabled;
