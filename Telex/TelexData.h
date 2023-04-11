@@ -7,11 +7,10 @@
 #include "TelexEngine.h"
 
 #define MAKE_MAP(K, V, n, ...)                                                                                         \
-    static constexpr const std::initializer_list<std::pair<K, V>> _makemap_##n = {__VA_ARGS__};                        \
-    static constexpr const sorted_map_type<K, V, _makemap_##n.size()> n = {__VA_ARGS__}
+    static constexpr const sorted_map_type<K, V, std::initializer_list<std::pair<K, V>>{__VA_ARGS__}.size()> n = {     \
+        __VA_ARGS__}
 #define MAKE_SET(K, n, ...)                                                                                            \
-    static constexpr const std::initializer_list<K> _makeset_##n = {__VA_ARGS__};                                      \
-    static constexpr const sorted_set_type<K, _makeset_##n.size()> n = {__VA_ARGS__}
+    static constexpr const sorted_set_type<K, std::initializer_list<K>{__VA_ARGS__}.size()> n = {__VA_ARGS__}
 #define MAKE_SORTED_MAP(K, V, n, ...)                                                                                  \
     MAKE_MAP(K, V, n, __VA_ARGS__);                                                                                    \
     static_assert(std::is_sorted(n.begin(), n.end(), twopair_less<K, V>))
