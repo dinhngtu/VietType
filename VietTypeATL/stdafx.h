@@ -32,12 +32,11 @@
 #include <memory>
 #include <cassert>
 #include <vector>
-#include <unordered_set>
 #include <array>
 #include <algorithm>
 #include <iterator>
 #include <optional>
-#include <sstream>
+#include <string>
 
 #include <strsafe.h>
 #include <msctf.h>

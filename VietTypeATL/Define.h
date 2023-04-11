@@ -5,6 +5,8 @@
 #include <Windows.h>
 #include <strsafe.h>
 
+#define VIETTYPE_QUIET
+
 /// <summary>support function, do not use directly</summary>
 template <typename... Args>
 void _dprint(_In_ LPCWSTR func, _In_ int line, _In_ LPCWSTR fmt, Args... args) {
@@ -40,11 +42,23 @@ void _errorprint(_In_ LPCWSTR func, _In_ int line, _In_ DWORD err, _In_ LPCWSTR 
     OutputDebugString(&buf[0]);
 }
 
+#ifndef VIETTYPE_QUIET
 // print formatted string to debugger output
 #define DPRINT(fmt, ...) _dprint(__FUNCTIONW__, __LINE__, L"%s:%d: " fmt L"\n", __VA_ARGS__)
 
 #define HRESULT_PRINT(hr, fmt, ...)                                                                                    \
     _errorprint(__FUNCTIONW__, __LINE__, hr, L"%s:%d: HRESULT error %lx (%s): " fmt, __VA_ARGS__)
+
+// format win32 error and print formatted string to debugger output
+#define WINERROR_PRINT(err, fmt, ...)                                                                                  \
+    _errorprint(__FUNCTIONW__, __LINE__, err, L"%s:%d: WINERROR %lx (%s): " fmt L"\n", __VA_ARGS__)
+
+#else
+#define DPRINT(fmt, ...)
+#define HRESULT_PRINT(hr, fmt, ...)
+#define WINERROR_PRINT(err, fmt, ...)
+#endif
+
 // check if HRESULT is successful; if not, print error information to debugger output
 #define HRESULT_CHECK_NOASSERT(hr, fmt, ...)                                                                           \
     if (FAILED(hr)) {                                                                                                  \
@@ -82,9 +96,6 @@ void _errorprint(_In_ LPCWSTR func, _In_ int line, _In_ DWORD err, _In_ LPCWSTR 
     }
 #endif
 
-// format win32 error and print formatted string to debugger output
-#define WINERROR_PRINT(err, fmt, ...)                                                                                  \
-    _errorprint(__FUNCTIONW__, __LINE__, err, L"%s:%d: WINERROR %lx (%s): " fmt L"\n", __VA_ARGS__)
 // format win32 error, print formatted string to debugger output, and return from calling function with error
 // converted to HRESULT
 #define WINERROR_CHECK_RETURN_HRESULT(err, fmt, ...)                                                                   \

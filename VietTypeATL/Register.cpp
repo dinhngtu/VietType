@@ -27,9 +27,9 @@ static std::vector<GUID> SupportedCategories = {
 extern "C" typedef HRESULT(__cdecl* funtype)();
 
 static void ShowRunError(HWND hWnd, HRESULT hr) {
-    std::wstringstream errmsg;
-    errmsg << L"VietType registration error: " << hr;
-    MessageBoxW(hWnd, errmsg.str().c_str(), L"VietType", MB_ICONERROR | MB_OK);
+    wchar_t errmsg[64];
+    swprintf_s(errmsg, L"VietType registration error: %ld", hr);
+    MessageBoxW(hWnd, &errmsg[0], L"VietType", MB_ICONERROR | MB_OK);
 }
 
 static void DoRunFunction(funtype fun, HWND hWnd, HINSTANCE hInst, LPWSTR lpszCmdLine, int nCmdShow) {
