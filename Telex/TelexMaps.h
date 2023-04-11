@@ -21,7 +21,7 @@ static constexpr bool pair_less(const std::pair<K, V>& a, const KK& b) {
 }
 
 template <typename K, typename V, size_t N, bool sorted = false>
-struct VectorMap : public std::array<std::pair<K, V>, N> {
+struct ArrayMap : public std::array<std::pair<K, V>, N> {
     using const_iterator = typename std::array<std::pair<K, V>, N>::const_iterator;
 
     template <typename KK>
@@ -50,7 +50,7 @@ struct VectorMap : public std::array<std::pair<K, V>, N> {
 };
 
 template <typename K, size_t N, bool sorted = false>
-struct VectorSet : public std::array<K, N> {
+struct ArraySet : public std::array<K, N> {
     using const_iterator = typename std::array<K, N>::const_iterator;
 
     template <typename KK>
@@ -77,15 +77,6 @@ struct VectorSet : public std::array<K, N> {
         }
     }
 };
-
-template <typename K, typename V, size_t N>
-using generic_map_type = VectorMap<K, V, N, false>;
-template <typename K, typename V, size_t N>
-using sorted_map_type = VectorMap<K, V, N, true>;
-template <typename T, size_t N>
-using generic_set_type = VectorSet<T, N, false>;
-template <typename T, size_t N>
-using sorted_set_type = VectorSet<T, N, true>;
 
 } // namespace Telex
 } // namespace VietType

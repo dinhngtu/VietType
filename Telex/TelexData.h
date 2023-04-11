@@ -7,15 +7,16 @@
 #include "TelexEngine.h"
 
 #define MAKE_MAP(K, V, n, ...)                                                                                         \
-    static constexpr const sorted_map_type<K, V, std::initializer_list<std::pair<K, V>>{__VA_ARGS__}.size()> n = {     \
+    static constexpr const ArrayMap<K, V, std::initializer_list<std::pair<K, V>>{__VA_ARGS__}.size(), false> n = {     \
         __VA_ARGS__}
 #define MAKE_SET(K, n, ...)                                                                                            \
-    static constexpr const sorted_set_type<K, std::initializer_list<K>{__VA_ARGS__}.size()> n = {__VA_ARGS__}
+    static constexpr const ArraySet<K, std::initializer_list<K>{__VA_ARGS__}.size(), false> n = {__VA_ARGS__}
 #define MAKE_SORTED_MAP(K, V, n, ...)                                                                                  \
-    MAKE_MAP(K, V, n, __VA_ARGS__);                                                                                    \
+    static constexpr const ArrayMap<K, V, std::initializer_list<std::pair<K, V>>{__VA_ARGS__}.size(), true> n = {      \
+        __VA_ARGS__};                                                                                                  \
     static_assert(std::is_sorted(n.begin(), n.end(), twopair_less<K, V>))
 #define MAKE_SORTED_SET(K, n, ...)                                                                                     \
-    MAKE_SET(K, n, __VA_ARGS__);                                                                                       \
+    static constexpr const ArraySet<K, std::initializer_list<K>{__VA_ARGS__}.size(), true> n = {__VA_ARGS__};          \
     static_assert(std::is_sorted(n.begin(), n.end()))
 #define P(a, b) std::make_pair(WConStr(a), WConStr(b))
 #define P1(a, b) std::make_pair(WConStr(a), b)
