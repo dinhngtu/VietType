@@ -118,11 +118,10 @@ static HRESULT DoEditSurroundingWord(
     if (wordlen < 1) {
         return E_FAIL;
     }
-    if (retrieved == SWF_MAXCHARS && wordlen == retrieved - ignore && !IsSeparatorCharacter(buf[0])) {
+    if (retrieved == SWF_MAXCHARS && std::cmp_equal(wordlen, retrieved - ignore) && !IsSeparatorCharacter(buf[0])) {
         return E_FAIL;
     }
-    if (static_cast<ULONG>(wordlen + 1) < retrieved &&
-        !IsSeparatorCharacter(buf.at(retrieved - wordlen - 1L - ignore))) {
+    if (std::cmp_less(wordlen + 1, retrieved) && !IsSeparatorCharacter(buf.at(retrieved - wordlen - 1L - ignore))) {
         // word is not bordered by separator character
         return E_FAIL;
     }
@@ -183,9 +182,9 @@ HRESULT EditSurroundingWord(
         return E_PENDING;
     }
 
-    std::array<TF_SELECTION, 2> sel;
+    std::array<TF_SELECTION, 2> sel{};
     ULONG fetched;
-    hr = context->GetSelection(ec, 0, sel.size(), sel.data(), &fetched);
+    hr = context->GetSelection(ec, 0, static_cast<ULONG>(sel.size()), sel.data(), &fetched);
     HRESULT_CHECK_RETURN(hr, L"%s", L"context->GetSelection failed");
 
     if (fetched > 1) {

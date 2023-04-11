@@ -99,7 +99,7 @@ public:
         _In_ TfClientId clientid,
         _In_ const GUID& guidCompartment,
         _In_ bool global = false,
-        _In_ callback_type callback = [] { return S_OK; }) {
+        _In_ NotifiedSetting<long>::callback_type callback = [] { return S_OK; }) {
 
         _guidCompartment = guidCompartment;
         _callback = callback;
@@ -231,11 +231,11 @@ public:
         _In_ TfClientId clientid,
         _In_ const GUID& guidDataCompartment,
         _In_ bool global = false,
-        _In_ callback_type callback = [] { return S_OK; }) {
+        _In_ typename NotifiedSetting<T>::callback_type callback = [] { return S_OK; }) {
 
-        _guidCompartment = guidDataCompartment;
+        this->_guidCompartment = guidDataCompartment;
         _callback_chain = callback;
-        _callback = [this] { return CachingCallback(); };
+        this->_callback = [this] { return CachingCallback(); };
 
         return SettingsStore::InitializeSink(
             punk, clientid, guidDataCompartment, _dataCompartment, _dataCompartmentEventSink, this, global);
@@ -257,7 +257,7 @@ private:
     }
 
 private:
-    callback_type _callback_chain = [] { return S_OK; };
+    typename NotifiedSetting<T>::callback_type _callback_chain = [] { return S_OK; };
     std::optional<T> _cache = std::nullopt;
     Compartment<T> _dataCompartment;
     SinkAdvisor<ITfCompartmentEventSink> _dataCompartmentEventSink;
