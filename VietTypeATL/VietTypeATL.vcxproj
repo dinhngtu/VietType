@@ -108,6 +108,9 @@
       <DisableSpecificWarnings>26439;26434;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <AdditionalIncludeDirectories>$(SolutionDir)Telex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <GuardEHContMetadata>true</GuardEHContMetadata>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
     </ClCompile>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -135,6 +138,7 @@
       <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>libucrt.lib</IgnoreSpecificDefaultLibraries>
       <AdditionalOptions>/defaultlib:ucrt.lib %(AdditionalOptions)</AdditionalOptions>
+      <CETCompat>true</CETCompat>
     </Link>
     <PreBuildEvent>
       <Command>powershell.exe -nop -noni -executionpolicy bypass $(SolutionDir)\UpdateVersion.ps1</Command>
@@ -152,6 +156,8 @@
       <DisableSpecificWarnings>26439;26434;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <AdditionalIncludeDirectories>$(SolutionDir)Telex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <ControlFlowGuard>Guard</ControlFlowGuard>
     </ClCompile>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -176,6 +182,7 @@
       <RegisterOutput>false</RegisterOutput>
       <AdditionalDependencies>Telex.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <CETCompat>true</CETCompat>
     </Link>
     <PreBuildEvent>
       <Command>powershell.exe -nop -noni -executionpolicy bypass $(SolutionDir)\UpdateVersion.ps1</Command>
@@ -193,6 +200,9 @@
       <DisableSpecificWarnings>26439;26434;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <AdditionalIncludeDirectories>$(SolutionDir)Telex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <ControlFlowGuard>Guard</ControlFlowGuard>
+      <GuardEHContMetadata>true</GuardEHContMetadata>
     </ClCompile>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -216,6 +226,7 @@
       <RegisterOutput>false</RegisterOutput>
       <AdditionalDependencies>Telex.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <CETCompat>true</CETCompat>
     </Link>
     <PreBuildEvent>
       <Command>powershell.exe -nop -noni -executionpolicy bypass $(SolutionDir)\UpdateVersion.ps1</Command>
@@ -234,6 +245,8 @@
       <DisableSpecificWarnings>26439;26434;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <AdditionalIncludeDirectories>$(SolutionDir)Telex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
     </ClCompile>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -262,6 +275,7 @@
       <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>libucrt.lib</IgnoreSpecificDefaultLibraries>
       <AdditionalOptions>/defaultlib:ucrt.lib %(AdditionalOptions)</AdditionalOptions>
+      <CETCompat>true</CETCompat>
     </Link>
     <PreBuildEvent>
       <Command>powershell.exe -nop -noni -executionpolicy bypass $(SolutionDir)\UpdateVersion.ps1</Command>
