@@ -79,8 +79,11 @@ HRESULT RefreshableButton::GetIcon(__RPC__deref_out_opt HICON* hicon) {
     }
 
     DWORD light = GetSystemLightTheme();
-    int iconx = GetSystemMetrics(SM_CXSMICON);
-    int icony = GetSystemMetrics(SM_CYSMICON);
+    auto old = SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+    auto dpi = GetDpiForSystem();
+    int iconx = GetSystemMetricsForDpi(SM_CXSMICON, dpi);
+    int icony = GetSystemMetricsForDpi(SM_CYSMICON, dpi);
+    SetThreadDpiAwarenessContext(old);
     if (_controller->GetBlocked() == EngineController::BlockedKind::Blocked) {
         *hicon = static_cast<HICON>(LoadImage(
             Globals::DllInstance, MAKEINTRESOURCE(light ? IDI_ICONXL : IDI_ICONXD), IMAGE_ICON, iconx, icony, 0));
