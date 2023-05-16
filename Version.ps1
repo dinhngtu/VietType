@@ -1,5 +1,5 @@
-$fileVersion = 1,8,1,0
-$productVersion = 1,8,1,0
+$fileVersion = 1,8,2,0
+$productVersion = 1,8,2,0
 
 if ($Env:GITHUB_ACTIONS -eq "true") {
     $fileVersion[3] = [int]$Env:GITHUB_RUN_NUMBER
