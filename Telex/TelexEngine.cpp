@@ -67,7 +67,7 @@ static Tones GetTone(_In_ wchar_t c) {
 // the rest can be correctly transformed or not, doesn't matter
 
 static wchar_t ToUpper(_In_ wchar_t c) {
-    auto uc = c & ~32;
+    wchar_t uc = c & ~32;
     // Basic Latin
     if (uc >= L'A' && uc <= L'Z') {
         return uc;
@@ -93,7 +93,7 @@ static wchar_t ToUpper(_In_ wchar_t c) {
 }
 
 static wchar_t ToLower(_In_ wchar_t c) {
-    auto lc = c | 32;
+    wchar_t lc = c | 32;
     if (lc >= L'a' && lc <= L'z') {
         return lc;
     }
@@ -122,6 +122,10 @@ static int FindLower(_In_ wchar_t c, _Out_ wchar_t* out) {
     }
     if (c >= L'\xe0' && c <= L'\xfe') {
         return *out != c;
+    }
+    // "uw" exception
+    if (c >= L'\x1af' && c <= L'\x1b0') {
+        return c == L'\x1af';
     }
     *out = c | 1;
     if (c >= L'\x100' && c <= L'\x1bf') {
