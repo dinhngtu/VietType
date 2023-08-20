@@ -22,6 +22,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		UpdateVersionCs.ps1 = UpdateVersionCs.ps1
 		UpdateVersionWix.ps1 = UpdateVersionWix.ps1
 		Version.ps1 = Version.ps1
+		VietType.props = VietType.props
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Telex", "Telex\Telex.vcxproj", "{4C4CE742-99A9-40E7-B03A-68A3CBE0AE77}"
