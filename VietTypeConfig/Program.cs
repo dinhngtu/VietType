@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 using System;
+using System.Globalization;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace VietTypeConfig {

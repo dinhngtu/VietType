@@ -1,3 +1,4 @@
+using System.Resources;
 // SPDX-License-Identifier: GPL-3.0-only
 
 using System.Reflection;
@@ -23,6 +24,7 @@ using System.Runtime.InteropServices;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("e48868bf-c55d-41e4-9a25-85190bd57684")]
+[assembly: NeutralResourcesLanguage("en")]
 
 // Version information for an assembly consists of the following four values:
 //
