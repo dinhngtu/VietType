@@ -387,14 +387,29 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
 
     } else if (((_c1 == L"gi" && _v.empty()) || !_v.empty()) && _c2.empty() && IS(cat, CharTypes::ConsoC2)) {
         // word-ending consonants (cnpt)
-        if (_c1 == L"q") {
-            TelexEngineImpl::TransitionV(*this, transitions_v_c2_q);
-        } else {
-            TelexEngineImpl::TransitionV(*this, transitions_v_c2);
+        bool success = true;
+        // special teencode exception
+        if (_c1 != L"\x111" && _t != Tones::Z && _t != Tones::S && _t != Tones::J) {
+            wchar_t tmpc2[2] = {c, 0};
+            auto testtone = valid_c2.find(tmpc2);
+            // all the c2 that share a prefix have the same restrict value
+            // i.e. valid_c2["c"]->second == valid_c2["ch"]->second
+            // so we should know from just the first character
+            if (testtone != valid_c2.end() && testtone->second) {
+                _state = TelexStates::Invalid;
+                success = false;
+            }
         }
-        _c2.push_back(c);
-        _cases.push_back(ccase);
-        _respos.push_back(_respos_current++);
+        if (success) {
+            if (_c1 == L"q") {
+                TelexEngineImpl::TransitionV(*this, transitions_v_c2_q);
+            } else {
+                TelexEngineImpl::TransitionV(*this, transitions_v_c2);
+            }
+            _c2.push_back(c);
+            _cases.push_back(ccase);
+            _respos.push_back(_respos_current++);
+        }
 
     } else if (_c2.size() && IS(cat, CharTypes::ConsoContinue)) {
         // consonant continuation (dgh)

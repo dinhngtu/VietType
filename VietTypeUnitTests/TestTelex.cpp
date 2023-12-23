@@ -355,6 +355,18 @@ public:
         Assert::AreEqual(L"z", e.Peek().c_str());
     }
 
+    TEST_METHOD(TestPeekCarc) {
+        TelexEngine e(config);
+        FeedWord(e, L"carc");
+        Assert::AreEqual(L"carc", e.Peek().c_str());
+    }
+
+    TEST_METHOD(TestPeekDdark) {
+        TelexEngine e(config);
+        FeedWord(e, L"ddark");
+        Assert::AreEqual(L"\x111\x1ea3k", e.Peek().c_str());
+    }
+
     // test peek key ordering
 
     TEST_METHOD(TestPeekCace) {
