@@ -428,4 +428,22 @@ VietType is free software, licensed under the GNU General Public License. VietTy
   <data name="aboutTitle" xml:space="preserve">
     <value>About VietType</value>
   </data>
+  <data name="cannotConfigureMessage" xml:space="preserve">
+    <value>Cannot configure VietType: {0}</value>
+  </data>
+  <data name="cannotFindLibraryMessage" xml:space="preserve">
+    <value>Cannot find VietType library: {0}</value>
+  </data>
+  <data name="cannotSaveSettingsMessage" xml:space="preserve">
+    <value>Cannot save settings: {0}</value>
+  </data>
+  <data name="disableSuccessMessage" xml:space="preserve">
+    <value>Successfully disabled VietType.</value>
+  </data>
+  <data name="enableSuccessMessage" xml:space="preserve">
+    <value>Successfully enabled VietType. Switch to VietType in the language bar to start using it.</value>
+  </data>
+  <data name="notEnabledQuestion" xml:space="preserve">
+    <value>VietType is not enabled. Enable it now?</value>
+  </data>
 </root>
