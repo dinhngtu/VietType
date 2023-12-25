@@ -33,16 +33,18 @@ SPDX-License-Identifier: GPL-3.0-only
 
     <MediaTemplate EmbedCab="yes" />
 
-    <Feature Id="ProductFeature" Title="VietType" Absent="disallow" AllowAdvertise="no">
+    <Feature Id="ProductFeature" Title="VietType input method" Absent="disallow" AllowAdvertise="no">
       <ComponentGroupRef Id="ProductComponents" />
+      <Feature Id="DebugSymbolsFeature" Title="Debug symbols" AllowAdvertise="no">
+        <ComponentGroupRef Id="DebugSymbols" />
+      </Feature>
     </Feature>
 
     <Feature Id="ConfigFeature" Title="Configuration tool" AllowAdvertise="no">
       <ComponentGroupRef Id="ConfigComponents" />
-    </Feature>
-
-    <Feature Id="DebugSymbolsFeature" Title="Debug symbols" AllowAdvertise="no">
-      <ComponentGroupRef Id="DebugSymbols" />
+      <Feature Id="ConfigDebugSymbolsFeature" Title="Debug symbols for configuration tool" AllowAdvertise="no">
+        <ComponentGroupRef Id="ConfigDebugSymbols" />
+      </Feature>
     </Feature>
 
     <UIRef Id="VietTypeSetupUI" />
@@ -133,6 +135,9 @@ SPDX-License-Identifier: GPL-3.0-only
   <!-- config -->
 
   <Fragment>
+    <DirectoryRef Id="INSTALLFOLDER">
+      <Directory Id="ConfigRes_vi" Name="vi" />
+    </DirectoryRef>
     <ComponentGroup Id="ConfigComponents">
       <Component Win64="no" Directory="INSTALLFOLDER">
         <File Source="$(var.SolutionDir)\VietTypeConfig\bin\$(var.Configuration)\VietTypeConfig.exe" />
@@ -143,6 +148,9 @@ SPDX-License-Identifier: GPL-3.0-only
       <Component Win64="no" Directory="INSTALLFOLDER">
         <File Source="$(var.SolutionDir)\VietTypeConfig\bin\$(var.Configuration)\VietTypeConfig.exe.config"
               DefaultLanguage="!(bind.fileLanguage.VietTypeConfig.exe)" DefaultVersion="!(bind.fileVersion.VietTypeConfig.exe)" />
+      </Component>
+      <Component Win64="no" Directory="ConfigRes_vi">
+        <File Source="$(var.SolutionDir)\VietTypeConfig\bin\$(var.Configuration)\vi\VietTypeConfig.resources.dll" />
       </Component>
     </ComponentGroup>
   </Fragment>
@@ -163,6 +171,15 @@ SPDX-License-Identifier: GPL-3.0-only
               DefaultLanguage="!(bind.fileLanguage.VietTypeATL32.dll)" DefaultVersion="!(bind.fileVersion.VietTypeATL64.dll)" />
       </Component>
       <?endif ?>
+    </ComponentGroup>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="ConfigDebugSymbols">
+      <Component Win64="no" Directory="INSTALLFOLDER">
+        <File Source="$(var.SolutionDir)\VietTypeConfig\bin\$(var.Configuration)\VietTypeConfig.pdb"
+              DefaultLanguage="!(bind.fileLanguage.VietTypeConfig.exe)" DefaultVersion="!(bind.fileVersion.VietTypeConfig.exe)" />
+      </Component>
     </ComponentGroup>
   </Fragment>
 
