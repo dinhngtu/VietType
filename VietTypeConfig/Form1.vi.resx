@@ -137,12 +137,23 @@
     <value>95, 23</value>
   </data>
   <data name="btnAbout.Text" xml:space="preserve">
-    <value>Thông tin... (&amp;B)</value>
+    <value>Thông tin (&amp;B)</value>
   </data>
   <data name="btnEnable.Text" xml:space="preserve">
     <value>Bật VietType (&amp;E)</value>
   </data>
   <data name="$this.Text" xml:space="preserve">
     <value>Cài đặt VietType</value>
+  </data>
+  <data name="aboutMessage" xml:space="preserve">
+    <value>VietType {0} {1}
+Bản quyền © 2018 Đinh Ngọc Tú.
+VietType là phần mềm tự do, bạn có thể cung cấp lại và/hoặc chỉnh sửa nó theo những điều khoản của Giấy phép Công cộng GNU phiên bản 3 do Tổ chức Phần mềm Tự do công bố. VietType không cung cấp bất cứ bảo hành hay bảo đảm nào. Bạn tự chấp nhận mọi rủi ro và trách nhiệm khi sử dụng VietType. Tham khảo tập tin LICENSE đi kèm VietType để biết chính xác các điều khoản.</value>
+  </data>
+  <data name="btnEnable_DisableText" xml:space="preserve">
+    <value>Tắt VietType (&amp;D)</value>
+  </data>
+  <data name="aboutTitle" xml:space="preserve">
+    <value>Thông tin VietType</value>
   </data>
 </root>
