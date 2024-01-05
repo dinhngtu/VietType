@@ -619,6 +619,30 @@ public:
         AssertTelexStatesEqual(TelexStates::CommittedInvalid, e.Cancel());
     }
 
+    TEST_METHOD(TestBackconversionXooong) {
+        TelexEngine e(config);
+        AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(L"xoong"));
+        Assert::AreEqual(L"xoong", e.Peek().c_str());
+    }
+
+    TEST_METHOD(TestBackconversionXooongUpper) {
+        TelexEngine e(config);
+        AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(L"XOONG"));
+        Assert::AreEqual(L"XOONG", e.Peek().c_str());
+    }
+
+    TEST_METHOD(TestBackconversionThooongf) {
+        TelexEngine e(config);
+        AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(L"tho\xf2ng"));
+        Assert::AreEqual(L"tho\xf2ng", e.Peek().c_str());
+    }
+
+    TEST_METHOD(TestBackconversionThooongfUpper) {
+        TelexEngine e(config);
+        AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(L"THO\xd2NG"));
+        Assert::AreEqual(L"THO\xd2NG", e.Peek().c_str());
+    }
+
     // test oa/oe/uy
 
     TEST_METHOD(TestTypingOaUy) {

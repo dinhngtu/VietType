@@ -653,13 +653,25 @@ TelexStates TelexEngine::Backconvert(_In_ const std::wstring& s) {
     bool found_backconversion = false;
     for (auto c : s) {
         if (c >= L'a' && c <= L'z') {
+            if (_v.size() == 1 && !_c2.size() && c == _v[0])
+                PushChar(c);
             PushChar(c);
         } else if (c >= L'A' && c <= L'Z') {
+            if (_v.size() == 1 && !_c2.size() && ToLower(c) == _v[0])
+                PushChar(c);
             PushChar(c);
         } else {
             auto clow = ToLower(c);
             auto it = backconversions.find(clow);
             assert(it != backconversions.end());
+            if (_v.size() == 1 && !_c2.size() && it->second[0] == _v[0]) {
+                if (c != clow) {
+                    // c is upper
+                    PushChar(ToUpper(it->second[0]));
+                } else {
+                    PushChar(it->second[0]);
+                }
+            }
             for (auto backc : it->second) {
                 if (c != clow) {
                     // c is upper
