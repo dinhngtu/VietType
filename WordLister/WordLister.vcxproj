@@ -141,6 +141,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="EngScan.cpp" />
+    <ClCompile Include="ConfuseScan.cpp" />
     <ClCompile Include="FileUtil.cpp" />
     <ClCompile Include="VietScan.cpp" />
     <ClCompile Include="WordLister.cpp" />
