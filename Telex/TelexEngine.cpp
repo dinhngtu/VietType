@@ -561,6 +561,11 @@ TelexStates TelexEngine::Commit() {
         return _state;
     }
 
+    if (tone_exceptions_en.find(_keyBuffer) != tone_exceptions_en.end()) {
+        _state = TelexStates::CommittedInvalid;
+        return _state;
+    }
+
     // validate c1
     auto c1_it = valid_c1.find(_c1);
     if (c1_it == valid_c1.end()) {

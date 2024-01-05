@@ -679,6 +679,14 @@ public:
         TelexEngine e(config1);
         TestValidWord(e, L"to\xe0n", L"toanf");
     }
+
+    // test tone exceptions
+    TEST_METHOD(TestExceptionVirus) {
+        auto config1 = config;
+        config1.oa_uy_tone1 = false;
+        TelexEngine e(config1);
+        TestInvalidWord(e, L"virus", L"virus");
+    }
 };
 
 }
