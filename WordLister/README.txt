@@ -9,3 +9,5 @@ Creation script:
     sort -u | \
     tr '\n' '\000' | \
     iconv -f utf8 -t utf16le > ewdsw.txt
+
+`confusw.txt` was generated from `ewdsw.txt` by WordLister in EngScan mode while selecting all DoubleTone words.
