@@ -44,7 +44,7 @@ static CharTypes ClassifyCharacter(_In_ wchar_t c) {
     return CharTypes::Uncategorized;
 }
 
-static Tones GetTone(_In_ wchar_t c) {
+static Tones GetCharTone(_In_ wchar_t c) {
     switch (c) {
     case L'z':
         return Tones::Z;
@@ -375,7 +375,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
 
     } else if ((_c1 == L"gi" || !_v.empty()) && IS(cat, CharTypes::Tone) && IS(cat, CharTypes::Conso)) {
         // ambiguous (rsx) -> tone
-        auto newtone = GetTone(c);
+        auto newtone = GetCharTone(c);
         if (newtone != _t) {
             _t = newtone;
             _respos.push_back(ResposTone);
@@ -420,7 +420,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
     } else if ((_c1 == L"gi" || _v.size()) && IS(cat, CharTypes::Tone)) {
         // tones-only (fjz)
         // we must check for _c1 == 'gi' to allow typing 'gì'
-        auto newtone = GetTone(c);
+        auto newtone = GetCharTone(c);
         if (newtone != _t) {
             _t = newtone;
             _respos.push_back(ResposTone);
@@ -693,10 +693,6 @@ TelexStates TelexEngine::Backconvert(_In_ const std::wstring& s) {
     return _state;
 }
 
-TelexStates TelexEngine::GetState() const {
-    return _state;
-}
-
 std::wstring TelexEngine::Retrieve() const {
     if (_state == TelexStates::Invalid || _state == TelexStates::CommittedInvalid ||
         _state == TelexStates::BackconvertFailed) {
@@ -707,10 +703,6 @@ std::wstring TelexEngine::Retrieve() const {
     result.append(_c2);
     ApplyCases(result, _cases);
     return result;
-}
-
-std::wstring TelexEngine::RetrieveRaw() const {
-    return std::wstring(_keyBuffer);
 }
 
 std::wstring TelexEngine::Peek() const {
@@ -748,10 +740,6 @@ std::wstring TelexEngine::Peek() const {
     ApplyCases(result, _cases);
 
     return result;
-}
-
-std::wstring::size_type TelexEngine::Count() const {
-    return _keyBuffer.size();
 }
 
 bool TelexEngine::CheckInvariants() const {

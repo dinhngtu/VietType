@@ -68,11 +68,26 @@ public:
     TelexStates Cancel();
     TelexStates Backconvert(_In_ const std::wstring& s);
 
-    TelexStates GetState() const;
+    constexpr TelexStates GetState() const {
+        return _state;
+    }
     std::wstring Retrieve() const;
-    std::wstring RetrieveRaw() const;
+    std::wstring RetrieveRaw() const {
+        return std::wstring(_keyBuffer);
+    }
     std::wstring Peek() const;
-    std::wstring::size_type Count() const;
+    constexpr std::wstring::size_type Count() const {
+        return _keyBuffer.size();
+    }
+    constexpr Tones GetTone() const {
+        return _t;
+    }
+    constexpr const std::vector<int>& GetRespos() const {
+        return _respos;
+    }
+    constexpr bool IsBackconverted() const {
+        return _backconverted;
+    }
 
 private:
     struct TelexConfig _config;

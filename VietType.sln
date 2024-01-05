@@ -29,6 +29,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Telex", "Telex\Telex.vcxpro
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VietTypeConfig", "VietTypeConfig\VietTypeConfig.csproj", "{E48868BF-C55D-41E4-9A25-85190BD57684}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WordLister", "WordLister\WordLister.vcxproj", "{99B31857-77B4-45E1-8969-90F5172A9999}"
+	ProjectSection(ProjectDependencies) = postProject
+		{4C4CE742-99A9-40E7-B03A-68A3CBE0AE77} = {4C4CE742-99A9-40E7-B03A-68A3CBE0AE77}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -81,6 +86,14 @@ Global
 		{E48868BF-C55D-41E4-9A25-85190BD57684}.Release|Win32.Build.0 = Release|Any CPU
 		{E48868BF-C55D-41E4-9A25-85190BD57684}.Release|x64.ActiveCfg = Release|Any CPU
 		{E48868BF-C55D-41E4-9A25-85190BD57684}.Release|x64.Build.0 = Release|Any CPU
+		{99B31857-77B4-45E1-8969-90F5172A9999}.Debug|Win32.ActiveCfg = Debug|Win32
+		{99B31857-77B4-45E1-8969-90F5172A9999}.Debug|Win32.Build.0 = Debug|Win32
+		{99B31857-77B4-45E1-8969-90F5172A9999}.Debug|x64.ActiveCfg = Debug|x64
+		{99B31857-77B4-45E1-8969-90F5172A9999}.Debug|x64.Build.0 = Debug|x64
+		{99B31857-77B4-45E1-8969-90F5172A9999}.Release|Win32.ActiveCfg = Release|Win32
+		{99B31857-77B4-45E1-8969-90F5172A9999}.Release|Win32.Build.0 = Release|Win32
+		{99B31857-77B4-45E1-8969-90F5172A9999}.Release|x64.ActiveCfg = Release|x64
+		{99B31857-77B4-45E1-8969-90F5172A9999}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
