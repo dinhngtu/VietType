@@ -657,19 +657,20 @@ TelexStates TelexEngine::Cancel() {
 TelexStates TelexEngine::Backconvert(_In_ const std::wstring& s) {
     bool found_backconversion = false;
     for (auto c : s) {
+        auto double_flag = !_c2.size() && (_v == L"e" || _v == L"o");
         if (c >= L'a' && c <= L'z') {
-            if (_v.size() == 1 && !_c2.size() && c == _v[0])
+            if (double_flag && c == _v[0])
                 PushChar(c);
             PushChar(c);
         } else if (c >= L'A' && c <= L'Z') {
-            if (_v.size() == 1 && !_c2.size() && ToLower(c) == _v[0])
+            if (double_flag && ToLower(c) == _v[0])
                 PushChar(c);
             PushChar(c);
         } else {
             auto clow = ToLower(c);
             auto it = backconversions.find(clow);
             assert(it != backconversions.end());
-            if (_v.size() == 1 && !_c2.size() && it->second[0] == _v[0]) {
+            if (double_flag && it->second[0] == _v[0]) {
                 if (c != clow) {
                     // c is upper
                     PushChar(ToUpper(it->second[0]));
@@ -688,11 +689,13 @@ TelexStates TelexEngine::Backconvert(_In_ const std::wstring& s) {
             found_backconversion = true;
         }
     }
-    if (found_backconversion && _state != TelexStates::Valid) {
-        _keyBuffer = s;
-        _state = TelexStates::BackconvertFailed;
-    } else if (_c1.size() + _v.size() + _c2.size() != s.size()) {
-        _state = TelexStates::Invalid;
+    if (_c1.size() + _v.size() + _c2.size() != s.size()) {
+        if (found_backconversion) {
+            _keyBuffer = s;
+            _state = TelexStates::BackconvertFailed;
+        } else {
+            _state = TelexStates::Invalid;
+        }
     }
     _backconverted = true;
     return _state;
