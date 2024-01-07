@@ -698,12 +698,19 @@ public:
         TestValidWord(e, L"to\xe0n", L"toanf");
     }
 
-    // test tone exceptions
-    TEST_METHOD(TestExceptionVirus) {
+    // test multilang optimizations
+    TEST_METHOD(TestMultilangVirus) {
         auto config1 = config;
-        config1.oa_uy_tone1 = false;
+        config1.optimize_multilang = true;
         TelexEngine e(config1);
         TestInvalidWord(e, L"virus", L"virus");
+    }
+
+    TEST_METHOD(TestMultilangDefe) {
+        auto config1 = config;
+        config1.optimize_multilang = true;
+        TelexEngine e(config1);
+        AssertTelexStatesEqual(TelexStates::Invalid, FeedWord(e, L"defe"));
     }
 };
 

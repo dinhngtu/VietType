@@ -47,6 +47,8 @@ struct TelexConfig {
     bool accept_separate_dd = true;
     // whether backspacing from invalid state preserves that invalid state
     bool backspaced_word_stays_invalid = true;
+    // optimize key engine for foreign language typing
+    bool optimize_multilang = true;
 };
 
 class TelexEngine {

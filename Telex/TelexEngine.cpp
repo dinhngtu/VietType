@@ -315,7 +315,9 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
         // vowel parts (aeiouy)
         _v.push_back(c);
         auto before = _v.size();
-        if (TelexEngineImpl::TransitionV(*this, transitions)) {
+        if (_config.optimize_multilang && _t != Tones::Z) {
+            _state = TelexStates::Invalid;
+        } else if (TelexEngineImpl::TransitionV(*this, transitions)) {
             auto after = _v.size();
             // we don't yet take into account if _v grows in length due to the transition
             if (_keyBuffer.size() > 1 && _respos.back() == ResposTransitionV && c == ToLower(_keyBuffer.rbegin()[1])) {
@@ -561,7 +563,8 @@ TelexStates TelexEngine::Commit() {
         return _state;
     }
 
-    if (tone_exceptions_en.find(_keyBuffer) != tone_exceptions_en.end()) {
+    if (_config.optimize_multilang && _state == TelexStates::Valid &&
+        tone_exceptions_en.find(_keyBuffer) != tone_exceptions_en.end()) {
         _state = TelexStates::CommittedInvalid;
         return _state;
     }
