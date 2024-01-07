@@ -301,7 +301,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
         // only used for 'dd'
         // relaxed constraint: _v.empty()
         if (_keyBuffer.size() > 1 && ToLower(_keyBuffer.rbegin()[1]) == L'd') {
-            _keyBuffer.pop_back();
+            _respos.push_back(ResposDoubleUndo);
         }
         _state = TelexStates::Invalid;
 
@@ -319,19 +319,14 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
             auto after = _v.size();
             if (_config.optimize_multilang >= TelexConfig::OptimizeMultilang::Aggressive && _t != Tones::Z) {
                 _state = TelexStates::Invalid;
-            } else if (
-                _keyBuffer.size() > 1 && _respos.back() == ResposTransitionV && c == ToLower(_keyBuffer.rbegin()[1])) {
-                // we don't yet take into account if _v grows in length due to the transition
-                _keyBuffer.pop_back();
-                if (after == before) {
-                    // in case of double key, we want to pretend that the first V transition char didn't happen
-                    // the rest is handled below
-                    _respos.pop_back();
-                }
-            } else if (after < before) {
+            } else if (_keyBuffer.size() > 1 && _respos.back() == ResposTransitionV && c == ToLower(_keyBuffer.rbegin()[1])) {
+                _cases.push_back(ccase);
+                _respos.push_back(ResposDoubleUndo);
+            }
+            else if (after < before) {
                 _respos.push_back(ResposTransitionV);
             }
-            if (after == before) {
+            else if (after == before) {
                 // in case of 'uơi' -> 'ươi', the transition char itself is a normal character
                 // so it must be recorded as such rather than just a transition
                 // the best solution however is to introduce flags into respos
@@ -343,10 +338,11 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
             _cases.push_back(ccase);
             // invalidate if same char entered twice in a row in order to undo transition
             if (_keyBuffer.size() > 1 && _respos.back() == ResposTransitionV && c == ToLower(_keyBuffer.rbegin()[1])) {
-                _keyBuffer.pop_back();
+                _respos.push_back(ResposDoubleUndo);
                 _state = TelexStates::Invalid;
+            } else {
+                _respos.push_back(_respos_current++);
             }
-            _respos.push_back(_respos_current++);
             if (!_c2.empty()) {
                 // in case there exists no transition when _c2 is already typed
                 // e.g. 'cace'

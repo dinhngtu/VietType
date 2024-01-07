@@ -20,6 +20,7 @@ enum ResposTransitions {
     ResposTransitionV = -3,
     ResposTransitionW = -4,
     ResposTone = -5,
+    ResposDoubleUndo = -6,
 };
 
 enum class CharTypes : unsigned int {
