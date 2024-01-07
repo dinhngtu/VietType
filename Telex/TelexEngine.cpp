@@ -315,12 +315,13 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
         // vowel parts (aeiouy)
         _v.push_back(c);
         auto before = _v.size();
-        if (_config.optimize_multilang && _t != Tones::Z) {
-            _state = TelexStates::Invalid;
-        } else if (TelexEngineImpl::TransitionV(*this, transitions)) {
+        if (TelexEngineImpl::TransitionV(*this, transitions)) {
             auto after = _v.size();
-            // we don't yet take into account if _v grows in length due to the transition
-            if (_keyBuffer.size() > 1 && _respos.back() == ResposTransitionV && c == ToLower(_keyBuffer.rbegin()[1])) {
+            if (_config.optimize_multilang && _t != Tones::Z) {
+                _state = TelexStates::Invalid;
+            } else if (
+                _keyBuffer.size() > 1 && _respos.back() == ResposTransitionV && c == ToLower(_keyBuffer.rbegin()[1])) {
+                // we don't yet take into account if _v grows in length due to the transition
                 _keyBuffer.pop_back();
                 if (after == before) {
                     // in case of double key, we want to pretend that the first V transition char didn't happen
