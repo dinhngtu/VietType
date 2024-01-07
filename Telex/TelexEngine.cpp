@@ -317,7 +317,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
         auto before = _v.size();
         if (TelexEngineImpl::TransitionV(*this, transitions)) {
             auto after = _v.size();
-            if (_config.optimize_multilang && _t != Tones::Z) {
+            if (_config.optimize_multilang >= TelexConfig::OptimizeMultilang::Aggressive && _t != Tones::Z) {
                 _state = TelexStates::Invalid;
             } else if (
                 _keyBuffer.size() > 1 && _respos.back() == ResposTransitionV && c == ToLower(_keyBuffer.rbegin()[1])) {
@@ -564,7 +564,7 @@ TelexStates TelexEngine::Commit() {
         return _state;
     }
 
-    if (_config.optimize_multilang && _state == TelexStates::Valid &&
+    if (_config.optimize_multilang >= TelexConfig::OptimizeMultilang::On && _state == TelexStates::Valid &&
         tone_exceptions_en.find(_keyBuffer) != tone_exceptions_en.end()) {
         _state = TelexStates::CommittedInvalid;
         return _state;

@@ -33,13 +33,13 @@ void TestValidWord(TelexEngine& e, const wchar_t* expected, const wchar_t* input
 void TestValidWord(const wchar_t* expected, const wchar_t* input) {
     {
         auto config_ = config;
-        config_.optimize_multilang = false;
+        config_.optimize_multilang = TelexConfig::OptimizeMultilang::Off;
         TelexEngine e(config_);
         TestValidWord(e, expected, input);
     }
     {
         auto config_ = config;
-        config_.optimize_multilang = true;
+        config_.optimize_multilang = TelexConfig::OptimizeMultilang::On;
         TelexEngine e(config_);
         TestValidWord(e, expected, input);
     }
@@ -57,13 +57,13 @@ void TestInvalidWord(TelexEngine& e, const wchar_t* expected, const wchar_t* inp
 void TestInvalidWord(const wchar_t* expected, const wchar_t* input) {
     {
         auto config_ = config;
-        config_.optimize_multilang = false;
+        config_.optimize_multilang = TelexConfig::OptimizeMultilang::Off;
         TelexEngine e(config);
         TestInvalidWord(e, expected, input);
     }
     {
         auto config_ = config;
-        config_.optimize_multilang = true;
+        config_.optimize_multilang = TelexConfig::OptimizeMultilang::On;
         TelexEngine e(config);
         TestInvalidWord(e, expected, input);
     }
@@ -77,13 +77,13 @@ void TestPeekWord(TelexEngine& e, const wchar_t* expected, const wchar_t* input)
 void TestPeekWord(const wchar_t* expected, const wchar_t* input) {
     {
         auto config_ = config;
-        config_.optimize_multilang = false;
+        config_.optimize_multilang = TelexConfig::OptimizeMultilang::Off;
         TelexEngine e(config_);
         TestPeekWord(e, expected, input);
     }
     {
         auto config_ = config;
-        config_.optimize_multilang = true;
+        config_.optimize_multilang = TelexConfig::OptimizeMultilang::On;
         TelexEngine e(config_);
         TestPeekWord(e, expected, input);
     }
@@ -739,14 +739,14 @@ public:
     // test multilang optimizations
     TEST_METHOD(TestMultilangVirus) {
         auto config1 = config;
-        config1.optimize_multilang = true;
+        config1.optimize_multilang = TelexConfig::OptimizeMultilang::On;
         TelexEngine e(config1);
         TestInvalidWord(e, L"virus", L"virus");
     }
 
     TEST_METHOD(TestMultilangDefe) {
         auto config1 = config;
-        config1.optimize_multilang = true;
+        config1.optimize_multilang = TelexConfig::OptimizeMultilang::Aggressive;
         TelexEngine e(config1);
         AssertTelexStatesEqual(TelexStates::Invalid, FeedWord(e, L"defe"));
     }
