@@ -180,7 +180,16 @@ VietType là phần mềm tự do, bạn có thể cung cấp lại và/hoặc c
   <data name="notEnabledQuestion" xml:space="preserve">
     <value>VietType hiện chưa bật. Bạn có muốn bật VietType không?</value>
   </data>
-  <data name="cbOptimizeMultilang.Text" xml:space="preserve">
+  <data name="lblOptimizeMultilang.Text" xml:space="preserve">
     <value>Tối ưu gõ nhiều ngôn ngữ (&amp;O)</value>
+  </data>
+  <data name="cbOptimizeMultilang.Items" xml:space="preserve">
+    <value>Tắt</value>
+  </data>
+  <data name="cbOptimizeMultilang.Items1" xml:space="preserve">
+    <value>Bật</value>
+  </data>
+  <data name="cbOptimizeMultilang.Items2" xml:space="preserve">
+    <value>Mạnh</value>
   </data>
 </root>

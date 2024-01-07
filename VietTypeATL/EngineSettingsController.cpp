@@ -125,9 +125,9 @@ HRESULT EngineSettingsController::LoadTelexSettings(Telex::TelexConfig& cfg) {
 
     DWORD optimize_multilang = true;
     hr = _tc_optimize_multilang->GetValueOrDefault(
-        &optimize_multilang, _ec->GetEngine().GetConfig().optimize_multilang);
+        &optimize_multilang, static_cast<DWORD>(_ec->GetEngine().GetConfig().optimize_multilang));
     HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_optimize_multilang->GetValueOrWriteback failed");
-    cfg.optimize_multilang = static_cast<bool>(optimize_multilang);
+    cfg.optimize_multilang = static_cast<Telex::TelexConfig::OptimizeMultilang>(optimize_multilang);
 
     return S_OK;
 }
