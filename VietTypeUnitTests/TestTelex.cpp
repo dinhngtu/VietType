@@ -31,8 +31,18 @@ void TestValidWord(TelexEngine& e, const wchar_t* expected, const wchar_t* input
 }
 
 void TestValidWord(const wchar_t* expected, const wchar_t* input) {
-    TelexEngine e(config);
-    TestValidWord(e, expected, input);
+    {
+        auto config_ = config;
+        config_.optimize_multilang = false;
+        TelexEngine e(config_);
+        TestValidWord(e, expected, input);
+    }
+    {
+        auto config_ = config;
+        config_.optimize_multilang = true;
+        TelexEngine e(config_);
+        TestValidWord(e, expected, input);
+    }
 }
 
 void TestInvalidWord(TelexEngine& e, const wchar_t* expected, const wchar_t* input) {
@@ -45,8 +55,38 @@ void TestInvalidWord(TelexEngine& e, const wchar_t* expected, const wchar_t* inp
 }
 
 void TestInvalidWord(const wchar_t* expected, const wchar_t* input) {
-    TelexEngine e(config);
-    TestInvalidWord(e, expected, input);
+    {
+        auto config_ = config;
+        config_.optimize_multilang = false;
+        TelexEngine e(config);
+        TestInvalidWord(e, expected, input);
+    }
+    {
+        auto config_ = config;
+        config_.optimize_multilang = true;
+        TelexEngine e(config);
+        TestInvalidWord(e, expected, input);
+    }
+}
+
+void TestPeekWord(TelexEngine& e, const wchar_t* expected, const wchar_t* input) {
+    FeedWord(e, input);
+    Assert::AreEqual(expected, e.Peek().c_str());
+}
+
+void TestPeekWord(const wchar_t* expected, const wchar_t* input) {
+    {
+        auto config_ = config;
+        config_.optimize_multilang = false;
+        TelexEngine e(config_);
+        TestPeekWord(e, expected, input);
+    }
+    {
+        auto config_ = config;
+        config_.optimize_multilang = true;
+        TelexEngine e(config_);
+        TestPeekWord(e, expected, input);
+    }
 }
 
 TEST_CLASS(TestTelex) {
@@ -325,72 +365,54 @@ public:
     // peek tests
 
     TEST_METHOD(TestPeekDd) {
-        TelexEngine e(config);
-        FeedWord(e, L"dd");
-        Assert::AreEqual(L"\x111", e.Peek().c_str());
+        TestPeekWord(L"\x111", L"dd");
     }
 
     TEST_METHOD(TestPeekDdd) {
-        TelexEngine e(config);
-        FeedWord(e, L"ddd");
-        Assert::AreEqual(L"dd", e.Peek().c_str());
+        TestPeekWord(L"dd", L"ddd");
     }
 
     TEST_METHOD(TestPeekAd) {
-        TelexEngine e(config);
-        FeedWord(e, L"ad");
-        Assert::AreEqual(L"ad", e.Peek().c_str());
+        TestPeekWord(L"ad", L"ad");
     }
 
     TEST_METHOD(TestPeekQuaw) {
-        TelexEngine e(config);
-        FeedWord(e, L"quaw");
-        Assert::AreEqual(L"qu\x103", e.Peek().c_str());
+        TestPeekWord(L"qu\x103", L"quaw");
     }
 
     // used to cause a crash
     TEST_METHOD(TestPeekZ) {
-        TelexEngine e(config);
-        FeedWord(e, L"z");
-        Assert::AreEqual(L"z", e.Peek().c_str());
+        TestPeekWord(L"z", L"z");
     }
 
     TEST_METHOD(TestPeekCarc) {
-        TelexEngine e(config);
-        FeedWord(e, L"carc");
-        Assert::AreEqual(L"carc", e.Peek().c_str());
+        TestPeekWord(L"carc", L"carc");
     }
 
     TEST_METHOD(TestPeekDdark) {
-        TelexEngine e(config);
-        FeedWord(e, L"ddark");
-        Assert::AreEqual(L"\x111\x1ea3k", e.Peek().c_str());
+        TestPeekWord(L"\x111\x1ea3k", L"ddark");
     }
 
     // test peek key ordering
 
     TEST_METHOD(TestPeekCace) {
-        TelexEngine e(config);
-        FeedWord(e, L"cace");
-        Assert::AreEqual(L"cace", e.Peek().c_str());
+        TestPeekWord(L"cace", L"cace");
     }
 
     // peek shouldn't crash if tone position is not found
     TEST_METHOD(TestPeekNhaeng) {
-        TelexEngine e(config);
-        FeedWord(e, L"nhaeng");
-        Assert::AreEqual(L"nhaeng", e.Peek().c_str());
+        TestPeekWord(L"nhaeng", L"nhaeng");
     }
 
     // peek key ordering with tones
     TEST_METHOD(TestPeekCafe) {
-        TelexEngine e(config);
-        FeedWord(e, L"cafe");
-        Assert::AreEqual(L"cafe", e.Peek().c_str());
+        TestPeekWord(L"cafe", L"cafe");
     }
 
     TEST_METHOD(TestPeekDand) {
-        TelexEngine e(config);
+        auto config1 = config;
+        config1.accept_separate_dd = true;
+        TelexEngine e(config1);
         FeedWord(e, L"dand");
         Assert::AreEqual(L"\x111""an", e.Peek().c_str());
     }
@@ -433,12 +455,14 @@ public:
         TestInvalidWord(L"quwowns", L"quwowwns");
     }
 
+    TEST_METHOD(TestTypingCaasy) {
+        TestValidWord(L"c\x1ea5y", L"caasy");
+    }
+
     // caps
 
     TEST_METHOD(TestCapsPeekD) {
-        TelexEngine e(config);
-        e.PushChar(L'D');
-        Assert::AreEqual(L"D", e.Peek().c_str());
+        TestPeekWord(L"D", L"D");
     }
 
     TEST_METHOD(TestCapsXuOwngf) {
@@ -659,6 +683,20 @@ public:
         Assert::AreEqual(L"xo\xf4", e.Peek().c_str());
         AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
         Assert::AreEqual(L"xo", e.Peek().c_str());
+    }
+
+    TEST_METHOD(TestBackconversionCaays) {
+        TelexEngine e(config);
+        AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(L"c\x1ea5y"));
+        e.Commit();
+        Assert::AreEqual(L"c\x1ea5y", e.Retrieve().c_str());
+    }
+
+    TEST_METHOD(TestBackconversionQuaays) {
+        TelexEngine e(config);
+        AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(L"qu\x1ea5y"));
+        e.Commit();
+        Assert::AreEqual(L"qu\x1ea5y", e.Retrieve().c_str());
     }
 
     // test oa/oe/uy
