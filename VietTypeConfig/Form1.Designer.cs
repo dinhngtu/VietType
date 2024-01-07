@@ -31,11 +31,12 @@ namespace VietTypeConfig {
             this.cbAcceptDd = new System.Windows.Forms.CheckBox();
             this.cbBackspaceInvalid = new System.Windows.Forms.CheckBox();
             this.cbBackconvertOnBackspace = new System.Windows.Forms.CheckBox();
+            this.btnEnable = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
+            this.cbOptimizeMultilang = new System.Windows.Forms.CheckBox();
             this.btnOK = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnAbout = new System.Windows.Forms.Button();
-            this.btnEnable = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.settingsBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
@@ -83,6 +84,27 @@ namespace VietTypeConfig {
             this.cbBackconvertOnBackspace.Name = "cbBackconvertOnBackspace";
             this.cbBackconvertOnBackspace.UseVisualStyleBackColor = true;
             // 
+            // btnEnable
+            // 
+            resources.ApplyResources(this.btnEnable, "btnEnable");
+            this.btnEnable.Name = "btnEnable";
+            this.btnEnable.UseVisualStyleBackColor = true;
+            this.btnEnable.Click += new System.EventHandler(this.btnEnable_Click);
+            // 
+            // label1
+            // 
+            resources.ApplyResources(this.label1, "label1");
+            this.label1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.label1.Name = "label1";
+            // 
+            // cbOptimizeMultilang
+            // 
+            resources.ApplyResources(this.cbOptimizeMultilang, "cbOptimizeMultilang");
+            this.cbOptimizeMultilang.AutoEllipsis = true;
+            this.cbOptimizeMultilang.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.settingsBindingSource, "OptimizeMultilang", true));
+            this.cbOptimizeMultilang.Name = "cbOptimizeMultilang";
+            this.cbOptimizeMultilang.UseVisualStyleBackColor = true;
+            // 
             // btnOK
             // 
             resources.ApplyResources(this.btnOK, "btnOK");
@@ -106,19 +128,6 @@ namespace VietTypeConfig {
             this.btnAbout.UseVisualStyleBackColor = true;
             this.btnAbout.Click += new System.EventHandler(this.btnAbout_Click);
             // 
-            // btnEnable
-            // 
-            resources.ApplyResources(this.btnEnable, "btnEnable");
-            this.btnEnable.Name = "btnEnable";
-            this.btnEnable.UseVisualStyleBackColor = true;
-            this.btnEnable.Click += new System.EventHandler(this.btnEnable_Click);
-            // 
-            // label1
-            // 
-            resources.ApplyResources(this.label1, "label1");
-            this.label1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.label1.Name = "label1";
-            // 
             // Form1
             // 
             this.AcceptButton = this.btnOK;
@@ -130,6 +139,7 @@ namespace VietTypeConfig {
             this.Controls.Add(this.btnAbout);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnOK);
+            this.Controls.Add(this.cbOptimizeMultilang);
             this.Controls.Add(this.cbBackconvertOnBackspace);
             this.Controls.Add(this.cbBackspaceInvalid);
             this.Controls.Add(this.cbAcceptDd);
@@ -155,12 +165,13 @@ namespace VietTypeConfig {
         private System.Windows.Forms.CheckBox cbAcceptDd;
         private System.Windows.Forms.CheckBox cbBackspaceInvalid;
         private System.Windows.Forms.CheckBox cbBackconvertOnBackspace;
-        private System.Windows.Forms.Button btnOK;
-        private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.BindingSource settingsBindingSource;
-        private System.Windows.Forms.Button btnAbout;
         private System.Windows.Forms.Button btnEnable;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.CheckBox cbOptimizeMultilang;
+        private System.Windows.Forms.Button btnOK;
+        private System.Windows.Forms.Button btnCancel;
+        private System.Windows.Forms.Button btnAbout;
     }
 }
 

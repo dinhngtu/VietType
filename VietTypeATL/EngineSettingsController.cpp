@@ -61,11 +61,25 @@ _Check_return_ HRESULT EngineSettingsController::Initialize(
         clientid);
     HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(_tc_backspace_invalid) failed");
 
+    hr = CreateInitialize(
+        &_tc_optimize_multilang,
+        HKEY_CURRENT_USER,
+        Globals::ConfigKeyName.c_str(),
+        L"optimize_multilang",
+        KEY_QUERY_VALUE,
+        threadMgr,
+        clientid);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(_tc_optimize_multilang) failed");
+
     return S_OK;
 }
 
 HRESULT EngineSettingsController::Uninitialize() {
     HRESULT hr;
+
+    hr = _tc_optimize_multilang->Uninitialize();
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_optimize_multilang->Uninitialize failed");
+    _tc_optimize_multilang.Release();
 
     hr = _tc_backspace_invalid->Uninitialize();
     HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_backspace_invalid->Uninitialize failed");
@@ -108,6 +122,12 @@ HRESULT EngineSettingsController::LoadTelexSettings(Telex::TelexConfig& cfg) {
         &backspace_invalid, _ec->GetEngine().GetConfig().backspaced_word_stays_invalid);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_backspace_invalid->GetValueOrWriteback failed");
     cfg.backspaced_word_stays_invalid = static_cast<bool>(backspace_invalid);
+
+    DWORD optimize_multilang = true;
+    hr = _tc_optimize_multilang->GetValueOrDefault(
+        &optimize_multilang, _ec->GetEngine().GetConfig().optimize_multilang);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_optimize_multilang->GetValueOrWriteback failed");
+    cfg.optimize_multilang = static_cast<bool>(optimize_multilang);
 
     return S_OK;
 }

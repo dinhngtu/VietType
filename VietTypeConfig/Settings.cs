@@ -75,6 +75,19 @@ namespace VietTypeConfig {
             }
         }
 
+        bool optimize_multilang = true;
+        public bool OptimizeMultilang {
+            get {
+                return optimize_multilang;
+            }
+            set {
+                if (optimize_multilang != value) {
+                    optimize_multilang = value;
+                    OnPropertyChanged(nameof(OptimizeMultilang));
+                }
+            }
+        }
+
 
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged(string propName) {
@@ -97,6 +110,7 @@ namespace VietTypeConfig {
                 setting.AcceptDd = ToBool(regKey.GetValue(nameof(accept_dd))) ?? setting.AcceptDd;
                 setting.BackspaceInvalid = ToBool(regKey.GetValue(nameof(backspace_invalid))) ?? setting.BackspaceInvalid;
                 setting.BackconvertOnBackspace = ToBool(regKey.GetValue(nameof(backconvert_on_backspace))) ?? setting.BackconvertOnBackspace;
+                setting.OptimizeMultilang = ToBool(regKey.GetValue(nameof(optimize_multilang))) ?? setting.OptimizeMultilang;
                 return setting;
             }
         }
@@ -108,6 +122,7 @@ namespace VietTypeConfig {
                 regKey.SetValue(nameof(accept_dd), settings.AcceptDd ? 1 : 0);
                 regKey.SetValue(nameof(backspace_invalid), settings.BackspaceInvalid ? 1 : 0);
                 regKey.SetValue(nameof(backconvert_on_backspace), settings.BackconvertOnBackspace ? 1 : 0);
+                regKey.SetValue(nameof(optimize_multilang), settings.OptimizeMultilang ? 1 : 0);
 
                 var threadMgr = Activator.CreateInstance(Type.GetTypeFromCLSID(CLSID_TF_ThreadMgr, true)) as ITfThreadMgr;
                 if (threadMgr.Activate(out uint tid) >= 0) {

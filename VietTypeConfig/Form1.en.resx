@@ -117,70 +117,69 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="cbDefaultEnabled.Text" xml:space="preserve">
-    <value>Mặc định bật tiếng Việt (&amp;F)</value>
-  </data>
-  <data name="cbOaUy.Text" xml:space="preserve">
-    <value>Gõ "oà", "uý" thay vì "òa", "úy" (&amp;U)</value>
-  </data>
-  <data name="cbAcceptDd.Text" xml:space="preserve">
-    <value>Gõ 'đ' tự do (&amp;W)</value>
-  </data>
-  <data name="cbBackspaceInvalid.Text" xml:space="preserve">
-    <value>Giữ trạng thái sai khi xóa từ sai (&amp;I)</value>
-  </data>
-  <data name="cbBackconvertOnBackspace.Text" xml:space="preserve">
-    <value>Chuyển ngược từ khi Backspace (Tính năng thử nghiệm) (&amp;R)</value>
-  </data>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="btnAbout.Size" type="System.Drawing.Size, System.Drawing">
-    <value>95, 23</value>
-  </data>
-  <data name="btnAbout.Text" xml:space="preserve">
-    <value>Thông tin (&amp;B)</value>
-  </data>
-  <data name="btnEnable.Text" xml:space="preserve">
-    <value>Bật VietType (&amp;E)</value>
-  </data>
   <data name="$this.Text" xml:space="preserve">
-    <value>Cài đặt VietType</value>
+    <value>VietType Settings</value>
   </data>
   <data name="aboutMessage" xml:space="preserve">
     <value>VietType {0} {1}
-Bản quyền © 2018 Đinh Ngọc Tú.
-VietType là phần mềm tự do, bạn có thể cung cấp lại và/hoặc chỉnh sửa nó theo những điều khoản của Giấy phép Công cộng GNU phiên bản 3 do Tổ chức Phần mềm Tự do công bố. VietType không cung cấp bất cứ bảo hành hay bảo đảm nào. Bạn tự chấp nhận mọi rủi ro và trách nhiệm khi sử dụng VietType. Tham khảo tập tin LICENSE đi kèm VietType để biết chính xác các điều khoản.</value>
-  </data>
-  <data name="btnEnable_DisableText" xml:space="preserve">
-    <value>Tắt VietType (&amp;D)</value>
+Copyright © 2018 Dinh Ngoc Tu.
+VietType is free software, licensed under the GNU General Public License. VietType is distributed WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the included LICENSE file for more details.</value>
   </data>
   <data name="aboutTitle" xml:space="preserve">
-    <value>Thông tin VietType</value>
+    <value>About VietType</value>
+  </data>
+  <data name="btnAbout.Text" xml:space="preserve">
+    <value>A&amp;bout</value>
   </data>
   <data name="btnCancel.Text" xml:space="preserve">
-    <value>Hủy bỏ</value>
+    <value>Cancel</value>
+  </data>
+  <data name="btnEnable.Text" xml:space="preserve">
+    <value>&amp;Enable VietType</value>
+  </data>
+  <data name="btnEnable_DisableText" xml:space="preserve">
+    <value>&amp;Disable VietType</value>
   </data>
   <data name="btnOK.Text" xml:space="preserve">
     <value>OK</value>
   </data>
   <data name="cannotConfigureMessage" xml:space="preserve">
-    <value>Không bật/tắt được VietType: {0}</value>
+    <value>Cannot configure VietType: {0}</value>
   </data>
   <data name="cannotFindLibraryMessage" xml:space="preserve">
-    <value>Không tìm thấy thư viện VietType: {0}</value>
+    <value>Cannot find VietType library: {0}</value>
   </data>
   <data name="cannotSaveSettingsMessage" xml:space="preserve">
-    <value>Lưu cài đặt thất bại: {0}</value>
+    <value>Cannot save settings: {0}</value>
   </data>
-  <data name="disableSuccessMessage" xml:space="preserve">
-    <value>Đã tắt VietType.</value>
+  <data name="cbAcceptDd.Text" xml:space="preserve">
+    <value>Accept 'd' any&amp;where</value>
   </data>
-  <data name="enableSuccessMessage" xml:space="preserve">
-    <value>Đã bật VietType. Hãy tìm VietType trong thanh ngôn ngữ của Windows.</value>
+  <data name="cbBackconvertOnBackspace.Text" xml:space="preserve">
+    <value>&amp;Reconvert word on Backspace (Experimental)</value>
   </data>
-  <data name="notEnabledQuestion" xml:space="preserve">
-    <value>VietType hiện chưa bật. Bạn có muốn bật VietType không?</value>
+  <data name="cbBackspaceInvalid.Text" xml:space="preserve">
+    <value>Backspaced &amp;invalid word stays invalid</value>
+  </data>
+  <data name="cbDefaultEnabled.Text" xml:space="preserve">
+    <value>Vietnamese mode by de&amp;fault</value>
+  </data>
+  <data name="cbOaUy.Text" xml:space="preserve">
+    <value>&amp;Use "oà", "uý" instead of "òa", "úy"</value>
   </data>
   <data name="cbOptimizeMultilang.Text" xml:space="preserve">
-    <value>Tối ưu gõ nhiều ngôn ngữ (&amp;O)</value>
+    <value>&amp;Optimize multilingual typing</value>
+  </data>
+  <data name="disableSuccessMessage" xml:space="preserve">
+    <value>Successfully disabled VietType.</value>
+  </data>
+  <data name="enableSuccessMessage" xml:space="preserve">
+    <value>Successfully enabled VietType. Switch to VietType in the language bar to start using it.</value>
+  </data>
+  <data name="label1.Text" xml:space="preserve">
+    <value>label1</value>
+  </data>
+  <data name="notEnabledQuestion" xml:space="preserve">
+    <value>VietType is not enabled. Enable it now?</value>
   </data>
 </root>

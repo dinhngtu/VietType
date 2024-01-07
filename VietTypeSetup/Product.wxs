@@ -136,6 +136,7 @@ SPDX-License-Identifier: GPL-3.0-only
 
   <Fragment>
     <DirectoryRef Id="INSTALLFOLDER">
+      <Directory Id="ConfigRes_en" Name="en" />
       <Directory Id="ConfigRes_vi" Name="vi" />
     </DirectoryRef>
     <ComponentGroup Id="ConfigComponents">
@@ -149,8 +150,11 @@ SPDX-License-Identifier: GPL-3.0-only
         <File Source="$(var.SolutionDir)\VietTypeConfig\bin\$(var.Configuration)\VietTypeConfig.exe.config"
               DefaultLanguage="!(bind.fileLanguage.VietTypeConfig.exe)" DefaultVersion="!(bind.fileVersion.VietTypeConfig.exe)" />
       </Component>
+      <Component Win64="no" Directory="ConfigRes_en">
+        <File Id="VietTypeConfig.resources.en.dll" Source="$(var.SolutionDir)\VietTypeConfig\bin\$(var.Configuration)\en\VietTypeConfig.resources.dll" />
+      </Component>
       <Component Win64="no" Directory="ConfigRes_vi">
-        <File Source="$(var.SolutionDir)\VietTypeConfig\bin\$(var.Configuration)\vi\VietTypeConfig.resources.dll" />
+        <File Id="VietTypeConfig.resources.vi.dll" Source="$(var.SolutionDir)\VietTypeConfig\bin\$(var.Configuration)\vi\VietTypeConfig.resources.dll" />
       </Component>
     </ComponentGroup>
   </Fragment>
