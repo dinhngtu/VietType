@@ -15,7 +15,13 @@ namespace VietTypeConfig {
 
         private void Form1_Load(object sender, EventArgs e) {
             settingsBindingSource.DataSource = Settings.LoadSettings();
-            UpdateEnabled();
+            try {
+                UpdateEnabled();
+            } catch (Exception ex) {
+                btnEnable.Enabled = false;
+                MessageBox.Show(string.Format(rm.GetString("cannotFindLibraryMessage"), ex.Message), "VietType", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Close();
+            }
         }
 
         private void CloseForm(object sender, EventArgs e) {
@@ -39,14 +45,9 @@ namespace VietTypeConfig {
         }
 
         private void UpdateEnabled() {
-            try {
-                var activated = VietTypeRegistrar.IsProfileActivated();
-                btnEnable.Enabled = activated >= 0;
-                btnEnable.Text = (activated == S_OK) ? rm.GetString("btnEnable_DisableText") : rm.GetString("btnEnable.Text");
-            } catch (Exception ex) {
-                btnEnable.Enabled = false;
-                MessageBox.Show(string.Format(rm.GetString("cannotFindLibraryMessage"), ex.Message), "VietType", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            var activated = IsProfileActivated();
+            btnEnable.Enabled = activated >= 0;
+            btnEnable.Text = (activated == S_OK) ? rm.GetString("btnEnable_DisableText") : rm.GetString("btnEnable.Text");
         }
 
         private void btnEnable_Click(object sender, EventArgs e) {
