@@ -1,7 +1,12 @@
+// SPDX-License-Identifier: GPL-3.0-only
+
 #pragma once
 
 #include <cstddef>
 #include <iterator>
+
+namespace VietType {
+namespace TestLib {
 
 class WordListIterator {
 public:
@@ -16,7 +21,7 @@ public:
     }
 
     WordListIterator& operator++() {
-        if (_wlen == _wend - _words)
+        if (static_cast<ptrdiff_t>(_wlen) == _wend - _words)
             _words = _wend;
         else
             _words += _wlen + 1;
@@ -58,3 +63,6 @@ private:
     const wchar_t *_words, *_wend;
     size_t _wlen;
 };
+
+} // namespace TestLib
+} // namespace VietType

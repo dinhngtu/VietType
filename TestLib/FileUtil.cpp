@@ -1,4 +1,12 @@
+// SPDX-License-Identifier: GPL-3.0-only
+
+#include <cstdlib>
+#include <stdexcept>
+#include <system_error>
 #include "FileUtil.hpp"
+
+namespace VietType {
+namespace TestLib {
 
 static BOOL readall(HANDLE fd, PVOID buf, DWORD count) {
     auto _buf = static_cast<char*>(buf);
@@ -41,3 +49,6 @@ PVOID ReadWholeFile(PCWSTR filename, _Out_ PLONGLONG size) {
     *size = fsize.QuadPart;
     return bytes;
 }
+
+} // namespace TestLib
+} // namespace VietType

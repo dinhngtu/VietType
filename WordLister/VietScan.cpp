@@ -1,12 +1,12 @@
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
-#include <cstdio>
+// SPDX-License-Identifier: GPL-3.0-only
+
 #include "stdafx.h"
 #include "Telex.h"
 #include "WordListIterator.hpp"
 #include "FileUtil.hpp"
 
 using namespace VietType::Telex;
+using namespace VietType::TestLib;
 
 bool vietscan(const wchar_t* filename) {
     LONGLONG fsize;

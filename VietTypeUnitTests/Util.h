@@ -3,22 +3,24 @@
 #pragma once
 
 #include "stdafx.h"
-#include "CppUnitTest.h"
+#include "Telex.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace VietType {
-namespace Telex {
-enum class TelexStates;
-}
-}
+namespace UnitTests {
 
-using namespace VietType::Telex;
-
-namespace VietTypeUnitTests {
-
-inline void AssertTelexStatesEqual(TelexStates expected, TelexStates actual) {
+inline void AssertTelexStatesEqual(VietType::Telex::TelexStates expected, VietType::Telex::TelexStates actual) {
     Assert::AreEqual(static_cast<int>(expected), static_cast<int>(actual));
 }
 
-}
+VietType::Telex::TelexStates FeedWord(VietType::Telex::TelexEngine& e, const wchar_t* input);
+
+void TestValidWord(VietType::Telex::TelexEngine& e, const wchar_t* expected, const wchar_t* input);
+
+void TestInvalidWord(VietType::Telex::TelexEngine& e, const wchar_t* expected, const wchar_t* input);
+
+void TestPeekWord(VietType::Telex::TelexEngine& e, const wchar_t* expected, const wchar_t* input);
+
+} // namespace UnitTests
+} // namespace VietType

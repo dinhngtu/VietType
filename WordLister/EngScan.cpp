@@ -1,9 +1,12 @@
+// SPDX-License-Identifier: GPL-3.0-only
+
 #include "stdafx.h"
 #include "Telex.h"
 #include "WordListIterator.hpp"
 #include "FileUtil.hpp"
 
 using namespace VietType::Telex;
+using namespace VietType::TestLib;
 
 enum ResposTransitions {
     ResposExpunged = -1,

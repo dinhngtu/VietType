@@ -10,3 +10,4 @@ AlignAfterOpenBracket: AlwaysBreak
 Cpp11BracedListStyle: true
 AccessModifierOffset: -4
 AlwaysBreakTemplateDeclarations: Yes
+ForEachMacros: [TEST_CLASS, TEST_METHOD]
