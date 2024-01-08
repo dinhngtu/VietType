@@ -702,6 +702,7 @@ TelexStates TelexEngine::Backconvert(_In_ const std::wstring& s) {
         }
     }
     _backconverted = true;
+    assert(CheckInvariants());
     return _state;
 }
 
