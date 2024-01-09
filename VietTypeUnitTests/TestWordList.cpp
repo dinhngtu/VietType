@@ -2,6 +2,7 @@
 
 #include "stdafx.h"
 #include <cstdlib>
+#include <cstdio>
 #include <memory>
 #include "Telex.h"
 #include "WordListIterator.hpp"
@@ -13,6 +14,22 @@ using namespace VietType::Telex;
 using namespace VietType::TestLib;
 
 namespace VietType {
+namespace Telex {
+
+enum ResposTransitions {
+    ResposExpunged = 0x40000000,
+    ResposTransitionC1 = 0x20000000,
+    ResposTransitionV = 0x10000000,
+    ResposTransitionW = 0x8000000,
+    ResposTone = 0x4000000,
+    ResposDoubleUndo = 0x2000000,
+    ResposInvalidate = 0x1000000,
+    //
+    ResposMask = 0xff,
+};
+
+} // namespace Telex
+
 namespace UnitTests {
 
 TEST_CLASS (TestWordList) {
@@ -32,6 +49,8 @@ public:
             if (!w.wlen())
                 continue;
             std::wstring word(*w, w.wlen());
+            // if (word == L"boong")
+            //__debugbreak();
 
             engine.Reset();
             AssertTelexStatesEqual(TelexStates::Valid, engine.Backconvert(word));

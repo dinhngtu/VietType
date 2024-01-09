@@ -112,9 +112,10 @@ private:
     /// </summary>
     std::vector<int> _cases;
     /// <summary>
-    /// only use when valid;
     /// for each character in the _keyBuffer, record which output character it's responsible for,
-    /// ex. 'đuống' (dduoongs) _respos = 0C12V34T (T = tone, C = transition _c1, V = transition _v)
+    /// e.g. 'đuống' (dduoongs) _respos = 00122342 (T = tone, C = transition _c1, V = transition _v)
+    ///                                    C  V  T
+    /// note that respos position masks are only valid if state is Valid
     /// </summary>
     std::vector<int> _respos;
     int _respos_current = 0;

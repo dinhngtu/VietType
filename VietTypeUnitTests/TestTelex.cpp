@@ -577,12 +577,24 @@ public:
         Assert::AreEqual(L"g\xec", e.Peek().c_str());
     }
 
-    TEST_METHOD(TestBackspaceXooong) {
+    TEST_METHOD (TestBackspaceXooong) {
         TelexEngine e(config);
-        FeedWord(e, L"xooong");
+        AssertTelexStatesEqual(TelexStates::Valid, FeedWord(e, L"xooong"));
         Assert::AreEqual(L"xoong", e.Peek().c_str());
-        e.Backspace();
+        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
         Assert::AreEqual(L"xoon", e.Peek().c_str());
+        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+        Assert::AreEqual(L"xoo", e.Peek().c_str());
+    }
+
+    TEST_METHOD (TestBackspaceThooongf) {
+        TelexEngine e(config);
+        AssertTelexStatesEqual(TelexStates::Valid, FeedWord(e, L"thooongf"));
+        Assert::AreEqual(L"tho\xf2ng", e.Peek().c_str());
+        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+        Assert::AreEqual(L"tho\xf2n", e.Peek().c_str());
+        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+        Assert::AreEqual(L"tho\xf2", e.Peek().c_str());
     }
 
     // test backconversions
@@ -634,6 +646,8 @@ public:
         TelexEngine e(config);
         AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(L"xoong"));
         Assert::AreEqual(L"xoong", e.Peek().c_str());
+        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+        Assert::AreEqual(L"xoon", e.Peek().c_str());
     }
 
     TEST_METHOD (TestBackconversionXooongUpper) {
@@ -646,6 +660,8 @@ public:
         TelexEngine e(config);
         AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(L"tho\xf2ng"));
         Assert::AreEqual(L"tho\xf2ng", e.Peek().c_str());
+        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+        Assert::AreEqual(L"tho\xf2n", e.Peek().c_str());
     }
 
     TEST_METHOD (TestBackconversionThooongfUpper) {
@@ -744,6 +760,22 @@ public:
         config1.optimize_multilang = TelexConfig::OptimizeMultilang::Aggressive;
         TelexEngine e(config1);
         AssertTelexStatesEqual(TelexStates::Invalid, FeedWord(e, L"defe"));
+    }
+
+    // test doublekey backspace
+
+    TEST_METHOD (TestBackspaceMooo) {
+        TelexEngine e(config);
+        FeedWord(e, L"mooo");
+        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+        Assert::AreEqual(L"mo", e.Peek().c_str());
+    }
+
+    TEST_METHOD (TestBackspaceMooof) {
+        TelexEngine e(config);
+        FeedWord(e, L"mooof");
+        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+        Assert::AreEqual(L"mo", e.Peek().c_str());
     }
 };
 

@@ -231,6 +231,25 @@ struct TelexEngineImpl {
         *vinfo = retinfo;
         return found.has_value();
     }
+
+    static void ReapplyTone(TelexEngine& e) {
+        int found = -1;
+        for (int i = static_cast<int>(e._respos.size() - 1); i >= 0; i--) {
+            if (e._respos[i] & ResposTone) {
+                found = i;
+                break;
+            }
+        }
+        if (found >= 0) {
+            e._respos.push_back(found | ResposTone);
+        } else {
+            VInfo vinfo;
+            if (TelexEngineImpl::GetTonePos(e, false, &vinfo))
+                e._respos.push_back((e._c1.size() + vinfo.tonepos) | ResposTone);
+            else
+                e._respos.push_back((e._c1.size() + e._v.size() - 1) | ResposTone);
+        }
+    }
 };
 
 TelexEngine::TelexEngine(_In_ TelexConfig config) {
@@ -301,7 +320,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
         // only used for 'dd'
         // relaxed constraint: _v.empty()
         _c1 = L"\x111";
-        _respos.push_back(ResposTransitionC1);
+        _respos.push_back(0 | ResposTransitionC1);
 
     } else if (_c1 == L"\x111" && c == L'd') {
         // only used for 'dd'
@@ -309,7 +328,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
         if (_keyBuffer.size() > 1 && ToLower(_keyBuffer.rbegin()[1]) == L'd')
             _respos.push_back(_respos_current++ | ResposDoubleUndo);
         else
-            _respos.push_back(ResposInvalidate);
+            _respos.push_back(_respos_current++ | ResposInvalidate);
         _state = TelexStates::Invalid;
 
     } else if (_v.empty() && _c2.empty() && _c1 != L"gi" && IS(cat, CharTypes::ConsoC1)) {
@@ -331,7 +350,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
                 _cases.push_back(ccase);
                 _respos.push_back(_respos_current++ | ResposDoubleUndo);
             } else if (after < before) {
-                _respos.push_back(ResposTransitionV);
+                _respos.push_back((_c1.size() + _v.size() - 1) | ResposTransitionV);
             } else if (after == before) {
                 // in case of 'uơi' -> 'ươi', the transition char itself is a normal character
                 // so it must be recorded as such rather than just a transition
@@ -343,7 +362,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
             _cases.push_back(ccase);
             // invalidate if same char entered twice in a row in order to undo transition
             if (_keyBuffer.size() > 1 && _respos.back() & ResposTransitionV && c == ToLower(_keyBuffer.rbegin()[1])) {
-                _respos.push_back(ResposDoubleUndo);
+                _respos.push_back(_respos_current++ | ResposDoubleUndo);
                 _state = TelexStates::Invalid;
             } else {
                 _respos.push_back(_respos_current++);
@@ -366,7 +385,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
             if (!_c2.empty()) {
                 TelexEngineImpl::TransitionV(*this, transitions_v_c2);
             }
-            _respos.push_back(ResposTransitionW);
+            _respos.push_back((_c1.size() + _v.size() - 1) | ResposTransitionW);
         } else {
             TelexEngineImpl::InvalidateAndPopBack(*this, c);
         }
@@ -382,7 +401,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
         auto newtone = GetCharTone(c);
         if (newtone != _t) {
             _t = newtone;
-            _respos.push_back(ResposTone);
+            TelexEngineImpl::ReapplyTone(*this);
         } else {
             // the condition "_c1 == L"gi" || !_v.empty()" should ensure this already
             assert(_keyBuffer.length() > 1);
@@ -427,7 +446,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
         auto newtone = GetCharTone(c);
         if (newtone != _t) {
             _t = newtone;
-            _respos.push_back(ResposTone);
+            TelexEngineImpl::ReapplyTone(*this);
         } else {
             assert(_keyBuffer.length() > 1);
             TelexEngineImpl::InvalidateAndPopBack(*this, c);
@@ -448,6 +467,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
 TelexStates TelexEngine::Backspace() {
     auto prevState = _state;
     std::wstring buf(_keyBuffer);
+    std::vector<int> rp(_respos);
 
     if (_state == TelexStates::BackconvertFailed) {
         _keyBuffer.pop_back();
@@ -464,9 +484,9 @@ TelexStates TelexEngine::Backspace() {
         if (buf.size() && _config.backspaced_word_stays_invalid) {
             _state = TelexStates::Invalid;
         }
-        for (auto c : buf) {
-            PushChar(c);
-        }
+        for (size_t i = 0; i < buf.size(); i++)
+            if (!(rp[i] & ResposDoubleUndo))
+                PushChar(buf[i]);
         assert(CheckInvariants());
         if (prevState == TelexStates::Valid)
             assert(_state == TelexStates::Valid);
@@ -493,7 +513,7 @@ TelexStates TelexEngine::Backspace() {
     }
 
     assert(_keyBuffer.size() == _respos.size());
-    std::vector<int> rp(_respos);
+    rp = _respos;
     std::wstring oldc1(_c1);
     std::wstring oldv(_v);
     bool oldBackconverted = _backconverted;
@@ -515,37 +535,16 @@ TelexStates TelexEngine::Backspace() {
     }
 
     for (size_t i = 0; i < buf.size(); i++) {
-        if ((rp[i] & ResposMask) >= toDelete) {
-            // pass
-        } else if (rp[i] & ResposExpunged) {
-            // pass
-        } else if (rp[i] & ResposTransitionC1 && toDelete == 0) {
-            // assume that C1 transition is 'dd' on the first char
-            // pass
-        } else if (rp[i] & ResposTransitionV) {
-            auto rp_it = respos.find(oldv);
-            if (rp_it != respos.end() && (static_cast<int>(oldc1.size()) + rp_it->second) < toDelete) {
-                PushChar(buf[i]);
-            } else if (rp_it == respos.end()) {
-                PushChar(buf[i]);
-            }
-        } else if (rp[i] & ResposTransitionW) {
-            auto rpw_it = respos_w.find(oldv);
-            if (rpw_it != respos_w.end() && (static_cast<int>(oldc1.size()) + rpw_it->second) < toDelete) {
-                PushChar(buf[i]);
-            } else if (rpw_it == respos_w.end()) {
-                PushChar(buf[i]);
-            }
-        } else if (rp[i] & ResposTone) {
-            if (static_cast<int>(oldc1.size()) + vinfo.tonepos < toDelete) {
-                PushChar(buf[i]);
-            } else if (oldc1 == L"gi" && toDelete >= 2) {
-                PushChar(buf[i]);
-            }
-        } else {
-            PushChar(buf[i]);
+        if (rp[i] & ResposDoubleUndo && (rp[i] & ResposMask) >= toDelete) {
+            assert(i > 0);
+            assert(rp[i - 1] & ~ResposMask);
+            rp[i - 1] = (rp[i - 1] & ResposMask) | ResposExpunged;
         }
     }
+
+    for (size_t i = 0; i < buf.size(); i++)
+        if (!(rp[i] & ResposExpunged) && (rp[i] & ResposMask) < toDelete)
+            PushChar(buf[i]);
 
     if (_keyBuffer.size()) {
         _backconverted = oldBackconverted;
@@ -798,10 +797,6 @@ bool TelexEngine::CheckInvariants() const {
     }
     if (_state == TelexStates::Valid || _state == TelexStates::Committed) {
         if (_c1.size() + _v.size() + _c2.size() != _cases.size()) {
-            return false;
-        }
-        if (_respos.size() && (_respos.back() & ResposMask) > 0 &&
-            (_respos.back() & ResposMask) != _respos_current - 1) {
             return false;
         }
     }
