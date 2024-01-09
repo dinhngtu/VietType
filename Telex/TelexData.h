@@ -134,6 +134,9 @@ MAKE_MAP(
     WConStr,
     transitions_v_c2,
     P(L"u\x1a1", L"\x1b0\x1a1"), //
+    P(L"\x1b0"
+      "a",
+      L"u\x103"),                //
     P(L"\x1b0o", L"\x1b0\x1a1"), //
 );
 
@@ -231,6 +234,7 @@ MAKE_SORTED_MAP(
     P1(L"u\xea", VI(1, C2Mode::Either)),      // uê
     P1(L"u\xf4", VI(1, C2Mode::MustC2)),      // uô
     P1(L"u\xf4i", VI(1, C2Mode::NoC2)),       // uôi
+    P1(L"u\x103", VI(1, C2Mode::MustC2)),     // uă
     P1(L"u\x1a1", VI(1, C2Mode::NoC2)),       // uơ
     P1(L"y", VI(0, C2Mode::NoC2)),            //
     P1(L"y\xea", VI(1, C2Mode::MustC2)),      // yê

@@ -278,6 +278,14 @@ public:
         TestValidWord(L"thu\x1ebf", L"thuees");
     }
 
+    TEST_METHOD (TestTypingKhuawngs) {
+        TestValidWord(L"khu\x1eafng", L"khuawngs");
+    }
+
+    TEST_METHOD (TestTypingKhuawsng) {
+        TestValidWord(L"khu\x1eafng", L"khuawsng");
+    }
+
     // test variations of 'gi'
 
     TEST_METHOD (TestTypingGif) {
