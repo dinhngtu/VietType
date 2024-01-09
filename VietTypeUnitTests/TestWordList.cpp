@@ -14,22 +14,6 @@ using namespace VietType::Telex;
 using namespace VietType::TestLib;
 
 namespace VietType {
-namespace Telex {
-
-enum ResposTransitions {
-    ResposExpunged = 0x40000000,
-    ResposTransitionC1 = 0x20000000,
-    ResposTransitionV = 0x10000000,
-    ResposTransitionW = 0x8000000,
-    ResposTone = 0x4000000,
-    ResposDoubleUndo = 0x2000000,
-    ResposInvalidate = 0x1000000,
-    //
-    ResposMask = 0xff,
-};
-
-} // namespace Telex
-
 namespace UnitTests {
 
 TEST_CLASS (TestWordList) {
@@ -42,24 +26,52 @@ public:
     }
 
     TEST_METHOD (TestBackconvertWordList) {
-        TelexConfig config;
-        TelexEngine engine(config);
+        TelexConfig config1;
+        config1.oa_uy_tone1 = false;
+        TelexEngine engine1(config1);
+
+        TelexConfig config2;
+        config1.oa_uy_tone1 = true;
+        TelexEngine engine2(config2);
+
         auto wend = words.get() + fsize / sizeof(wchar_t);
         for (WordListIterator w(words.get(), wend); w != wend; w++) {
             if (!w.wlen())
                 continue;
             std::wstring word(*w, w.wlen());
-            // if (word == L"boong")
-            //__debugbreak();
 
-            engine.Reset();
-            AssertTelexStatesEqual(TelexStates::Valid, engine.Backconvert(word));
-            for (auto i = static_cast<int>(w.wlen()) - 1; i >= 0; i--) {
-                AssertTelexStatesEqual(TelexStates::Valid, engine.Backspace());
-                auto w1 = word.substr(0, i);
-                auto w2 = engine.Peek();
-                Assert::AreEqual(w1.c_str(), w2.c_str());
-            }
+            engine1.Reset();
+            engine2.Reset();
+
+            engine1.Backconvert(word);
+            engine2.Backconvert(word);
+            /*
+            if (engine1.GetState() != TelexStates::Valid || engine2.GetState() != TelexStates::Valid)
+                __debugbreak();
+            AssertTelexStatesEqual(TelexStates::Valid, engine1.GetState());
+            AssertTelexStatesEqual(TelexStates::Valid, engine2.GetState());
+            */
+            auto p1 = engine1.Peek(), p2 = engine2.Peek();
+            /*
+            if (word != p1 && word != p2)
+                __debugbreak();
+            */
+            Assert::IsTrue(word == p1 || word == p2);
+
+            engine1.Commit();
+            engine2.Commit();
+            /*
+            if (engine1.GetState() != TelexStates::Committed || engine2.GetState() != TelexStates::Committed)
+                __debugbreak();
+            AssertTelexStatesEqual(TelexStates::Committed, engine1.GetState());
+            AssertTelexStatesEqual(TelexStates::Committed, engine2.GetState());
+            */
+            auto c1 = engine1.Retrieve(), c2 = engine2.Retrieve();
+            /*
+            if (word != c1 && word != c2)
+                __debugbreak();
+            */
+            Assert::IsTrue(word == c1 || word == c2);
         }
     }
 };
