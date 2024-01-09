@@ -277,6 +277,7 @@ MAKE_SORTED_MAP(
     P1(L"u\xe2", VI(1, C2Mode::MustC2)),      // uâ
     P1(L"u\xe2y", VI(1, C2Mode::NoC2)),       // uây
     P1(L"u\xea", VI(1, C2Mode::Either)),      // uê
+    P1(L"u\xeau", VI(1, C2Mode::NoC2)),       // uêu
     P1(L"u\xf4", VI(1, C2Mode::Either)),      // ô
     P1(L"u\x103", VI(1, C2Mode::MustC2)),     // uă
     P1(L"u\x1a1", VI(1, C2Mode::Either)),     // uơ
@@ -294,7 +295,7 @@ MAKE_SORTED_MAP(
     P1(L"ao", VI(0, C2Mode::NoC2)),           //
     P1(L"au", VI(0, C2Mode::NoC2)),           //
     P1(L"ay", VI(0, C2Mode::NoC2)),           //
-    P1(L"e", VI(0, C2Mode::NoC2)),            //
+    P1(L"e", VI(0, C2Mode::Either)),          //
     P1(L"eo", VI(0, C2Mode::NoC2)),           //
     P1(L"o", VI(0, C2Mode::Either)),          //
     P1(L"oi", VI(0, C2Mode::NoC2)),           //
@@ -306,7 +307,7 @@ MAKE_SORTED_MAP(
     P1(L"\xe2", VI(0, C2Mode::MustC2)),       // â
     P1(L"\xe2u", VI(0, C2Mode::NoC2)),        // âu
     P1(L"\xe2y", VI(0, C2Mode::NoC2)),        // ây
-    P1(L"\xea", VI(0, C2Mode::MustC2)),       // ê
+    P1(L"\xea", VI(0, C2Mode::Either)),       // ê
     P1(L"\xeau", VI(0, C2Mode::NoC2)),        // êu
     P1(L"\xf4", VI(0, C2Mode::Either)),       // ô
     P1(L"\xf4i", VI(0, C2Mode::NoC2)),        // ôi

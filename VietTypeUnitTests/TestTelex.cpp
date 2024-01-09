@@ -322,6 +322,14 @@ public:
             L"giuoocj");
     }
 
+    TEST_METHOD (TestTypingGiemf) {
+        TestValidWord(L"gi\xe8m", L"giemf");
+    }
+
+    TEST_METHOD (TestTypingGiee) {
+        TestValidWord(L"gi\xea", L"giee");
+    }
+
     // test 'aua' and similar transitions
 
     TEST_METHOD (TestTypingLauar) {
