@@ -667,6 +667,7 @@ TelexStates TelexEngine::Cancel() {
 }
 
 TelexStates TelexEngine::Backconvert(_In_ const std::wstring& s) {
+    assert(!_keyBuffer.size());
     bool found_backconversion = false;
     for (auto c : s) {
         auto double_flag = !_c2.size() && (_v == L"e" || _v == L"o");
