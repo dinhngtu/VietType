@@ -420,7 +420,7 @@ MAKE_SORTED_MAP(
 
 MAKE_SORTED_SET(
     WConStr,
-    tone_exceptions_en,
+    word_exceptions_en,
     L"airs",     //
     L"arms",     //
     L"auras",    //

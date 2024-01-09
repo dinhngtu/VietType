@@ -573,7 +573,7 @@ TelexStates TelexEngine::Commit() {
     }
 
     if (_config.optimize_multilang >= TelexConfig::OptimizeMultilang::On && _state == TelexStates::Valid &&
-        tone_exceptions_en.find(_keyBuffer) != tone_exceptions_en.end()) {
+        word_exceptions_en.find(_keyBuffer) != word_exceptions_en.end()) {
         _state = TelexStates::CommittedInvalid;
         return _state;
     }
