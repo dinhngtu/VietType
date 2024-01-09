@@ -80,9 +80,7 @@ public:
         return _state;
     }
     std::wstring Retrieve() const;
-    std::wstring RetrieveRaw() const {
-        return std::wstring(_keyBuffer);
-    }
+    std::wstring RetrieveRaw() const;
     std::wstring Peek() const;
     constexpr std::wstring::size_type Count() const {
         return _keyBuffer.size();

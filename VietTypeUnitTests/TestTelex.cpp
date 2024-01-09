@@ -490,7 +490,7 @@ public:
         Assert::AreEqual(L"", e.Peek().c_str());
     }
 
-    TEST_METHOD (TestBackspaceMooon) {
+    TEST_METHOD (TestBackspaceLeeen) {
         TelexEngine e(config);
         FeedWord(e, L"leeen");
         Assert::AreEqual(L"leen", e.Peek().c_str());

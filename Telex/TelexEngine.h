@@ -15,12 +15,15 @@ struct VInfo {
 };
 
 enum ResposTransitions {
-    ResposExpunged = -1,
-    ResposTransitionC1 = -2,
-    ResposTransitionV = -3,
-    ResposTransitionW = -4,
-    ResposTone = -5,
-    ResposDoubleUndo = -6,
+    ResposExpunged = 0x40000000,
+    ResposTransitionC1 = 0x20000000,
+    ResposTransitionV = 0x10000000,
+    ResposTransitionW = 0x8000000,
+    ResposTone = 0x4000000,
+    ResposDoubleUndo = 0x2000000,
+    ResposInvalidate = 0x1000000,
+    //
+    ResposMask = 0xff,
 };
 
 enum class CharTypes : unsigned int {
