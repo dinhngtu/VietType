@@ -620,6 +620,48 @@ public:
         Assert::AreEqual(L"tho\xf2", e.Peek().c_str());
     }
 
+    // test tone and w movements
+
+    TEST_METHOD (TestBackspaceCuwsoc) {
+        TelexEngine e(config);
+        AssertTelexStatesEqual(TelexStates::Valid, FeedWord(e, L"cuwsoc"));
+        Assert::AreEqual(
+            L"c\x1b0\x1edb"
+            "c",
+            e.Peek().c_str());
+        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+        Assert::AreEqual(L"c\x1b0\x1edb", e.Peek().c_str());
+        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+        // since the tone is entered with the "uw", it should stay there
+        Assert::AreEqual(L"c\x1ee9", e.Peek().c_str());
+    }
+
+    TEST_METHOD (TestBackspaceCuwocs) {
+        TelexEngine e(config);
+        AssertTelexStatesEqual(TelexStates::Valid, FeedWord(e, L"cuwocs"));
+        Assert::AreEqual(
+            L"c\x1b0\x1edb"
+            "c",
+            e.Peek().c_str());
+        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+        Assert::AreEqual(L"c\x1b0\x1edb", e.Peek().c_str());
+        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+        Assert::AreEqual(L"c\x1b0", e.Peek().c_str());
+    }
+
+    TEST_METHOD (TestBackspaceCuocws) {
+        TelexEngine e(config);
+        AssertTelexStatesEqual(TelexStates::Valid, FeedWord(e, L"cuocws"));
+        Assert::AreEqual(
+            L"c\x1b0\x1edb"
+            "c",
+            e.Peek().c_str());
+        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+        Assert::AreEqual(L"cu\x1edb", e.Peek().c_str());
+        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+        Assert::AreEqual(L"cu", e.Peek().c_str());
+    }
+
     // test backconversions
 
     TEST_METHOD (TestBackconversionDdoongf) {
