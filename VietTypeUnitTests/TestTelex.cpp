@@ -307,6 +307,13 @@ public:
         TestValidWord(L"gi\x169", L"giux");
     }
 
+    TEST_METHOD (TestTypingGiuoocj) {
+        TestValidWord(
+            L"giu\x1ed9"
+            "c",
+            L"giuoocj");
+    }
+
     // test 'aua' and similar transitions
 
     TEST_METHOD (TestTypingLauar) {

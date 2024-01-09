@@ -298,6 +298,7 @@ MAKE_SORTED_MAP(
     P1(L"u", VI(0, C2Mode::Either)),          //
     P1(L"ua", VI(0, C2Mode::NoC2)),           // c2 either with qu
     P1(L"ui", VI(0, C2Mode::NoC2)),           //
+    P1(L"u\xf4", VI(1, C2Mode::Either)),      // ô
     P1(L"\xe2", VI(0, C2Mode::MustC2)),       // â
     P1(L"\xe2u", VI(0, C2Mode::NoC2)),        // âu
     P1(L"\xe2y", VI(0, C2Mode::NoC2)),        // ây
