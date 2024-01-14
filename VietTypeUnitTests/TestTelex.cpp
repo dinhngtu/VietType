@@ -817,6 +817,7 @@ public:
     }
 
     // test multilang optimizations
+
     TEST_METHOD (TestMultilangVirus) {
         auto config1 = config;
         config1.optimize_multilang = 1;
@@ -836,6 +837,20 @@ public:
         config1.optimize_multilang = 3;
         TelexEngine e(config1);
         AssertTelexStatesEqual(TelexStates::Invalid, FeedWord(e, L"defe"));
+    }
+
+    TEST_METHOD (TestMultilangVirusUpper) {
+        auto config1 = config;
+        config1.optimize_multilang = 1;
+        TelexEngine e(config1);
+        VietType::UnitTests::TestInvalidWord(e, L"VIRUS", L"VIRUS");
+    }
+
+    TEST_METHOD (TestMultilangDenseUpper) {
+        auto config1 = config;
+        config1.optimize_multilang = 2;
+        TelexEngine e(config1);
+        VietType::UnitTests::TestInvalidWord(e, L"DENSE", L"DENSE");
     }
 
     // test doublekey backspace

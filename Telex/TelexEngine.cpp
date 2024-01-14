@@ -546,12 +546,16 @@ TelexStates TelexEngine::Commit() {
         return _state;
     }
 
-    if (_state == TelexStates::Valid) {
-        if (_config.optimize_multilang >= 1 && word_exceptions_en.find(_keyBuffer) != word_exceptions_en.end()) {
+    if (_state == TelexStates::Valid && _config.optimize_multilang >= 1) {
+        auto wordBuffer = _keyBuffer;
+        for (auto& c : wordBuffer) {
+            c = ToLower(c);
+        }
+        if (word_exceptions_en.find(wordBuffer) != word_exceptions_en.end()) {
             _state = TelexStates::CommittedInvalid;
             return _state;
         }
-        if (_config.optimize_multilang >= 2 && word_exceptions_en_2.find(_keyBuffer) != word_exceptions_en_2.end()) {
+        if (_config.optimize_multilang >= 2 && word_exceptions_en_2.find(wordBuffer) != word_exceptions_en_2.end()) {
             _state = TelexStates::CommittedInvalid;
             return _state;
         }
