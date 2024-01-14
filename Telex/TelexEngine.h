@@ -39,7 +39,6 @@ enum class CharTypes : unsigned int {
     ConsoC2 = 1 << 5 | 1 << 7,
     ConsoContinue = 1 << 5 | 1 << 8,
     Tone = 1 << 9,
-    Shorthand = 1 << 10,
 };
 
 constexpr CharTypes operator|(CharTypes lhs, CharTypes rhs) {

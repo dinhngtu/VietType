@@ -26,11 +26,6 @@ static CharTypes ClassifyCharacter(_In_ wchar_t c) {
     case L'|':
     case L'~':
         return CharTypes::Commit;
-    case L'[':
-    case L']':
-    case L'{':
-    case L'}':
-        return CharTypes::Shorthand;
     }
 
     if (c >= 32 && c <= 64) {
@@ -306,7 +301,8 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
     if (cat == CharTypes::Uncategorized) {
         TelexEngineImpl::Invalidate(*this);
 
-    } else if (_c1.empty() && _v.empty() && (IS(cat, CharTypes::ConsoC1) || IS(cat, CharTypes::ConsoContinue))) {
+    } else if (_c1.empty() && _v.empty() && IS(cat, CharTypes::ConsoC1)) {
+        // ConsoContinue is a subset of ConsoC1, no need to check
         _c1.push_back(c);
         _cases.push_back(ccase);
         _respos.push_back(_respos_current++);
@@ -332,7 +328,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
             _respos.push_back(_respos_current++ | ResposInvalidate);
         _state = TelexStates::Invalid;
 
-    } else if (_v.empty() && _c2.empty() && _c1 != L"gi" && IS(cat, CharTypes::ConsoC1)) {
+    } else if (_v.empty() && _c2.empty() && _c1 != L"gi" && IS(cat, CharTypes::ConsoContinue)) {
         _c1.push_back(c);
         _cases.push_back(ccase);
         _respos.push_back(_respos_current++);
@@ -392,11 +388,6 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
         }
         // 'w' always keeps V size constant, don't push case
 
-    } else if (_c1.empty() && _v.empty() && IS(cat, CharTypes::Tone) && IS(cat, CharTypes::Conso)) {
-        // ambiguous (rsx) -> first character
-        _c1.push_back(c);
-        _cases.push_back(ccase);
-
     } else if ((_c1 == L"gi" || !_v.empty()) && IS(cat, CharTypes::Tone)) {
         // tones
         if (_config.optimize_multilang >= TelexConfig::OptimizeMultilang::Aggressive && _toned) {
@@ -444,10 +435,6 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
         _c2.push_back(c);
         _cases.push_back(ccase);
         _respos.push_back(_respos_current++);
-
-    } else if (cat == CharTypes::Shorthand) {
-        // not implemented
-        TelexEngineImpl::Invalidate(*this);
 
     } else {
         TelexEngineImpl::Invalidate(*this);

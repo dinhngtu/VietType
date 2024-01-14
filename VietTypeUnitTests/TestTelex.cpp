@@ -286,6 +286,10 @@ public:
         TestValidWord(L"khu\x1eafng", L"khuawsng");
     }
 
+    TEST_METHOD (TestTypingRa) {
+        TestValidWord(L"ra", L"ra");
+    }
+
     // test variations of 'gi'
 
     TEST_METHOD (TestTypingGif) {
