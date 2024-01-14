@@ -4,17 +4,10 @@
 #include "Telex.h"
 #include "WordListIterator.hpp"
 #include "FileUtil.hpp"
+#include "TelexEngine.h"
 
 using namespace VietType::Telex;
 using namespace VietType::TestLib;
-
-enum ResposTransitions {
-    ResposExpunged = -1,
-    ResposTransitionC1 = -2,
-    ResposTransitionV = -3,
-    ResposTransitionW = -4,
-    ResposTone = -5,
-};
 
 static TelexStates TestWord(TelexEngine& e, const wchar_t* input) {
     e.Reset();
@@ -30,6 +23,7 @@ bool engscan(const wchar_t* filename) {
     auto wend = words + fsize / sizeof(wchar_t);
 
     TelexConfig config;
+    config.optimize_multilang = TelexConfig::OptimizeMultilang::Off;
     TelexEngine engine(config);
     for (WordListIterator w(words, wend); w != wend; w++) {
         std::wstring word(*w, w.wlen());
@@ -37,9 +31,10 @@ bool engscan(const wchar_t* filename) {
         auto state = TestWord(engine, word.c_str());
         if (state == TelexStates::Committed && engine.GetTone() != Tones::Z) {
             const wchar_t* wordclass = L"";
-            if (std::count(engine.GetRespos().begin(), engine.GetRespos().end(), ResposTone) > 1)
+            if (std::count_if(
+                    engine.GetRespos().begin(), engine.GetRespos().end(), [](auto x) { return x & ResposTone; }) > 1)
                 wordclass = L"DoubleTone";
-            else if (*engine.GetRespos().rbegin() != ResposTone)
+            else if (!(*engine.GetRespos().rbegin() & ResposTone))
                 wordclass = L"ToneNotEnd";
             wprintf(L"%s %s\n", word.c_str(), wordclass);
         }
