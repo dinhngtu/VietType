@@ -125,6 +125,7 @@ private:
 private:
     friend struct TelexEngineImpl;
     bool CheckInvariants() const;
+    bool CheckInvariantsBackspace(TelexStates prevState) const;
 };
 
 } // namespace Telex

@@ -241,9 +241,9 @@ struct TelexEngineImpl {
         } else {
             VInfo vinfo;
             if (TelexEngineImpl::GetTonePos(e, false, &vinfo))
-                e._respos.push_back((e._c1.size() + vinfo.tonepos) | ResposTone);
+                e._respos.push_back(static_cast<int>(e._c1.size() + vinfo.tonepos) | ResposTone);
             else
-                e._respos.push_back((e._c1.size() + e._v.size() - 1) | ResposTone);
+                e._respos.push_back(static_cast<int>(e._c1.size() + e._v.size() - 1) | ResposTone);
         }
     }
 };
@@ -347,7 +347,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
                 _cases.push_back(ccase);
                 _respos.push_back(_respos_current++ | ResposDoubleUndo);
             } else if (after < before) {
-                _respos.push_back((_c1.size() + _v.size() - 1) | ResposTransitionV);
+                _respos.push_back(static_cast<int>(_c1.size() + _v.size() - 1) | ResposTransitionV);
             } else if (after == before) {
                 // in case of 'uơi' -> 'ươi', the transition char itself is a normal character
                 // so it must be recorded as such rather than just a transition
@@ -382,7 +382,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
             if (!_c2.empty()) {
                 TelexEngineImpl::TransitionV(*this, transitions_v_c2);
             }
-            _respos.push_back((_c1.size() + _v.size() - 1) | ResposTransitionW);
+            _respos.push_back(static_cast<int>(_c1.size() + _v.size() - 1) | ResposTransitionW);
         } else {
             TelexEngineImpl::InvalidateAndPopBack(*this, c);
         }
@@ -445,7 +445,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
 }
 
 TelexStates TelexEngine::Backspace() {
-    auto prevState = _state;
+    [[maybe_unused]] auto prevState = _state;
     std::wstring buf(_keyBuffer);
     std::vector<int> rp(_respos);
 
@@ -467,9 +467,7 @@ TelexStates TelexEngine::Backspace() {
         for (size_t i = 0; i < buf.size(); i++)
             if (!(rp[i] & ResposDoubleUndo))
                 PushChar(buf[i]);
-        assert(CheckInvariants());
-        if (prevState == TelexStates::Valid)
-            assert(_state == TelexStates::Valid);
+        assert(CheckInvariantsBackspace(prevState));
         return _state;
     } else if (_state != TelexStates::Valid) {
         return TelexStates::TxError;
@@ -486,9 +484,7 @@ TelexStates TelexEngine::Backspace() {
         for (auto c : buf) {
             PushChar(c);
         }
-        assert(CheckInvariants());
-        if (prevState == TelexStates::Valid)
-            assert(_state == TelexStates::Valid);
+        assert(CheckInvariantsBackspace(prevState));
         return _state;
     }
 
@@ -530,9 +526,7 @@ TelexStates TelexEngine::Backspace() {
         _backconverted = oldBackconverted;
     }
 
-    assert(CheckInvariants());
-    if (prevState == TelexStates::Valid)
-        assert(_state == TelexStates::Valid);
+    assert(CheckInvariantsBackspace(prevState));
     return _state;
 }
 
@@ -782,6 +776,13 @@ bool TelexEngine::CheckInvariants() const {
         }
     }
     return true;
+}
+
+bool TelexEngine::CheckInvariantsBackspace(TelexStates prevState) const {
+    if (prevState == TelexStates::Valid && _state != TelexStates::Valid) {
+        return false;
+    }
+    return CheckInvariants();
 }
 
 } // namespace Telex
