@@ -23,7 +23,7 @@ bool engscan(const wchar_t* filename) {
     auto wend = words + fsize / sizeof(wchar_t);
 
     TelexConfig config;
-    config.optimize_multilang = TelexConfig::OptimizeMultilang::Off;
+    config.optimize_multilang = 0;
     TelexEngine engine(config);
     for (WordListIterator w(words, wend); w != wend; w++) {
         std::wstring word(*w, w.wlen());

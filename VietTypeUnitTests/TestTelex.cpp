@@ -15,13 +15,13 @@ TEST_CLASS (TestTelex) {
     void TestValidWord(const wchar_t* expected, const wchar_t* input) const {
         {
             auto config_ = config;
-            config_.optimize_multilang = TelexConfig::OptimizeMultilang::Off;
+            config_.optimize_multilang = 0;
             TelexEngine e(config_);
             VietType::UnitTests::TestValidWord(e, expected, input);
         }
         {
             auto config_ = config;
-            config_.optimize_multilang = TelexConfig::OptimizeMultilang::On;
+            config_.optimize_multilang = 1;
             TelexEngine e(config_);
             VietType::UnitTests::TestValidWord(e, expected, input);
         }
@@ -30,13 +30,13 @@ TEST_CLASS (TestTelex) {
     void TestInvalidWord(const wchar_t* expected, const wchar_t* input) const {
         {
             auto config_ = config;
-            config_.optimize_multilang = TelexConfig::OptimizeMultilang::Off;
+            config_.optimize_multilang = 0;
             TelexEngine e(config);
             VietType::UnitTests::TestInvalidWord(e, expected, input);
         }
         {
             auto config_ = config;
-            config_.optimize_multilang = TelexConfig::OptimizeMultilang::On;
+            config_.optimize_multilang = 1;
             TelexEngine e(config);
             VietType::UnitTests::TestInvalidWord(e, expected, input);
         }
@@ -45,13 +45,13 @@ TEST_CLASS (TestTelex) {
     void TestPeekWord(const wchar_t* expected, const wchar_t* input) const {
         {
             auto config_ = config;
-            config_.optimize_multilang = TelexConfig::OptimizeMultilang::Off;
+            config_.optimize_multilang = 0;
             TelexEngine e(config_);
             VietType::UnitTests::TestPeekWord(e, expected, input);
         }
         {
             auto config_ = config;
-            config_.optimize_multilang = TelexConfig::OptimizeMultilang::On;
+            config_.optimize_multilang = 1;
             TelexEngine e(config_);
             VietType::UnitTests::TestPeekWord(e, expected, input);
         }
@@ -819,23 +819,23 @@ public:
     // test multilang optimizations
     TEST_METHOD (TestMultilangVirus) {
         auto config1 = config;
-        config1.optimize_multilang = TelexConfig::OptimizeMultilang::On;
+        config1.optimize_multilang = 1;
         TelexEngine e(config1);
         VietType::UnitTests::TestInvalidWord(e, L"virus", L"virus");
     }
 
-    TEST_METHOD (TestMultilangDefe) {
-        auto config1 = config;
-        config1.optimize_multilang = TelexConfig::OptimizeMultilang::Aggressive;
-        TelexEngine e(config1);
-        AssertTelexStatesEqual(TelexStates::Invalid, FeedWord(e, L"defe"));
-    }
-
     TEST_METHOD (TestMultilangDense) {
         auto config1 = config;
-        config1.optimize_multilang = TelexConfig::OptimizeMultilang::Aggressive;
+        config1.optimize_multilang = 2;
         TelexEngine e(config1);
         VietType::UnitTests::TestInvalidWord(e, L"dense", L"dense");
+    }
+
+    TEST_METHOD (TestMultilangDefe) {
+        auto config1 = config;
+        config1.optimize_multilang = 3;
+        TelexEngine e(config1);
+        AssertTelexStatesEqual(TelexStates::Invalid, FeedWord(e, L"defe"));
     }
 
     // test doublekey backspace

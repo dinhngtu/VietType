@@ -340,7 +340,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
         auto before = _v.size();
         if (TelexEngineImpl::TransitionV(*this, transitions)) {
             auto after = _v.size();
-            if (_config.optimize_multilang >= TelexConfig::OptimizeMultilang::Aggressive && _toned) {
+            if (_config.optimize_multilang >= 3 && _toned) {
                 TelexEngineImpl::Invalidate(*this);
             } else if (
                 _keyBuffer.size() > 1 && _respos.back() & ResposTransitionV && c == ToLower(_keyBuffer.rbegin()[1])) {
@@ -390,7 +390,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
 
     } else if ((_c1 == L"gi" || !_v.empty()) && IS(cat, CharTypes::Tone)) {
         // tones
-        if (_config.optimize_multilang >= TelexConfig::OptimizeMultilang::Aggressive && _toned) {
+        if (_config.optimize_multilang >= 3 && _toned) {
             TelexEngineImpl::Invalidate(*this);
         } else {
             auto newtone = GetCharTone(c);
@@ -547,13 +547,11 @@ TelexStates TelexEngine::Commit() {
     }
 
     if (_state == TelexStates::Valid) {
-        if (_config.optimize_multilang >= TelexConfig::OptimizeMultilang::On &&
-            word_exceptions_en.find(_keyBuffer) != word_exceptions_en.end()) {
+        if (_config.optimize_multilang >= 1 && word_exceptions_en.find(_keyBuffer) != word_exceptions_en.end()) {
             _state = TelexStates::CommittedInvalid;
             return _state;
         }
-        if (_config.optimize_multilang >= TelexConfig::OptimizeMultilang::Aggressive &&
-            word_exceptions_en_aggressive.find(_keyBuffer) != word_exceptions_en_aggressive.end()) {
+        if (_config.optimize_multilang >= 2 && word_exceptions_en_2.find(_keyBuffer) != word_exceptions_en_2.end()) {
             _state = TelexStates::CommittedInvalid;
             return _state;
         }

@@ -41,12 +41,6 @@ enum class TelexStates {
 };
 
 struct TelexConfig {
-    enum class OptimizeMultilang : unsigned long {
-        Off = 0,
-        On = 1,
-        Aggressive = 2,
-    };
-
     // put the tone in "oa"/"uy" in the second character instead of the first
     bool oa_uy_tone1 = true;
     // allow typing the second 'd' of 'dd' anywhere in the word
@@ -54,7 +48,7 @@ struct TelexConfig {
     // whether backspacing from invalid state preserves that invalid state
     bool backspaced_word_stays_invalid = true;
     // optimize key engine for foreign language typing
-    OptimizeMultilang optimize_multilang = OptimizeMultilang::On;
+    unsigned long optimize_multilang = 1;
 };
 
 class TelexEngine {
