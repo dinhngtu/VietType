@@ -121,7 +121,7 @@
     <value>VietType Settings</value>
   </data>
   <data name="aboutMessage" xml:space="preserve">
-    <value>VietType {0} {1}
+    <value>VietType {0} ({1})
 Copyright © 2018 Dinh Ngoc Tu.
 VietType is free software, licensed under the GNU General Public License. VietType is distributed WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the included LICENSE file for more details.</value>
   </data>
