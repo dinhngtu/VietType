@@ -460,7 +460,7 @@
     <value>120, 20</value>
   </data>
   <data name="udOptimizeMultilang.TabIndex" type="System.Int32, mscorlib">
-    <value>12</value>
+    <value>7</value>
   </data>
   <data name="&gt;&gt;udOptimizeMultilang.Name" xml:space="preserve">
     <value>udOptimizeMultilang</value>
