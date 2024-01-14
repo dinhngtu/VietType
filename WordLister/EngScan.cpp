@@ -44,6 +44,6 @@ bool engscan(const wchar_t* filename) {
             wprintf(L"%s %s\n", word.c_str(), wordclass);
         }
     }
-    free(words);
+    FreeFile(words);
     return true;
 }

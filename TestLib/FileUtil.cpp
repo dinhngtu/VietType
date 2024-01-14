@@ -50,5 +50,9 @@ PVOID ReadWholeFile(PCWSTR filename, _Out_ PLONGLONG size) {
     return bytes;
 }
 
+VOID FreeFile(PVOID file) {
+    free(file);
+}
+
 } // namespace TestLib
 } // namespace VietType

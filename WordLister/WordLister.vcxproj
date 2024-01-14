@@ -140,6 +140,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DualScan.cpp" />
     <ClCompile Include="EngScan.cpp" />
     <ClCompile Include="VietScan.cpp" />
     <ClCompile Include="WordLister.cpp" />

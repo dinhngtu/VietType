@@ -4,14 +4,19 @@
 
 bool vietscan(const wchar_t* filename);
 bool engscan(const wchar_t* filename);
+bool dualscan();
 
 int wmain(int argc, wchar_t** argv) {
     if (argc == 3 && !wcscmp(argv[1], L"vietscan")) {
         return !vietscan(argv[2]);
     } else if (argc == 3 && !wcscmp(argv[1], L"engscan")) {
         return !engscan(argv[2]);
+    } else if (argc == 2 && !wcscmp(argv[1], L"dualscan")) {
+        return !dualscan();
     } else {
-        wprintf(L"usage: wordlister <vietscan|engscan> <filename>\n");
+        wprintf(L"usage: \n"
+                L"    wordlister <vietscan|engscan> <filename>\n"
+                L"    wordlister dualscan\n");
         return 1;
     }
 }

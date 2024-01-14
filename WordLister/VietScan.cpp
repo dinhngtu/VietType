@@ -31,6 +31,6 @@ bool vietscan(const wchar_t* filename) {
             throw std::runtime_error("unexpected state");
         }
     }
-    free(words);
+    FreeFile(words);
     return true;
 }

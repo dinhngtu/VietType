@@ -17,12 +17,12 @@ namespace VietType {
 namespace UnitTests {
 
 TEST_CLASS (TestWordList) {
-    std::unique_ptr<wchar_t, decltype(std::free)*> words{nullptr, free};
+    std::unique_ptr<wchar_t, decltype(FreeFile)*> words{nullptr, FreeFile};
     LONGLONG fsize = 0;
 
 public:
     TestWordList() {
-        words = {static_cast<wchar_t*>(ReadWholeFile(L"..\\..\\data\\vw39kw.txt", &fsize)), free};
+        words = {static_cast<wchar_t*>(ReadWholeFile(L"..\\..\\data\\vw39kw.txt", &fsize)), FreeFile};
     }
 
     TEST_METHOD (TestBackconvertWordList) {
