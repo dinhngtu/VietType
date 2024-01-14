@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
+SPDX-FileCopyrightText: Copyright (c) 2018 Dinh Ngoc Tu
 SPDX-License-Identifier: GPL-3.0-only
 -->
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">

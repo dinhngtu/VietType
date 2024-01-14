@@ -1,3 +1,4 @@
+// SPDX-FileCopyrightText: Copyright (c) 2022 Dinh Ngoc Tu
 // SPDX-License-Identifier: GPL-3.0-only
 
 using System;

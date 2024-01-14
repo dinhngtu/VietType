@@ -1,3 +1,4 @@
+// SPDX-FileCopyrightText: Copyright (c) 2018 Dinh Ngoc Tu
 // SPDX-License-Identifier: GPL-3.0-only
 
 // Derived from Microsoft's SampleIME source code included in the Windows classic samples,

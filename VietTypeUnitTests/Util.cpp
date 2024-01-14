@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Copyright (c) 2024 Dinh Ngoc Tu
+// SPDX-License-Identifier: GPL-3.0-only
+
 #include "stdafx.h"
 #include "Util.h"
 #include "Telex.h"
