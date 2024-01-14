@@ -5,6 +5,7 @@
 #include "Telex.h"
 #include "WordListIterator.hpp"
 #include "FileUtil.hpp"
+#include "TelexEngine.h"
 
 using namespace VietType::Telex;
 using namespace VietType::TestLib;
@@ -34,7 +35,9 @@ bool dualscan() {
         }
         if (engine.Commit() == TelexStates::Committed) {
             auto outword = engine.Retrieve();
-            if (vwordset.find(outword) == vwordset.end()) {
+            if (vwordset.find(outword) == vwordset.end() &&
+                std::any_of(
+                    engine.GetRespos().begin(), engine.GetRespos().end(), [](auto x) { return x & ~ResposMask; })) {
                 wprintf(L"%s\n", eword.c_str());
             }
         }
