@@ -105,6 +105,7 @@ private:
     std::wstring _v;
     std::wstring _c2;
     Tones _t = Tones::Z;
+    bool _toned = false;
     // don't use bool vector since that's special cased in the STL
     /// <summary>
     /// only use when valid;

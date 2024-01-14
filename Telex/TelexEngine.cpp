@@ -233,6 +233,7 @@ struct TelexEngineImpl {
     }
 
     static void ReapplyTone(TelexEngine& e) {
+        e._toned = true;
         int found = -1;
         for (int i = static_cast<int>(e._respos.size() - 1); i >= 0; i--) {
             if (e._respos[i] & ResposTone) {
@@ -343,7 +344,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
         auto before = _v.size();
         if (TelexEngineImpl::TransitionV(*this, transitions)) {
             auto after = _v.size();
-            if (_config.optimize_multilang >= TelexConfig::OptimizeMultilang::Aggressive && _t != Tones::Z) {
+            if (_config.optimize_multilang >= TelexConfig::OptimizeMultilang::Aggressive && _toned) {
                 TelexEngineImpl::Invalidate(*this);
             } else if (
                 _keyBuffer.size() > 1 && _respos.back() & ResposTransitionV && c == ToLower(_keyBuffer.rbegin()[1])) {
@@ -396,16 +397,20 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
         _c1.push_back(c);
         _cases.push_back(ccase);
 
-    } else if ((_c1 == L"gi" || !_v.empty()) && IS(cat, CharTypes::Tone) && IS(cat, CharTypes::Conso)) {
-        // ambiguous (rsx) -> tone
-        auto newtone = GetCharTone(c);
-        if (newtone != _t) {
-            _t = newtone;
-            TelexEngineImpl::ReapplyTone(*this);
+    } else if ((_c1 == L"gi" || !_v.empty()) && IS(cat, CharTypes::Tone)) {
+        // tones
+        if (_config.optimize_multilang >= TelexConfig::OptimizeMultilang::Aggressive && _toned) {
+            TelexEngineImpl::Invalidate(*this);
         } else {
-            // the condition "_c1 == L"gi" || !_v.empty()" should ensure this already
-            assert(_keyBuffer.length() > 1);
-            TelexEngineImpl::InvalidateAndPopBack(*this, c);
+            auto newtone = GetCharTone(c);
+            if (newtone != _t) {
+                _t = newtone;
+                TelexEngineImpl::ReapplyTone(*this);
+            } else {
+                // the condition "_c1 == L"gi" || !_v.empty()" should ensure this already
+                assert(_keyBuffer.length() > 1);
+                TelexEngineImpl::InvalidateAndPopBack(*this, c);
+            }
         }
 
     } else if (((_c1 == L"gi" && _v.empty()) || !_v.empty()) && _c2.empty() && IS(cat, CharTypes::ConsoC2)) {
@@ -439,18 +444,6 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
         _c2.push_back(c);
         _cases.push_back(ccase);
         _respos.push_back(_respos_current++);
-
-    } else if ((_c1 == L"gi" || _v.size()) && IS(cat, CharTypes::Tone)) {
-        // tones-only (fjz)
-        // we must check for _c1 == 'gi' to allow typing 'gì'
-        auto newtone = GetCharTone(c);
-        if (newtone != _t) {
-            _t = newtone;
-            TelexEngineImpl::ReapplyTone(*this);
-        } else {
-            assert(_keyBuffer.length() > 1);
-            TelexEngineImpl::InvalidateAndPopBack(*this, c);
-        }
 
     } else if (cat == CharTypes::Shorthand) {
         // not implemented
