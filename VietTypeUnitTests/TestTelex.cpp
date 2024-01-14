@@ -831,6 +831,13 @@ public:
         AssertTelexStatesEqual(TelexStates::Invalid, FeedWord(e, L"defe"));
     }
 
+    TEST_METHOD (TestMultilangDense) {
+        auto config1 = config;
+        config1.optimize_multilang = TelexConfig::OptimizeMultilang::Aggressive;
+        TelexEngine e(config1);
+        VietType::UnitTests::TestInvalidWord(e, L"dense", L"dense");
+    }
+
     // test doublekey backspace
 
     TEST_METHOD (TestBackspaceMooo) {

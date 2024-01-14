@@ -546,10 +546,17 @@ TelexStates TelexEngine::Commit() {
         return _state;
     }
 
-    if (_config.optimize_multilang >= TelexConfig::OptimizeMultilang::On && _state == TelexStates::Valid &&
-        word_exceptions_en.find(_keyBuffer) != word_exceptions_en.end()) {
-        _state = TelexStates::CommittedInvalid;
-        return _state;
+    if (_state == TelexStates::Valid) {
+        if (_config.optimize_multilang >= TelexConfig::OptimizeMultilang::On &&
+            word_exceptions_en.find(_keyBuffer) != word_exceptions_en.end()) {
+            _state = TelexStates::CommittedInvalid;
+            return _state;
+        }
+        if (_config.optimize_multilang >= TelexConfig::OptimizeMultilang::Aggressive &&
+            word_exceptions_en_aggressive.find(_keyBuffer) != word_exceptions_en_aggressive.end()) {
+            _state = TelexStates::CommittedInvalid;
+            return _state;
+        }
     }
 
     // validate c1
