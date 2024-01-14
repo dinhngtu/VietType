@@ -420,39 +420,6 @@
   <data name="&gt;&gt;btnAbout.ZOrder" xml:space="preserve">
     <value>4</value>
   </data>
-  <data name="cbOptimizeMultilang.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Top, Left, Right</value>
-  </data>
-  <data name="cbOptimizeMultilang.Items" xml:space="preserve">
-    <value>Off</value>
-  </data>
-  <data name="cbOptimizeMultilang.Items1" xml:space="preserve">
-    <value>On</value>
-  </data>
-  <data name="cbOptimizeMultilang.Items2" xml:space="preserve">
-    <value>Aggressive</value>
-  </data>
-  <data name="cbOptimizeMultilang.Location" type="System.Drawing.Point, System.Drawing">
-    <value>211, 166</value>
-  </data>
-  <data name="cbOptimizeMultilang.Size" type="System.Drawing.Size, System.Drawing">
-    <value>121, 21</value>
-  </data>
-  <data name="cbOptimizeMultilang.TabIndex" type="System.Int32, mscorlib">
-    <value>7</value>
-  </data>
-  <data name="&gt;&gt;cbOptimizeMultilang.Name" xml:space="preserve">
-    <value>cbOptimizeMultilang</value>
-  </data>
-  <data name="&gt;&gt;cbOptimizeMultilang.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ComboBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;cbOptimizeMultilang.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="&gt;&gt;cbOptimizeMultilang.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
   <data name="lblOptimizeMultilang.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
@@ -460,16 +427,16 @@
     <value>NoControl</value>
   </data>
   <data name="lblOptimizeMultilang.Location" type="System.Drawing.Point, System.Drawing">
-    <value>9, 169</value>
+    <value>9, 168</value>
   </data>
   <data name="lblOptimizeMultilang.Size" type="System.Drawing.Size, System.Drawing">
-    <value>135, 13</value>
+    <value>176, 13</value>
   </data>
   <data name="lblOptimizeMultilang.TabIndex" type="System.Int32, mscorlib">
     <value>6</value>
   </data>
   <data name="lblOptimizeMultilang.Text" xml:space="preserve">
-    <value>&amp;Optimize multilingual typing:</value>
+    <value>Multilingual typing &amp;optimization level:</value>
   </data>
   <data name="&gt;&gt;lblOptimizeMultilang.Name" xml:space="preserve">
     <value>lblOptimizeMultilang</value>
@@ -481,6 +448,30 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;lblOptimizeMultilang.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="udOptimizeMultilang.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Left, Right</value>
+  </data>
+  <data name="udOptimizeMultilang.Location" type="System.Drawing.Point, System.Drawing">
+    <value>212, 166</value>
+  </data>
+  <data name="udOptimizeMultilang.Size" type="System.Drawing.Size, System.Drawing">
+    <value>120, 20</value>
+  </data>
+  <data name="udOptimizeMultilang.TabIndex" type="System.Int32, mscorlib">
+    <value>12</value>
+  </data>
+  <data name="&gt;&gt;udOptimizeMultilang.Name" xml:space="preserve">
+    <value>udOptimizeMultilang</value>
+  </data>
+  <data name="&gt;&gt;udOptimizeMultilang.Type" xml:space="preserve">
+    <value>System.Windows.Forms.NumericUpDown, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;udOptimizeMultilang.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;udOptimizeMultilang.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">

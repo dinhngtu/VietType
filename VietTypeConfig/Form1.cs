@@ -17,7 +17,6 @@ namespace VietTypeConfig {
         private void Form1_Load(object sender, EventArgs e) {
             var settings = Settings.LoadSettings();
             settingsBindingSource.DataSource = settings;
-            cbOptimizeMultilang.SelectedIndex = settings.OptimizeMultilang;
             try {
                 UpdateEnabled();
             } catch (Exception ex) {
@@ -34,7 +33,6 @@ namespace VietTypeConfig {
         private void Form1_FormClosing(object sender, FormClosingEventArgs e) {
             var settings = settingsBindingSource.DataSource as Settings;
             if (DialogResult == DialogResult.OK && settings != null) {
-                settings.OptimizeMultilang = cbOptimizeMultilang.SelectedIndex;
                 try {
                     Settings.SaveSettings(settings);
                 } catch (Exception ex) {

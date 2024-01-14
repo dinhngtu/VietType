@@ -36,9 +36,10 @@ namespace VietTypeConfig {
             this.btnOK = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnAbout = new System.Windows.Forms.Button();
-            this.cbOptimizeMultilang = new System.Windows.Forms.ComboBox();
             this.lblOptimizeMultilang = new System.Windows.Forms.Label();
+            this.udOptimizeMultilang = new System.Windows.Forms.NumericUpDown();
             ((System.ComponentModel.ISupportInitialize)(this.settingsBindingSource)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.udOptimizeMultilang)).BeginInit();
             this.SuspendLayout();
             // 
             // cbDefaultEnabled
@@ -121,21 +122,21 @@ namespace VietTypeConfig {
             this.btnAbout.UseVisualStyleBackColor = true;
             this.btnAbout.Click += new System.EventHandler(this.btnAbout_Click);
             // 
-            // cbOptimizeMultilang
-            // 
-            resources.ApplyResources(this.cbOptimizeMultilang, "cbOptimizeMultilang");
-            this.cbOptimizeMultilang.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbOptimizeMultilang.FormattingEnabled = true;
-            this.cbOptimizeMultilang.Items.AddRange(new object[] {
-            resources.GetString("cbOptimizeMultilang.Items"),
-            resources.GetString("cbOptimizeMultilang.Items1"),
-            resources.GetString("cbOptimizeMultilang.Items2")});
-            this.cbOptimizeMultilang.Name = "cbOptimizeMultilang";
-            // 
             // lblOptimizeMultilang
             // 
             resources.ApplyResources(this.lblOptimizeMultilang, "lblOptimizeMultilang");
             this.lblOptimizeMultilang.Name = "lblOptimizeMultilang";
+            // 
+            // udOptimizeMultilang
+            // 
+            resources.ApplyResources(this.udOptimizeMultilang, "udOptimizeMultilang");
+            this.udOptimizeMultilang.DataBindings.Add(new System.Windows.Forms.Binding("Value", this.settingsBindingSource, "OptimizeMultilang", true));
+            this.udOptimizeMultilang.Maximum = new decimal(new int[] {
+            3,
+            0,
+            0,
+            0});
+            this.udOptimizeMultilang.Name = "udOptimizeMultilang";
             // 
             // Form1
             // 
@@ -143,8 +144,8 @@ namespace VietTypeConfig {
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnCancel;
+            this.Controls.Add(this.udOptimizeMultilang);
             this.Controls.Add(this.lblOptimizeMultilang);
-            this.Controls.Add(this.cbOptimizeMultilang);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.btnEnable);
             this.Controls.Add(this.btnAbout);
@@ -164,6 +165,7 @@ namespace VietTypeConfig {
             this.Load += new System.EventHandler(this.Form1_Load);
             this.Shown += new System.EventHandler(this.Form1_Shown);
             ((System.ComponentModel.ISupportInitialize)(this.settingsBindingSource)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.udOptimizeMultilang)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -182,8 +184,8 @@ namespace VietTypeConfig {
         private System.Windows.Forms.Button btnOK;
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.Button btnAbout;
-        private System.Windows.Forms.ComboBox cbOptimizeMultilang;
         private System.Windows.Forms.Label lblOptimizeMultilang;
+        private System.Windows.Forms.NumericUpDown udOptimizeMultilang;
     }
 }
 

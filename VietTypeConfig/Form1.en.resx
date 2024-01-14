@@ -167,15 +167,6 @@ VietType is free software, licensed under the GNU General Public License. VietTy
   <data name="cbOaUy.Text" xml:space="preserve">
     <value>&amp;Use "oà", "uý" instead of "òa", "úy"</value>
   </data>
-  <data name="cbOptimizeMultilang.Items" xml:space="preserve">
-    <value>Off</value>
-  </data>
-  <data name="cbOptimizeMultilang.Items1" xml:space="preserve">
-    <value>On</value>
-  </data>
-  <data name="cbOptimizeMultilang.Items2" xml:space="preserve">
-    <value>Aggressive</value>
-  </data>
   <data name="disableSuccessMessage" xml:space="preserve">
     <value>Successfully disabled VietType.</value>
   </data>
@@ -183,7 +174,7 @@ VietType is free software, licensed under the GNU General Public License. VietTy
     <value>Successfully enabled VietType. Switch to VietType in the language bar to start using it.</value>
   </data>
   <data name="lblOptimizeMultilang.Text" xml:space="preserve">
-    <value>&amp;Optimize multilingual typing:</value>
+    <value>Multilingual typing &amp;optimization level:</value>
   </data>
   <data name="notEnabledQuestion" xml:space="preserve">
     <value>VietType is not enabled. Enable it now?</value>
