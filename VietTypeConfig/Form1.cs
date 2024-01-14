@@ -12,6 +12,7 @@ namespace VietTypeConfig {
 
         public Form1() {
             InitializeComponent();
+            udOptimizeMultilang.MouseWheel += (sender, e) => ((HandledMouseEventArgs)e).Handled = true;
         }
 
         private void Form1_Load(object sender, EventArgs e) {
