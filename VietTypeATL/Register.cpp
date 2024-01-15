@@ -16,6 +16,9 @@
 #include <AccCtrl.h>
 #include <AclAPI.h>
 
+constexpr DWORD ILOT_UNINSTALL = 0x00000001;
+using InstallLayoutOrTip_t = BOOL(CALLBACK*)(_In_ LPCWSTR psz, DWORD dwFlags);
+
 static std::vector<GUID> SupportedCategories = {
     GUID_TFCAT_TIP_KEYBOARD,
     GUID_TFCAT_TIPCAP_UIELEMENTENABLED,  // UI-less
@@ -245,6 +248,54 @@ extern "C" __declspec(dllexport) void CALLBACK
     DoRunFunction(UnregisterCategories, hWnd, hInst, lpszCmdLine, nCmdShow);
 }
 
+static std::wstring GetTipString() {
+    HRESULT hr;
+    std::array<wchar_t, 4 + 1 + 2 * 38 + 1> tipString = {0};
+    hr = StringCchPrintfW(
+        tipString.data(), tipString.size(), L"%04X:{%036X}{%036X}", VietType::Globals::TextServiceLangId, 0, 0);
+    if (FAILED(hr))
+        return std::wstring();
+    hr = StringFromGUID2(VietType::Globals::CLSID_TextService, &tipString[4 + 1], 39) ? S_OK : E_FAIL;
+    if (FAILED(hr))
+        return std::wstring();
+    hr = StringFromGUID2(VietType::Globals::GUID_Profile, &tipString[4 + 1 + 38], 39) ? S_OK : E_FAIL;
+    if (FAILED(hr))
+        return std::wstring();
+    *tipString.rbegin() = 0;
+    return std::wstring(tipString.data());
+}
+
+static HRESULT InstallTip(bool install) {
+    HRESULT hr;
+    HMODULE inputDll = NULL;
+    InstallLayoutOrTip_t ilot = NULL;
+
+    auto tipString = GetTipString();
+    if (tipString.empty()) {
+        hr = E_FAIL;
+        goto out;
+    }
+
+    inputDll = LoadLibraryW(L"input.dll");
+    if (!inputDll) {
+        hr = HRESULT_FROM_WIN32(GetLastError());
+        goto out;
+    }
+
+    ilot = reinterpret_cast<InstallLayoutOrTip_t>(GetProcAddress(inputDll, "InstallLayoutOrTip"));
+    if (!ilot) {
+        hr = HRESULT_FROM_WIN32(GetLastError());
+        goto out_module;
+    }
+
+    hr = ilot(tipString.c_str(), install ? 0 : ILOT_UNINSTALL) ? S_OK : E_FAIL;
+
+out_module:
+    FreeLibrary(inputDll);
+out:
+    return hr;
+}
+
 extern "C" __declspec(dllexport) HRESULT __cdecl ActivateProfiles() {
     HRESULT hr;
     LSTATUS err;
@@ -261,6 +312,9 @@ extern "C" __declspec(dllexport) HRESULT __cdecl ActivateProfiles() {
     hr = SetSettingsKeyAcl();
     HRESULT_CHECK_RETURN(hr, L"%s", L"SetSettingsKeyAcl failed");
 
+    hr = InstallTip(true);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"InstallTip failed");
+
     CComPtr<ITfInputProcessorProfileMgr> profileMgr;
     hr = profileMgr.CoCreateInstance(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER);
     HRESULT_CHECK_RETURN(hr, L"%s", L"profileMgr.CoCreateInstance failed");
@@ -271,7 +325,7 @@ extern "C" __declspec(dllexport) HRESULT __cdecl ActivateProfiles() {
         VietType::Globals::CLSID_TextService,
         VietType::Globals::GUID_Profile,
         NULL,
-        TF_IPPMF_ENABLEPROFILE | TF_IPPMF_DONTCARECURRENTINPUTLANGUAGE);
+        TF_IPPMF_FORPROCESS | TF_IPPMF_FORSESSION);
 
     return S_OK;
 }
@@ -289,13 +343,8 @@ extern "C" __declspec(dllexport) HRESULT __cdecl DeactivateProfiles() {
     hr = profileMgr.CoCreateInstance(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER);
     HRESULT_CHECK_RETURN(hr, L"%s", L"profileMgr.CoCreateInstance failed");
 
-    hr = profileMgr->DeactivateProfile(
-        TF_PROFILETYPE_INPUTPROCESSOR,
-        VietType::Globals::TextServiceLangId,
-        VietType::Globals::CLSID_TextService,
-        VietType::Globals::GUID_Profile,
-        NULL,
-        TF_IPPMF_DISABLEPROFILE);
+    hr = InstallTip(false);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"InstallTip failed");
 
     {
         CRegKey key;
