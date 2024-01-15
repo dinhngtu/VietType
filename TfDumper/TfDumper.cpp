@@ -7,9 +7,13 @@
 #include "stdafx.h"
 #include "Common.h"
 
-#define CHECK(hr, fmt, ...) if (FAILED(hr)) { wprintf(L"HRESULT error %lx: " fmt "\n", hr, __VA_ARGS__); return hr; }
+#define CHECK(hr, fmt, ...)                                                                                            \
+    if (FAILED(hr)) {                                                                                                  \
+        wprintf(L"HRESULT error %lx: " fmt "\n", hr, __VA_ARGS__);                                                     \
+        return hr;                                                                                                     \
+    }
 
-std::wstring CppStringFromIID(const IID& iid) {
+static std::wstring CppStringFromIID(const IID& iid) {
     CComHeapPtr<OLECHAR> ret;
     HRESULT hr = StringFromCLSID(iid, &ret);
     if (FAILED(hr)) {
@@ -18,7 +22,7 @@ std::wstring CppStringFromIID(const IID& iid) {
     return std::wstring(ret);
 }
 
-void PrintProfileInfo(const TF_INPUTPROCESSORPROFILE* p) {
+static void PrintProfileInfo(const TF_INPUTPROCESSORPROFILE* p) {
     if (p->dwProfileType == TF_PROFILETYPE_INPUTPROCESSOR) {
         wprintf(L"TF_PROFILETYPE_INPUTPROCESSOR ");
     } else if (p->dwProfileType == TF_PROFILETYPE_KEYBOARDLAYOUT) {
@@ -26,7 +30,40 @@ void PrintProfileInfo(const TF_INPUTPROCESSORPROFILE* p) {
     }
     wprintf(L"0x%04x:\n", static_cast<int>(p->langid));
 
-    wprintf(L"clsid: %s, guidProfile: %s\n", CppStringFromIID(p->clsid).c_str(), CppStringFromIID(p->guidProfile).c_str());
+    auto clsidString = CppStringFromIID(p->clsid);
+    wprintf(L"clsid: %s", clsidString.c_str());
+    {
+        CRegKey clsKey;
+        auto keyPath = std::wstring(L"CLSID\\") + clsidString;
+        LSTATUS status;
+        status = clsKey.Open(HKEY_CLASSES_ROOT, keyPath.c_str(), KEY_READ);
+        if (status == ERROR_SUCCESS) {
+            {
+                CRegKey serverKey;
+                status = serverKey.Open(clsKey, L"InprocServer32", KEY_READ);
+                if (status == ERROR_SUCCESS) {
+                    ULONG dllPathSize;
+                    serverKey.QueryStringValue(NULL, NULL, &dllPathSize);
+                    std::vector<wchar_t> dllPath(dllPathSize);
+                    status = serverKey.QueryStringValue(NULL, dllPath.data(), &dllPathSize);
+                    if (status == ERROR_SUCCESS) {
+                        wprintf(L" %.*s", dllPathSize, dllPath.data());
+                    }
+                }
+            }
+            {
+                ULONG descSize;
+                status = clsKey.QueryStringValue(NULL, NULL, &descSize);
+                std::vector<wchar_t> desc(descSize);
+                status = clsKey.QueryStringValue(NULL, desc.data(), &descSize);
+                if (status == ERROR_SUCCESS) {
+                    wprintf(L" \"%.*s\"", descSize, desc.data());
+                }
+            }
+        }
+        wprintf(L"\n");
+    }
+    wprintf(L"guidProfile: %s\n", CppStringFromIID(p->guidProfile).c_str());
 
     std::wstring catid = CppStringFromIID(p->catid);
     if (p->catid == GUID_TFCAT_TIP_KEYBOARD) {
@@ -65,7 +102,7 @@ void PrintProfileInfo(const TF_INPUTPROCESSORPROFILE* p) {
     if (p->dwCaps & TF_IPP_CAPS_SYSTRAYSUPPORT) {
         capabilities += L"SYSTRAYSUPPORT ";
     }
-    wprintf(L"capabilities: %s\n", capabilities.c_str());
+    wprintf(L"capabilities: %lx %s\n", p->dwCaps, capabilities.c_str());
 
     wprintf(L"hklSubstitute: %p\n", p->hklSubstitute);
 
@@ -79,12 +116,12 @@ void PrintProfileInfo(const TF_INPUTPROCESSORPROFILE* p) {
     if (p->dwFlags & TF_IPP_FLAG_SUBSTITUTEDBYINPUTPROCESSOR) {
         flags += L"SUBSTITUTEDBYINPUTPROCESSOR ";
     }
-    wprintf(L"flags: %s\n", flags.c_str());
+    wprintf(L"flags: %lx %s\n", p->dwFlags, flags.c_str());
 
     wprintf(L"\n");
 }
 
-HRESULT EnumProfileMgr() {
+static HRESULT EnumProfileMgr() {
     HRESULT hr;
 
     CComPtr<ITfInputProcessorProfileMgr> pm;
@@ -112,7 +149,7 @@ HRESULT EnumProfileMgr() {
     return S_OK;
 }
 
-HRESULT EnumDefaultKeyboardLanguageProfiles() {
+static HRESULT EnumDefaultKeyboardLanguageProfiles() {
     HRESULT hr;
 
     CComPtr<ITfInputProcessorProfiles> profiles;
@@ -141,7 +178,8 @@ HRESULT EnumDefaultKeyboardLanguageProfiles() {
         if (hr == S_FALSE) {
             wprintf(L"no default\n");
         } else {
-            wprintf(L"clsid %s, guidProfile %s\n", CppStringFromIID(clsid).c_str(), CppStringFromIID(guidProfile).c_str());
+            wprintf(
+                L"clsid %s, guidProfile %s\n", CppStringFromIID(clsid).c_str(), CppStringFromIID(guidProfile).c_str());
         }
     }
 
