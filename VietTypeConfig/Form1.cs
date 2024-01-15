@@ -3,17 +3,19 @@
 
 using System;
 using System.Resources;
-using System.Runtime;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
-using VietTypeConfig.Properties;
 using static VietTypeConfig.VietTypeRegistrar;
 
 namespace VietTypeConfig {
     public partial class Form1 : Form {
         private readonly ResourceManager rm = new ResourceManager(typeof(Form1));
+        private bool oobe = false;
 
-        public Form1() {
+        public Form1(string[] args) {
+            if (args.Length > 0) {
+                oobe = string.Equals(args[0], "-oobe", StringComparison.InvariantCultureIgnoreCase);
+            }
             InitializeComponent();
             udOptimizeMultilang.MouseWheel += (sender, e) => ((HandledMouseEventArgs)e).Handled = true;
         }
@@ -64,6 +66,13 @@ namespace VietTypeConfig {
             var result = newState ? ActivateProfiles() : DeactivateProfiles();
             if (result == S_OK) {
                 if (newState) {
+                    if (MessageBox.Show(rm.GetString("setDefaultQuestion"), "VietType", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) {
+                        try {
+                            Settings.SetDefault();
+                        } catch (Exception ex) {
+                            MessageBox.Show(string.Format(rm.GetString("cannotSaveSettingsMessage"), ex.Message), "VietType", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
                     MessageBox.Show(rm.GetString("enableSuccessMessage"), "VietType", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 } else {
                     MessageBox.Show(rm.GetString("disableSuccessMessage"), "VietType", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -77,7 +86,7 @@ namespace VietTypeConfig {
 
         private void Form1_Shown(object sender, EventArgs e) {
             if (IsProfileActivated() != S_OK) {
-                if (MessageBox.Show(rm.GetString("notEnabledQuestion"), "VietType", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) {
+                if (oobe || MessageBox.Show(rm.GetString("notEnabledQuestion"), "VietType", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) {
                     Activate(true);
                 }
             }

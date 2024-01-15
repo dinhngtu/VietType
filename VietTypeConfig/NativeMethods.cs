@@ -52,4 +52,9 @@ namespace VietTypeConfig {
         [DllImport("VietTypeATL32.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern int IsProfileActivated();
     }
+
+    internal static class NativeMethods {
+        [DllImport("bcp47langs.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        public static extern int SetInputMethodOverride(string TipString);
+    }
 }

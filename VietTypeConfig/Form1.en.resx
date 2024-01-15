@@ -179,4 +179,7 @@ VietType is free software, licensed under the GNU General Public License. VietTy
   <data name="notEnabledQuestion" xml:space="preserve">
     <value>VietType is not enabled. Enable it now?</value>
   </data>
+  <data name="setDefaultQuestion" xml:space="preserve">
+    <value>Set VietType as default input method?</value>
+  </data>
 </root>
