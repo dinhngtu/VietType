@@ -57,15 +57,11 @@ SPDX-License-Identifier: GPL-3.0-only
     <?endif ?>
 
     <InstallExecuteSequence>
-      <Custom Action="RegisterCategoriesRollback" After="InstallFiles">(NOT Installed) OR REINSTALL</Custom>
-      <Custom Action="RegisterCategories" After="RegisterCategoriesRollback">(NOT Installed) OR REINSTALL</Custom>
-      <Custom Action="RegisterProfilesRollback" After="RegisterCategories">(NOT Installed) OR REINSTALL</Custom>
-      <Custom Action="RegisterProfiles" After="RegisterProfilesRollback">(NOT Installed) OR REINSTALL</Custom>
+      <Custom Action="RegisterTipRollback" After="InstallFiles">(NOT Installed) OR REINSTALL</Custom>
+      <Custom Action="RegisterTip" After="RegisterTipRollback">(NOT Installed) OR REINSTALL</Custom>
 
-      <Custom Action="UnregisterProfilesRollback" After="InstallInitialize">REMOVE OR REINSTALL</Custom>
-      <Custom Action="UnregisterProfiles" After="UnregisterProfilesRollback">REMOVE OR REINSTALL</Custom>
-      <Custom Action="UnregisterCategoriesRollback" After="UnregisterProfiles">REMOVE OR REINSTALL</Custom>
-      <Custom Action="UnregisterCategories" After="UnregisterCategoriesRollback">REMOVE OR REINSTALL</Custom>
+      <Custom Action="UnregisterTipRollback" After="InstallInitialize">REMOVE OR REINSTALL</Custom>
+      <Custom Action="UnregisterTip" After="UnregisterTipRollback">REMOVE OR REINSTALL</Custom>
     </InstallExecuteSequence>
   </Product>
 
@@ -192,25 +188,15 @@ SPDX-License-Identifier: GPL-3.0-only
   <!-- custom actions -->
 
   <Fragment>
-    <SetProperty Id="RegisterCategories" Value='"[%SystemRoot]\System32\rundll32.exe" "[#VietTypeATL32.dll]",RunRegisterCategories' After="CostFinalize" Sequence="execute" />
-    <SetProperty Id="RegisterCategoriesRollback" Value='"[%SystemRoot]\System32\rundll32.exe" "[#VietTypeATL32.dll]",RunUnregisterCategories' After="CostFinalize" Sequence="execute" />
-    <SetProperty Id="UnregisterCategories" Value='"[%SystemRoot]\System32\rundll32.exe" "[#VietTypeATL32.dll]",RunUnregisterCategories' After="CostFinalize" Sequence="execute" />
-    <SetProperty Id="UnregisterCategoriesRollback" Value='"[%SystemRoot]\System32\rundll32.exe" "[#VietTypeATL32.dll]",RunRegisterCategories' After="CostFinalize" Sequence="execute" />
+    <SetProperty Id="RegisterTip" Value='"[%SystemRoot]\System32\regsvr32.exe" /s "[#VietTypeATL32.dll]"' After="CostFinalize" Sequence="execute" />
+    <SetProperty Id="RegisterTipRollback" Value='"[%SystemRoot]\System32\regsvr32.exe" /s /u "[#VietTypeATL32.dll]"' After="CostFinalize" Sequence="execute" />
+    <SetProperty Id="UnregisterTip" Value='"[%SystemRoot]\System32\regsvr32.exe" /s /u "[#VietTypeATL32.dll]"' After="CostFinalize" Sequence="execute" />
+    <SetProperty Id="UnregisterTipRollback" Value='"[%SystemRoot]\System32\regsvr32.exe" /s "[#VietTypeATL32.dll]"' After="CostFinalize" Sequence="execute" />
 
-    <SetProperty Id="RegisterProfiles" Value='"[%SystemRoot]\System32\rundll32.exe" "[#VietTypeATL32.dll]",RunRegisterProfiles' After="CostFinalize" Sequence="execute" />
-    <SetProperty Id="RegisterProfilesRollback" Value='"[%SystemRoot]\System32\rundll32.exe" "[#VietTypeATL32.dll]",RunUnregisterProfiles' After="CostFinalize" Sequence="execute" />
-    <SetProperty Id="UnregisterProfiles" Value='"[%SystemRoot]\System32\rundll32.exe" "[#VietTypeATL32.dll]",RunUnregisterProfiles' After="CostFinalize" Sequence="execute" />
-    <SetProperty Id="UnregisterProfilesRollback" Value='"[%SystemRoot]\System32\rundll32.exe" "[#VietTypeATL32.dll]",RunRegisterProfiles' After="CostFinalize" Sequence="execute" />
-
-    <CustomAction Id="RegisterCategories" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="deferred" />
-    <CustomAction Id="RegisterCategoriesRollback" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="rollback" />
-    <CustomAction Id="UnregisterCategories" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="deferred" />
-    <CustomAction Id="UnregisterCategoriesRollback" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="rollback" />
-
-    <CustomAction Id="RegisterProfiles" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="deferred" />
-    <CustomAction Id="RegisterProfilesRollback" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="rollback" />
-    <CustomAction Id="UnregisterProfiles" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="deferred" />
-    <CustomAction Id="UnregisterProfilesRollback" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="rollback" />
+    <CustomAction Id="RegisterTip" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="deferred" />
+    <CustomAction Id="RegisterTipRollback" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="rollback" />
+    <CustomAction Id="UnregisterTip" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="deferred" />
+    <CustomAction Id="UnregisterTipRollback" BinaryKey="WixCA" DllEntry="WixQuietExec" Impersonate="no" Execute="rollback" />
   </Fragment>
 
   <!-- ################################################################################ -->
@@ -219,7 +205,6 @@ SPDX-License-Identifier: GPL-3.0-only
   <Fragment>
     <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
     <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Open VietType Settings" />
-    <Property Id="Rundll32Path" Value="[%SystemRoot]\System32\rundll32.exe" />
     <Property Id="WixShellExecTarget" Value="[#VietTypeConfig.exe]" />
     <CustomAction Id="OpenSettingsAfterInstall" Impersonate="yes" BinaryKey="WixCA" DllEntry="WixShellExec" />
   </Fragment>

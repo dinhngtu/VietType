@@ -1,16 +1,6 @@
 // SPDX-FileCopyrightText: Copyright (c) 2018 Dinh Ngoc Tu
 // SPDX-License-Identifier: GPL-3.0-only
 
-// Derived from Microsoft's SampleIME source code included in the Windows classic samples,
-// whose original copyright and permission notice is included below:
-//
-//     THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF
-//     ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO
-//     THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
-//     PARTICULAR PURPOSE.
-//
-//     Copyright (c) Microsoft Corporation. All rights reserved
-
 #include "Common.h"
 #include <Windows.h>
 #include <AccCtrl.h>
@@ -27,31 +17,6 @@ static std::vector<GUID> SupportedCategories = {
     GUID_TFCAT_TIPCAP_SYSTRAYSUPPORT,    // systray on win8+?
     GUID_TFCAT_DISPLAYATTRIBUTEPROVIDER, // display attributes for composition
 };
-
-extern "C" typedef HRESULT(__cdecl* funtype)();
-
-static void ShowRunError(HWND hWnd, HRESULT hr) {
-    wchar_t errmsg[64];
-    swprintf_s(errmsg, L"VietType registration error: %ld", hr);
-    MessageBoxW(hWnd, &errmsg[0], L"VietType", MB_ICONERROR | MB_OK);
-}
-
-static void DoRunFunction(funtype fun, HWND hWnd, HINSTANCE hInst, LPWSTR lpszCmdLine, int nCmdShow) {
-    HRESULT hr;
-    if (!VietType::Globals::DllInstance) {
-        VietType::Globals::DllInstance = hInst;
-    }
-    hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
-    if (FAILED(hr)) {
-        ShowRunError(hWnd, hr);
-    } else {
-        hr = fun();
-        if (FAILED(hr)) {
-            ShowRunError(hWnd, hr);
-        }
-        CoUninitialize();
-    }
-}
 
 // allow ALL APPLICATION PACKAGES permissions to query value
 static HRESULT SetSettingsKeyAcl() {
@@ -120,11 +85,6 @@ static HRESULT SetSettingsKeyAcl() {
     return S_OK;
 }
 
-extern "C" __declspec(dllexport) void CALLBACK
-    RunSetSettingsKeyAclW(HWND hWnd, HINSTANCE hInst, LPWSTR lpszCmdLine, int nCmdShow) {
-    DoRunFunction(SetSettingsKeyAcl, hWnd, hInst, lpszCmdLine, nCmdShow);
-}
-
 static HRESULT RegisterProfiles() {
     HRESULT hr;
 
@@ -167,11 +127,6 @@ static HRESULT RegisterProfiles() {
     return S_OK;
 }
 
-extern "C" __declspec(dllexport) void CALLBACK
-    RunRegisterProfilesW(HWND hWnd, HINSTANCE hInst, LPWSTR lpszCmdLine, int nCmdShow) {
-    DoRunFunction(RegisterProfiles, hWnd, hInst, lpszCmdLine, nCmdShow);
-}
-
 static HRESULT UnregisterProfiles() {
     HRESULT hr;
 
@@ -186,11 +141,6 @@ static HRESULT UnregisterProfiles() {
         TF_URP_ALLPROFILES);
 
     return S_OK;
-}
-
-extern "C" __declspec(dllexport) void CALLBACK
-    RunUnregisterProfilesW(HWND hWnd, HINSTANCE hInst, LPWSTR lpszCmdLine, int nCmdShow) {
-    DoRunFunction(UnregisterProfiles, hWnd, hInst, lpszCmdLine, nCmdShow);
 }
 
 static HRESULT RegisterCategories() {
@@ -208,11 +158,6 @@ static HRESULT RegisterCategories() {
     }
 
     return S_OK;
-}
-
-extern "C" __declspec(dllexport) void CALLBACK
-    RunRegisterCategoriesW(HWND hWnd, HINSTANCE hInst, LPWSTR lpszCmdLine, int nCmdShow) {
-    DoRunFunction(RegisterCategories, hWnd, hInst, lpszCmdLine, nCmdShow);
 }
 
 static HRESULT UnregisterCategories() {
@@ -243,9 +188,24 @@ static HRESULT UnregisterCategories() {
     return S_OK;
 }
 
-extern "C" __declspec(dllexport) void CALLBACK
-    RunUnregisterCategoriesW(HWND hWnd, HINSTANCE hInst, LPWSTR lpszCmdLine, int nCmdShow) {
-    DoRunFunction(UnregisterCategories, hWnd, hInst, lpszCmdLine, nCmdShow);
+STDAPI DllUnregisterServer() {
+    UnregisterCategories();
+    UnregisterProfiles();
+    return S_OK;
+}
+
+STDAPI DllRegisterServer() {
+    HRESULT hr;
+    hr = RegisterProfiles();
+    if (FAILED(hr))
+        goto fail;
+    hr = RegisterCategories();
+    if (FAILED(hr))
+        goto fail;
+    return S_OK;
+fail:
+    DllUnregisterServer();
+    return hr;
 }
 
 static std::wstring GetTipString() {
@@ -296,7 +256,7 @@ out:
     return hr;
 }
 
-extern "C" __declspec(dllexport) HRESULT __cdecl ActivateProfiles() {
+extern "C" HRESULT __cdecl ActivateProfiles() {
     HRESULT hr;
     LSTATUS err;
 
@@ -330,12 +290,7 @@ extern "C" __declspec(dllexport) HRESULT __cdecl ActivateProfiles() {
     return S_OK;
 }
 
-extern "C" __declspec(dllexport) void CALLBACK
-    RunActivateProfilesW(HWND hWnd, HINSTANCE hInst, LPWSTR lpszCmdLine, int nCmdShow) {
-    DoRunFunction(ActivateProfiles, hWnd, hInst, lpszCmdLine, nCmdShow);
-}
-
-extern "C" __declspec(dllexport) HRESULT __cdecl DeactivateProfiles() {
+extern "C" HRESULT __cdecl DeactivateProfiles() {
     HRESULT hr;
     LSTATUS err;
 
@@ -358,12 +313,7 @@ extern "C" __declspec(dllexport) HRESULT __cdecl DeactivateProfiles() {
     return S_OK;
 }
 
-extern "C" __declspec(dllexport) void CALLBACK
-    RunDeactivateProfilesW(HWND hWnd, HINSTANCE hInst, LPWSTR lpszCmdLine, int nCmdShow) {
-    DoRunFunction(DeactivateProfiles, hWnd, hInst, lpszCmdLine, nCmdShow);
-}
-
-extern "C" __declspec(dllexport) HRESULT __cdecl IsProfileActivated() {
+extern "C" HRESULT __cdecl IsProfileActivated() {
     HRESULT hr;
 
     CComPtr<ITfInputProcessorProfileMgr> profileMgr;

@@ -5,13 +5,8 @@ LIBRARY
 EXPORTS
     DllCanUnloadNow PRIVATE
     DllGetClassObject PRIVATE
-    RunSetSettingsKeyAclW
-    RunRegisterProfilesW
-    RunUnregisterProfilesW
-    RunRegisterCategoriesW
-    RunUnregisterCategoriesW
-    RunActivateProfilesW
-    RunDeactivateProfilesW
+    DllRegisterServer PRIVATE
+    DllUnregisterServer PRIVATE
     ActivateProfiles
     DeactivateProfiles
     IsProfileActivated
