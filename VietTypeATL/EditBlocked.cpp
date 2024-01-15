@@ -30,18 +30,6 @@ HRESULT EditBlocked(
 
     DBG_DPRINT(L"EditBlocked ec = %ld", ec);
 
-    // check GUID_COMPARTMENT_KEYBOARD_OPENCLOSE from EngineController
-
-    long openclose;
-    hr = controller->GetOpenClose(&openclose);
-    EB_HRESULT_CHECK_COMMIT(hr, controller, L"%s", L"controller->GetOpenClose failed");
-
-    if (hr == S_OK && !openclose) {
-        DBG_DPRINT(L"%s", L"scopeBlocked: openclose");
-        controller->SetBlocked(BlockedKind::Blocked);
-        return S_OK;
-    }
-
     // check GUID_COMPARTMENT_KEYBOARD_DISABLED
 
     Compartment<long> compDisabled;

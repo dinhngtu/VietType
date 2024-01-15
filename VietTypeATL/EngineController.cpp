@@ -20,19 +20,7 @@ static const GUID GUID_SystemNotifyCompartment = {
     0xb2fbd2e7, 0x922f, 0x4996, {0xbe, 0x77, 0x21, 0x8, 0x5b, 0x91, 0xa8, 0xf0}};
 
 STDMETHODIMP EngineController::OnChange(__RPC__in REFGUID rguid) {
-    HRESULT hr;
-
-    if (rguid == GUID_SettingsCompartment_Toggle) {
-        UpdateStates();
-    } else if (rguid == GUID_COMPARTMENT_KEYBOARD_OPENCLOSE) {
-        long openclose;
-        hr = _openCloseCompartment.GetValue(&openclose);
-        assert(hr == S_OK);
-        HRESULT_CHECK(hr, L"%s", L"_openCloseCompartment.GetValue failed");
-        _blocked = openclose ? _blocked : BlockedKind::Blocked;
-        UpdateStates();
-    }
-
+    UpdateStates();
     return S_OK;
 }
 
@@ -71,29 +59,11 @@ EngineController::Initialize(_In_ Telex::TelexEngine* engine, _In_ ITfThreadMgr*
     hr = InitLanguageBar();
     HRESULT_CHECK_RETURN(hr, L"%s", L"InitLanguageBar failed");
 
-    // init GUID_COMPARTMENT_KEYBOARD_OPENCLOSE listener
-
-    hr = _openCloseCompartment.Initialize(threadMgr, clientid, GUID_COMPARTMENT_HANDWRITING_OPENCLOSE);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_openCloseCompartment->Initialize failed");
-
-    CComPtr<ITfSource> openCloseSource;
-    hr = _openCloseCompartment.GetCompartmentSource(&openCloseSource);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_openCloseCompartment->GetCompartmentSource failed");
-
-    hr = _openCloseCompartmentEventSink.Advise(openCloseSource, this);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_openCloseCompartmentEventSink.Advise failed");
-
     return S_OK;
 }
 
 HRESULT EngineController::Uninitialize() {
     HRESULT hr;
-
-    hr = _openCloseCompartmentEventSink.Unadvise();
-    DBG_HRESULT_CHECK(hr, L"%s", L"_openCloseCompartmentEventSink.Unadvise failed");
-
-    hr = _openCloseCompartment.Uninitialize();
-    DBG_HRESULT_CHECK(hr, L"%s", L"_openCloseCompartment.Uninitialize failed");
 
     hr = _enabled->Uninitialize();
     DBG_HRESULT_CHECK(hr, L"%s", L"_enabled->Uninitialize failed");
@@ -178,10 +148,6 @@ EngineController::BlockedKind EngineController::GetBlocked() const {
 void EngineController::SetBlocked(_In_ EngineController::BlockedKind blocked) {
     _blocked = blocked;
     UpdateStates();
-}
-
-_Check_return_ HRESULT EngineController::GetOpenClose(_Out_ long* openclose) {
-    return _openCloseCompartment.GetValue(openclose);
 }
 
 EngineSettingsController* EngineController::GetSettings() const {

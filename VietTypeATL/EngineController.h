@@ -57,8 +57,6 @@ public:
     BlockedKind GetBlocked() const;
     void SetBlocked(_In_ BlockedKind blocked);
 
-    _Check_return_ HRESULT GetOpenClose(_Out_ long* openclose);
-
     EngineSettingsController* GetSettings() const;
 
     // update engine and langbar enabled state to match enabled/blocked value
@@ -77,9 +75,6 @@ private:
     TfClientId _clientid = TF_CLIENTID_NULL;
 
     CComPtr<CachedCompartmentSetting<long>> _enabled;
-
-    Compartment<long> _openCloseCompartment;
-    SinkAdvisor<ITfCompartmentEventSink> _openCloseCompartmentEventSink;
 
     // unique_ptr is not necessary but used just to break include cycle
     std::unique_ptr<RefreshableButton> _indicatorButton;
