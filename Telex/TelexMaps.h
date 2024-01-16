@@ -27,7 +27,7 @@ struct ArrayMap : public std::array<std::pair<K, V>, N> {
 
     template <typename KK>
     constexpr const_iterator find(const KK& key) const {
-        if (sorted) {
+        if constexpr (sorted) {
             auto first = std::lower_bound(this->cbegin(), this->cend(), key, pair_less<K, V, KK>);
             if (first != this->cend() && first->first == key) {
                 return first;
@@ -56,7 +56,7 @@ struct ArraySet : public std::array<K, N> {
 
     template <typename KK>
     constexpr const_iterator find(const KK& key) const {
-        if (sorted) {
+        if constexpr (sorted) {
             auto first = std::lower_bound(this->cbegin(), this->cend(), key);
             if (first != this->cend() && *first == key) {
                 return first;

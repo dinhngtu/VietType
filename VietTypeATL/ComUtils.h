@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <typeinfo>
 #include <atlbase.h>
 
 template <typename T>
