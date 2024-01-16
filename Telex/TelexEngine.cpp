@@ -694,7 +694,9 @@ TelexStates TelexEngine::Backconvert(_In_ const std::wstring& s) {
             _state = TelexStates::Invalid;
         }
     }
-    _backconverted = true;
+    if (_keyBuffer.size()) {
+        _backconverted = true;
+    }
     assert(CheckInvariants());
     return _state;
 }

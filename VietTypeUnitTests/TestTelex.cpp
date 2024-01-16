@@ -202,6 +202,13 @@ public:
         Assert::AreEqual(L"", e.RetrieveRaw().c_str());
     }
 
+    TEST_METHOD (TestEmptyBackconversion) {
+        TelexEngine e(config);
+        e.Reset();
+        AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(std::wstring()));
+        Assert::AreEqual(L"", e.RetrieveRaw().c_str());
+    }
+
     // word typing tests
 
     TEST_METHOD (TestTypingDdoongf) {
