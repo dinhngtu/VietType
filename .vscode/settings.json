@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "*.h": "c",
+        "*.dsl": "EASL",
+        "cwchar": "cpp"
+    }
+}

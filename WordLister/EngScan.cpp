@@ -18,16 +18,16 @@ static TelexStates TestWord(TelexEngine& e, const wchar_t* input) {
     return e.Commit();
 }
 
-bool engscan(const wchar_t* filename) {
-    LONGLONG fsize;
-    auto words = static_cast<wchar_t*>(ReadWholeFile(filename, &fsize));
-    auto wend = words + fsize / sizeof(wchar_t);
+bool engscan(const TCHAR* filename) {
+    long long fsize;
+    auto words = static_cast<uint16_t*>(ReadWholeFile(filename, &fsize));
+    auto wend = words + fsize / sizeof(uint16_t);
 
     TelexConfig config;
     config.optimize_multilang = 0;
     TelexEngine engine(config);
     for (WordListIterator w(words, wend); w != wend; w++) {
-        std::wstring word(*w, w.wlen());
+        auto word = w.to_wstring();
 
         auto state = TestWord(engine, word.c_str());
         if (state == TelexStates::Committed && engine.GetTone() != Tones::Z) {
@@ -37,7 +37,7 @@ bool engscan(const wchar_t* filename) {
                 wordclass = L"DoubleTone";
             else if (!(*engine.GetRespos().rbegin() & ResposTone))
                 wordclass = L"ToneNotEnd";
-            wprintf(L"%s %s\n", word.c_str(), wordclass);
+            wprintf(L"%ls %ls\n", word.c_str(), wordclass);
         }
     }
     FreeFile(words);

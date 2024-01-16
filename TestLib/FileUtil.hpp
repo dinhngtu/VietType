@@ -3,13 +3,11 @@
 
 #pragma once
 
-#include <Windows.h>
-
 namespace VietType {
 namespace TestLib {
 
-PVOID ReadWholeFile(PCWSTR filename, _Out_ PLONGLONG size);
-VOID FreeFile(PVOID file);
+void* ReadWholeFile(const TCHAR* filename, _Out_ long long* size);
+void FreeFile(void* file);
 
 } // namespace TestLib
 } // namespace VietType

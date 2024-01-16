@@ -77,7 +77,7 @@ public:
     std::wstring Retrieve() const;
     std::wstring RetrieveRaw() const;
     std::wstring Peek() const;
-    constexpr std::wstring::size_type Count() const {
+    std::wstring::size_type Count() const {
         return _keyBuffer.size();
     }
     constexpr Tones GetTone() const {

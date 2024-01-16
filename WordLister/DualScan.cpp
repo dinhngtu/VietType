@@ -14,22 +14,22 @@ using namespace VietType::TestLib;
 bool dualscan() {
     std::set<std::wstring> vwordset;
     {
-        LONGLONG vfsize;
-        auto vwords = static_cast<wchar_t*>(ReadWholeFile(L"..\\..\\data\\vw39kw.txt", &vfsize));
-        auto vwend = vwords + vfsize / sizeof(wchar_t);
+        long long vfsize;
+        auto vwords = static_cast<uint16_t*>(ReadWholeFile(DATA("vw39kw.txt"), &vfsize));
+        auto vwend = vwords + vfsize / sizeof(uint16_t);
         for (WordListIterator vw(vwords, vwend); vw != vwend; vw++) {
-            vwordset.insert(std::wstring(*vw, vw.wlen()));
+            vwordset.insert(vw.to_wstring());
         }
         FreeFile(vwords);
     }
 
-    LONGLONG efsize;
-    auto ewords = static_cast<wchar_t*>(ReadWholeFile(L"..\\..\\data\\ewdsw.txt", &efsize));
-    auto ewend = ewords + efsize / sizeof(wchar_t);
+    long long efsize;
+    auto ewords = static_cast<uint16_t*>(ReadWholeFile(DATA("ewdsw.txt"), &efsize));
+    auto ewend = ewords + efsize / sizeof(uint16_t);
     TelexConfig config;
     TelexEngine engine(config);
     for (WordListIterator ew(ewords, ewend); ew != ewend; ew++) {
-        std::wstring eword(*ew, ew.wlen());
+        auto eword = ew.to_wstring();
         engine.Reset();
         for (auto c : eword) {
             engine.PushChar(c);
@@ -39,7 +39,7 @@ bool dualscan() {
             if (vwordset.find(outword) == vwordset.end() &&
                 std::any_of(
                     engine.GetRespos().begin(), engine.GetRespos().end(), [](auto x) { return x & ~ResposMask; })) {
-                wprintf(L"%s\n", eword.c_str());
+                wprintf(L"%ls\n", eword.c_str());
             }
         }
     }

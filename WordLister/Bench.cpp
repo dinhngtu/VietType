@@ -20,16 +20,16 @@ using namespace VietType::TestLib;
 
 bool bench() {
     {
-        LONGLONG efsize;
-        auto ewords = static_cast<wchar_t*>(ReadWholeFile(L"..\\..\\data\\ewdsw.txt", &efsize));
-        auto ewend = ewords + efsize / sizeof(wchar_t);
+        long long efsize;
+        auto ewords = static_cast<uint16_t*>(ReadWholeFile(DATA("ewdsw.txt"), &efsize));
+        auto ewend = ewords + efsize / sizeof(uint16_t);
         TelexConfig config;
         TelexEngine engine(config);
         unsigned long long count = 0;
         auto t1 = std::chrono::high_resolution_clock::now();
         for (auto i = 0; i < EITERATIONS; i++) {
             for (WordListIterator ew(ewords, ewend); ew != ewend; ew++) {
-                std::wstring eword(*ew, ew.wlen());
+                auto eword = ew.to_wstring();
                 engine.Reset();
                 for (auto c : eword) {
                     engine.PushChar(c);
@@ -50,16 +50,18 @@ bool bench() {
     }
 
     {
-        LONGLONG vfsize;
-        auto vwords = static_cast<wchar_t*>(ReadWholeFile(L"..\\..\\data\\vw39kw.txt", &vfsize));
-        auto vwend = vwords + vfsize / sizeof(wchar_t);
+        long long vfsize;
+        auto vwords = static_cast<uint16_t*>(ReadWholeFile(DATA("vw39kw.txt"), &vfsize));
+        auto vwend = vwords + vfsize / sizeof(uint16_t);
         TelexConfig config;
         TelexEngine engine(config);
         unsigned long long count = 0;
         auto t1 = std::chrono::high_resolution_clock::now();
         for (auto i = 0; i < VITERATIONS; i++) {
             for (WordListIterator vw(vwords, vwend); vw != vwend; vw++) {
-                std::wstring vword(*vw, vw.wlen());
+                auto vword = vw.to_wstring();
+                if (vword.empty())
+                    continue;
                 engine.Reset();
                 engine.Backconvert(vword);
                 count++;

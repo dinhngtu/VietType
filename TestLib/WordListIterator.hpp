@@ -4,6 +4,9 @@
 #pragma once
 
 #include <cstddef>
+#include <cstring>
+#include <cstdint>
+#include <cassert>
 #include <iterator>
 
 namespace VietType {
@@ -11,13 +14,14 @@ namespace TestLib {
 
 class WordListIterator {
 public:
-    using value_type = const wchar_t*;
+    using value_type = const uint16_t*;
     using difference_type = ptrdiff_t;
     using reference = value_type&;
     using pointer = value_type*;
     using iterator_category = std::input_iterator_tag;
 
     explicit WordListIterator(value_type words, value_type wend) : _words(words), _wend(wend) {
+        assert(_words < _wend);
         UpdateWordLength();
     }
 
@@ -55,13 +59,18 @@ public:
     constexpr size_t wlen() const {
         return _wlen;
     }
+    std::wstring to_wstring() const {
+        return std::wstring(_words, _words + _wlen);
+    }
 
 private:
     void UpdateWordLength() {
-        _wlen = wcsnlen_s(_words, _wend - _words);
+        _wlen = 0;
+        for (_wlen = 0; _wlen < static_cast<size_t>(_wend - _words) && _words[_wlen]; _wlen++)
+            ;
     }
 
-    const wchar_t *_words, *_wend;
+    value_type _words, _wend;
     size_t _wlen;
 };
 

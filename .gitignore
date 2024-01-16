@@ -13,8 +13,11 @@ TestRelease/
 *.i
 *_i.c
 *_i.h
+*.d
+*.o
 VietTypeATL/VersionVCS.h
 VietTypeATL/VersionNumbers.h
 VietTypeSetup/Version.wxi
 VietTypeConfig/Properties/Version.cs
 VietTypeBundle/*.exe
+wordlister
