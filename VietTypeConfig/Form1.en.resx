@@ -167,6 +167,9 @@ VietType is free software, licensed under the GNU General Public License. VietTy
   <data name="cbOaUy.Text" xml:space="preserve">
     <value>&amp;Use "oà", "uý" instead of "òa", "úy"</value>
   </data>
+  <data name="cbVietnameseUI.Text" xml:space="preserve">
+    <value>Giao diện tiếng &amp;Việt</value>
+  </data>
   <data name="disableSuccessMessage" xml:space="preserve">
     <value>Successfully disabled VietType.</value>
   </data>

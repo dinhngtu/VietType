@@ -1,16 +1,18 @@
 // SPDX-FileCopyrightText: Copyright (c) 2022 Dinh Ngoc Tu
 // SPDX-License-Identifier: GPL-3.0-only
 
+using Microsoft.Win32;
 using System;
 using System.Resources;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows.Forms;
 using static VietTypeConfig.VietTypeRegistrar;
 
 namespace VietTypeConfig {
     public partial class Form1 : Form {
         private readonly ResourceManager rm = new ResourceManager(typeof(Form1));
-        private bool oobe = false;
+        private readonly bool oobe = false;
 
         public Form1(string[] args) {
             if (args.Length > 0) {
@@ -30,6 +32,8 @@ namespace VietTypeConfig {
                 MessageBox.Show(string.Format(rm.GetString("cannotFindLibraryMessage"), ex.Message), "VietType", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Close();
             }
+            cbVietnameseUI.Checked = Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName == "vi";
+            cbVietnameseUI.CheckedChanged += cbVietnameseUI_CheckedChanged;
         }
 
         private void CloseForm(object sender, EventArgs e) {
@@ -60,6 +64,17 @@ namespace VietTypeConfig {
 
         private void btnEnable_Click(object sender, EventArgs e) {
             Activate(IsProfileActivated() != S_OK);
+        }
+
+        private void cbVietnameseUI_CheckedChanged(object sender, EventArgs e) {
+            try {
+                using (var regKey = Registry.CurrentUser.CreateSubKey(Settings.Subkey)) {
+                    regKey.SetValue("ui_language", cbVietnameseUI.Checked ? "vi" : "en");
+                    Application.Restart();
+                }
+            } catch (Exception ex) {
+                MessageBox.Show(string.Format(rm.GetString("cannotSaveSettingsMessage"), ex.Message), "VietType", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void Activate(bool newState) {

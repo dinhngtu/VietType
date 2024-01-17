@@ -186,4 +186,7 @@ VietType là phần mềm tự do, bạn có thể cung cấp lại và/hoặc c
   <data name="setDefaultQuestion" xml:space="preserve">
     <value>Đặt VietType làm bộ gõ mặc định?</value>
   </data>
+  <data name="cbVietnameseUI.Text" xml:space="preserve">
+    <value>&amp;Vietnamese interface</value>
+  </data>
 </root>

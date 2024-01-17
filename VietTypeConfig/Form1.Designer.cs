@@ -38,6 +38,7 @@ namespace VietTypeConfig {
             this.btnAbout = new System.Windows.Forms.Button();
             this.lblOptimizeMultilang = new System.Windows.Forms.Label();
             this.udOptimizeMultilang = new System.Windows.Forms.NumericUpDown();
+            this.cbVietnameseUI = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.settingsBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.udOptimizeMultilang)).BeginInit();
             this.SuspendLayout();
@@ -138,12 +139,19 @@ namespace VietTypeConfig {
             0});
             this.udOptimizeMultilang.Name = "udOptimizeMultilang";
             // 
+            // cbVietnameseUI
+            // 
+            resources.ApplyResources(this.cbVietnameseUI, "cbVietnameseUI");
+            this.cbVietnameseUI.Name = "cbVietnameseUI";
+            this.cbVietnameseUI.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AcceptButton = this.btnOK;
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnCancel;
+            this.Controls.Add(this.cbVietnameseUI);
             this.Controls.Add(this.udOptimizeMultilang);
             this.Controls.Add(this.lblOptimizeMultilang);
             this.Controls.Add(this.label1);
@@ -186,6 +194,7 @@ namespace VietTypeConfig {
         private System.Windows.Forms.Button btnAbout;
         private System.Windows.Forms.Label lblOptimizeMultilang;
         private System.Windows.Forms.NumericUpDown udOptimizeMultilang;
+        private System.Windows.Forms.CheckBox cbVietnameseUI;
     }
 }
 
