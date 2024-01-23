@@ -772,6 +772,8 @@ bool TelexEngine::CheckInvariants() const {
             return false;
         if (_c1.size() || _v.size() || _c2.size())
             return false;
+        if (_t != Tones::Z || _toned)
+            return false;
         if (_cases.size() || _respos.size() || _respos_current != 0)
             return false;
         if (_backconverted)
