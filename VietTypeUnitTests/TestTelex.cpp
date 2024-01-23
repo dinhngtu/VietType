@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 #include "stdafx.h"
+#include <functional>
 #include "Util.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -13,132 +14,140 @@ namespace UnitTests {
 TEST_CLASS (TestTelex) {
     const TelexConfig config{};
 
-    void TestValidWord(const wchar_t* expected, const wchar_t* input) const {
-        {
-            auto config_ = config;
-            config_.optimize_multilang = 0;
-            TelexEngine e(config_);
-            VietType::UnitTests::TestValidWord(e, expected, input);
+    class MultilangRangeTester {
+    public:
+        MultilangRangeTester(const TelexConfig& config, int minLevel = 0, int maxLevel = 3)
+            : _config(config), _minLevel(minLevel), _maxLevel(maxLevel) {
         }
-        {
-            auto config_ = config;
-            config_.optimize_multilang = 1;
-            TelexEngine e(config_);
-            VietType::UnitTests::TestValidWord(e, expected, input);
+
+        void invoke(std::function<void(TelexEngine&)> f) const {
+            for (int level = _minLevel; level <= _maxLevel; level++) {
+                auto config = _config;
+                config.optimize_multilang = level;
+                TelexEngine e(config);
+                f(e);
+            }
         }
+
+    private:
+        TelexConfig _config;
+        int _minLevel;
+        int _maxLevel;
+    };
+
+    void TestValidWord(const wchar_t* expected, const wchar_t* input, int minLevel = 0, int maxLevel = 3) const {
+        MultilangRangeTester(config).invoke([=](auto& e) { VietType::UnitTests::TestValidWord(e, expected, input); });
     }
 
-    void TestInvalidWord(const wchar_t* expected, const wchar_t* input) const {
-        {
-            auto config_ = config;
-            config_.optimize_multilang = 0;
-            TelexEngine e(config);
-            VietType::UnitTests::TestInvalidWord(e, expected, input);
-        }
-        {
-            auto config_ = config;
-            config_.optimize_multilang = 1;
-            TelexEngine e(config);
-            VietType::UnitTests::TestInvalidWord(e, expected, input);
-        }
+    void TestInvalidWord(const wchar_t* expected, const wchar_t* input, int minLevel = 0, int maxLevel = 3) const {
+        MultilangRangeTester(config).invoke([=](auto& e) { VietType::UnitTests::TestInvalidWord(e, expected, input); });
     }
 
-    void TestPeekWord(const wchar_t* expected, const wchar_t* input) const {
-        {
-            auto config_ = config;
-            config_.optimize_multilang = 0;
-            TelexEngine e(config_);
+    void TestPeekWord(
+        const wchar_t* expected,
+        const wchar_t* input,
+        int minLevel = 0,
+        int maxLevel = 3,
+        TelexStates state = TelexStates::TxError) const {
+        MultilangRangeTester(config).invoke([=](auto& e) {
             VietType::UnitTests::TestPeekWord(e, expected, input);
-        }
-        {
-            auto config_ = config;
-            config_.optimize_multilang = 1;
-            TelexEngine e(config_);
-            VietType::UnitTests::TestPeekWord(e, expected, input);
-        }
+            if (state != TelexStates::TxError) {
+                AssertTelexStatesEqual(state, e.GetState());
+            }
+        });
     }
 
 public:
     // reset
 
     TEST_METHOD (TestEmpty) {
-        TelexEngine e(config);
-        e.Reset();
-        Assert::AreEqual(L"", e.Retrieve().c_str());
-        Assert::AreEqual(L"", e.RetrieveRaw().c_str());
-        Assert::AreEqual(L"", e.Peek().c_str());
-        Assert::AreEqual(std::size_t{0}, e.Count());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            e.Reset();
+            Assert::AreEqual(L"", e.Retrieve().c_str());
+            Assert::AreEqual(L"", e.RetrieveRaw().c_str());
+            Assert::AreEqual(L"", e.Peek().c_str());
+            Assert::AreEqual(std::size_t{0}, e.Count());
+        });
     }
 
     // push char
 
     TEST_METHOD (TestEmptyPushCharC1_1) {
-        TelexEngine e(config);
-        e.Reset();
-        AssertTelexStatesEqual(TelexStates::Valid, e.PushChar(L'b'));
-        Assert::AreEqual(L"b", e.Retrieve().c_str());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            e.Reset();
+            AssertTelexStatesEqual(TelexStates::Valid, e.PushChar(L'b'));
+            Assert::AreEqual(L"b", e.Retrieve().c_str());
+        });
     }
 
     TEST_METHOD (TestEmptyPushCharC1_2) {
-        TelexEngine e(config);
-        e.Reset();
-        AssertTelexStatesEqual(TelexStates::Valid, e.PushChar(L'c'));
-        Assert::AreEqual(L"c", e.Retrieve().c_str());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            e.Reset();
+            AssertTelexStatesEqual(TelexStates::Valid, e.PushChar(L'c'));
+            Assert::AreEqual(L"c", e.Retrieve().c_str());
+        });
     }
 
     TEST_METHOD (TestEmptyPushCharC1_3) {
-        TelexEngine e(config);
-        e.Reset();
-        AssertTelexStatesEqual(TelexStates::Valid, e.PushChar(L'd'));
-        Assert::AreEqual(L"d", e.Retrieve().c_str());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            e.Reset();
+            AssertTelexStatesEqual(TelexStates::Valid, e.PushChar(L'd'));
+            Assert::AreEqual(L"d", e.Retrieve().c_str());
+        });
     }
 
     TEST_METHOD (TestEmptyPushCharC1_4) {
-        TelexEngine e(config);
-        e.Reset();
-        AssertTelexStatesEqual(TelexStates::Valid, e.PushChar(L'r'));
-        Assert::AreEqual(L"r", e.Retrieve().c_str());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            e.Reset();
+            AssertTelexStatesEqual(TelexStates::Valid, e.PushChar(L'r'));
+            Assert::AreEqual(L"r", e.Retrieve().c_str());
+        });
     }
 
     TEST_METHOD (TestEmptyPushCharC1_5) {
-        TelexEngine e(config);
-        e.Reset();
-        AssertTelexStatesEqual(TelexStates::Valid, e.PushChar(L'x'));
-        Assert::AreEqual(L"x", e.Retrieve().c_str());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            e.Reset();
+            AssertTelexStatesEqual(TelexStates::Valid, e.PushChar(L'x'));
+            Assert::AreEqual(L"x", e.Retrieve().c_str());
+        });
     }
 
     TEST_METHOD (TestEmptyPushCharV) {
-        TelexEngine e(config);
-        e.Reset();
-        AssertTelexStatesEqual(TelexStates::Valid, e.PushChar(L'a'));
-        Assert::AreEqual(L"a", e.Retrieve().c_str());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            e.Reset();
+            AssertTelexStatesEqual(TelexStates::Valid, e.PushChar(L'a'));
+            Assert::AreEqual(L"a", e.Retrieve().c_str());
+        });
     }
 
     TEST_METHOD (TestEmptyCommittedPushChar) {
-        TelexEngine e(config);
-        e.Reset();
-        AssertTelexStatesEqual(TelexStates::Committed, e.Commit());
-        AssertTelexStatesEqual(TelexStates::Committed, e.PushChar('a'));
-        Assert::AreEqual(L"", e.Retrieve().c_str());
-        Assert::AreEqual(L"", e.RetrieveRaw().c_str());
-        Assert::AreEqual(L"", e.Peek().c_str());
-        Assert::AreEqual(std::size_t{0}, e.Count());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            e.Reset();
+            AssertTelexStatesEqual(TelexStates::Committed, e.Commit());
+            AssertTelexStatesEqual(TelexStates::Committed, e.PushChar('a'));
+            Assert::AreEqual(L"", e.Retrieve().c_str());
+            Assert::AreEqual(L"", e.RetrieveRaw().c_str());
+            Assert::AreEqual(L"", e.Peek().c_str());
+            Assert::AreEqual(std::size_t{0}, e.Count());
+        });
     }
 
     // uppercase
 
     TEST_METHOD (TestEmptyPushCharUpC1) {
-        TelexEngine e(config);
-        e.Reset();
-        AssertTelexStatesEqual(TelexStates::Valid, e.PushChar(L'B'));
-        Assert::AreEqual(L"B", e.Retrieve().c_str());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            e.Reset();
+            AssertTelexStatesEqual(TelexStates::Valid, e.PushChar(L'B'));
+            Assert::AreEqual(L"B", e.Retrieve().c_str());
+        });
     }
 
     TEST_METHOD (TestEmptyPushCharUpV) {
-        TelexEngine e(config);
-        e.Reset();
-        AssertTelexStatesEqual(TelexStates::Valid, e.PushChar(L'A'));
-        Assert::AreEqual(L"A", e.Retrieve().c_str());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            e.Reset();
+            AssertTelexStatesEqual(TelexStates::Valid, e.PushChar(L'A'));
+            Assert::AreEqual(L"A", e.Retrieve().c_str());
+        });
     }
 
     TEST_METHOD (TestTypingUpAai_1) {
@@ -172,41 +181,46 @@ public:
     // backspace
 
     TEST_METHOD (TestEmptyBackspace) {
-        TelexEngine e(config);
-        e.Reset();
-        // must leave the class in a valid state
-        Assert::AreEqual(L"", e.Retrieve().c_str());
-        Assert::AreEqual(L"", e.RetrieveRaw().c_str());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            e.Reset();
+            // must leave the class in a valid state
+            Assert::AreEqual(L"", e.Retrieve().c_str());
+            Assert::AreEqual(L"", e.RetrieveRaw().c_str());
+        });
     }
 
     // commit
 
     TEST_METHOD (TestEmptyCommit) {
-        TelexEngine e(config);
-        e.Reset();
-        AssertTelexStatesEqual(TelexStates::Committed, e.Commit());
-        Assert::AreEqual(L"", e.Retrieve().c_str());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            e.Reset();
+            AssertTelexStatesEqual(TelexStates::Committed, e.Commit());
+            Assert::AreEqual(L"", e.Retrieve().c_str());
+        });
     }
 
     TEST_METHOD (TestEmptyForceCommit) {
-        TelexEngine e(config);
-        e.Reset();
-        AssertTelexStatesEqual(TelexStates::Committed, e.ForceCommit());
-        Assert::AreEqual(L"", e.Retrieve().c_str());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            e.Reset();
+            AssertTelexStatesEqual(TelexStates::Committed, e.ForceCommit());
+            Assert::AreEqual(L"", e.Retrieve().c_str());
+        });
     }
 
     TEST_METHOD (TestEmptyCancel) {
-        TelexEngine e(config);
-        e.Reset();
-        AssertTelexStatesEqual(TelexStates::CommittedInvalid, e.Cancel());
-        Assert::AreEqual(L"", e.RetrieveRaw().c_str());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            e.Reset();
+            AssertTelexStatesEqual(TelexStates::CommittedInvalid, e.Cancel());
+            Assert::AreEqual(L"", e.RetrieveRaw().c_str());
+        });
     }
 
     TEST_METHOD (TestEmptyBackconversion) {
-        TelexEngine e(config);
-        e.Reset();
-        AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(std::wstring()));
-        Assert::AreEqual(L"", e.RetrieveRaw().c_str());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            e.Reset();
+            AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(std::wstring()));
+            Assert::AreEqual(L"", e.RetrieveRaw().c_str());
+        });
     }
 
     // word typing tests
@@ -420,12 +434,13 @@ public:
     TEST_METHOD (TestPeekDand) {
         auto config1 = config;
         config1.accept_separate_dd = true;
-        TelexEngine e(config1);
-        FeedWord(e, L"dand");
-        Assert::AreEqual(
-            L"\x111"
-            "an",
-            e.Peek().c_str());
+        MultilangRangeTester(config1).invoke([](auto& e) {
+            FeedWord(e, L"dand");
+            Assert::AreEqual(
+                L"\x111"
+                "an",
+                e.Peek().c_str());
+        });
     }
 
     // double key tests
@@ -513,270 +528,300 @@ public:
     // backspace tests
 
     TEST_METHOD (TestBackspaceDdoongf) {
-        TelexEngine e(config);
-        FeedWord(e, L"ddoongf");
-        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-        Assert::AreEqual(L"\x111\x1ed3n", e.Peek().c_str());
-        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-        Assert::AreEqual(L"\x111\x1ed3", e.Peek().c_str());
-        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-        Assert::AreEqual(L"\x111", e.Peek().c_str());
-        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-        Assert::AreEqual(L"", e.Peek().c_str());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            FeedWord(e, L"ddoongf");
+            AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+            Assert::AreEqual(L"\x111\x1ed3n", e.Peek().c_str());
+            AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+            Assert::AreEqual(L"\x111\x1ed3", e.Peek().c_str());
+            AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+            Assert::AreEqual(L"\x111", e.Peek().c_str());
+            AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+            Assert::AreEqual(L"", e.Peek().c_str());
+        });
     }
 
     TEST_METHOD (TestBackspaceLeeen) {
-        TelexEngine e(config);
-        FeedWord(e, L"leeen");
-        Assert::AreEqual(L"leen", e.Peek().c_str());
-        AssertTelexStatesEqual(TelexStates::Invalid, e.Backspace());
-        Assert::AreEqual(L"lee", e.Peek().c_str());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            FeedWord(e, L"leeen");
+            Assert::AreEqual(L"leen", e.Peek().c_str());
+            AssertTelexStatesEqual(TelexStates::Invalid, e.Backspace());
+            Assert::AreEqual(L"lee", e.Peek().c_str());
+        });
     }
 
     TEST_METHOD (TestBackspaceHuowng) {
-        TelexEngine e(config);
-        FeedWord(e, L"huowng");
-        Assert::AreEqual(L"h\x1b0\x1a1ng", e.Peek().c_str());
-        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-        Assert::AreEqual(L"h\x1b0\x1a1n", e.Peek().c_str());
-        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-        Assert::AreEqual(L"hu\x1a1", e.Peek().c_str());
-        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-        Assert::AreEqual(L"hu", e.Peek().c_str());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            FeedWord(e, L"huowng");
+            Assert::AreEqual(L"h\x1b0\x1a1ng", e.Peek().c_str());
+            AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+            Assert::AreEqual(L"h\x1b0\x1a1n", e.Peek().c_str());
+            AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+            Assert::AreEqual(L"hu\x1a1", e.Peek().c_str());
+            AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+            Assert::AreEqual(L"hu", e.Peek().c_str());
+        });
     }
 
     TEST_METHOD (TestBackspaceAoas) {
-        TelexEngine e(config);
-        FeedWord(e, L"aoas");
-        Assert::AreEqual(L"aoas", e.Peek().c_str());
-        e.Backspace();
-        Assert::AreEqual(L"aoa", e.Peek().c_str());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            FeedWord(e, L"aoas");
+            Assert::AreEqual(L"aoas", e.Peek().c_str());
+            e.Backspace();
+            Assert::AreEqual(L"aoa", e.Peek().c_str());
+        });
     }
 
     TEST_METHOD (TestBackspaceHeei) {
-        TelexEngine e(config);
-        FeedWord(e, L"heei");
-        Assert::AreEqual(L"h\xeai", e.Peek().c_str());
-        e.Backspace();
-        Assert::AreEqual(L"h\xea", e.Peek().c_str());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            FeedWord(e, L"heei");
+            Assert::AreEqual(L"h\xeai", e.Peek().c_str());
+            e.Backspace();
+            Assert::AreEqual(L"h\xea", e.Peek().c_str());
+        });
     }
 
     TEST_METHOD (TestBackspaceOwa) {
-        TelexEngine e(config);
-        FeedWord(e, L"owa");
-        Assert::AreEqual(
-            L"\x1a1"
-            "a",
-            e.Peek().c_str());
-        e.Backspace();
-        Assert::AreEqual(L"\x1a1", e.Peek().c_str());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            FeedWord(e, L"owa");
+            Assert::AreEqual(
+                L"\x1a1"
+                "a",
+                e.Peek().c_str());
+            e.Backspace();
+            Assert::AreEqual(L"\x1a1", e.Peek().c_str());
+        });
     }
 
     TEST_METHOD (TestBackspaceRuowi) {
-        TelexEngine e(config);
-        FeedWord(e, L"ruowi");
-        Assert::AreEqual(L"r\x1b0\x1a1i", e.Peek().c_str());
-        e.Backspace();
-        Assert::AreEqual(L"ru\x1a1", e.Peek().c_str());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            FeedWord(e, L"ruowi");
+            Assert::AreEqual(L"r\x1b0\x1a1i", e.Peek().c_str());
+            e.Backspace();
+            Assert::AreEqual(L"ru\x1a1", e.Peek().c_str());
+        });
     }
 
     TEST_METHOD (TestBackspaceQuee) {
-        TelexEngine e(config);
-        FeedWord(e, L"quee");
-        Assert::AreEqual(L"qu\xea", e.Peek().c_str());
-        e.Backspace();
-        Assert::AreEqual(L"qu", e.Peek().c_str());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            FeedWord(e, L"quee");
+            Assert::AreEqual(L"qu\xea", e.Peek().c_str());
+            e.Backspace();
+            Assert::AreEqual(L"qu", e.Peek().c_str());
+        });
     }
 
     TEST_METHOD (TestBackspaceQuys) {
-        TelexEngine e(config);
-        FeedWord(e, L"quys");
-        Assert::AreEqual(L"qu\xfd", e.Peek().c_str());
-        e.Backspace();
-        Assert::AreEqual(L"qu", e.Peek().c_str());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            FeedWord(e, L"quys");
+            Assert::AreEqual(L"qu\xfd", e.Peek().c_str());
+            e.Backspace();
+            Assert::AreEqual(L"qu", e.Peek().c_str());
+        });
     }
 
     TEST_METHOD (TestBackspaceHieef) {
-        TelexEngine e(config);
-        FeedWord(e, L"hieef");
-        Assert::AreEqual(L"hi\x1ec1", e.Peek().c_str());
-        e.Backspace();
-        Assert::AreEqual(L"hi", e.Peek().c_str());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            FeedWord(e, L"hieef");
+            Assert::AreEqual(L"hi\x1ec1", e.Peek().c_str());
+            e.Backspace();
+            Assert::AreEqual(L"hi", e.Peek().c_str());
+        });
     }
 
     TEST_METHOD (TestBackspaceGifg) {
-        TelexEngine e(config);
-        FeedWord(e, L"gifg");
-        Assert::AreEqual(L"g\xecg", e.Peek().c_str());
-        e.Backspace();
-        Assert::AreEqual(L"g\xec", e.Peek().c_str());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            FeedWord(e, L"gifg");
+            Assert::AreEqual(L"g\xecg", e.Peek().c_str());
+            e.Backspace();
+            Assert::AreEqual(L"g\xec", e.Peek().c_str());
+        });
     }
 
     TEST_METHOD (TestBackspaceXooong) {
-        TelexEngine e(config);
-        AssertTelexStatesEqual(TelexStates::Valid, FeedWord(e, L"xooong"));
-        Assert::AreEqual(L"xoong", e.Peek().c_str());
-        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-        Assert::AreEqual(L"xoon", e.Peek().c_str());
-        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-        Assert::AreEqual(L"xoo", e.Peek().c_str());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            AssertTelexStatesEqual(TelexStates::Valid, FeedWord(e, L"xooong"));
+            Assert::AreEqual(L"xoong", e.Peek().c_str());
+            AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+            Assert::AreEqual(L"xoon", e.Peek().c_str());
+            AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+            Assert::AreEqual(L"xoo", e.Peek().c_str());
+        });
     }
 
     TEST_METHOD (TestBackspaceThooongf) {
-        TelexEngine e(config);
-        AssertTelexStatesEqual(TelexStates::Valid, FeedWord(e, L"thooongf"));
-        Assert::AreEqual(L"tho\xf2ng", e.Peek().c_str());
-        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-        Assert::AreEqual(L"tho\xf2n", e.Peek().c_str());
-        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-        Assert::AreEqual(L"tho\xf2", e.Peek().c_str());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            AssertTelexStatesEqual(TelexStates::Valid, FeedWord(e, L"thooongf"));
+            Assert::AreEqual(L"tho\xf2ng", e.Peek().c_str());
+            AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+            Assert::AreEqual(L"tho\xf2n", e.Peek().c_str());
+            AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+            Assert::AreEqual(L"tho\xf2", e.Peek().c_str());
+        });
     }
 
     // test tone and w movements
 
     TEST_METHOD (TestBackspaceCuwsoc) {
-        TelexEngine e(config);
-        AssertTelexStatesEqual(TelexStates::Valid, FeedWord(e, L"cuwsoc"));
-        Assert::AreEqual(
-            L"c\x1b0\x1edb"
-            "c",
-            e.Peek().c_str());
-        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-        Assert::AreEqual(L"c\x1b0\x1edb", e.Peek().c_str());
-        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-        // since the tone is entered with the "uw", it should stay there
-        Assert::AreEqual(L"c\x1ee9", e.Peek().c_str());
+        MultilangRangeTester(config, 0, 2).invoke([](auto& e) {
+            AssertTelexStatesEqual(TelexStates::Valid, FeedWord(e, L"cuwsoc"));
+            Assert::AreEqual(
+                L"c\x1b0\x1edb"
+                "c",
+                e.Peek().c_str());
+            AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+            Assert::AreEqual(L"c\x1b0\x1edb", e.Peek().c_str());
+            AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+            // since the tone is entered with the "uw", it should stay there
+            Assert::AreEqual(L"c\x1ee9", e.Peek().c_str());
+        });
     }
 
     TEST_METHOD (TestBackspaceCuwocs) {
-        TelexEngine e(config);
-        AssertTelexStatesEqual(TelexStates::Valid, FeedWord(e, L"cuwocs"));
-        Assert::AreEqual(
-            L"c\x1b0\x1edb"
-            "c",
-            e.Peek().c_str());
-        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-        Assert::AreEqual(L"c\x1b0\x1edb", e.Peek().c_str());
-        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-        Assert::AreEqual(L"c\x1b0", e.Peek().c_str());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            AssertTelexStatesEqual(TelexStates::Valid, FeedWord(e, L"cuwocs"));
+            Assert::AreEqual(
+                L"c\x1b0\x1edb"
+                "c",
+                e.Peek().c_str());
+            AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+            Assert::AreEqual(L"c\x1b0\x1edb", e.Peek().c_str());
+            AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+            Assert::AreEqual(L"c\x1b0", e.Peek().c_str());
+        });
     }
 
     TEST_METHOD (TestBackspaceCuocws) {
-        TelexEngine e(config);
-        AssertTelexStatesEqual(TelexStates::Valid, FeedWord(e, L"cuocws"));
-        Assert::AreEqual(
-            L"c\x1b0\x1edb"
-            "c",
-            e.Peek().c_str());
-        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-        Assert::AreEqual(L"cu\x1edb", e.Peek().c_str());
-        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-        Assert::AreEqual(L"cu", e.Peek().c_str());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            AssertTelexStatesEqual(TelexStates::Valid, FeedWord(e, L"cuocws"));
+            Assert::AreEqual(
+                L"c\x1b0\x1edb"
+                "c",
+                e.Peek().c_str());
+            AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+            Assert::AreEqual(L"cu\x1edb", e.Peek().c_str());
+            AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+            Assert::AreEqual(L"cu", e.Peek().c_str());
+        });
     }
 
     // test backconversions
 
     TEST_METHOD (TestBackconversionDdoongf) {
-        TelexEngine e(config);
-        AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(L"\x111\x1ed3ng"));
-        Assert::AreEqual(L"\x111\x1ed3ng", e.Peek().c_str());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(L"\x111\x1ed3ng"));
+            Assert::AreEqual(L"\x111\x1ed3ng", e.Peek().c_str());
+        });
     }
 
     TEST_METHOD (TestBackconversionSystem) {
-        TelexEngine e(config);
-        AssertTelexStatesEqual(TelexStates::Invalid, e.Backconvert(L"system"));
-        Assert::AreEqual(L"system", e.Peek().c_str());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            AssertTelexStatesEqual(TelexStates::Invalid, e.Backconvert(L"system"));
+            Assert::AreEqual(L"system", e.Peek().c_str());
+        });
     }
 
     TEST_METHOD (TestBackconversionThees) {
-        TelexEngine e(config);
-        AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(L"TH\x1ebe"));
-        Assert::AreEqual(L"TH\x1ebe", e.Peek().c_str());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(L"TH\x1ebe"));
+            Assert::AreEqual(L"TH\x1ebe", e.Peek().c_str());
+        });
     }
 
     TEST_METHOD (TestBackconversionVirus) {
-        TelexEngine e(config);
-        AssertTelexStatesEqual(TelexStates::Invalid, e.Backconvert(L"virus"));
-        Assert::AreEqual(L"virus", e.Peek().c_str());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            AssertTelexStatesEqual(TelexStates::Invalid, e.Backconvert(L"virus"));
+            Assert::AreEqual(L"virus", e.Peek().c_str());
+        });
     }
 
     TEST_METHOD (TestBackconversionDdoonfCtrlW) {
-        TelexEngine e(config);
-        AssertTelexStatesEqual(TelexStates::BackconvertFailed, e.Backconvert(L"\x111\x1ed3nw"));
-        Assert::AreEqual(L"\x111\x1ed3nw", e.Peek().c_str());
-        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-        Assert::AreEqual(L"\x111\x1ed3n", e.Peek().c_str());
-        e.Cancel();
-        Assert::AreEqual(L"\x111\x1ed3n", e.Peek().c_str());
-        Assert::AreEqual(L"\x111\x1ed3n", e.Retrieve().c_str());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            AssertTelexStatesEqual(TelexStates::BackconvertFailed, e.Backconvert(L"\x111\x1ed3nw"));
+            Assert::AreEqual(L"\x111\x1ed3nw", e.Peek().c_str());
+            AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+            Assert::AreEqual(L"\x111\x1ed3n", e.Peek().c_str());
+            e.Cancel();
+            Assert::AreEqual(L"\x111\x1ed3n", e.Peek().c_str());
+            Assert::AreEqual(L"\x111\x1ed3n", e.Retrieve().c_str());
+        });
     }
 
     TEST_METHOD (TestBackconversionDdCtrlW) {
-        TelexEngine e(config);
-        AssertTelexStatesEqual(TelexStates::BackconvertFailed, e.Backconvert(L"\x111w"));
-        e.Backspace();
-        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-        AssertTelexStatesEqual(TelexStates::CommittedInvalid, e.Cancel());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            AssertTelexStatesEqual(TelexStates::BackconvertFailed, e.Backconvert(L"\x111w"));
+            e.Backspace();
+            AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+            AssertTelexStatesEqual(TelexStates::CommittedInvalid, e.Cancel());
+        });
     }
 
     TEST_METHOD (TestBackconversionXooong) {
-        TelexEngine e(config);
-        AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(L"xoong"));
-        Assert::AreEqual(L"xoong", e.Peek().c_str());
-        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-        Assert::AreEqual(L"xoon", e.Peek().c_str());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(L"xoong"));
+            Assert::AreEqual(L"xoong", e.Peek().c_str());
+            AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+            Assert::AreEqual(L"xoon", e.Peek().c_str());
+        });
     }
 
     TEST_METHOD (TestBackconversionXooongUpper) {
-        TelexEngine e(config);
-        AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(L"XOONG"));
-        Assert::AreEqual(L"XOONG", e.Peek().c_str());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(L"XOONG"));
+            Assert::AreEqual(L"XOONG", e.Peek().c_str());
+        });
     }
 
     TEST_METHOD (TestBackconversionThooongf) {
-        TelexEngine e(config);
-        AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(L"tho\xf2ng"));
-        Assert::AreEqual(L"tho\xf2ng", e.Peek().c_str());
-        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-        Assert::AreEqual(L"tho\xf2n", e.Peek().c_str());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(L"tho\xf2ng"));
+            Assert::AreEqual(L"tho\xf2ng", e.Peek().c_str());
+            AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+            Assert::AreEqual(L"tho\xf2n", e.Peek().c_str());
+        });
     }
 
     TEST_METHOD (TestBackconversionThooongfUpper) {
-        TelexEngine e(config);
-        AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(L"THO\xd2NG"));
-        Assert::AreEqual(L"THO\xd2NG", e.Peek().c_str());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(L"THO\xd2NG"));
+            Assert::AreEqual(L"THO\xd2NG", e.Peek().c_str());
+        });
     }
 
     TEST_METHOD (TestBackconversionXoooong) {
-        TelexEngine e(config);
-        AssertTelexStatesEqual(TelexStates::BackconvertFailed, e.Backconvert(L"x\xf4\xf4ng"));
-        Assert::AreEqual(L"x\xf4\xf4ng", e.Peek().c_str());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            AssertTelexStatesEqual(TelexStates::BackconvertFailed, e.Backconvert(L"x\xf4\xf4ng"));
+            Assert::AreEqual(L"x\xf4\xf4ng", e.Peek().c_str());
+        });
     }
 
     TEST_METHOD (TestBackconversionXo_oong) {
-        TelexEngine e(config);
-        AssertTelexStatesEqual(TelexStates::BackconvertFailed, e.Backconvert(L"xo\xf4ng"));
-        Assert::AreEqual(L"xo\xf4ng", e.Peek().c_str());
-        AssertTelexStatesEqual(TelexStates::BackconvertFailed, e.Backspace());
-        Assert::AreEqual(L"xo\xf4n", e.Peek().c_str());
-        AssertTelexStatesEqual(TelexStates::BackconvertFailed, e.Backspace());
-        Assert::AreEqual(L"xo\xf4", e.Peek().c_str());
-        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-        Assert::AreEqual(L"xo", e.Peek().c_str());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            AssertTelexStatesEqual(TelexStates::BackconvertFailed, e.Backconvert(L"xo\xf4ng"));
+            Assert::AreEqual(L"xo\xf4ng", e.Peek().c_str());
+            AssertTelexStatesEqual(TelexStates::BackconvertFailed, e.Backspace());
+            Assert::AreEqual(L"xo\xf4n", e.Peek().c_str());
+            AssertTelexStatesEqual(TelexStates::BackconvertFailed, e.Backspace());
+            Assert::AreEqual(L"xo\xf4", e.Peek().c_str());
+            AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+            Assert::AreEqual(L"xo", e.Peek().c_str());
+        });
     }
 
     TEST_METHOD (TestBackconversionCaays) {
-        TelexEngine e(config);
-        AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(L"c\x1ea5y"));
-        e.Commit();
-        Assert::AreEqual(L"c\x1ea5y", e.Retrieve().c_str());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(L"c\x1ea5y"));
+            e.Commit();
+            Assert::AreEqual(L"c\x1ea5y", e.Retrieve().c_str());
+        });
     }
 
     TEST_METHOD (TestBackconversionQuaays) {
-        TelexEngine e(config);
-        AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(L"qu\x1ea5y"));
-        e.Commit();
-        Assert::AreEqual(L"qu\x1ea5y", e.Retrieve().c_str());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(L"qu\x1ea5y"));
+            e.Commit();
+            Assert::AreEqual(L"qu\x1ea5y", e.Retrieve().c_str());
+        });
     }
 
     // test oa/oe/uy
@@ -790,18 +835,19 @@ public:
     TEST_METHOD (TestTypingOaUyOff) {
         auto config1 = config;
         config1.oa_uy_tone1 = false;
-        TelexEngine e(config1);
-        VietType::UnitTests::TestValidWord(
-            e,
-            L"h\xf2"
-            "a",
-            L"hoaf");
-        VietType::UnitTests::TestValidWord(
-            e,
-            L"h\xf2"
-            "e",
-            L"hoef");
-        VietType::UnitTests::TestValidWord(e, L"l\x1ee5y", L"luyj");
+        MultilangRangeTester(config1).invoke([](auto& e) {
+            VietType::UnitTests::TestValidWord(
+                e,
+                L"h\xf2"
+                "a",
+                L"hoaf");
+            VietType::UnitTests::TestValidWord(
+                e,
+                L"h\xf2"
+                "e",
+                L"hoef");
+            VietType::UnitTests::TestValidWord(e, L"l\x1ee5y", L"luyj");
+        });
     }
 
     // test dd accept
@@ -813,15 +859,15 @@ public:
     TEST_METHOD (TestInvalidDodongf) {
         auto config1 = config;
         config1.accept_separate_dd = false;
-        TelexEngine e(config1);
-        VietType::UnitTests::TestInvalidWord(e, L"dodongf", L"dodongf");
+        MultilangRangeTester(config1).invoke(
+            [](auto& e) { VietType::UnitTests::TestInvalidWord(e, L"dodongf", L"dodongf"); });
     }
 
     TEST_METHOD (TestConfigOaUy) {
         auto config1 = config;
         config1.oa_uy_tone1 = false;
-        TelexEngine e(config1);
-        VietType::UnitTests::TestValidWord(e, L"to\xe0n", L"toanf");
+        MultilangRangeTester(config1).invoke(
+            [](auto& e) { VietType::UnitTests::TestValidWord(e, L"to\xe0n", L"toanf"); });
     }
 
     // test multilang optimizations
@@ -864,17 +910,19 @@ public:
     // test doublekey backspace
 
     TEST_METHOD (TestBackspaceMooo) {
-        TelexEngine e(config);
-        FeedWord(e, L"mooo");
-        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-        Assert::AreEqual(L"mo", e.Peek().c_str());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            FeedWord(e, L"mooo");
+            AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+            Assert::AreEqual(L"mo", e.Peek().c_str());
+        });
     }
 
     TEST_METHOD (TestBackspaceMooof) {
-        TelexEngine e(config);
-        FeedWord(e, L"mooof");
-        AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-        Assert::AreEqual(L"mo", e.Peek().c_str());
+        MultilangRangeTester(config).invoke([](auto& e) {
+            FeedWord(e, L"mooof");
+            AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+            Assert::AreEqual(L"mo", e.Peek().c_str());
+        });
     }
 };
 
