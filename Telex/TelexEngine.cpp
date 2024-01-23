@@ -275,6 +275,7 @@ void TelexEngine::Reset() {
     _v.clear();
     _c2.clear();
     _t = Tones::Z;
+    _toned = false;
     _cases.clear();
     _respos.clear();
     _respos_current = 0;
