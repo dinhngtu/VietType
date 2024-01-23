@@ -90,9 +90,11 @@ static wchar_t ToUpper(_In_ wchar_t c) {
 
 static wchar_t ToLower(_In_ wchar_t c) {
     wchar_t lc = c | 32;
+    // Basic Latin
     if (lc >= L'a' && lc <= L'z') {
         return lc;
     }
+    // Latin-1 Supplement
     if (c >= L'\xc0' && c <= L'\xde') {
         return lc;
     }
@@ -101,37 +103,15 @@ static wchar_t ToLower(_In_ wchar_t c) {
         return L'\x1b0';
     }
     lc = c | 1;
+    // Latin Extended-A/B
     if (c >= L'\x100' && c <= L'\x1bf') {
         return lc;
     }
+    // Latin Extended Additional
     if (c >= L'\x1ea0' && c <= L'\x1ef9') {
         return lc;
     }
     return c;
-}
-
-// return 1 if c is upper, 0 if c is lower
-static int FindLower(_In_ wchar_t c, _Out_ wchar_t* out) {
-    *out = c | 32;
-    if (*out >= L'a' && *out <= L'z') {
-        return *out != c;
-    }
-    if (c >= L'\xe0' && c <= L'\xfe') {
-        return *out != c;
-    }
-    // "uw" exception
-    if (c >= L'\x1af' && c <= L'\x1b0') {
-        return c == L'\x1af';
-    }
-    *out = c | 1;
-    if (c >= L'\x100' && c <= L'\x1bf') {
-        return *out != c;
-    }
-    if (c >= L'\x1ea0' && c <= L'\x1ef9') {
-        return *out != c;
-    }
-    *out = c;
-    return 0;
 }
 
 static wchar_t TranslateTone(_In_ wchar_t c, _In_ Tones t) {
@@ -297,8 +277,8 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
         return _state;
     }
 
-    wchar_t c;
-    auto ccase = FindLower(corig, &c);
+    wchar_t c = ToLower(corig);
+    auto ccase = c != corig;
     auto cat = ClassifyCharacter(c);
     if (cat == CharTypes::Uncategorized) {
         TelexEngineImpl::Invalidate(*this);
