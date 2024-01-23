@@ -392,18 +392,18 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
 
     } else if ((_c1 == L"gi" || !_v.empty()) && IS(cat, CharTypes::Tone)) {
         // tones
-        if (_config.optimize_multilang >= 3 && _toned) {
-            TelexEngineImpl::Invalidate(*this);
-        } else {
-            auto newtone = GetCharTone(c);
-            if (newtone != _t) {
+        auto newtone = GetCharTone(c);
+        if (newtone != _t) {
+            if (_config.optimize_multilang >= 3 && _toned) {
+                TelexEngineImpl::Invalidate(*this);
+            } else {
                 _t = newtone;
                 TelexEngineImpl::ReapplyTone(*this);
-            } else {
-                // the condition "_c1 == L"gi" || !_v.empty()" should ensure this already
-                assert(_keyBuffer.length() > 1);
-                TelexEngineImpl::InvalidateAndPopBack(*this, c);
             }
+        } else {
+            // the condition "_c1 == L"gi" || !_v.empty()" should ensure this already
+            assert(_keyBuffer.length() > 1);
+            TelexEngineImpl::InvalidateAndPopBack(*this, c);
         }
 
     } else if (((_c1 == L"gi" && _v.empty()) || !_v.empty()) && _c2.empty() && IS(cat, CharTypes::ConsoC2)) {
