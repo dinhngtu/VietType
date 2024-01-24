@@ -267,6 +267,7 @@ void TelexEngine::Reset() {
     _respos_current = 0;
     _backconverted = false;
     _autocorrected = false;
+    assert(CheckInvariants());
 }
 
 // remember to push into _cases when adding a new character
@@ -277,6 +278,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
     }
     if (_keyBuffer.size() > 250) {
         _state = TelexStates::Invalid;
+        assert(CheckInvariants());
         return _state;
     }
 
@@ -562,14 +564,17 @@ TelexStates TelexEngine::Commit() {
         }
         if (wlist_en.find(wordBuffer) != wlist_en.end()) {
             _state = TelexStates::CommittedInvalid;
+            assert(CheckInvariants());
             return _state;
         }
         if (_config.autocorrect && wlist_en_ac.find(wordBuffer) != wlist_en_ac.end()) {
             _state = TelexStates::CommittedInvalid;
+            assert(CheckInvariants());
             return _state;
         }
         if (_config.optimize_multilang >= 2 && wlist_en_2.find(wordBuffer) != wlist_en_2.end()) {
             _state = TelexStates::CommittedInvalid;
+            assert(CheckInvariants());
             return _state;
         }
     }
@@ -619,6 +624,7 @@ TelexStates TelexEngine::Commit() {
     auto c1_it = valid_c1.find(_c1);
     if (c1_it == valid_c1.end()) {
         _state = TelexStates::CommittedInvalid;
+        assert(CheckInvariants());
         return _state;
     }
 
@@ -626,10 +632,12 @@ TelexStates TelexEngine::Commit() {
     auto c2_it = valid_c2.find(_c2);
     if (c2_it == valid_c2.end()) {
         _state = TelexStates::CommittedInvalid;
+        assert(CheckInvariants());
         return _state;
     }
     if (c2_it->second && !(_t == Tones::S || _t == Tones::J)) {
         _state = TelexStates::CommittedInvalid;
+        assert(CheckInvariants());
         return _state;
     }
 
@@ -638,6 +646,7 @@ TelexStates TelexEngine::Commit() {
     auto found = TelexEngineImpl::GetTonePos(*this, false, &vinfo);
     if (!found) {
         _state = TelexStates::CommittedInvalid;
+        assert(CheckInvariants());
         return _state;
     }
 
@@ -650,15 +659,17 @@ TelexStates TelexEngine::Commit() {
         vinfo.tonepos = 0;
     } else if (vinfo.c2mode == C2Mode::MustC2 && !_c2.size()) {
         _state = TelexStates::CommittedInvalid;
+        assert(CheckInvariants());
         return _state;
     } else if (vinfo.c2mode == C2Mode::NoC2 && _c2.size()) {
         _state = TelexStates::CommittedInvalid;
+        assert(CheckInvariants());
         return _state;
     }
 
     _v[vinfo.tonepos] = TranslateTone(_v[vinfo.tonepos], _t);
-
     _state = TelexStates::Committed;
+
     assert(CheckInvariants());
     return _state;
 }
@@ -683,6 +694,7 @@ TelexStates TelexEngine::ForceCommit() {
     auto found = TelexEngineImpl::GetTonePos(*this, false, &vinfo);
     if (!found) {
         _state = TelexStates::CommittedInvalid;
+        assert(CheckInvariants());
         return _state;
     }
     _v[vinfo.tonepos] = TranslateTone(_v[vinfo.tonepos], _t);
@@ -700,6 +712,7 @@ TelexStates TelexEngine::Cancel() {
     } else {
         _state = TelexStates::CommittedInvalid;
     }
+    assert(CheckInvariants());
     return _state;
 }
 
@@ -822,7 +835,7 @@ bool TelexEngine::CheckInvariants() const {
         return false;
     }
     if (!_keyBuffer.size()) {
-        if (_state != TelexStates::Valid)
+        if (_state != TelexStates::Valid && _state != TelexStates::Committed)
             return false;
         if (_c1.size() || _v.size() || _c2.size())
             return false;
