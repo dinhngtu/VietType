@@ -581,17 +581,17 @@ TelexStates TelexEngine::Commit() {
                 _c2 = L"ch";
                 _cases.push_back(_cases[_c1.length() + _v.length()]);
                 _autocorrected = true;
-            } else if (_config.optimize_multilang == 0 || TelexEngineImpl::HasValidRespos(*this)) {
+            } else if (_config.optimize_multilang <= 1 || TelexEngineImpl::HasValidRespos(*this)) {
                 _c2 = L"nh";
                 _cases.push_back(_cases[_c1.length() + _v.length()]);
                 _autocorrected = true;
             }
         }
-        if (_config.optimize_multilang == 0 || TelexEngineImpl::HasValidRespos(*this)) {
+        if (TelexEngineImpl::HasValidRespos(*this)) {
             if (_c2 == L"gn") {
                 _c2 = L"ng";
                 _autocorrected = true;
-            } else if (_c2 == L"g") {
+            } else if (_config.optimize_multilang <= 1 && _c2 == L"g") {
                 _c2 = L"ng";
                 _cases.push_back(_cases.back());
                 _autocorrected = true;

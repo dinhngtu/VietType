@@ -453,6 +453,7 @@ MAKE_SORTED_MAP(
     P2(L'\x1ef9', L"yx"),  //
 );
 
+// generated from engscan (optimize=0) doubletone words
 MAKE_SORTED_SET(
     WConStr,
     wlist_en,
@@ -585,6 +586,7 @@ MAKE_SORTED_SET(
     L"virus",    //
 );
 
+// generated from dualscan mode 0 (optimize=1)
 MAKE_SORTED_SET(
     WConStr,
     wlist_en_2,
@@ -824,9 +826,11 @@ MAKE_SORTED_SET(
     L"xix",    //
 );
 
+// generated from dualscan mode 1 (optimize=0, autocorrect=1)
 MAKE_SORTED_SET(
     WConStr,
     wlist_en_ac,
+    L"ah",     //
     L"ash",    //
     L"bags",   //
     L"bash",   //
@@ -843,6 +847,7 @@ MAKE_SORTED_SET(
     L"gash",   //
     L"gigs",   //
     L"hags",   //
+    L"hah",    //
     L"hash",   //
     L"hogs",   //
     L"hugs",   //
@@ -857,6 +862,7 @@ MAKE_SORTED_SET(
     L"merge",  //
     L"mugs",   //
     L"nags",   //
+    L"nah",    //
     L"pagan",  //
     L"pagans", //
     L"pegs",   //
