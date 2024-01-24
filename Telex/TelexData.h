@@ -824,6 +824,64 @@ MAKE_SORTED_SET(
     L"xix",    //
 );
 
+MAKE_SORTED_SET(
+    WConStr,
+    wlist_en_ac,
+    L"ash",    //
+    L"bags",   //
+    L"bash",   //
+    L"begs",   //
+    L"bogs",   //
+    L"bugs",   //
+    L"cash",   //
+    L"chugs",  //
+    L"cogs",   //
+    L"dash",   //
+    L"digs",   //
+    L"dogs",   //
+    L"gags",   //
+    L"gash",   //
+    L"gigs",   //
+    L"hags",   //
+    L"hash",   //
+    L"hogs",   //
+    L"hugs",   //
+    L"kegs",   //
+    L"lags",   //
+    L"lash",   //
+    L"legs",   //
+    L"logo",   //
+    L"logs",   //
+    L"lugs",   //
+    L"mash",   //
+    L"merge",  //
+    L"mugs",   //
+    L"nags",   //
+    L"pagan",  //
+    L"pagans", //
+    L"pegs",   //
+    L"pigs",   //
+    L"rags",   //
+    L"rash",   //
+    L"rigs",   //
+    L"rugs",   //
+    L"saga",   //
+    L"sagas",  //
+    L"sags",   //
+    L"sash",   //
+    L"siege",  //
+    L"sieges", //
+    L"signs",  //
+    L"sworn",  //
+    L"tags",   //
+    L"thugs",  //
+    L"trash",  //
+    L"tugs",   //
+    L"two",    //
+    L"twos",   //
+    L"verge",  //
+);
+
 } // namespace Telex
 } // namespace VietType
 

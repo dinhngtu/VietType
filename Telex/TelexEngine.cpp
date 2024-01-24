@@ -229,6 +229,10 @@ struct TelexEngineImpl {
                 e._respos.push_back(static_cast<int>(e._c1.size() + e._v.size() - 1) | ResposTone);
         }
     }
+
+    static bool HasValidRespos(const TelexEngine& e) {
+        return std::any_of(e._respos.begin(), e._respos.end(), [](auto rp) { return rp & ResposValidMask; });
+    }
 };
 
 TelexEngine::TelexEngine(_In_ TelexConfig config) {
@@ -262,6 +266,7 @@ void TelexEngine::Reset() {
     _respos.clear();
     _respos_current = 0;
     _backconverted = false;
+    _autocorrected = false;
 }
 
 // remember to push into _cases when adding a new character
@@ -359,26 +364,34 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
             }
         }
 
-    } else if (!_v.empty() && IS(cat, CharTypes::VowelW)) {
-        bool tw;
-        if (_c1 == L"q") {
-            tw = TelexEngineImpl::TransitionV(*this, transitions_w_q, true);
-        } else {
-            tw = TelexEngineImpl::TransitionV(*this, transitions_w, true);
-        }
-        if (tw) {
-            if (!_c2.empty()) {
-                if (_c1 == L"q") {
-                    TelexEngineImpl::TransitionV(*this, transitions_v_c2_q);
-                } else {
-                    TelexEngineImpl::TransitionV(*this, transitions_v_c2);
-                }
+    } else if (IS(cat, CharTypes::VowelW)) {
+        if (!_v.empty()) {
+            bool tw;
+            if (_c1 == L"q") {
+                tw = TelexEngineImpl::TransitionV(*this, transitions_w_q, true);
+            } else {
+                tw = TelexEngineImpl::TransitionV(*this, transitions_w, true);
             }
-            _respos.push_back(static_cast<int>(_c1.size() + _v.size() - 1) | ResposTransitionW);
+            if (tw) {
+                if (!_c2.empty()) {
+                    if (_c1 == L"q") {
+                        TelexEngineImpl::TransitionV(*this, transitions_v_c2_q);
+                    } else {
+                        TelexEngineImpl::TransitionV(*this, transitions_v_c2);
+                    }
+                }
+                _respos.push_back(static_cast<int>(_c1.size() + _v.size() - 1) | ResposTransitionW);
+            } else {
+                TelexEngineImpl::InvalidateAndPopBack(*this, c);
+            }
+            // 'w' always keeps V size constant, don't push case
+        } else if (_config.autocorrect && !_toneCount && (!_c1.empty() || _config.optimize_multilang == 0)) {
+            _v.push_back(c);
+            _cases.push_back(ccase);
+            _respos.push_back(_respos_current++ | ResposAutocorrect);
         } else {
-            TelexEngineImpl::InvalidateAndPopBack(*this, c);
+            TelexEngineImpl::Invalidate(*this);
         }
-        // 'w' always keeps V size constant, don't push case
 
     } else if ((_c1 == L"gi" || !_v.empty()) && IS(cat, CharTypes::Tone)) {
         // tones
@@ -558,6 +571,47 @@ TelexStates TelexEngine::Commit() {
         if (_config.optimize_multilang >= 2 && wlist_en_2.find(wordBuffer) != wlist_en_2.end()) {
             _state = TelexStates::CommittedInvalid;
             return _state;
+        }
+    }
+
+    if (_config.autocorrect && _state == TelexStates::Valid && !_backconverted && _toneCount < 2) {
+        // fixing respos might not be necessary here but fixing cases is
+        if (_v == L"wu") {
+            _v = L"\x1b0u";
+            _autocorrected = true;
+        } else if (!_c1.empty() && _v == L"wo") {
+            _v = L"\x1a1";
+            for (auto& rp : _respos)
+                if (rp & ResposAutocorrect)
+                    _cases.erase(_cases.begin() + (rp & ResposMask));
+            _autocorrected = true;
+        } else if (_v == L"wuo") {
+            _v = L"\x1b0\x1a1";
+            for (auto& rp : _respos)
+                if (rp & ResposAutocorrect)
+                    _cases.erase(_cases.begin() + (rp & ResposMask));
+            _autocorrected = true;
+        }
+        if (_c2 == L"h" && (_v == L"a" || _v == L"\xea")) {
+            if (_t == Tones::S || _t == Tones::J) {
+                _c2 = L"ch";
+                _cases.push_back(_cases[_c1.length() + _v.length()]);
+                _autocorrected = true;
+            } else if (_config.optimize_multilang == 0 || TelexEngineImpl::HasValidRespos(*this)) {
+                _c2 = L"nh";
+                _cases.push_back(_cases[_c1.length() + _v.length()]);
+                _autocorrected = true;
+            }
+        }
+        if (_config.optimize_multilang == 0 || TelexEngineImpl::HasValidRespos(*this)) {
+            if (_c2 == L"gn") {
+                _c2 = L"ng";
+                _autocorrected = true;
+            } else if (_c2 == L"g") {
+                _c2 = L"ng";
+                _cases.push_back(_cases.back());
+                _autocorrected = true;
+            }
         }
     }
 
@@ -790,7 +844,7 @@ bool TelexEngine::CheckInvariants() const {
     if (_state == TelexStates::Valid || _state == TelexStates::Committed) {
         if (_c1.size() + _v.size() + _c2.size() != _cases.size())
             return false;
-        }
+    }
     return true;
 }
 

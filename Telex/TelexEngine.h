@@ -26,6 +26,7 @@ enum ResposTransitions {
     ResposTransitionV = 0x400000,
     ResposTransitionW = 0x200000,
     ResposTone = 0x100000,
+    ResposAutocorrect = 0x80000,
     //
     ResposMask = 0xff,
     ResposValidMask = 0xff0000,

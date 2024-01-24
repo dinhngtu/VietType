@@ -50,6 +50,8 @@ struct TelexConfig {
     bool backspaced_word_stays_invalid = true;
     // optimize key engine for foreign language typing
     unsigned long optimize_multilang = 1;
+    // enable certain autocorrect rules
+    bool autocorrect = false;
 };
 
 class TelexEngine {
@@ -89,6 +91,9 @@ public:
     constexpr bool IsBackconverted() const {
         return _backconverted;
     }
+    constexpr bool IsAutocorrected() const {
+        return _autocorrected;
+    }
 
 private:
     struct TelexConfig _config;
@@ -100,7 +105,7 @@ private:
     std::wstring _v;
     std::wstring _c2;
     Tones _t = Tones::Z;
-    bool _toned = false;
+    int _toneCount = 0;
     // don't use bool vector since that's special cased in the STL
     /// <summary>
     /// only use when valid;
@@ -116,6 +121,7 @@ private:
     std::vector<int> _respos;
     int _respos_current = 0;
     bool _backconverted = false;
+    bool _autocorrected = false;
 
 private:
     friend struct TelexEngineImpl;

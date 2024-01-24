@@ -27,6 +27,8 @@ bool dualscan() {
     auto ewords = static_cast<wchar_t*>(ReadWholeFile(L"..\\..\\data\\ewdsw.txt", &efsize));
     auto ewend = ewords + efsize / sizeof(wchar_t);
     TelexConfig config;
+    config.optimize_multilang = 1;
+    config.autocorrect = true;
     TelexEngine engine(config);
     for (WordListIterator ew(ewords, ewend); ew != ewend; ew++) {
         std::wstring eword(*ew, ew.wlen());
@@ -36,9 +38,14 @@ bool dualscan() {
         }
         if (engine.Commit() == TelexStates::Committed) {
             auto outword = engine.Retrieve();
+            /*
             if (vwordset.find(outword) == vwordset.end() &&
                 std::any_of(
                     engine.GetRespos().begin(), engine.GetRespos().end(), [](auto x) { return x & ~ResposMask; })) {
+                wprintf(L"%s\n", eword.c_str());
+            }
+            */
+            if (engine.IsAutocorrected()) {
                 wprintf(L"%s\n", eword.c_str());
             }
         }

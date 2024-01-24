@@ -922,6 +922,16 @@ public:
             Assert::AreEqual(L"mo", e.Peek().c_str());
         });
     }
+
+    TEST_METHOD (TestAutocorrectHwuogn) {
+        auto config1 = config;
+        config1.autocorrect = true;
+        MultiConfigTester(config1, 0, 1).Invoke([](auto& e) {
+            FeedWord(e, L"hwuogn");
+            AssertTelexStatesEqual(TelexStates::Committed, e.Commit());
+            Assert::AreEqual(L"h\x1b0\x1a1ng", e.Retrieve().c_str());
+        });
+    }
 };
 
 } // namespace UnitTests
