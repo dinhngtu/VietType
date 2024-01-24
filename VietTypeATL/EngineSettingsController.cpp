@@ -72,11 +72,25 @@ _Check_return_ HRESULT EngineSettingsController::Initialize(
         clientid);
     HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(_tc_optimize_multilang) failed");
 
+    hr = CreateInitialize(
+        &_tc_autocorrect,
+        HKEY_CURRENT_USER,
+        Globals::ConfigKeyName.c_str(),
+        L"autocorrect",
+        KEY_QUERY_VALUE,
+        threadMgr,
+        clientid);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(_tc_optimize_multilang) failed");
+
     return S_OK;
 }
 
 HRESULT EngineSettingsController::Uninitialize() {
     HRESULT hr;
+
+    hr = _tc_autocorrect->Uninitialize();
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_autocorrect->Uninitialize failed");
+    _tc_autocorrect.Release();
 
     hr = _tc_optimize_multilang->Uninitialize();
     HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_optimize_multilang->Uninitialize failed");
@@ -110,25 +124,30 @@ HRESULT EngineSettingsController::LoadTelexSettings(Telex::TelexConfig& cfg) {
 
     DWORD oa_uy_tone1 = true;
     hr = _tc_oa_uy_tone1->GetValueOrDefault(&oa_uy_tone1, _ec->GetEngine().GetConfig().oa_uy_tone1);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_oa_uy_tone1->GetValueOrWriteback failed");
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_oa_uy_tone1->GetValueOrDefault failed");
     cfg.oa_uy_tone1 = static_cast<bool>(oa_uy_tone1);
 
     DWORD accept_dd = true;
     hr = _tc_accept_dd->GetValueOrDefault(&accept_dd, _ec->GetEngine().GetConfig().accept_separate_dd);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_accept_dd->GetValueOrWriteback failed");
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_accept_dd->GetValueOrDefault failed");
     cfg.accept_separate_dd = static_cast<bool>(accept_dd);
 
     DWORD backspace_invalid = true;
     hr = _tc_backspace_invalid->GetValueOrDefault(
         &backspace_invalid, _ec->GetEngine().GetConfig().backspaced_word_stays_invalid);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_backspace_invalid->GetValueOrWriteback failed");
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_backspace_invalid->GetValueOrDefault failed");
     cfg.backspaced_word_stays_invalid = static_cast<bool>(backspace_invalid);
 
-    DWORD optimize_multilang = true;
+    DWORD optimize_multilang = 1;
     hr = _tc_optimize_multilang->GetValueOrDefault(
         &optimize_multilang, static_cast<DWORD>(_ec->GetEngine().GetConfig().optimize_multilang));
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_optimize_multilang->GetValueOrWriteback failed");
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_optimize_multilang->GetValueOrDefault failed");
     cfg.optimize_multilang = optimize_multilang;
+
+    DWORD autocorrect = true;
+    hr = _tc_autocorrect->GetValueOrDefault(&autocorrect, static_cast<DWORD>(_ec->GetEngine().GetConfig().autocorrect));
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_autocorrect->GetValueOrDefault failed");
+    cfg.autocorrect = autocorrect;
 
     return S_OK;
 }

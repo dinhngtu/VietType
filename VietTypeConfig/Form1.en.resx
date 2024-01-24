@@ -155,6 +155,9 @@ VietType is free software, licensed under the GNU General Public License. VietTy
   <data name="cbAcceptDd.Text" xml:space="preserve">
     <value>Accept 'd' any&amp;where</value>
   </data>
+  <data name="cbAutocorrect.Text" xml:space="preserve">
+    <value>Enable &amp;autocorrect (Experimental)</value>
+  </data>
   <data name="cbBackconvertOnBackspace.Text" xml:space="preserve">
     <value>&amp;Reconvert word on Backspace (Experimental)</value>
   </data>

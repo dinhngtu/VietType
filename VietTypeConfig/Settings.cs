@@ -92,6 +92,19 @@ namespace VietTypeConfig {
             }
         }
 
+        bool autocorrect = false;
+        public bool Autocorrect {
+            get {
+                return autocorrect;
+            }
+            set {
+                if (autocorrect != value) {
+                    autocorrect = value;
+                    OnPropertyChanged(nameof(Autocorrect));
+                }
+            }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged(string propName) {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
@@ -122,6 +135,7 @@ namespace VietTypeConfig {
                 setting.BackspaceInvalid = ToBool(regKey.GetValue(nameof(backspace_invalid))) ?? setting.BackspaceInvalid;
                 setting.BackconvertOnBackspace = ToBool(regKey.GetValue(nameof(backconvert_on_backspace))) ?? setting.BackconvertOnBackspace;
                 setting.OptimizeMultilang = ToInt(regKey.GetValue(nameof(optimize_multilang))) ?? setting.OptimizeMultilang;
+                setting.Autocorrect = ToBool(regKey.GetValue(nameof(autocorrect))) ?? setting.Autocorrect;
                 return setting;
             }
         }
@@ -134,6 +148,7 @@ namespace VietTypeConfig {
                 regKey.SetValue(nameof(backspace_invalid), settings.BackspaceInvalid ? 1 : 0);
                 regKey.SetValue(nameof(backconvert_on_backspace), settings.BackconvertOnBackspace ? 1 : 0);
                 regKey.SetValue(nameof(optimize_multilang), settings.OptimizeMultilang);
+                regKey.SetValue(nameof(autocorrect), settings.Autocorrect ? 1 : 0);
 
                 var threadMgr = Activator.CreateInstance(Type.GetTypeFromCLSID(CLSID_TF_ThreadMgr, true)) as ITfThreadMgr;
                 if (threadMgr.Activate(out uint tid) >= 0) {

@@ -189,4 +189,7 @@ VietType là phần mềm tự do, bạn có thể cung cấp lại và/hoặc c
   <data name="cbVietnameseUI.Text" xml:space="preserve">
     <value>&amp;Vietnamese interface</value>
   </data>
+  <data name="cbAutocorrect.Text" xml:space="preserve">
+    <value>Tự động sửa từ (Tính năng thử nghiệm) (&amp;A)</value>
+  </data>
 </root>

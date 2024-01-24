@@ -26,7 +26,6 @@ namespace VietTypeConfig {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.cbDefaultEnabled = new System.Windows.Forms.CheckBox();
-            this.settingsBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.cbOaUy = new System.Windows.Forms.CheckBox();
             this.cbAcceptDd = new System.Windows.Forms.CheckBox();
             this.cbBackspaceInvalid = new System.Windows.Forms.CheckBox();
@@ -39,8 +38,10 @@ namespace VietTypeConfig {
             this.lblOptimizeMultilang = new System.Windows.Forms.Label();
             this.udOptimizeMultilang = new System.Windows.Forms.NumericUpDown();
             this.cbVietnameseUI = new System.Windows.Forms.CheckBox();
-            ((System.ComponentModel.ISupportInitialize)(this.settingsBindingSource)).BeginInit();
+            this.cbAutocorrect = new System.Windows.Forms.CheckBox();
+            this.settingsBindingSource = new System.Windows.Forms.BindingSource(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.udOptimizeMultilang)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.settingsBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
             // cbDefaultEnabled
@@ -50,10 +51,6 @@ namespace VietTypeConfig {
             this.cbDefaultEnabled.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.settingsBindingSource, "DefaultEnabled", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.cbDefaultEnabled.Name = "cbDefaultEnabled";
             this.cbDefaultEnabled.UseVisualStyleBackColor = true;
-            // 
-            // settingsBindingSource
-            // 
-            this.settingsBindingSource.DataSource = typeof(VietTypeConfig.Settings);
             // 
             // cbOaUy
             // 
@@ -145,6 +142,18 @@ namespace VietTypeConfig {
             this.cbVietnameseUI.Name = "cbVietnameseUI";
             this.cbVietnameseUI.UseVisualStyleBackColor = true;
             // 
+            // cbAutocorrect
+            // 
+            resources.ApplyResources(this.cbAutocorrect, "cbAutocorrect");
+            this.cbAutocorrect.AutoEllipsis = true;
+            this.cbAutocorrect.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.settingsBindingSource, "Autocorrect", true));
+            this.cbAutocorrect.Name = "cbAutocorrect";
+            this.cbAutocorrect.UseVisualStyleBackColor = true;
+            // 
+            // settingsBindingSource
+            // 
+            this.settingsBindingSource.DataSource = typeof(VietTypeConfig.Settings);
+            // 
             // Form1
             // 
             this.AcceptButton = this.btnOK;
@@ -159,6 +168,7 @@ namespace VietTypeConfig {
             this.Controls.Add(this.btnAbout);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnOK);
+            this.Controls.Add(this.cbAutocorrect);
             this.Controls.Add(this.cbBackconvertOnBackspace);
             this.Controls.Add(this.cbBackspaceInvalid);
             this.Controls.Add(this.cbAcceptDd);
@@ -172,8 +182,8 @@ namespace VietTypeConfig {
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.Shown += new System.EventHandler(this.Form1_Shown);
-            ((System.ComponentModel.ISupportInitialize)(this.settingsBindingSource)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.udOptimizeMultilang)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.settingsBindingSource)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -195,6 +205,7 @@ namespace VietTypeConfig {
         private System.Windows.Forms.Label lblOptimizeMultilang;
         private System.Windows.Forms.NumericUpDown udOptimizeMultilang;
         private System.Windows.Forms.CheckBox cbVietnameseUI;
+        private System.Windows.Forms.CheckBox cbAutocorrect;
     }
 }
 

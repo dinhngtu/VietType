@@ -48,6 +48,7 @@ private:
     CComPtr<RegistrySetting<DWORD>> _tc_accept_dd;
     CComPtr<RegistrySetting<DWORD>> _tc_backspace_invalid;
     CComPtr<RegistrySetting<DWORD>> _tc_optimize_multilang;
+    CComPtr<RegistrySetting<DWORD>> _tc_autocorrect;
 };
 
 } // namespace VietType
