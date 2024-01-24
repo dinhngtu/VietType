@@ -159,7 +159,7 @@ VietType is free software, licensed under the GNU General Public License. VietTy
     <value>Enable &amp;autocorrect (Experimental)</value>
   </data>
   <data name="cbBackconvertOnBackspace.Text" xml:space="preserve">
-    <value>&amp;Reconvert word on Backspace (Experimental)</value>
+    <value>&amp;Reconvert word on Backspace</value>
   </data>
   <data name="cbBackspaceInvalid.Text" xml:space="preserve">
     <value>Backspaced &amp;invalid word stays invalid</value>
