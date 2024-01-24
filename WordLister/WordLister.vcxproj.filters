@@ -30,6 +30,9 @@
     <ClCompile Include="Bench.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Fuzz.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">

@@ -95,6 +95,8 @@ public:
         return _autocorrected;
     }
 
+    bool CheckInvariants() const;
+
 private:
     struct TelexConfig _config;
 
@@ -125,7 +127,6 @@ private:
 
 private:
     friend struct TelexEngineImpl;
-    bool CheckInvariants() const;
     bool CheckInvariantsBackspace(TelexStates prevState) const;
 };
 
