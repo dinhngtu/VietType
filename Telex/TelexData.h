@@ -455,7 +455,7 @@ MAKE_SORTED_MAP(
 
 MAKE_SORTED_SET(
     WConStr,
-    word_exceptions_en,
+    wlist_en,
     L"airs",     //
     L"arms",     //
     L"auras",    //
@@ -587,7 +587,7 @@ MAKE_SORTED_SET(
 
 MAKE_SORTED_SET(
     WConStr,
-    word_exceptions_en_2,
+    wlist_en_2,
     L"ask",    //
     L"bask",   //
     L"bays",   //

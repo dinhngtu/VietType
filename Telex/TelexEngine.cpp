@@ -12,6 +12,8 @@
 namespace VietType {
 namespace Telex {
 
+constexpr size_t MaxLength = 10; // enough for "nghieengsz" and "nhuwowngxf"
+
 static CharTypes ClassifyCharacter(_In_ wchar_t c) {
     if (c >= L'a' && c <= L'z') {
         return letterClasses[c - L'a'];
@@ -209,7 +211,7 @@ struct TelexEngineImpl {
     }
 
     static void ReapplyTone(TelexEngine& e) {
-        e._toned = true;
+        e._toneCount++;
         int found = -1;
         for (int i = static_cast<int>(e._respos.size() - 1); i >= 0; i--) {
             if (e._respos[i] & ResposTone) {
@@ -231,12 +233,12 @@ struct TelexEngineImpl {
 
 TelexEngine::TelexEngine(_In_ TelexConfig config) {
     _config = config;
-    _keyBuffer.reserve(9);
-    _c1.reserve(9);
-    _v.reserve(9);
-    _c2.reserve(9);
-    _cases.reserve(9);
-    _respos.reserve(9);
+    _keyBuffer.reserve(MaxLength);
+    _c1.reserve(MaxLength);
+    _v.reserve(MaxLength);
+    _c2.reserve(MaxLength);
+    _cases.reserve(MaxLength);
+    _respos.reserve(MaxLength);
     Reset();
 }
 
@@ -255,7 +257,7 @@ void TelexEngine::Reset() {
     _v.clear();
     _c2.clear();
     _t = Tones::Z;
-    _toned = false;
+    _toneCount = 0;
     _cases.clear();
     _respos.clear();
     _respos_current = 0;
@@ -268,10 +270,14 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
     if (_state != TelexStates::Valid && _state != TelexStates::Invalid) {
         return _state;
     }
+    if (_keyBuffer.size() > 250) {
+        _state = TelexStates::Invalid;
+        return _state;
+    }
 
     _keyBuffer.push_back(corig);
 
-    if (_state == TelexStates::Invalid || _keyBuffer.size() > 9) {
+    if (_state == TelexStates::Invalid || _keyBuffer.size() > MaxLength) {
         TelexEngineImpl::Invalidate(*this);
         assert(CheckInvariants());
         return _state;
@@ -322,7 +328,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
         auto before = _v.size();
         if (TelexEngineImpl::TransitionV(*this, transitions)) {
             auto after = _v.size();
-            if (_config.optimize_multilang >= 3 && _toned) {
+            if (_config.optimize_multilang >= 3 && _toneCount) {
                 TelexEngineImpl::Invalidate(*this);
             } else if (
                 _keyBuffer.size() > 1 && _respos.back() & ResposTransitionV && c == ToLower(_keyBuffer.rbegin()[1])) {
@@ -378,7 +384,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
         // tones
         auto newtone = GetCharTone(c);
         if (newtone != _t) {
-            if (_config.optimize_multilang >= 3 && _toned) {
+            if (_config.optimize_multilang >= 3 && _toneCount) {
                 TelexEngineImpl::Invalidate(*this);
             } else {
                 _t = newtone;
@@ -431,6 +437,10 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
 }
 
 TelexStates TelexEngine::Backspace() {
+    if (_state != TelexStates::Valid && _state != TelexStates::Invalid && _state != TelexStates::BackconvertFailed) {
+        return _state;
+    }
+
     [[maybe_unused]] auto prevState = _state;
     std::wstring buf(_keyBuffer);
     std::vector<int> rp(_respos);
@@ -537,11 +547,15 @@ TelexStates TelexEngine::Commit() {
         for (auto& c : wordBuffer) {
             c = ToLower(c);
         }
-        if (word_exceptions_en.find(wordBuffer) != word_exceptions_en.end()) {
+        if (wlist_en.find(wordBuffer) != wlist_en.end()) {
             _state = TelexStates::CommittedInvalid;
             return _state;
         }
-        if (_config.optimize_multilang >= 2 && word_exceptions_en_2.find(wordBuffer) != word_exceptions_en_2.end()) {
+        if (_config.autocorrect && wlist_en_ac.find(wordBuffer) != wlist_en_ac.end()) {
+            _state = TelexStates::CommittedInvalid;
+            return _state;
+        }
+        if (_config.optimize_multilang >= 2 && wlist_en_2.find(wordBuffer) != wlist_en_2.end()) {
             _state = TelexStates::CommittedInvalid;
             return _state;
         }
@@ -637,6 +651,8 @@ TelexStates TelexEngine::Cancel() {
 
 TelexStates TelexEngine::Backconvert(_In_ const std::wstring& s) {
     assert(!_keyBuffer.size());
+    if (_keyBuffer.size())
+        return _state;
     bool found_backconversion = false;
     for (auto c : s) {
         auto double_flag = !_c2.size() && (_v == L"e" || _v == L"o");
@@ -756,24 +772,25 @@ bool TelexEngine::CheckInvariants() const {
             return false;
         if (_c1.size() || _v.size() || _c2.size())
             return false;
-        if (_t != Tones::Z || _toned)
+        if (_t != Tones::Z || _toneCount)
             return false;
         if (_cases.size() || _respos.size() || _respos_current != 0)
             return false;
         if (_backconverted)
             return false;
     }
-    if (_state != TelexStates::BackconvertFailed) {
+    if (_state == TelexStates::Valid || _state == TelexStates::Invalid) {
         if (_c1.size() + _v.size() + _c2.size() > _keyBuffer.size())
             return false;
+    }
+    if (_state == TelexStates::Valid) {
         if (_keyBuffer.size() != _respos.size())
             return false;
     }
     if (_state == TelexStates::Valid || _state == TelexStates::Committed) {
-        if (_c1.size() + _v.size() + _c2.size() != _cases.size()) {
+        if (_c1.size() + _v.size() + _c2.size() != _cases.size())
             return false;
         }
-    }
     return true;
 }
 

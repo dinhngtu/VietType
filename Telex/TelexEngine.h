@@ -19,14 +19,16 @@ struct VInfo {
 
 enum ResposTransitions {
     ResposExpunged = 0x40000000,
-    ResposTransitionC1 = 0x20000000,
-    ResposTransitionV = 0x10000000,
-    ResposTransitionW = 0x8000000,
-    ResposTone = 0x4000000,
-    ResposDoubleUndo = 0x2000000,
-    ResposInvalidate = 0x1000000,
+    ResposDoubleUndo = 0x20000000,
+    ResposInvalidate = 0x10000000,
+    //
+    ResposTransitionC1 = 0x800000,
+    ResposTransitionV = 0x400000,
+    ResposTransitionW = 0x200000,
+    ResposTone = 0x100000,
     //
     ResposMask = 0xff,
+    ResposValidMask = 0xff0000,
 };
 
 enum class CharTypes : unsigned int {
