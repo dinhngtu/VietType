@@ -38,6 +38,10 @@ bool engscan(const wchar_t* filename) {
             else if (!(*engine.GetRespos().rbegin() & ResposTone))
                 wordclass = L"ToneNotEnd";
             wprintf(L"%s %s\n", word.c_str(), wordclass);
+        } else if (std::any_of(engine.GetRespos().begin(), engine.GetRespos().end(), [](auto x) {
+                       return x & ResposDoubleUndo;
+                   })) {
+            wprintf(L"%s %s\n", word.c_str(), L"DoubleUndo");
         }
     }
     FreeFile(words);
