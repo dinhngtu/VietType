@@ -283,6 +283,10 @@ public:
         TestValidWord(L"q\x1b0\x1edbn", L"quwowns");
     }
 
+    TEST_METHOD (TestTypingQuonwx) {
+        TestValidWord(L"qu\x1ee1n", L"quonwx");
+    }
+
     TEST_METHOD (TestTypingDduwowcj) {
         TestValidWord(L"\x111\x1b0\x1ee3\x63", L"dduwowcj");
     }

@@ -362,7 +362,11 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
         }
         if (tw) {
             if (!_c2.empty()) {
-                TelexEngineImpl::TransitionV(*this, transitions_v_c2);
+                if (_c1 == L"q") {
+                    TelexEngineImpl::TransitionV(*this, transitions_v_c2_q);
+                } else {
+                    TelexEngineImpl::TransitionV(*this, transitions_v_c2);
+                }
             }
             _respos.push_back(static_cast<int>(_c1.size() + _v.size() - 1) | ResposTransitionW);
         } else {
