@@ -134,6 +134,7 @@ struct TelexEngineImpl {
     }
 
     static void InvalidateAndPopBack(TelexEngine& e, wchar_t c) {
+        assert(e._keyBuffer.length() > 1);
         // pop back only if same char entered twice in a row
         if (c == ToLower(e._keyBuffer.rbegin()[1]))
             e._respos.push_back(e._respos_current++ | ResposDoubleUndo);
@@ -385,9 +386,11 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
                 TelexEngineImpl::ReapplyTone(*this);
             }
         } else {
-            // the condition "_c1 == L"gi" || !_v.empty()" should ensure this already
-            assert(_keyBuffer.length() > 1);
-            TelexEngineImpl::InvalidateAndPopBack(*this, c);
+            if (_config.optimize_multilang >= 2) {
+                TelexEngineImpl::Invalidate(*this);
+            } else {
+                TelexEngineImpl::InvalidateAndPopBack(*this, c);
+            }
         }
 
     } else if (((_c1 == L"gi" && _v.empty()) || !_v.empty()) && _c2.empty() && IS(cat, CharTypes::ConsoC2)) {

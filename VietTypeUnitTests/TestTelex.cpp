@@ -514,7 +514,7 @@ public:
     // caps repeat
 
     TEST_METHOD (TestCapsOSS) {
-        TestInvalidWord(L"OS", L"OSS");
+        MultiConfigTester(config, 0, 1).Invoke([](auto& e) { VietType::UnitTests::TestPeekWord(e, L"OS", L"OSS"); });
     }
 
     TEST_METHOD (TestCapsAAA) {
@@ -526,11 +526,11 @@ public:
     }
 
     TEST_METHOD (TestCapsGIFF) {
-        TestInvalidWord(L"GIF", L"GIFF");
+        MultiConfigTester(config, 0, 1).Invoke([](auto& e) { VietType::UnitTests::TestPeekWord(e, L"GIF", L"GIFF"); });
     }
 
     TEST_METHOD (TestCapsGISS) {
-        TestInvalidWord(L"GIS", L"GISS");
+        MultiConfigTester(config, 0, 1).Invoke([](auto& e) { VietType::UnitTests::TestPeekWord(e, L"GIS", L"GISS"); });
     }
 
     // backspace tests
@@ -671,7 +671,7 @@ public:
     TEST_METHOD (TestBackspaceAssi) {
         auto config1 = config;
         config1.backspaced_word_stays_invalid = false;
-        MultiConfigTester(config1).Invoke([](auto& e) {
+        MultiConfigTester(config1, 0, 1).Invoke([](auto& e) {
             FeedWord(e, L"asssi");
             Assert::AreEqual(L"assi", e.Peek().c_str());
             e.Backspace();
