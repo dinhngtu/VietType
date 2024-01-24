@@ -11,7 +11,12 @@
 using namespace VietType::Telex;
 using namespace VietType::TestLib;
 
-bool dualscan() {
+enum DualScanMode {
+    WlistEn2,
+    WlistEnAc,
+};
+
+bool dualscan(int mode) {
     std::set<std::wstring> vwordset;
     {
         LONGLONG vfsize;
@@ -27,8 +32,16 @@ bool dualscan() {
     auto ewords = static_cast<wchar_t*>(ReadWholeFile(L"..\\..\\data\\ewdsw.txt", &efsize));
     auto ewend = ewords + efsize / sizeof(wchar_t);
     TelexConfig config;
-    config.optimize_multilang = 1;
-    config.autocorrect = true;
+    switch (mode) {
+    case WlistEn2:
+        config.optimize_multilang = 1;
+        config.autocorrect = false;
+        break;
+    case WlistEnAc:
+        config.optimize_multilang = 0;
+        config.autocorrect = true;
+        break;
+    }
     TelexEngine engine(config);
     for (WordListIterator ew(ewords, ewend); ew != ewend; ew++) {
         std::wstring eword(*ew, ew.wlen());
@@ -38,15 +51,19 @@ bool dualscan() {
         }
         if (engine.Commit() == TelexStates::Committed) {
             auto outword = engine.Retrieve();
-            /*
-            if (vwordset.find(outword) == vwordset.end() &&
-                std::any_of(
-                    engine.GetRespos().begin(), engine.GetRespos().end(), [](auto x) { return x & ~ResposMask; })) {
-                wprintf(L"%s\n", eword.c_str());
-            }
-            */
-            if (engine.IsAutocorrected()) {
-                wprintf(L"%s\n", eword.c_str());
+            switch (mode) {
+            case WlistEn2:
+                if (vwordset.find(outword) == vwordset.end() &&
+                    std::any_of(
+                        engine.GetRespos().begin(), engine.GetRespos().end(), [](auto x) { return x & ~ResposMask; })) {
+                    wprintf(L"%s\n", eword.c_str());
+                }
+                break;
+            case WlistEnAc:
+                if (engine.IsAutocorrected()) {
+                    wprintf(L"%s\n", eword.c_str());
+                }
+                break;
             }
         }
     }
