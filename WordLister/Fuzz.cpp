@@ -10,6 +10,7 @@ using namespace VietType::Telex;
 static void DoFuzz(int len, wchar_t start = 0) {
     for (int level = 0; level <= 3; level++) {
         for (int autocorrect = 0; autocorrect <= 1; autocorrect++) {
+            wprintf(L"len %d level %d autocorrect %d\n", len, level, autocorrect);
             TelexConfig config;
             config.optimize_multilang = level;
             config.autocorrect = !!autocorrect;
@@ -19,7 +20,7 @@ static void DoFuzz(int len, wchar_t start = 0) {
                 max *= 26;
             }
             for (size_t i = 0; i < max; i++) {
-                std::wstring word(start ? start : L'a', len);
+                std::wstring word(len, start ? start : L'a');
                 size_t cur = i;
                 for (auto j = start ? 1 : 0; j < len; j++) {
                     word[j] = L'a' + cur % 26;
@@ -35,9 +36,6 @@ static void DoFuzz(int len, wchar_t start = 0) {
                 e.Commit();
                 if (!e.CheckInvariants()) {
                     wprintf(L"word failed commit: %s\n", word.c_str());
-                }
-                if (i % (1ull << 24) == 0) {
-                    wprintf(L"done %zu words\n", i);
                 }
             }
         }
@@ -57,11 +55,9 @@ bool fuzz() {
     SetPriorityClass(GetCurrentProcess(), IDLE_PRIORITY_CLASS);
     SetThreadExecutionState(ES_SYSTEM_REQUIRED | ES_CONTINUOUS);
     for (auto len = 1; len <= 4; len++) {
-        wprintf(L"len %d\n", len);
         DoFuzz(len);
     }
     for (auto len = 5; len <= 7; len++) {
-        wprintf(L"len %d\n", len);
         DoFuzzThreaded(len);
     }
     return true;
