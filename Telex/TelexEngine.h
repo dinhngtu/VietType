@@ -34,12 +34,8 @@ enum ResposTransitions {
 
 enum class CharTypes : unsigned int {
     Uncategorized = 0,
-    Commit = 1 << 0,
-    ForceCommit = 1 << 1,
-    Backspace = 1 << 2,
     Vowel = 1 << 3,
     VowelW = 1 << 4,
-    // TODO: classification for vowel continue
     Conso = 1 << 5,
     ConsoC1 = 1 << 5 | 1 << 6,
     ConsoC2 = 1 << 5 | 1 << 7,

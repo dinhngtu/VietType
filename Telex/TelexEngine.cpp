@@ -14,31 +14,10 @@ namespace Telex {
 
 constexpr size_t MaxLength = 10; // enough for "nghieengsz" and "nhuwowngxf"
 
-static CharTypes ClassifyCharacter(_In_ wchar_t c) {
-    if (c >= L'a' && c <= L'z') {
-        return letterClasses[c - L'a'];
+static CharTypes ClassifyCharacter(_In_ wchar_t lc) {
+    if (lc >= L'a' && lc <= L'z') {
+        return letterClasses[lc - L'a'];
     }
-    switch (c) {
-    case L'\b':
-        return CharTypes::Backspace;
-    case L'\0':
-        return CharTypes::ForceCommit;
-    case L'\t':
-    case L'\n':
-    case L'\r':
-    case L'|':
-    case L'~':
-        return CharTypes::Commit;
-    }
-
-    if (c >= 32 && c <= 64) {
-        // ' ' to '@'
-        return CharTypes::Commit;
-    }
-    if (c >= 91 && c <= 96) {
-        return CharTypes::Commit;
-    }
-
     return CharTypes::Uncategorized;
 }
 
@@ -835,7 +814,8 @@ bool TelexEngine::CheckInvariants() const {
         return false;
     }
     if (!_keyBuffer.size()) {
-        if (_state != TelexStates::Valid && _state != TelexStates::Committed)
+        if (_state != TelexStates::Valid && _state != TelexStates::Committed && _state != TelexStates::CommittedInvalid)
+            // CommittedInvalid might be caused by Cancel()
             return false;
         if (_c1.size() || _v.size() || _c2.size())
             return false;

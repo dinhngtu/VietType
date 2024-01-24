@@ -13,16 +13,24 @@ namespace UnitTests {
 
 class MultiConfigTester {
 public:
-    MultiConfigTester(const TelexConfig& config, int optimizeMultilangMin = 0, int optimizeMultilangMax = 3)
-        : _config(config), _omMin(optimizeMultilangMin), _omMax(optimizeMultilangMax) {
+    MultiConfigTester(
+        const TelexConfig& config,
+        int optimizeMultilangMin = 0,
+        int optimizeMultilangMax = 3,
+        bool testAutocorrect = true)
+        : _config(config), _omMin(optimizeMultilangMin), _omMax(optimizeMultilangMax), _ac(testAutocorrect) {
     }
 
     void Invoke(std::function<void(TelexEngine&)> f) const {
         for (int level = _omMin; level <= _omMax; level++) {
-            auto config = _config;
-            config.optimize_multilang = level;
-            TelexEngine e(config);
-            f(e);
+            for (int autocorrect = _ac ? 0 : 1; autocorrect <= 1; autocorrect++) {
+                auto config = _config;
+                config.optimize_multilang = level;
+                if (_ac)
+                    config.autocorrect = !!autocorrect;
+                TelexEngine e(config);
+                f(e);
+            }
         }
     }
 
@@ -30,6 +38,7 @@ private:
     TelexConfig _config;
     int _omMin;
     int _omMax;
+    bool _ac;
 };
 
 TEST_CLASS (TestTelex) {
@@ -747,7 +756,7 @@ public:
     }
 
     TEST_METHOD (TestBackconversionDdCtrlW) {
-        MultiConfigTester(config).Invoke([](auto& e) {
+        MultiConfigTester(config, 0, 3, false).Invoke([](auto& e) {
             AssertTelexStatesEqual(TelexStates::BackconvertFailed, e.Backconvert(L"\x111w"));
             e.Backspace();
             AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
@@ -926,7 +935,7 @@ public:
     TEST_METHOD (TestAutocorrectHwuogn) {
         auto config1 = config;
         config1.autocorrect = true;
-        MultiConfigTester(config1, 0, 1).Invoke([](auto& e) {
+        MultiConfigTester(config1, 0, 3, false).Invoke([](auto& e) {
             FeedWord(e, L"hwuogn");
             AssertTelexStatesEqual(TelexStates::Committed, e.Commit());
             Assert::AreEqual(L"h\x1b0\x1a1ng", e.Retrieve().c_str());
