@@ -668,6 +668,17 @@ public:
         });
     }
 
+    TEST_METHOD (TestBackspaceAssi) {
+        auto config1 = config;
+        config1.backspaced_word_stays_invalid = false;
+        MultiConfigTester(config1).Invoke([](auto& e) {
+            FeedWord(e, L"asssi");
+            Assert::AreEqual(L"assi", e.Peek().c_str());
+            e.Backspace();
+            Assert::AreEqual(L"ass", e.Peek().c_str());
+        });
+    }
+
     // test tone and w movements
 
     TEST_METHOD (TestBackspaceCuwsoc) {

@@ -455,7 +455,9 @@ TelexStates TelexEngine::Backspace() {
             _state = TelexStates::Invalid;
         }
         for (size_t i = 0; i < buf.size(); i++)
-            if (!(rp[i] & ResposDoubleUndo))
+            if (!_config.backspaced_word_stays_invalid || !(rp[i] & ResposDoubleUndo))
+                // if backspaced_word_stays_invalid=1, we need to push all chars in order to reproduce the
+                // ResposDoubleUndo, thus the check
                 PushChar(buf[i]);
         assert(CheckInvariantsBackspace(prevState));
         return _state;
