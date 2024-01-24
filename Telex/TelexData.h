@@ -56,6 +56,9 @@ MAKE_SORTED_MAP(
     P(L"\xf4o", L"oo"),            // only for 'xoong', etc.
     P(L"\x1b0o", L"\x1b0\x1a1"),   // relaxed transformations
 );
+static_assert(std::all_of(transitions.begin(), transitions.end(), [](const auto& x) {
+    return x.second.length() <= x.first.length();
+}));
 
 MAKE_SORTED_MAP(
     WConStr,
@@ -82,6 +85,7 @@ MAKE_SORTED_MAP(
     P1(L"\x1b0\x1a1i", 0), //
     P1(L"\x1b0\x1a1u", 0), //
 );
+static_assert(std::all_of(respos.begin(), respos.end(), [](const auto& x) { return x.second <= x.first.length(); }));
 
 MAKE_SORTED_MAP(
     WConStr,
@@ -102,6 +106,9 @@ MAKE_SORTED_MAP(
     // identical transitions are ignored if the last "w" is typed immediately after V without repeating (e.g. "uwow")
     P(L"\x1b0\x1a1", L"\x1b0\x1a1"), //
 );
+static_assert(std::all_of(transitions_w.begin(), transitions_w.end(), [](const auto& x) {
+    return x.second.length() == x.first.length();
+}));
 
 MAKE_MAP(
     WConStr,
@@ -113,6 +120,9 @@ MAKE_MAP(
     P(L"uoi", L"u\x1a1i"),
     P(L"\x1b0\x1a1", L"\x1b0\x1a1"), //
 );
+static_assert(std::all_of(transitions_w_q.begin(), transitions_w_q.end(), [](const auto& x) {
+    return x.second.length() == x.first.length();
+}));
 
 MAKE_SORTED_MAP(
     WConStr,
@@ -129,6 +139,9 @@ MAKE_SORTED_MAP(
     P1(L"\x1b0\x1a1", 1),  //
     P1(L"\x1b0\x1a1i", 1), //
 );
+static_assert(std::all_of(respos_w.begin(), respos_w.end(), [](const auto& x) {
+    return x.second <= x.first.length();
+}));
 
 MAKE_MAP(
     WConStr,
@@ -140,8 +153,14 @@ MAKE_MAP(
       L"u\x103"),                //
     P(L"\x1b0o", L"\x1b0\x1a1"), //
 );
+static_assert(std::all_of(transitions_v_c2.begin(), transitions_v_c2.end(), [](const auto& x) {
+    return x.second.length() == x.first.length();
+}));
 
 MAKE_MAP(WConStr, WConStr, transitions_v_c2_q, P(L"\x1b0o", L"\x1b0\x1a1"));
+static_assert(std::all_of(transitions_v_c2_q.begin(), transitions_v_c2_q.end(), [](const auto& x) {
+    return x.second.length() == x.first.length();
+}));
 
 MAKE_SORTED_MAP(
     wchar_t,
@@ -160,6 +179,9 @@ MAKE_SORTED_MAP(
     P2(L'\x1a1', L"\x1a1\x1edd\x1ee3\x1edf\x1edb\x1ee1"), //
     P2(L'\x1b0', L"\x1b0\x1eeb\x1ef1\x1eed\x1ee9\x1eef"), //
 );
+static_assert(std::all_of(transitions_tones.begin(), transitions_tones.end(), [](const auto& x) {
+    return x.second.length() == transitions_tones[0].second.length();
+}));
 
 MAKE_SORTED_SET(
     WConStr,
@@ -259,6 +281,9 @@ MAKE_SORTED_MAP(
     P1(L"\x1b0\x1a1i", VI(1, C2Mode::NoC2)),  // ươi
     P1(L"\x1b0\x1a1u", VI(1, C2Mode::NoC2)),  // ươu
 );
+static_assert(std::all_of(valid_v.begin(), valid_v.end(), [](const auto& x) {
+    return x.second.tonepos <= x.first.length();
+}));
 
 MAKE_SORTED_MAP(
     WConStr,
@@ -285,6 +310,9 @@ MAKE_SORTED_MAP(
     P1(L"u\x1a1i", VI(1, C2Mode::NoC2)),      // uơi
     P1(L"\x1b0\x1a1", VI(1, C2Mode::MustC2)), // ươ
 );
+static_assert(std::all_of(valid_v_q.begin(), valid_v_q.end(), [](const auto& x) {
+    return x.second.tonepos <= x.first.length();
+}));
 
 MAKE_SORTED_MAP(
     WConStr,
@@ -319,6 +347,9 @@ MAKE_SORTED_MAP(
     P1(L"\x1b0\x61", VI(0, C2Mode::NoC2)),    // ưa
     P1(L"\x1b0\x1a1", VI(1, C2Mode::MustC2)), // ươ
 );
+static_assert(std::all_of(valid_v_gi.begin(), valid_v_gi.end(), [](const auto& x) {
+    return x.second.tonepos <= static_cast<int>(x.first.length());
+}));
 
 // bool is whether tones are restricted to s/j or not
 MAKE_SORTED_MAP(
@@ -345,6 +376,9 @@ MAKE_MAP(
     P1(L"oe", VI(0, C2Mode::Either)), //
     P1(L"uy", VI(0, C2Mode::Either)), //
 );
+static_assert(std::all_of(valid_v_oa_uy.begin(), valid_v_oa_uy.end(), [](const auto& x) {
+    return x.second.tonepos <= x.first.length();
+}));
 
 MAKE_SORTED_MAP(
     wchar_t,
