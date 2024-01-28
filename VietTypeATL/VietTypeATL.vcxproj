@@ -251,7 +251,6 @@
     <ClCompile Include="KeyHandler.cpp" />
     <ClCompile Include="KeyTranslator.cpp" />
     <ClCompile Include="LanguageBarButton.cpp" />
-    <ClCompile Include="LanguageBarHandlers.cpp" />
     <ClCompile Include="Register.cpp" />
     <ClCompile Include="SettingsStore.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -286,7 +285,6 @@
     <ClInclude Include="KeyHandler.h" />
     <ClInclude Include="KeyTranslator.h" />
     <ClInclude Include="LanguageBarButton.h" />
-    <ClInclude Include="LanguageBarHandlers.h" />
     <ClInclude Include="SettingsStore.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SinkAdvisor.h" />

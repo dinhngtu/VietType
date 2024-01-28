@@ -58,9 +58,6 @@
     <ClCompile Include="LanguageBarButton.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="LanguageBarHandlers.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="VirtualDocument.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -139,9 +136,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="LanguageBarButton.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="LanguageBarHandlers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VirtualDocument.h">

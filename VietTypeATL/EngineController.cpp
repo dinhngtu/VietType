@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 #include "EngineController.h"
-#include "LanguageBarHandlers.h"
 #include "CompositionManager.h"
 #include "EditSessions.h"
 #include "Compartment.h"
@@ -187,8 +186,8 @@ HRESULT EngineController::UpdateStates(bool foreground) {
 _Check_return_ HRESULT EngineController::InitLanguageBar() {
     HRESULT hr;
 
-    _indicatorButton = std::make_unique<RefreshableButton>();
-    hr = _indicatorButton->Initialize(
+    hr = CreateInitialize(
+        &_indicatorButton,
         this,
         _langBarItemMgr,
         Globals::GUID_LBI_INPUTMODE,
@@ -197,8 +196,8 @@ _Check_return_ HRESULT EngineController::InitLanguageBar() {
         Globals::TextServiceDescription);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_indicatorButton->Initialize failed");
 
-    _langBarButton = std::make_unique<RefreshableButton>();
-    hr = _langBarButton->Initialize(
+    hr = CreateInitialize(
+        &_langBarButton,
         this,
         _langBarItemMgr,
         GUID_LanguageBarButton_Item,
@@ -212,10 +211,10 @@ _Check_return_ HRESULT EngineController::InitLanguageBar() {
 
 HRESULT EngineController::UninitLanguageBar() {
     _langBarButton->Uninitialize();
-    _langBarButton.reset();
+    _langBarButton.Release();
 
     _indicatorButton->Uninitialize();
-    _indicatorButton.reset();
+    _indicatorButton.Release();
 
     return S_OK;
 }

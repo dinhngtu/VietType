@@ -8,6 +8,7 @@
 #include "Telex.h"
 #include "Compartment.h"
 #include "SettingsStore.h"
+#include "LanguageBarButton.h"
 
 namespace VietType {
 
@@ -73,9 +74,8 @@ private:
 
     CComPtr<CachedCompartmentSetting<long>> _enabled;
 
-    // unique_ptr is not necessary but used just to break include cycle
-    std::unique_ptr<RefreshableButton> _indicatorButton;
-    std::unique_ptr<RefreshableButton> _langBarButton;
+    CComPtr<LanguageBarButton> _indicatorButton;
+    CComPtr<LanguageBarButton> _langBarButton;
 
     CComPtr<EngineSettingsController> _settings;
     // cached settings

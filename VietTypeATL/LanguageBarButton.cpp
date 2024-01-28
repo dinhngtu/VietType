@@ -2,8 +2,25 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 #include "LanguageBarButton.h"
+#include "EngineController.h"
 
 namespace VietType {
+
+static DWORD GetSystemLightTheme() {
+    CRegKey key;
+    DWORD light = 0;
+    LSTATUS err = key.Open(
+        HKEY_CURRENT_USER, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", KEY_QUERY_VALUE);
+    if (err == ERROR_SUCCESS) {
+        err = key.QueryDWORDValue(L"SystemUsesLightTheme", light);
+        if (err != ERROR_SUCCESS) {
+            light = 0;
+        }
+    } else {
+        light = 0;
+    }
+    return light;
+}
 
 // just a random number to identify the sink
 static const DWORD LanguageBarButtonCookie = 0x5a6fdd5e;
@@ -56,7 +73,7 @@ STDMETHODIMP LanguageBarButton::GetInfo(__RPC__out TF_LANGBARITEMINFO* pInfo) {
 }
 
 STDMETHODIMP LanguageBarButton::GetStatus(__RPC__out DWORD* pdwStatus) {
-    *pdwStatus = _callbacks->GetStatus();
+    *pdwStatus = 0;
     return S_OK;
 }
 
@@ -65,45 +82,54 @@ STDMETHODIMP LanguageBarButton::Show(_In_ BOOL fShow) {
 }
 
 STDMETHODIMP LanguageBarButton::OnClick(_In_ TfLBIClick click, _In_ POINT pt, __RPC__in const RECT* prcArea) {
-    if (_callbacks) {
-        return _callbacks->OnClick(click, pt, prcArea);
-    } else {
-        return E_FAIL;
+    if (click == TF_LBI_CLK_LEFT) {
+        return _controller->ToggleUserEnabled();
     }
+    return S_OK;
 }
 
 STDMETHODIMP LanguageBarButton::InitMenu(__RPC__in_opt ITfMenu* pMenu) {
     if (!pMenu) {
         return E_INVALIDARG;
     }
-    if (_callbacks) {
-        return _callbacks->InitMenu(pMenu);
-    } else {
-        return E_FAIL;
-    }
+    return S_OK;
 }
 
 STDMETHODIMP LanguageBarButton::OnMenuSelect(_In_ UINT wID) {
-    if (_callbacks) {
-        return _callbacks->OnMenuSelect(wID);
-    } else {
-        return E_FAIL;
-    }
+    return S_OK;
 }
 
 STDMETHODIMP LanguageBarButton::GetIcon(__RPC__deref_out_opt HICON* phIcon) {
-    if (_callbacks) {
-        return _callbacks->GetIcon(phIcon);
-    } else {
+    // Windows docs is a liar, icons are mandatory
+    if (!Globals::DllInstance) {
+        DBG_DPRINT(L"%s", L"cannot obtain instance");
         return E_FAIL;
     }
+
+    DWORD light = GetSystemLightTheme();
+    auto old = SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+    auto dpi = GetDpiForSystem();
+    int iconx = GetSystemMetricsForDpi(SM_CXSMICON, dpi);
+    int icony = GetSystemMetricsForDpi(SM_CYSMICON, dpi);
+    SetThreadDpiAwarenessContext(old);
+    if (_controller->GetBlocked() == EngineController::BlockedKind::Blocked) {
+        *phIcon = static_cast<HICON>(LoadImage(
+            Globals::DllInstance, MAKEINTRESOURCE(light ? IDI_ICONXL : IDI_ICONXD), IMAGE_ICON, iconx, icony, 0));
+    } else if (_controller->IsEnabled()) {
+        *phIcon = static_cast<HICON>(LoadImage(
+            Globals::DllInstance, MAKEINTRESOURCE(light ? IDI_ICONVL : IDI_ICONVD), IMAGE_ICON, iconx, icony, 0));
+    } else {
+        *phIcon = static_cast<HICON>(LoadImage(
+            Globals::DllInstance, MAKEINTRESOURCE(light ? IDI_ICONEL : IDI_ICONED), IMAGE_ICON, iconx, icony, 0));
+    }
+    return *phIcon ? S_OK : E_FAIL;
 }
 
 STDMETHODIMP LanguageBarButton::GetText(__RPC__deref_out_opt BSTR* pbstrText) {
     if (!pbstrText) {
         return E_INVALIDARG;
     }
-    *pbstrText = SysAllocString(_callbacks->GetText().c_str());
+    *pbstrText = SysAllocString(_controller->IsEnabled() ? L"VIE" : L"ENG");
     return *pbstrText ? S_OK : E_OUTOFMEMORY;
 }
 
@@ -111,21 +137,43 @@ STDMETHODIMP LanguageBarButton::GetTooltipString(__RPC__deref_out_opt BSTR* pbst
     if (!pbstrText) {
         return E_INVALIDARG;
     }
-    *pbstrText = SysAllocString(_callbacks->GetTooltipString().c_str());
+    const wchar_t* status = L"";
+    if (_controller->GetBlocked() == EngineController::BlockedKind::Blocked) {
+        status = L"Paused";
+    } else {
+        status = _controller->IsEnabled() ? L"Vietnamese" : L"English";
+    }
+    *pbstrText = SysAllocString(status);
     return *pbstrText ? S_OK : E_OUTOFMEMORY;
 }
 
 _Check_return_ HRESULT LanguageBarButton::Initialize(
+    _In_ EngineController* ec,
+    _In_ ITfLangBarItemMgr* langBarItemMgr,
     _In_ const GUID& guidItem,
     _In_ DWORD style,
     _In_ ULONG sort,
-    _In_ const std::wstring& description,
-    _In_ ILanguageBarCallbacks* callbacks) {
+    _In_ const std::wstring& description) {
+    HRESULT hr;
+
+    _controller = ec;
+    _langBarItemMgr = langBarItemMgr;
     _guidItem = guidItem;
     _style = style;
     _sort = sort;
     _description = description;
-    _callbacks = callbacks;
+
+    hr = _langBarItemMgr->AddItem(this);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_langBarItemMgr->AddItem failed");
+
+    return S_OK;
+}
+
+HRESULT LanguageBarButton::Uninitialize() {
+    HRESULT hr;
+    hr = _langBarItemMgr->RemoveItem(this);
+    DBG_HRESULT_CHECK(hr, L"%s", L"langBarItemMgr->RemoveItem failed");
+    _langBarItemMgr.Release();
     return S_OK;
 }
 
@@ -138,9 +186,8 @@ HRESULT LanguageBarButton::NotifyUpdate(_In_ DWORD flags) {
     return S_OK;
 }
 
-HRESULT LanguageBarButton::Uninitialize() {
-    _callbacks = nullptr;
-    return S_OK;
+HRESULT LanguageBarButton::Refresh() {
+    return NotifyUpdate(TF_LBI_ICON | TF_LBI_TEXT | TF_LBI_TOOLTIP);
 }
 
 } // namespace VietType

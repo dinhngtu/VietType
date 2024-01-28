@@ -7,16 +7,7 @@
 
 namespace VietType {
 
-class ILanguageBarCallbacks {
-public:
-    virtual HRESULT OnClick(_In_ TfLBIClick click, _In_ POINT pt, __RPC__in const RECT* prcArea) = 0;
-    virtual HRESULT InitMenu(__RPC__in_opt ITfMenu* menu) = 0;
-    virtual HRESULT OnMenuSelect(_In_ UINT id) = 0;
-    virtual HRESULT GetIcon(__RPC__deref_out_opt HICON* hicon) = 0;
-    virtual DWORD GetStatus() = 0;
-    virtual std::wstring GetText() = 0;
-    virtual std::wstring GetTooltipString() = 0;
-};
+class EngineController;
 
 class LanguageBarButton : public CComObjectRootEx<CComSingleThreadModel>,
                           public ITfSource,
@@ -53,21 +44,25 @@ public:
     virtual STDMETHODIMP GetText(__RPC__deref_out_opt BSTR* pbstrText) override;
 
     _Check_return_ HRESULT Initialize(
+        _In_ EngineController* ec,
+        _In_ ITfLangBarItemMgr* langBarItemMgr,
         _In_ const GUID& guidItem,
         _In_ DWORD style,
         _In_ ULONG sort,
-        _In_ const std::wstring& description,
-        _In_ ILanguageBarCallbacks* callbacks);
-    HRESULT NotifyUpdate(_In_ DWORD flags);
+        _In_ const std::wstring& description);
     HRESULT Uninitialize();
+
+    HRESULT NotifyUpdate(_In_ DWORD flags);
+    HRESULT Refresh();
 
 private:
     GUID _guidItem = {0};
     DWORD _style = 0;
     ULONG _sort = 0;
     std::wstring _description;
-    ILanguageBarCallbacks* _callbacks = nullptr;
 
+    EngineController* _controller = nullptr;
+    CComPtr<ITfLangBarItemMgr> _langBarItemMgr;
     CComPtr<ITfLangBarItemSink> _itemSink;
 };
 
