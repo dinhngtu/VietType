@@ -36,7 +36,7 @@ EngineController::Initialize(_In_ Telex::TelexEngine* engine, _In_ ITfThreadMgr*
 
     // GUID_SettingsCompartment_Toggle is global
     hr = CreateInitialize(
-        &_enabled, threadMgr, clientid, GUID_SettingsCompartment_Toggle, true, [this] { return UpdateStates(); });
+        &_enabled, threadMgr, clientid, GUID_SettingsCompartment_Toggle, true, [this] { return UpdateStates(false); });
     HRESULT_CHECK_RETURN(hr, L"%s", L"_enabled->Initialize failed");
 #ifdef _DEBUG
     long dbgEnabled = 0;
@@ -115,7 +115,7 @@ HRESULT EngineController::ToggleUserEnabled() {
     DBG_DPRINT(L"toggling enabled from %ld", enabled);
     hr = _enabled->SetValue(enabled == 0 ? -1 : 0);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_enabled->SetValue failed");
-    hr = UpdateStates();
+    hr = UpdateStates(true);
     HRESULT_CHECK_RETURN(hr, L"%s", L"UpdateEnabled failed");
 
     return S_OK;
@@ -134,14 +134,14 @@ EngineController::BlockedKind EngineController::GetBlocked() const {
 
 void EngineController::SetBlocked(_In_ EngineController::BlockedKind blocked) {
     _blocked = blocked;
-    UpdateStates();
+    UpdateStates(false);
 }
 
 EngineSettingsController* EngineController::GetSettings() const {
     return _settings;
 }
 
-HRESULT EngineController::UpdateStates() {
+HRESULT EngineController::UpdateStates(bool foreground) {
     HRESULT hr;
 
     DBG_DPRINT(L"%s", L"called");
@@ -156,13 +156,15 @@ HRESULT EngineController::UpdateStates() {
 
     DBG_DPRINT(L"enabled = %ld, blocked = %d", enabled, static_cast<int>(_blocked));
 
-    _settings->IsDefaultEnabled(&_defaultEnabled);
-    _settings->IsBackconvertOnBackspace(&_backconvertOnBackspace);
+    if (foreground) {
+        _settings->IsDefaultEnabled(&_defaultEnabled);
+        _settings->IsBackconvertOnBackspace(&_backconvertOnBackspace);
 
-    Telex::TelexConfig cfg = GetEngine().GetConfig();
-    hr = _settings->LoadTelexSettings(cfg);
-    DBG_HRESULT_CHECK(hr, L"%s", L"_settings->LoadSettings failed") else {
-        GetEngine().SetConfig(cfg);
+        Telex::TelexConfig cfg = GetEngine().GetConfig();
+        hr = _settings->LoadTelexSettings(cfg);
+        DBG_HRESULT_CHECK(hr, L"%s", L"_settings->LoadSettings failed") else {
+            GetEngine().SetConfig(cfg);
+        }
     }
 
     hr = _indicatorButton->Refresh();

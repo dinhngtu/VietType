@@ -57,7 +57,7 @@ public:
     EngineSettingsController* GetSettings() const;
 
     // update engine and langbar enabled state to match enabled/blocked value
-    HRESULT UpdateStates();
+    HRESULT UpdateStates(bool foreground);
 
 private:
     _Check_return_ HRESULT InitLanguageBar();
