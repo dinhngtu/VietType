@@ -8,6 +8,7 @@ using System.ComponentModel;
 namespace VietTypeConfig {
     internal class Settings : INotifyPropertyChanged {
         public const string Subkey = "Software\\VietType";
+        private static readonly Guid GUID_SystemNotifyCompartment = Guid.Parse("{B2FBD2E7-922F-4996-BE77-21085B91A8F0}");
         private static readonly Guid CLSID_TF_ThreadMgr = Guid.Parse("{529a9e6b-6587-4f23-ab9e-9c7d683e3c50}");
         private static readonly Guid CLSID_TextService = Guid.Parse("{c0dd01a1-0deb-454b-8b42-d22ced1b4b23}");
         private static readonly Guid GUID_Profile = Guid.Parse("{8D93D10A-203B-4C5F-A122-8898EF9C56F5}");
@@ -148,6 +149,20 @@ namespace VietTypeConfig {
                 regKey.SetValue(nameof(backconvert_on_backspace), settings.BackconvertOnBackspace ? 1 : 0);
                 regKey.SetValue(nameof(optimize_multilang), settings.OptimizeMultilang);
                 regKey.SetValue(nameof(autocorrect), settings.Autocorrect ? 1 : 0);
+
+                var threadMgr = Activator.CreateInstance(Type.GetTypeFromCLSID(CLSID_TF_ThreadMgr, true)) as ITfThreadMgr;
+                if (threadMgr.Activate(out uint tid) >= 0) {
+                    try {
+                        if (threadMgr.GetGlobalCompartment(out ITfCompartmentMgr globalMgr) >= 0 &&
+                            globalMgr.GetCompartment(GUID_SystemNotifyCompartment, out ITfCompartment globalCompartment) >= 0) {
+                            if (globalCompartment.GetValue(out object oldGlobal) >= 0) {
+                                globalCompartment.SetValue(tid, unchecked((oldGlobal as int? ?? 0) + 1));
+                            }
+                        }
+                    } finally {
+                        threadMgr.Deactivate();
+                    }
+                }
             }
         }
 

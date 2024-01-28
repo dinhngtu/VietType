@@ -91,6 +91,58 @@ protected:
     callback_type _callback = [] { return S_OK; };
 };
 
+class CompartmentNotifier : public CComObjectRootEx<CComSingleThreadModel>, public NotifiedSetting<long> {
+public:
+    DECLARE_NO_REGISTRY()
+    DECLARE_NOT_AGGREGATABLE(CompartmentNotifier)
+    BEGIN_COM_MAP(CompartmentNotifier)
+    COM_INTERFACE_ENTRY(ITfCompartmentEventSink)
+    END_COM_MAP()
+    DECLARE_PROTECT_FINAL_CONSTRUCT()
+
+    // Inherited via Setting
+    virtual _Check_return_ HRESULT GetValue(_Out_ long* val) override {
+        return _compartment.GetValue(val);
+    }
+    virtual _Check_return_ HRESULT GetValueOrWriteback(_Out_ long* val, const long& defaultValue) override {
+        return _compartment.GetValueOrWriteback(val, defaultValue);
+    }
+    virtual HRESULT SetValue(const long& val) override {
+        return _compartment.SetValue(val);
+    }
+    HRESULT Increment() {
+        long val;
+        HRESULT hr = GetValueOrWriteback(&val, 0);
+        if (SUCCEEDED(hr)) {
+            return SetValue(static_cast<unsigned long>(val) + 1);
+        } else {
+            return hr;
+        }
+    }
+
+    _Check_return_ HRESULT Initialize(
+        _In_ IUnknown* punk,
+        _In_ TfClientId clientid,
+        _In_ const GUID& guidCompartment,
+        _In_ bool global = false,
+        _In_ NotifiedSetting<long>::callback_type callback = [] { return S_OK; }) {
+
+        _guidCompartment = guidCompartment;
+        _callback = callback;
+
+        return SettingsStore::InitializeSink(
+            punk, clientid, guidCompartment, _compartment, _compartmentEventSink, this, global);
+    }
+
+    HRESULT Uninitialize() {
+        return SettingsStore::UninitializeSink(_compartment, _compartmentEventSink);
+    }
+
+private:
+    Compartment<long> _compartment;
+    SinkAdvisor<ITfCompartmentEventSink> _compartmentEventSink;
+};
+
 template <typename T>
 class CachedCompartmentSetting : public CComObjectRootEx<CComSingleThreadModel>, public NotifiedSetting<T> {
 public:

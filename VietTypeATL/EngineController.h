@@ -81,6 +81,7 @@ private:
     // cached settings
     DWORD _defaultEnabled = 0;
     DWORD _backconvertOnBackspace = 0;
+    CComPtr<CompartmentNotifier> _systemNotify;
 
     BlockedKind _blocked = BlockedKind::Free;
 };
