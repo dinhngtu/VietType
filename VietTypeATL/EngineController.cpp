@@ -16,14 +16,6 @@ static const GUID GUID_SettingsCompartment_Toggle = {
 // {CCA3D390-EF1A-4DE4-B2FF-B6BC76D68C3B}
 static const GUID GUID_LanguageBarButton_Item = {
     0xcca3d390, 0xef1a, 0x4de4, {0xb2, 0xff, 0xb6, 0xbc, 0x76, 0xd6, 0x8c, 0x3b}};
-// {B2FBD2E7-922F-4996-BE77-21085B91A8F0}
-static const GUID GUID_SystemNotifyCompartment = {
-    0xb2fbd2e7, 0x922f, 0x4996, {0xbe, 0x77, 0x21, 0x8, 0x5b, 0x91, 0xa8, 0xf0}};
-
-STDMETHODIMP EngineController::OnChange(__RPC__in REFGUID rguid) {
-    UpdateStates();
-    return S_OK;
-}
 
 _Check_return_ HRESULT
 EngineController::Initialize(_In_ Telex::TelexEngine* engine, _In_ ITfThreadMgr* threadMgr, _In_ TfClientId clientid) {
@@ -39,9 +31,6 @@ EngineController::Initialize(_In_ Telex::TelexEngine* engine, _In_ ITfThreadMgr*
     // init settings compartment & listener
     hr = CreateInitialize(&_settings, this, threadMgr, clientid);
     HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(_settings) failed");
-    hr = CreateInitialize(
-        &_systemNotify, threadMgr, clientid, GUID_SystemNotifyCompartment, true, [this] { return UpdateStates(); });
-    DBG_HRESULT_CHECK(hr, L"%s", L"_systemNotify->Initialize failed");
     // must cache defaultEnabled early since it's used right away
     _settings->IsDefaultEnabled(&_defaultEnabled);
 
@@ -70,9 +59,6 @@ HRESULT EngineController::Uninitialize() {
     DBG_HRESULT_CHECK(hr, L"%s", L"_enabled->Uninitialize failed");
     _enabled.Release();
 
-    hr = _systemNotify->Uninitialize();
-    DBG_HRESULT_CHECK(hr, L"%s", L"_systemNotify->Uninitialize failed");
-    _systemNotify.Release();
     hr = _settings->Uninitialize();
     DBG_HRESULT_CHECK(hr, L"%s", L"_settings->Uninitialize failed");
     _settings.Release();

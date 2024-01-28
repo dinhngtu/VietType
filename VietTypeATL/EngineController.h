@@ -17,7 +17,7 @@ class EngineController;
 class SettingsDialog;
 class EngineSettingsController;
 
-class EngineController : public CComObjectRootEx<CComSingleThreadModel>, public ITfCompartmentEventSink {
+class EngineController : public CComObjectRootEx<CComSingleThreadModel> {
 public:
     enum class BlockedKind {
         // don't change enable setting
@@ -34,12 +34,8 @@ public:
     DECLARE_NO_REGISTRY()
     DECLARE_NOT_AGGREGATABLE(EngineController)
     BEGIN_COM_MAP(EngineController)
-    COM_INTERFACE_ENTRY(ITfCompartmentEventSink)
     END_COM_MAP()
     DECLARE_PROTECT_FINAL_CONSTRUCT()
-
-    // Inherited via ITfCompartmentEventSink
-    virtual STDMETHODIMP OnChange(__RPC__in REFGUID rguid) override;
 
     _Check_return_ HRESULT
     Initialize(_In_ Telex::TelexEngine* engine, _In_ ITfThreadMgr* threadMgr, _In_ TfClientId clientid);
@@ -85,7 +81,6 @@ private:
     // cached settings
     DWORD _defaultEnabled = 0;
     DWORD _backconvertOnBackspace = 0;
-    CComPtr<CompartmentNotifier> _systemNotify;
 
     BlockedKind _blocked = BlockedKind::Free;
 };
