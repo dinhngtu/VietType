@@ -31,28 +31,14 @@ public:
 
     HRESULT LoadTelexSettings(Telex::TelexConfig& cfg);
 
-    void IsDefaultEnabled(_Out_ DWORD* pde) const;
-    void IsBackconvertOnBackspace(_Out_ DWORD* pde) const;
-    void GetPreservedKeyToggle(_Out_ TF_PRESERVEDKEY* pde) const;
-    void IsShowingComposingAttr(_Out_ DWORD* pde) const;
+    void IsDefaultEnabled(_Out_ DWORD* pde);
+    void IsBackconvertOnBackspace(_Out_ DWORD* pde);
+    void GetPreservedKeyToggle(_Out_ TF_PRESERVEDKEY* pde);
+    void IsShowingComposingAttr(_Out_ DWORD* pde);
 
 private:
     EngineController* _ec = nullptr;
-
-    // system settings
-
-    CComPtr<RegistrySetting<DWORD>> _default_enabled;
-    CComPtr<RegistrySetting<DWORD>> _backconvert_on_backspace;
-    CComPtr<RegistrySetting<ULONGLONG>> _pk_toggle;
-    CComPtr<RegistrySetting<DWORD>> _show_composing_attr;
-
-    // telex settings
-
-    CComPtr<RegistrySetting<DWORD>> _tc_oa_uy_tone1;
-    CComPtr<RegistrySetting<DWORD>> _tc_accept_dd;
-    CComPtr<RegistrySetting<DWORD>> _tc_backspace_invalid;
-    CComPtr<RegistrySetting<DWORD>> _tc_optimize_multilang;
-    CComPtr<RegistrySetting<DWORD>> _tc_autocorrect;
+    CRegKey _settingsKey;
 };
 
 } // namespace VietType
