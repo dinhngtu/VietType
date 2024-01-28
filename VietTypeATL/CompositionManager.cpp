@@ -28,7 +28,7 @@ STDMETHODIMP CompositionManager::OnCompositionTerminated(
 }
 
 _Check_return_ HRESULT CompositionManager::Initialize(
-    _In_ TfClientId clientid, _In_ ITfDisplayAttributeInfo* composingAttribute, _In_ bool comless) {
+    _In_ TfClientId clientid, _In_opt_ ITfDisplayAttributeInfo* composingAttribute, _In_ bool comless) {
     HRESULT hr;
 
     _clientid = clientid;
@@ -44,7 +44,9 @@ _Check_return_ HRESULT CompositionManager::Initialize(
 
 HRESULT CompositionManager::Uninitialize() {
     _categoryMgr.Release();
-    _composingAttribute.Release();
+    if (_composingAttribute) {
+        _composingAttribute.Release();
+    }
     return S_OK;
 }
 
@@ -187,8 +189,10 @@ HRESULT CompositionManager::EndCompositionNow(_In_ TfEditCookie ec) {
         hr = _composition->GetRange(&range);
         HRESULT_CHECK_RETURN(hr, L"%s", L"_composition->GetRange failed");
 
-        hr = ClearRangeDisplayAttribute(ec, _context, range);
-        HRESULT_CHECK_RETURN(hr, L"%s", L"ClearRangeDisplayAttribute failed");
+        if (_composingAttribute) {
+            hr = ClearRangeDisplayAttribute(ec, _context, range);
+            HRESULT_CHECK_RETURN(hr, L"%s", L"ClearRangeDisplayAttribute failed");
+        }
 
         hr = MoveCaretToEnd(ec);
         DBG_HRESULT_CHECK(hr, L"%s", L"MoveCaretToEnd failed");
@@ -214,8 +218,10 @@ HRESULT CompositionManager::SetCompositionText(_In_ TfEditCookie ec, _In_z_ LPCW
         hr = range->SetText(ec, TF_ST_CORRECTION, str, length);
         HRESULT_CHECK_RETURN(hr, L"%s", L"range->SetText failed");
 
-        hr = SetRangeDisplayAttribute(ec, _context, range, _composingAttribute);
-        HRESULT_CHECK_RETURN(hr, L"%s", L"SetRangeDisplayAttribute failed");
+        if (_composingAttribute) {
+            hr = SetRangeDisplayAttribute(ec, _context, range, _composingAttribute);
+            HRESULT_CHECK_RETURN(hr, L"%s", L"SetRangeDisplayAttribute failed");
+        }
 
         hr = MoveCaretToEnd(ec);
         DBG_HRESULT_CHECK(hr, L"%s", L"MoveCaretToEnd failed");

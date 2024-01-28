@@ -27,7 +27,7 @@ public:
         _In_ TfEditCookie ecWrite, __RPC__in_opt ITfComposition* pComposition) override;
 
     _Check_return_ HRESULT
-    Initialize(_In_ TfClientId clientid, _In_ ITfDisplayAttributeInfo* composingAttribute, _In_ bool comless);
+    Initialize(_In_ TfClientId clientid, _In_opt_ ITfDisplayAttributeInfo* composingAttribute, _In_ bool comless);
     HRESULT Uninitialize();
 
     HRESULT RequestEditSession(

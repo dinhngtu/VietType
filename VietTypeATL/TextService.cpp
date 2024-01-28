@@ -64,16 +64,23 @@ STDMETHODIMP TextService::ActivateEx(_In_ ITfThreadMgr* ptim, _In_ TfClientId ti
     HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&_attributeStore) failed");
 
     CComPtr<DisplayAttributeInfo> composingAttrib;
-    hr = CreateInitialize(
-        &composingAttrib,
-        std::get<0>(ComposingAttributeData),
-        std::get<1>(ComposingAttributeData),
-        std::get<2>(ComposingAttributeData));
-    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&attr1) failed");
-    _attributeStore->AddAttribute(composingAttrib);
+    DWORD showComposingAttr;
+    _engineController->GetSettings()->IsShowingComposingAttr(&showComposingAttr);
+    if (showComposingAttr) {
+        hr = CreateInitialize(
+            &composingAttrib,
+            std::get<0>(ComposingAttributeData),
+            std::get<1>(ComposingAttributeData),
+            std::get<2>(ComposingAttributeData));
+        HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&attr1) failed");
+        _attributeStore->AddAttribute(composingAttrib);
+    }
 
     hr = CreateInitialize(
-        &_compositionManager, tid, _attributeStore->GetAttribute(0), static_cast<bool>(dwFlags & TF_TMAE_COMLESS));
+        &_compositionManager,
+        tid,
+        static_cast<ITfDisplayAttributeInfo*>(composingAttrib),
+        static_cast<bool>(dwFlags & TF_TMAE_COMLESS));
     HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(&_compositionManager) failed");
 
     long enabled;

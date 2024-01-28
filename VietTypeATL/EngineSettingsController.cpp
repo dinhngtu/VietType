@@ -45,6 +45,16 @@ _Check_return_ HRESULT EngineSettingsController::Initialize(
     HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(_pk_toggle) failed");
 
     hr = CreateInitialize(
+        &_show_composing_attr,
+        HKEY_CURRENT_USER,
+        Globals::ConfigKeyName.c_str(),
+        L"show_composing_attr",
+        KEY_QUERY_VALUE,
+        threadMgr,
+        clientid);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(_show_composing_attr) failed");
+
+    hr = CreateInitialize(
         &_tc_oa_uy_tone1,
         HKEY_CURRENT_USER,
         Globals::ConfigKeyName.c_str(),
@@ -120,6 +130,10 @@ HRESULT EngineSettingsController::Uninitialize() {
     HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_oa_uy_tone1->Uninitialize failed");
     _tc_oa_uy_tone1.Release();
 
+    hr = _show_composing_attr->Uninitialize();
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_show_composing_attr->Uninitialize failed");
+    _show_composing_attr.Release();
+
     hr = _pk_toggle->Uninitialize();
     HRESULT_CHECK_RETURN(hr, L"%s", L"_pk_toggle->Uninitialize failed");
     _pk_toggle.Release();
@@ -184,6 +198,10 @@ void EngineSettingsController::GetPreservedKeyToggle(_Out_ TF_PRESERVEDKEY* pde)
     } else {
         *pde = PK_Toggle;
     }
+}
+
+void EngineSettingsController::IsShowingComposingAttr(_Out_ DWORD* pde) const {
+    std::ignore = _show_composing_attr->GetValueOrDefault(pde, 1);
 }
 
 } // namespace VietType
