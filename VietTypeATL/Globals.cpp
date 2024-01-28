@@ -25,8 +25,8 @@ const GUID GUID_PROP_INPUTSCOPE = {0x1713dd5a, 0x68e7, 0x4a5b, {0x9a, 0xf6, 0x59
 const GUID GUID_Compartment_Backconvert = {
     0xc36cf93e, 0x2fe6, 0x4132, {0x92, 0xe5, 0x7e, 0x7f, 0xb2, 0x42, 0xd5, 0x6d}};
 
-const std::wstring TextServiceDescription = L"VietType";
-const std::wstring ConfigKeyName = L"Software\\VietType";
+const wchar_t* TextServiceDescription = L"VietType";
+const wchar_t* ConfigKeyName = L"Software\\VietType";
 
 const LANGID TextServiceLangId = MAKELANGID(LANG_VIETNAMESE, SUBLANG_VIETNAMESE_VIETNAM);
 

@@ -49,7 +49,7 @@ public:
         _In_ const GUID& guidItem,
         _In_ DWORD style,
         _In_ ULONG sort,
-        _In_ const std::wstring& description);
+        _In_z_ const wchar_t* description);
     HRESULT Uninitialize();
 
     HRESULT NotifyUpdate(_In_ DWORD flags);
@@ -59,7 +59,7 @@ private:
     GUID _guidItem = {0};
     DWORD _style = 0;
     ULONG _sort = 0;
-    std::wstring _description;
+    const wchar_t* _description;
 
     EngineController* _controller = nullptr;
     CComPtr<ITfLangBarItemMgr> _langBarItemMgr;

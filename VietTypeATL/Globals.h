@@ -18,8 +18,8 @@ extern const GUID GUID_PROP_INPUTSCOPE;
 
 extern const GUID GUID_Compartment_Backconvert;
 
-extern const std::wstring TextServiceDescription;
-extern const std::wstring ConfigKeyName;
+extern const wchar_t* TextServiceDescription;
+extern const wchar_t* ConfigKeyName;
 
 extern const LANGID TextServiceLangId;
 

@@ -11,7 +11,7 @@ static constexpr TF_PRESERVEDKEY PK_Toggle = {VK_OEM_3, TF_MOD_ALT}; // Alt-`
 _Check_return_ HRESULT EngineSettingsController::Initialize(
     _In_ EngineController* ec, _In_ ITfThreadMgr* threadMgr, _In_ TfClientId clientid) {
     _ec = ec;
-    _settingsKey.Open(HKEY_CURRENT_USER, Globals::ConfigKeyName.c_str(), KEY_QUERY_VALUE);
+    _settingsKey.Open(HKEY_CURRENT_USER, Globals::ConfigKeyName, KEY_QUERY_VALUE);
 
     return S_OK;
 }

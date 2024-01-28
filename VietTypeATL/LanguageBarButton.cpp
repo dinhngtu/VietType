@@ -67,7 +67,7 @@ STDMETHODIMP LanguageBarButton::GetInfo(__RPC__out TF_LANGBARITEMINFO* pInfo) {
     pInfo->guidItem = _guidItem;
     pInfo->dwStyle = _style;
     pInfo->ulSort = _sort;
-    StringCchCopy(pInfo->szDescription, TF_LBI_DESC_MAXLEN, _description.c_str());
+    StringCchCopy(pInfo->szDescription, TF_LBI_DESC_MAXLEN, _description);
 
     return S_OK;
 }
@@ -153,7 +153,7 @@ _Check_return_ HRESULT LanguageBarButton::Initialize(
     _In_ const GUID& guidItem,
     _In_ DWORD style,
     _In_ ULONG sort,
-    _In_ const std::wstring& description) {
+    _In_z_ const wchar_t* description) {
     HRESULT hr;
 
     _controller = ec;

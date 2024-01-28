@@ -23,7 +23,7 @@ static HRESULT SetSettingsKeyAcl() {
     LSTATUS err;
 
     CRegKey key;
-    err = key.Create(HKEY_CURRENT_USER, VietType::Globals::ConfigKeyName.c_str(), nullptr, 0, READ_CONTROL | WRITE_DAC);
+    err = key.Create(HKEY_CURRENT_USER, VietType::Globals::ConfigKeyName, nullptr, 0, READ_CONTROL | WRITE_DAC);
     WINERROR_CHECK_RETURN_HRESULT(err, L"%s", L"key.Create failed");
 
     std::vector<BYTE> sdbuf;
@@ -113,8 +113,8 @@ static HRESULT RegisterProfiles() {
         VietType::Globals::CLSID_TextService,
         VietType::Globals::TextServiceLangId,
         VietType::Globals::GUID_Profile,
-        VietType::Globals::TextServiceDescription.c_str(),
-        static_cast<LONG>(VietType::Globals::TextServiceDescription.length()),
+        VietType::Globals::TextServiceDescription,
+        static_cast<ULONG>(wcslen(VietType::Globals::TextServiceDescription)),
         dllPath,
         dllPathLength,
         static_cast<ULONG>(-IDI_IMELOGO),
