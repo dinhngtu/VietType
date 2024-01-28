@@ -26,7 +26,6 @@ namespace VietType {
 // {8CC27CF8-93D2-416C-B1A3-66827F54244A}
 static const GUID GUID_KeyEventSink_PreservedKey_Toggle = {
     0x8cc27cf8, 0x93d2, 0x416c, {0xb1, 0xa3, 0x66, 0x82, 0x7f, 0x54, 0x24, 0x4a}};
-static const TF_PRESERVEDKEY PK_Toggle = {VK_OEM_3, TF_MOD_ALT}; // Alt-`
 
 STDMETHODIMP KeyEventSink::OnSetFocus(_In_ BOOL fForeground) {
     HRESULT hr;
@@ -227,7 +226,8 @@ _Check_return_ HRESULT KeyEventSink::Initialize(
     hr = _keystrokeMgr->AdviseKeyEventSink(_clientid, this, TRUE);
     HRESULT_CHECK_RETURN(hr, L"%s", L"_keystrokeMgr->AdviseKeyEventSink failed");
 
-    hr = _keystrokeMgr->PreserveKey(_clientid, GUID_KeyEventSink_PreservedKey_Toggle, &PK_Toggle, NULL, 0);
+    _controller->GetSettings()->GetPreservedKeyToggle(&_pk_toggle);
+    hr = _keystrokeMgr->PreserveKey(_clientid, GUID_KeyEventSink_PreservedKey_Toggle, &_pk_toggle, NULL, 0);
     // probably not fatal
     DBG_HRESULT_CHECK(hr, L"%s", L"_keystrokeMgr->PreserveKey failed");
 
@@ -237,7 +237,7 @@ _Check_return_ HRESULT KeyEventSink::Initialize(
 HRESULT KeyEventSink::Uninitialize() {
     HRESULT hr;
 
-    hr = _keystrokeMgr->UnpreserveKey(GUID_KeyEventSink_PreservedKey_Toggle, &PK_Toggle);
+    hr = _keystrokeMgr->UnpreserveKey(GUID_KeyEventSink_PreservedKey_Toggle, &_pk_toggle);
     DBG_HRESULT_CHECK(hr, L"%s", L"_keystrokeMgr->UnpreserveKey failed");
 
     hr = _keystrokeMgr->UnadviseKeyEventSink(_clientid);

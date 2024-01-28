@@ -6,6 +6,8 @@
 
 namespace VietType {
 
+static constexpr TF_PRESERVEDKEY PK_Toggle = {VK_OEM_3, TF_MOD_ALT}; // Alt-`
+
 _Check_return_ HRESULT EngineSettingsController::Initialize(
     _In_ EngineController* ec, _In_ ITfThreadMgr* threadMgr, _In_ TfClientId clientid) {
     HRESULT hr;
@@ -31,6 +33,16 @@ _Check_return_ HRESULT EngineSettingsController::Initialize(
         threadMgr,
         clientid);
     HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(_backconvert_on_backspace) failed");
+
+    hr = CreateInitialize(
+        &_pk_toggle,
+        HKEY_CURRENT_USER,
+        Globals::ConfigKeyName.c_str(),
+        L"pk_toggle",
+        KEY_QUERY_VALUE,
+        threadMgr,
+        clientid);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(_pk_toggle) failed");
 
     hr = CreateInitialize(
         &_tc_oa_uy_tone1,
@@ -108,6 +120,10 @@ HRESULT EngineSettingsController::Uninitialize() {
     HRESULT_CHECK_RETURN(hr, L"%s", L"_tc_oa_uy_tone1->Uninitialize failed");
     _tc_oa_uy_tone1.Release();
 
+    hr = _pk_toggle->Uninitialize();
+    HRESULT_CHECK_RETURN(hr, L"%s", L"_pk_toggle->Uninitialize failed");
+    _pk_toggle.Release();
+
     hr = _backconvert_on_backspace->Uninitialize();
     HRESULT_CHECK_RETURN(hr, L"%s", L"_backconvert_on_backspace->Uninitialize failed");
     _backconvert_on_backspace.Release();
@@ -158,6 +174,16 @@ void EngineSettingsController::IsDefaultEnabled(_Out_ DWORD* pde) const {
 
 void EngineSettingsController::IsBackconvertOnBackspace(_Out_ DWORD* pde) const {
     std::ignore = _backconvert_on_backspace->GetValueOrDefault(pde, 0);
+}
+
+void EngineSettingsController::GetPreservedKeyToggle(_Out_ TF_PRESERVEDKEY* pde) const {
+    ULONGLONG val;
+    HRESULT hr = _pk_toggle->GetValue(&val);
+    if (SUCCEEDED(val)) {
+        *pde = TF_PRESERVEDKEY{static_cast<UINT>(val & UINT_MAX), static_cast<UINT>((val >> 32) & UINT_MAX)};
+    } else {
+        *pde = PK_Toggle;
+    }
 }
 
 } // namespace VietType

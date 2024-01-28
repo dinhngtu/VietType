@@ -58,6 +58,8 @@ private:
     CComPtr<CompositionManager> _compositionManager;
     CComPtr<EngineController> _controller;
 
+    TF_PRESERVEDKEY _pk_toggle;
+
     // shared key state buffer; for temporary use only
     BYTE _keyState[256] = {0};
 };

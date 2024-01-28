@@ -33,6 +33,7 @@ public:
 
     void IsDefaultEnabled(_Out_ DWORD* pde) const;
     void IsBackconvertOnBackspace(_Out_ DWORD* pde) const;
+    void GetPreservedKeyToggle(_Out_ TF_PRESERVEDKEY* pde) const;
 
 private:
     EngineController* _ec = nullptr;
@@ -41,6 +42,7 @@ private:
 
     CComPtr<RegistrySetting<DWORD>> _default_enabled;
     CComPtr<RegistrySetting<DWORD>> _backconvert_on_backspace;
+    CComPtr<RegistrySetting<ULONGLONG>> _pk_toggle;
 
     // telex settings
 

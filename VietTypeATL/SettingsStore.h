@@ -37,6 +37,16 @@ struct regType<DWORD> {
     }
 };
 
+template <>
+struct regType<ULONGLONG> {
+    static LSTATUS QueryValue(_In_ CRegKey& key, _In_opt_z_ LPCTSTR pszValueName, _Out_ ULONGLONG& value) {
+        return key.QueryQWORDValue(pszValueName, value);
+    }
+    static LSTATUS SetValue(_In_ CRegKey& key, _In_opt_z_ LPCTSTR pszValueName, _In_ const ULONGLONG& value) {
+        return key.SetQWORDValue(pszValueName, value);
+    }
+};
+
 } // namespace SettingsStore
 
 template <typename T>
