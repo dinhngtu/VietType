@@ -78,8 +78,7 @@ void EngineSettingsController::IsBackconvertOnBackspace(_Out_ DWORD* pde) {
 
 void EngineSettingsController::GetPreservedKeyToggle(_Out_ TF_PRESERVEDKEY* pde) {
     ULONGLONG val;
-    HRESULT hr = _settingsKey.QueryQWORDValue(L"pk_toggle", val);
-    if (SUCCEEDED(hr)) {
+    if (_settingsKey.m_hKey != NULL && _settingsKey.QueryQWORDValue(L"pk_toggle", val) == ERROR_SUCCESS) {
         *pde = TF_PRESERVEDKEY{static_cast<UINT>(val & UINT_MAX), static_cast<UINT>((val >> 32) & UINT_MAX)};
     } else {
         *pde = PK_Toggle;
