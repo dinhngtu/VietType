@@ -63,14 +63,14 @@ private:
 
     std::unique_ptr<Telex::TelexEngine> _engine;
 
-    CComPtr<VietType::EnumDisplayAttributeInfo> _attributeStore;
+    CComPtr<EngineController> _engineController;
 
-    CComPtr<ThreadMgrEventSink> _threadMgrEventSink;
-    CComPtr<KeyEventSink> _keyEventSink;
+    CComPtr<VietType::EnumDisplayAttributeInfo> _attributeStore;
 
     CComPtr<CompositionManager> _compositionManager;
 
-    CComPtr<EngineController> _engineController;
+    CComPtr<KeyEventSink> _keyEventSink;
+    CComPtr<ThreadMgrEventSink> _threadMgrEventSink;
 };
 OBJECT_ENTRY_AUTO(VietType::Globals::CLSID_TextService, TextService)
 

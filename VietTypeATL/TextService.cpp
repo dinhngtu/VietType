@@ -57,6 +57,9 @@ STDMETHODIMP TextService::ActivateEx(_In_ ITfThreadMgr* ptim, _In_ TfClientId ti
 
     _engine = std::make_unique<Telex::TelexEngine>(Telex::TelexConfig{});
 
+    hr = CreateInitialize(&_engineController, _engine.get(), ptim, tid);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(&_engineController) failed");
+
     hr = CreateInstance2(&_attributeStore);
     HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&_attributeStore) failed");
 
@@ -72,9 +75,6 @@ STDMETHODIMP TextService::ActivateEx(_In_ ITfThreadMgr* ptim, _In_ TfClientId ti
     hr = CreateInitialize(
         &_compositionManager, tid, _attributeStore->GetAttribute(0), static_cast<bool>(dwFlags & TF_TMAE_COMLESS));
     HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(&_compositionManager) failed");
-
-    hr = CreateInitialize(&_engineController, _engine.get(), ptim, tid);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(&_engineController) failed");
 
     long enabled;
     // this already sets enabled state if the compartment is empty
@@ -104,14 +104,14 @@ STDMETHODIMP TextService::Deactivate(void) {
     DBG_HRESULT_CHECK(hr, L"%s", L"_keyEventSink->Uninitialize failed");
     _keyEventSink.Release();
 
-    hr = _engineController->Uninitialize();
-    DBG_HRESULT_CHECK(hr, L"%s", L"_engineController->Uninitialize failed");
-    _engineController.Release();
-
     _compositionManager->Uninitialize();
     _compositionManager.Release();
 
     _attributeStore.Release();
+
+    hr = _engineController->Uninitialize();
+    DBG_HRESULT_CHECK(hr, L"%s", L"_engineController->Uninitialize failed");
+    _engineController.Release();
 
     return S_OK;
 }
