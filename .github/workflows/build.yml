@@ -12,10 +12,10 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Add MSBuild to PATH
-        uses: microsoft/setup-msbuild@v1
+        uses: microsoft/setup-msbuild@v2
         
       - name: Build DLL Win32
         run: msbuild -m -target:VietTypeATL:Rebuild -p:Configuration=Release -p:Platform=Win32 .
@@ -33,6 +33,6 @@ jobs:
         run: msbuild -m -target:VietTypeSetup:Rebuild -p:Configuration=Release -p:Platform=x64 .
 
       - name: Upload a Build Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           path: VietTypeSetup/bin/Release/*.msi
