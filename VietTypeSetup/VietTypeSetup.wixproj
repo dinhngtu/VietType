@@ -25,6 +25,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="licembed.rtf" />
+    <Content Include="Version.wxi" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VietTypeConfig\VietTypeConfig.csproj" />

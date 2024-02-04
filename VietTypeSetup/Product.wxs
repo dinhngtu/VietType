@@ -18,7 +18,7 @@ SPDX-License-Identifier: GPL-3.0-only
     Manufacturer="Dinh Ngoc Tu"
     UpgradeCode="$(var.upgradeCode)"
     InstallerVersion="400">
-    <SummaryInformation Description="$(Configuration) Ver-$(productVersion) Rev-$(vcsRev) $(Platform)" />
+    <SummaryInformation Description="VietType $(Configuration) Ver-$(productVersion) Rev-$(vcsRev) $(Platform)" />
     <MajorUpgrade AllowSameVersionUpgrades="yes" DowngradeErrorMessage="A newer version of [ProductName] is already installed." Schedule="afterInstallInitialize" />
     <?if $(Platform) = x86 ?>
     <Upgrade Id="{E00AC838-881D-4301-AAC5-0A723BB0B0EF}">
@@ -92,20 +92,20 @@ SPDX-License-Identifier: GPL-3.0-only
 
   <Fragment>
     <ComponentGroup Id="ProductComponents">
-      <Component Id="VietTypeATL32.dll" Directory="INSTALLFOLDER" Bitness="always32">
+      <Component Directory="INSTALLFOLDER" Bitness="always32">
         <File Id="VietTypeATL32.dll" Source="$(SolutionDir)\Win32\$(Configuration)\VietTypeATL32.dll" />
         <Class Id="{C0DD01A1-0DEB-454B-8B42-D22CED1B4B23}" Context="InprocServer32" Description="VietType" ThreadingModel="apartment" Advertise="yes" />
       </Component>
 
       <?if $(Platform) = x64 ?>
-      <Component Id="VietTypeATL64.dll" Directory="INSTALLFOLDER64" Bitness="always64">
+      <Component Directory="INSTALLFOLDER64" Bitness="always64">
         <File Id="VietTypeATL64.dll" Source="$(SolutionDir)\x64\$(Configuration)\VietTypeATL64.dll" />
         <Class Id="{C0DD01A1-0DEB-454B-8B42-D22CED1B4B23}" Context="InprocServer32" Description="VietType" ThreadingModel="apartment" Advertise="yes" />
       </Component>
       <?endif?>
 
       <Component Directory="INSTALLFOLDER" Bitness="always32">
-        <File Id="LICENSE" Source="$(SolutionDir)\LICENSE" DefaultLanguage="1033" DefaultVersion="$(productVersion)" />
+        <File Source="$(SolutionDir)\LICENSE" DefaultLanguage="1033" DefaultVersion="$(productVersion)" />
       </Component>
     </ComponentGroup>
   </Fragment>
@@ -122,19 +122,19 @@ SPDX-License-Identifier: GPL-3.0-only
     <ComponentGroup Id="ConfigComponents">
       <Component Directory="INSTALLFOLDER" Bitness="always32">
         <File Id="VietTypeConfig.exe" Source="$(VietTypeConfig.TargetPath)" />
-        <Shortcut Id="ConfigShortcut" Directory="ProgramMenuFolder" Name="VietType Settings" WorkingDirectory="INSTALLFOLDER" Advertise="yes" Icon="logo.exe">
+        <Shortcut Directory="ProgramMenuFolder" Name="VietType Settings" WorkingDirectory="INSTALLFOLDER" Advertise="yes" Icon="logo.exe">
           <Icon Id="logo.exe" SourceFile="$(VietTypeConfig.ProjectDir)\logo.ico" />
         </Shortcut>
       </Component>
       <Component Directory="INSTALLFOLDER" Bitness="always32">
-        <File Id="VietTypeConfig.exe.config" Source="$(VietTypeConfig.TargetPath).config"
+        <File Source="$(VietTypeConfig.TargetPath).config"
               DefaultLanguage="0" DefaultVersion="$(productVersion)" />
       </Component>
       <Component Directory="ConfigRes_en" Bitness="always32">
-        <File Id="VietTypeConfig.resources.en.dll" Source="$(VietTypeConfig.TargetDir)\en\VietTypeConfig.resources.dll" />
+        <File Source="$(VietTypeConfig.TargetDir)\en\VietTypeConfig.resources.dll" />
       </Component>
       <Component Directory="ConfigRes_vi" Bitness="always32">
-        <File Id="VietTypeConfig.resources.vi.dll" Source="$(VietTypeConfig.TargetDir)\vi\VietTypeConfig.resources.dll" />
+        <File Source="$(VietTypeConfig.TargetDir)\vi\VietTypeConfig.resources.dll" />
       </Component>
     </ComponentGroup>
   </Fragment>
@@ -145,13 +145,13 @@ SPDX-License-Identifier: GPL-3.0-only
   <Fragment>
     <ComponentGroup Id="DebugSymbols">
       <Component Directory="INSTALLFOLDER" Bitness="always32">
-        <File Id="VietTypeATL32.pdb" Source="$(SolutionDir)\Win32\$(Configuration)\VietTypeATL32.pdb"
+        <File Source="$(SolutionDir)\Win32\$(Configuration)\VietTypeATL32.pdb"
               DefaultLanguage="1033" DefaultVersion="$(fileVersion)" />
       </Component>
 
       <?if $(Platform) = x64 ?>
       <Component Directory="INSTALLFOLDER64" Bitness="always64">
-        <File Id="VietTypeATL64.pdb" Source="$(SolutionDir)\x64\$(Configuration)\VietTypeATL64.pdb"
+        <File Source="$(SolutionDir)\x64\$(Configuration)\VietTypeATL64.pdb"
               DefaultLanguage="1033" DefaultVersion="$(fileVersion)" />
       </Component>
       <?endif?>
@@ -161,7 +161,7 @@ SPDX-License-Identifier: GPL-3.0-only
   <Fragment>
     <ComponentGroup Id="ConfigDebugSymbols">
       <Component Directory="INSTALLFOLDER" Bitness="always32">
-        <File Id="VietTypeConfig.pdb" Source="$(VietTypeConfig.TargetDir)\VietTypeConfig.pdb"
+        <File Source="$(VietTypeConfig.TargetDir)\VietTypeConfig.pdb"
               DefaultLanguage="0" DefaultVersion="$(productVersion)" />
       </Component>
     </ComponentGroup>
