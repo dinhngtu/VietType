@@ -386,11 +386,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
                 TelexEngineImpl::ReapplyTone(*this);
             }
         } else {
-            if (_config.optimize_multilang >= 2) {
-                TelexEngineImpl::Invalidate(*this);
-            } else {
-                TelexEngineImpl::InvalidateAndPopBack(*this, c);
-            }
+            TelexEngineImpl::InvalidateAndPopBack(*this, c);
         }
 
     } else if (((_c1 == L"gi" && _v.empty()) || !_v.empty()) && _c2.empty() && IS(cat, CharTypes::ConsoC2)) {
