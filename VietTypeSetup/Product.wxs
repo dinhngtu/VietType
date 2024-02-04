@@ -5,24 +5,24 @@ SPDX-License-Identifier: GPL-3.0-only
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
   <?include Version.wxi ?>
 
-  <?if $(var.Platform) = x86 ?>
+  <?if $(Platform) = x86 ?>
   <?define upgradeCode = "{9AD3C40D-774F-4150-829A-F69ED4BE5A59}" ?>
-  <?elseif $(var.Platform) = x64 ?>
+  <?elseif $(Platform) = x64 ?>
   <?define upgradeCode = "{E00AC838-881D-4301-AAC5-0A723BB0B0EF}" ?>
   <?endif?>
 
   <Package
     Name="VietType"
     Language="!(bind.fileLanguage.VietTypeATL32.dll)"
-    Version="$(var.productVersion)"
+    Version="$(productVersion)"
     Manufacturer="Dinh Ngoc Tu"
     UpgradeCode="$(var.upgradeCode)"
     InstallerVersion="400">
-    <SummaryInformation Description="$(var.Configuration) Ver-$(var.productVersion) Rev-$(var.vcsRev) $(var.Platform)" />
+    <SummaryInformation Description="$(Configuration) Ver-$(productVersion) Rev-$(vcsRev) $(Platform)" />
     <MajorUpgrade AllowSameVersionUpgrades="yes" DowngradeErrorMessage="A newer version of [ProductName] is already installed." Schedule="afterInstallInitialize" />
-    <?if $(var.Platform) = x86 ?>
+    <?if $(Platform) = x86 ?>
     <Upgrade Id="{E00AC838-881D-4301-AAC5-0A723BB0B0EF}">
-      <UpgradeVersion Maximum="$(var.productVersion)" Property="VIETTYPE_OLD_UPGRADE_CODE_DETECTED" MigrateFeatures="yes" />
+      <UpgradeVersion Maximum="$(productVersion)" Property="VIETTYPE_OLD_UPGRADE_CODE_DETECTED" MigrateFeatures="yes" />
     </Upgrade>
     <?endif?>
 
@@ -46,7 +46,7 @@ SPDX-License-Identifier: GPL-3.0-only
 
     <Launch Condition="Installed OR (VersionNT &gt;= 602)" Message="VietType is only compatible with Windows 8 and newer." />
 
-    <?if $(var.Platform) = x86 ?>
+    <?if $(Platform) = x86 ?>
     <Launch Condition="Installed OR (NOT VersionNT64)" Message="32-bit setup can only run on a 32-bit OS." />
     <?endif?>
 
@@ -65,7 +65,12 @@ SPDX-License-Identifier: GPL-3.0-only
   <Fragment>
     <UI Id="VietTypeSetupUI">
       <ui:WixUI Id="WixUI_Minimal" />
-      <Publish Dialog="ExitDialog" Control="Finish" Event="DoAction" Value="OpenSettingsAfterInstall" Condition="WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed" />
+      <Publish
+        Dialog="ExitDialog"
+        Control="Finish"
+        Event="DoAction"
+        Value="OpenSettingsAfterInstall"
+        Condition="WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed" />
     </UI>
     <WixVariable Id="WixUILicenseRtf" Value="licembed.rtf" />
   </Fragment>
@@ -88,19 +93,19 @@ SPDX-License-Identifier: GPL-3.0-only
   <Fragment>
     <ComponentGroup Id="ProductComponents">
       <Component Id="VietTypeATL32.dll" Directory="INSTALLFOLDER" Bitness="always32">
-        <File Id="VietTypeATL32.dll" Source="$(var.SolutionDir)\Win32\$(var.Configuration)\VietTypeATL32.dll" />
+        <File Id="VietTypeATL32.dll" Source="$(SolutionDir)\Win32\$(Configuration)\VietTypeATL32.dll" />
         <Class Id="{C0DD01A1-0DEB-454B-8B42-D22CED1B4B23}" Context="InprocServer32" Description="VietType" ThreadingModel="apartment" Advertise="yes" />
       </Component>
 
-      <?if $(var.Platform) = x64 ?>
+      <?if $(Platform) = x64 ?>
       <Component Id="VietTypeATL64.dll" Directory="INSTALLFOLDER64" Bitness="always64">
-        <File Id="VietTypeATL64.dll" Source="$(var.SolutionDir)\x64\$(var.Configuration)\VietTypeATL64.dll" />
+        <File Id="VietTypeATL64.dll" Source="$(SolutionDir)\x64\$(Configuration)\VietTypeATL64.dll" />
         <Class Id="{C0DD01A1-0DEB-454B-8B42-D22CED1B4B23}" Context="InprocServer32" Description="VietType" ThreadingModel="apartment" Advertise="yes" />
       </Component>
       <?endif?>
 
       <Component Directory="INSTALLFOLDER" Bitness="always32">
-        <File Id="LICENSE" Source="$(var.SolutionDir)\LICENSE" DefaultLanguage="1033" DefaultVersion="$(var.productVersion)" />
+        <File Id="LICENSE" Source="$(SolutionDir)\LICENSE" DefaultLanguage="1033" DefaultVersion="$(productVersion)" />
       </Component>
     </ComponentGroup>
   </Fragment>
@@ -116,20 +121,20 @@ SPDX-License-Identifier: GPL-3.0-only
     </DirectoryRef>
     <ComponentGroup Id="ConfigComponents">
       <Component Directory="INSTALLFOLDER" Bitness="always32">
-        <File Id="VietTypeConfig.exe" Source="$(var.SolutionDir)\VietTypeConfig\bin\$(var.Configuration)\VietTypeConfig.exe" />
+        <File Id="VietTypeConfig.exe" Source="$(VietTypeConfig.TargetPath)" />
         <Shortcut Id="ConfigShortcut" Directory="ProgramMenuFolder" Name="VietType Settings" WorkingDirectory="INSTALLFOLDER" Advertise="yes" Icon="logo.exe">
-          <Icon Id="logo.exe" SourceFile="$(var.SolutionDir)\VietTypeConfig\logo.ico" />
+          <Icon Id="logo.exe" SourceFile="$(VietTypeConfig.ProjectDir)\logo.ico" />
         </Shortcut>
       </Component>
       <Component Directory="INSTALLFOLDER" Bitness="always32">
-        <File Id="VietTypeConfig.exe.config" Source="$(var.SolutionDir)\VietTypeConfig\bin\$(var.Configuration)\VietTypeConfig.exe.config"
-              DefaultLanguage="1033" DefaultVersion="$(var.productVersion)" />
+        <File Id="VietTypeConfig.exe.config" Source="$(VietTypeConfig.TargetPath).config"
+              DefaultLanguage="0" DefaultVersion="$(productVersion)" />
       </Component>
       <Component Directory="ConfigRes_en" Bitness="always32">
-        <File Id="VietTypeConfig.resources.en.dll" Source="$(var.SolutionDir)\VietTypeConfig\bin\$(var.Configuration)\en\VietTypeConfig.resources.dll" />
+        <File Id="VietTypeConfig.resources.en.dll" Source="$(VietTypeConfig.TargetDir)\en\VietTypeConfig.resources.dll" />
       </Component>
       <Component Directory="ConfigRes_vi" Bitness="always32">
-        <File Id="VietTypeConfig.resources.vi.dll" Source="$(var.SolutionDir)\VietTypeConfig\bin\$(var.Configuration)\vi\VietTypeConfig.resources.dll" />
+        <File Id="VietTypeConfig.resources.vi.dll" Source="$(VietTypeConfig.TargetDir)\vi\VietTypeConfig.resources.dll" />
       </Component>
     </ComponentGroup>
   </Fragment>
@@ -140,14 +145,14 @@ SPDX-License-Identifier: GPL-3.0-only
   <Fragment>
     <ComponentGroup Id="DebugSymbols">
       <Component Directory="INSTALLFOLDER" Bitness="always32">
-        <File Id="VietTypeATL32.pdb" Source="$(var.SolutionDir)\Win32\$(var.Configuration)\VietTypeATL32.pdb"
-              DefaultLanguage="1033" DefaultVersion="$(var.fileVersion)" />
+        <File Id="VietTypeATL32.pdb" Source="$(SolutionDir)\Win32\$(Configuration)\VietTypeATL32.pdb"
+              DefaultLanguage="1033" DefaultVersion="$(fileVersion)" />
       </Component>
 
-      <?if $(var.Platform) = x64 ?>
+      <?if $(Platform) = x64 ?>
       <Component Directory="INSTALLFOLDER64" Bitness="always64">
-        <File Id="VietTypeATL64.pdb" Source="$(var.SolutionDir)\x64\$(var.Configuration)\VietTypeATL64.pdb"
-              DefaultLanguage="1033" DefaultVersion="$(var.fileVersion)" />
+        <File Id="VietTypeATL64.pdb" Source="$(SolutionDir)\x64\$(Configuration)\VietTypeATL64.pdb"
+              DefaultLanguage="1033" DefaultVersion="$(fileVersion)" />
       </Component>
       <?endif?>
     </ComponentGroup>
@@ -156,8 +161,8 @@ SPDX-License-Identifier: GPL-3.0-only
   <Fragment>
     <ComponentGroup Id="ConfigDebugSymbols">
       <Component Directory="INSTALLFOLDER" Bitness="always32">
-        <File Id="VietTypeConfig.pdb" Source="$(var.SolutionDir)\VietTypeConfig\bin\$(var.Configuration)\VietTypeConfig.pdb"
-              DefaultLanguage="1033" DefaultVersion="$(var.productVersion)" />
+        <File Id="VietTypeConfig.pdb" Source="$(VietTypeConfig.TargetDir)\VietTypeConfig.pdb"
+              DefaultLanguage="0" DefaultVersion="$(productVersion)" />
       </Component>
     </ComponentGroup>
   </Fragment>
@@ -166,10 +171,10 @@ SPDX-License-Identifier: GPL-3.0-only
   <!-- custom actions -->
 
   <Fragment>
-    <SetProperty Id="RegisterTip" Value="&quot;[%SystemRoot]\System32\regsvr32.exe&quot; /s &quot;[#VietTypeATL32.dll]&quot;" After="CostFinalize" Sequence="execute" />
-    <SetProperty Id="RegisterTipRollback" Value="&quot;[%SystemRoot]\System32\regsvr32.exe&quot; /s /u &quot;[#VietTypeATL32.dll]&quot;" After="CostFinalize" Sequence="execute" />
-    <SetProperty Id="UnregisterTip" Value="&quot;[%SystemRoot]\System32\regsvr32.exe&quot; /s /u &quot;[#VietTypeATL32.dll]&quot;" After="CostFinalize" Sequence="execute" />
-    <SetProperty Id="UnregisterTipRollback" Value="&quot;[%SystemRoot]\System32\regsvr32.exe&quot; /s &quot;[#VietTypeATL32.dll]&quot;" After="CostFinalize" Sequence="execute" />
+    <SetProperty Id="RegisterTip" Value='"[%SystemRoot]\System32\regsvr32.exe" /s "[#VietTypeATL32.dll]"' After="CostFinalize" Sequence="execute" />
+    <SetProperty Id="RegisterTipRollback" Value='"[%SystemRoot]\System32\regsvr32.exe" /s /u "[#VietTypeATL32.dll]"' After="CostFinalize" Sequence="execute" />
+    <SetProperty Id="UnregisterTip" Value='"[%SystemRoot]\System32\regsvr32.exe" /s /u "[#VietTypeATL32.dll]"' After="CostFinalize" Sequence="execute" />
+    <SetProperty Id="UnregisterTipRollback" Value='"[%SystemRoot]\System32\regsvr32.exe" /s "[#VietTypeATL32.dll]"' After="CostFinalize" Sequence="execute" />
 
     <CustomAction Id="RegisterTip" DllEntry="WixQuietExec" Impersonate="no" Execute="deferred" BinaryRef="Wix4UtilCA_X86" />
     <CustomAction Id="RegisterTipRollback" DllEntry="WixQuietExec" Impersonate="no" Execute="rollback" BinaryRef="Wix4UtilCA_X86" />
