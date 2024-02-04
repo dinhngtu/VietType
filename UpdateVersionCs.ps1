@@ -7,7 +7,7 @@ $vcsRev = git describe --tags --long --dirty --always
 Get-Content -Raw "$PSScriptRoot\Version.ps1" | Invoke-Expression
 $productVersionText = "$($productVersion[0]).$($productVersion[1]).$($productVersion[2]).$($productVersion[3])"
 
-$csFile = "..\..\Properties\Version.cs"
+$csFile = "$pwd\..\..\Properties\Version.cs"
 $csOld = Get-Content -ErrorAction Ignore -Raw $csFile
 $csNew = `
 @"

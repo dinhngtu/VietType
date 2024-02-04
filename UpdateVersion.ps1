@@ -14,7 +14,7 @@ if ($Force -or ($vcsOld -ne $vcsNew)) {
 
 Get-Content -Raw "$PSScriptRoot\Version.ps1" | Invoke-Expression
 
-$hFile = "VersionNumbers.h"
+$hFile = "$pwd\VersionNumbers.h"
 $hOld = Get-Content -ErrorAction Ignore -Raw $hFile
 $hNew = `
 @"
