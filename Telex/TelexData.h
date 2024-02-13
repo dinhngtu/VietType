@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include "ConStr.h"
 #include "TelexMaps.h"
 #include "TelexEngine.h"
 
@@ -19,9 +18,9 @@
 #define MAKE_SORTED_SET(K, n, ...)                                                                                     \
     static constexpr const ArraySet<K, std::initializer_list<K>{__VA_ARGS__}.size(), true> n = {__VA_ARGS__};          \
     static_assert(std::is_sorted(n.begin(), n.end()))
-#define P(a, b) std::make_pair(WConStr(a), WConStr(b))
-#define P1(a, b) std::make_pair(WConStr(a), b)
-#define P2(a, b) std::make_pair(a, WConStr(b))
+#define P(a, b) std::make_pair(std::wstring_view(a), std::wstring_view(b))
+#define P1(a, b) std::make_pair(std::wstring_view(a), b)
+#define P2(a, b) std::make_pair(a, std::wstring_view(b))
 #define VI(a, b) (VInfo{a, b})
 
 namespace VietType {
@@ -30,8 +29,8 @@ namespace Telex {
 // maps that are too short are kept as generic
 
 MAKE_SORTED_MAP(
-    WConStr,
-    WConStr,
+    std::wstring_view,
+    std::wstring_view,
     transitions,
     P(L"aa", L"\xe2"),     //
     P(L"aua", L"\xe2u"),   // relaxed transformations
@@ -61,7 +60,7 @@ static_assert(std::all_of(transitions.begin(), transitions.end(), [](const auto&
 }));
 
 MAKE_SORTED_MAP(
-    WConStr,
+    std::wstring_view,
     int,
     respos,
     P1(L"i\xea", 1),       //
@@ -88,8 +87,8 @@ MAKE_SORTED_MAP(
 static_assert(std::all_of(respos.begin(), respos.end(), [](const auto& x) { return x.second <= x.first.length(); }));
 
 MAKE_SORTED_MAP(
-    WConStr,
-    WConStr,
+    std::wstring_view,
+    std::wstring_view,
     transitions_w,
     P(L"a", L"\x103"),
     P(L"o", L"\x1a1"),
@@ -111,8 +110,8 @@ static_assert(std::all_of(transitions_w.begin(), transitions_w.end(), [](const a
 }));
 
 MAKE_MAP(
-    WConStr,
-    WConStr,
+    std::wstring_view,
+    std::wstring_view,
     transitions_w_q,
     P(L"u", L"\x1b0"),
     P(L"ua", L"u\x103"),
@@ -125,7 +124,7 @@ static_assert(std::all_of(transitions_w_q.begin(), transitions_w_q.end(), [](con
 }));
 
 MAKE_SORTED_MAP(
-    WConStr,
+    std::wstring_view,
     int,
     respos_w,
     P1(L"o\x103", 1),      //
@@ -144,8 +143,8 @@ static_assert(std::all_of(respos_w.begin(), respos_w.end(), [](const auto& x) {
 }));
 
 MAKE_MAP(
-    WConStr,
-    WConStr,
+    std::wstring_view,
+    std::wstring_view,
     transitions_v_c2,
     P(L"u\x1a1", L"\x1b0\x1a1"), //
     P(L"\x1b0"
@@ -157,14 +156,14 @@ static_assert(std::all_of(transitions_v_c2.begin(), transitions_v_c2.end(), [](c
     return x.second.length() == x.first.length();
 }));
 
-MAKE_MAP(WConStr, WConStr, transitions_v_c2_q, P(L"\x1b0o", L"\x1b0\x1a1"));
+MAKE_MAP(std::wstring_view, std::wstring_view, transitions_v_c2_q, P(L"\x1b0o", L"\x1b0\x1a1"));
 static_assert(std::all_of(transitions_v_c2_q.begin(), transitions_v_c2_q.end(), [](const auto& x) {
     return x.second.length() == x.first.length();
 }));
 
 MAKE_SORTED_MAP(
     wchar_t,
-    WConStr,
+    std::wstring_view,
     transitions_tones,
     P2(L'a', L"a\xe0\x1ea1\x1ea3\xe1\xe3"),               //
     P2(L'e', L"e\xe8\x1eb9\x1ebb\xe9\x1ebd"),             //
@@ -184,7 +183,7 @@ static_assert(std::all_of(transitions_tones.begin(), transitions_tones.end(), []
 }));
 
 MAKE_SORTED_SET(
-    WConStr,
+    std::wstring_view,
     valid_c1,
     L"",    //
     L"b",   //
@@ -218,7 +217,7 @@ MAKE_SORTED_SET(
 );
 
 MAKE_SORTED_MAP(
-    WConStr,
+    std::wstring_view,
     VInfo,
     valid_v,
     // oa_uy must be 1 as default since 0 can only be used if there is no c2
@@ -286,7 +285,7 @@ static_assert(std::all_of(valid_v.begin(), valid_v.end(), [](const auto& x) {
 }));
 
 MAKE_SORTED_MAP(
-    WConStr,
+    std::wstring_view,
     VInfo,
     valid_v_q,
     P1(L"ua", VI(1, C2Mode::Either)),         // c2 either with qu
@@ -315,7 +314,7 @@ static_assert(std::all_of(valid_v_q.begin(), valid_v_q.end(), [](const auto& x) 
 }));
 
 MAKE_SORTED_MAP(
-    WConStr,
+    std::wstring_view,
     VInfo,
     valid_v_gi,
     P1(L"", VI(-1, C2Mode::Either)),          //
@@ -353,7 +352,7 @@ static_assert(std::all_of(valid_v_gi.begin(), valid_v_gi.end(), [](const auto& x
 
 // bool is whether tones are restricted to s/j or not
 MAKE_SORTED_MAP(
-    WConStr,
+    std::wstring_view,
     bool,
     valid_c2,
     P1(L"", false),   //
@@ -369,7 +368,7 @@ MAKE_SORTED_MAP(
 );
 
 MAKE_MAP(
-    WConStr,
+    std::wstring_view,
     VInfo,
     valid_v_oa_uy,
     P1(L"oa", VI(0, C2Mode::Either)), //
@@ -382,7 +381,7 @@ static_assert(std::all_of(valid_v_oa_uy.begin(), valid_v_oa_uy.end(), [](const a
 
 MAKE_SORTED_MAP(
     wchar_t,
-    WConStr,
+    std::wstring_view,
     backconversions,
     P2(L'\xe0', L"af"),    //
     P2(L'\xe1', L"as"),    //
@@ -455,7 +454,7 @@ MAKE_SORTED_MAP(
 
 // generated from engscan (optimize=0) doubletone words
 MAKE_SORTED_SET(
-    WConStr,
+    std::wstring_view,
     wlist_en,
     L"airs",     //
     L"arms",     //
@@ -588,7 +587,7 @@ MAKE_SORTED_SET(
 
 // generated from dualscan mode 0 (optimize=1)
 MAKE_SORTED_SET(
-    WConStr,
+    std::wstring_view,
     wlist_en_2,
     L"ask",    //
     L"bask",   //
@@ -828,7 +827,7 @@ MAKE_SORTED_SET(
 
 // generated from dualscan mode 1 (optimize=0, autocorrect=1)
 MAKE_SORTED_SET(
-    WConStr,
+    std::wstring_view,
     wlist_en_ac,
     L"ah",     //
     L"ash",    //

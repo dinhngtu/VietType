@@ -121,7 +121,7 @@ struct TelexEngineImpl {
         auto it = source.find(e._v);
         if (it != source.end() &&
             (!w_mode || ((e._v != it->second || e._c2.empty()) && !(e._respos.back() & ResposTransitionW)))) {
-            e._v = it->second.str();
+            e._v = it->second;
             return true;
         } else {
             return false;
@@ -143,7 +143,7 @@ struct TelexEngineImpl {
         e._state = TelexStates::Invalid;
     }
 
-    static std::optional<std::pair<WConStr, VInfo>> FindTable(const TelexEngine& e) {
+    static std::optional<std::pair<std::wstring_view, VInfo>> FindTable(const TelexEngine& e) {
         if (e._c1 == L"q") {
             return valid_v_q.find_opt(e._v);
         } else if (e._c1 == L"gi") {

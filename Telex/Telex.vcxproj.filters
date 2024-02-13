@@ -24,9 +24,6 @@
     <ClInclude Include="TelexMaps.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ConStr.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="TelexEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>

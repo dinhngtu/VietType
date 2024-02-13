@@ -45,7 +45,7 @@ struct ArrayMap : public std::array<std::pair<K, V>, N> {
         if (it != this->cend()) {
             return *it;
         } else {
-            return {};
+            return std::nullopt;
         }
     }
 };
@@ -74,7 +74,7 @@ struct ArraySet : public std::array<K, N> {
         if (it != this->cend()) {
             return *it;
         } else {
-            return {};
+            return std::nullopt;
         }
     }
 };
