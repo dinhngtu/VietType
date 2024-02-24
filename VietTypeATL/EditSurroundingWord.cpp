@@ -88,15 +88,16 @@ static HRESULT DoEditSurroundingWord(
     hr = rangeTest->ShiftStart(ec, -SWF_MAXCHARS, &shifted, &haltcond);
     HRESULT_CHECK_RETURN(hr, L"%s", L"rangeTest->ShiftStart failed");
 
-    if (!shifted) {
+    if (shifted >= 0) {
         return E_NOTIMPL;
     }
+    shifted = -shifted;
 
     // find word boundary
 
     std::array<WCHAR, SWF_MAXCHARS> buf;
     ULONG retrieved;
-    hr = rangeTest->GetText(ec, 0, &buf[0], shifted, &retrieved);
+    hr = rangeTest->GetText(ec, 0, &buf[0], std::min(shifted, SWF_MAXCHARS), &retrieved);
     HRESULT_CHECK_RETURN(hr, L"%s", L"rangeTest->GetText failed");
 
     if (!retrieved) {
