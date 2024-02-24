@@ -84,7 +84,9 @@ MAKE_SORTED_MAP(
     P1(L"\x1b0\x1a1i", 0), //
     P1(L"\x1b0\x1a1u", 0), //
 );
-static_assert(std::all_of(respos.begin(), respos.end(), [](const auto& x) { return x.second <= x.first.length(); }));
+static_assert(std::all_of(respos.begin(), respos.end(), [](const auto& x) {
+    return std::cmp_less_equal(x.second, x.first.length());
+}));
 
 MAKE_SORTED_MAP(
     std::wstring_view,
@@ -139,7 +141,7 @@ MAKE_SORTED_MAP(
     P1(L"\x1b0\x1a1i", 1), //
 );
 static_assert(std::all_of(respos_w.begin(), respos_w.end(), [](const auto& x) {
-    return x.second <= x.first.length();
+    return std::cmp_less_equal(x.second, x.first.length());
 }));
 
 MAKE_MAP(
@@ -281,7 +283,7 @@ MAKE_SORTED_MAP(
     P1(L"\x1b0\x1a1u", VI(1, C2Mode::NoC2)),  // ươu
 );
 static_assert(std::all_of(valid_v.begin(), valid_v.end(), [](const auto& x) {
-    return x.second.tonepos <= x.first.length();
+    return std::cmp_less_equal(x.second.tonepos, x.first.length());
 }));
 
 MAKE_SORTED_MAP(
@@ -310,7 +312,7 @@ MAKE_SORTED_MAP(
     P1(L"\x1b0\x1a1", VI(1, C2Mode::MustC2)), // ươ
 );
 static_assert(std::all_of(valid_v_q.begin(), valid_v_q.end(), [](const auto& x) {
-    return x.second.tonepos <= x.first.length();
+    return std::cmp_less_equal(x.second.tonepos, x.first.length());
 }));
 
 MAKE_SORTED_MAP(
@@ -376,7 +378,7 @@ MAKE_MAP(
     P1(L"uy", VI(0, C2Mode::Either)), //
 );
 static_assert(std::all_of(valid_v_oa_uy.begin(), valid_v_oa_uy.end(), [](const auto& x) {
-    return x.second.tonepos <= x.first.length();
+    return std::cmp_less_equal(x.second.tonepos, x.first.length());
 }));
 
 MAKE_SORTED_MAP(
