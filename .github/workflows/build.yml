@@ -16,13 +16,19 @@ jobs:
 
       - name: Add MSBuild to PATH
         uses: microsoft/setup-msbuild@v2
-        
+
+      - name: Restore Win32
+        run: msbuild -m -target:Restore -p:Configuration=Release -p:Platform=Win32 .
+
+      - name: Restore x64
+        run: msbuild -m -target:Restore -p:Configuration=Release -p:Platform=x64 .
+
       - name: Build DLL Win32
         run: msbuild -m -target:VietTypeATL:Rebuild -p:Configuration=Release -p:Platform=Win32 .
-        
+
       - name: Build DLL x64
         run: msbuild -m -target:VietTypeATL:Rebuild -p:Configuration=Release -p:Platform=x64 .
-        
+
       - name: Build Config
         run: msbuild -m -target:VietTypeConfig:Rebuild -p:Configuration=Release -p:Platform=Win32 .
 
