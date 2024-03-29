@@ -32,6 +32,6 @@
   </ItemGroup>
   <Import Project="Sdk.targets" Sdk="WixToolset.Sdk" Version="4.0.3" />
   <PropertyGroup>
-    <PreBuildEvent>powershell.exe -nop -noni -executionpolicy bypass $(SolutionDir)\UpdateVersionWix.ps1</PreBuildEvent>
+    <PreBuildEvent>powershell.exe -noprofile -noninteractive -executionpolicy bypass $(SolutionDir)\UpdateVersionWix.ps1</PreBuildEvent>
   </PropertyGroup>
 </Project>

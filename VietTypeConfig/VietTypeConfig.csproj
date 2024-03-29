@@ -105,6 +105,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>powershell.exe -nop -noni -executionpolicy bypass $(SolutionDir)\UpdateVersionCs.ps1</PreBuildEvent>
+    <PreBuildEvent>powershell.exe -noprofile -noninteractive -executionpolicy bypass $(SolutionDir)\UpdateVersionCs.ps1</PreBuildEvent>
   </PropertyGroup>
 </Project>

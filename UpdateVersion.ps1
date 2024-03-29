@@ -12,7 +12,7 @@ if ($Force -or ($vcsOld -ne $vcsNew)) {
     [System.IO.File]::WriteAllText($vcsFile, [string]::Join("`n", $vcsNew))
 }
 
-Get-Content -Raw "$PSScriptRoot\Version.ps1" | Invoke-Expression
+. "$PSScriptRoot\Version.ps1"
 
 $hFile = "$pwd\VersionNumbers.h"
 $hOld = Get-Content -ErrorAction Ignore -Raw $hFile
