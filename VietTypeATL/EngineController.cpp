@@ -20,7 +20,7 @@ static const GUID GUID_SystemNotifyCompartment = {
     0xb2fbd2e7, 0x922f, 0x4996, {0xbe, 0x77, 0x21, 0x8, 0x5b, 0x91, 0xa8, 0xf0}};
 
 _Check_return_ HRESULT
-EngineController::Initialize(_In_ Telex::TelexEngine* engine, _In_ ITfThreadMgr* threadMgr, _In_ TfClientId clientid) {
+EngineController::Initialize(_In_ Telex::ITelexEngine* engine, _In_ ITfThreadMgr* threadMgr, _In_ TfClientId clientid) {
 
     HRESULT hr;
 
@@ -80,11 +80,11 @@ HRESULT EngineController::Uninitialize() {
     return S_OK;
 }
 
-Telex::TelexEngine& EngineController::GetEngine() {
+Telex::ITelexEngine& EngineController::GetEngine() {
     return *_engine;
 }
 
-const Telex::TelexEngine& EngineController::GetEngine() const {
+const Telex::ITelexEngine& EngineController::GetEngine() const {
     return *_engine;
 }
 

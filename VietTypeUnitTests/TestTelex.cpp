@@ -21,15 +21,15 @@ public:
         : _config(config), _omMin(optimizeMultilangMin), _omMax(optimizeMultilangMax), _ac(testAutocorrect) {
     }
 
-    void Invoke(std::function<void(TelexEngine&)> f) const {
+    void Invoke(std::function<void(ITelexEngine&)> f) const {
         for (int level = _omMin; level <= _omMax; level++) {
             for (int autocorrect = _ac ? 0 : 1; autocorrect <= 1; autocorrect++) {
                 auto config = _config;
                 config.optimize_multilang = level;
                 if (_ac)
                     config.autocorrect = !!autocorrect;
-                TelexEngine e(config);
-                f(e);
+                std::unique_ptr<ITelexEngine> e(TelexNew(config));
+                f(*e);
             }
         }
     }
@@ -893,36 +893,36 @@ public:
     TEST_METHOD (TestMultilangVirus) {
         auto config1 = config;
         config1.optimize_multilang = 1;
-        TelexEngine e(config1);
-        VietType::UnitTests::TestInvalidWord(e, L"virus", L"virus");
+        std::unique_ptr<ITelexEngine> e(TelexNew(config1));
+        VietType::UnitTests::TestInvalidWord(*e, L"virus", L"virus");
     }
 
     TEST_METHOD (TestMultilangDense) {
         auto config1 = config;
         config1.optimize_multilang = 2;
-        TelexEngine e(config1);
-        VietType::UnitTests::TestInvalidWord(e, L"dense", L"dense");
+        std::unique_ptr<ITelexEngine> e(TelexNew(config1));
+        VietType::UnitTests::TestInvalidWord(*e, L"dense", L"dense");
     }
 
     TEST_METHOD (TestMultilangDefe) {
         auto config1 = config;
         config1.optimize_multilang = 3;
-        TelexEngine e(config1);
-        AssertTelexStatesEqual(TelexStates::Invalid, FeedWord(e, L"defe"));
+        std::unique_ptr<ITelexEngine> e(TelexNew(config1));
+        AssertTelexStatesEqual(TelexStates::Invalid, FeedWord(*e, L"defe"));
     }
 
     TEST_METHOD (TestMultilangVirusUpper) {
         auto config1 = config;
         config1.optimize_multilang = 1;
-        TelexEngine e(config1);
-        VietType::UnitTests::TestInvalidWord(e, L"VIRUS", L"VIRUS");
+        std::unique_ptr<ITelexEngine> e(TelexNew(config1));
+        VietType::UnitTests::TestInvalidWord(*e, L"VIRUS", L"VIRUS");
     }
 
     TEST_METHOD (TestMultilangDenseUpper) {
         auto config1 = config;
         config1.optimize_multilang = 2;
-        TelexEngine e(config1);
-        VietType::UnitTests::TestInvalidWord(e, L"DENSE", L"DENSE");
+        std::unique_ptr<ITelexEngine> e(TelexNew(config1));
+        VietType::UnitTests::TestInvalidWord(*e, L"DENSE", L"DENSE");
     }
 
     // test doublekey backspace

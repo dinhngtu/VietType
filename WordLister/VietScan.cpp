@@ -5,6 +5,7 @@
 #include "Telex.h"
 #include "WordListIterator.hpp"
 #include "FileUtil.hpp"
+#include "TelexEngine.h"
 
 using namespace VietType::Telex;
 using namespace VietType::TestLib;

@@ -45,7 +45,7 @@ bool VietType::IsKeyEaten(
 }
 
 VietType::Telex::TelexStates VietType::PushKey(
-    _In_ VietType::Telex::TelexEngine& engine,
+    _In_ VietType::Telex::ITelexEngine& engine,
     _In_ uintptr_t wParam,
     _In_ intptr_t lParam,
     _In_reads_(256) const unsigned char* keyState) {

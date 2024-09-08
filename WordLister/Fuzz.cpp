@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include <thread>
 #include "Telex.h"
+#include "TelexEngine.h"
 
 using namespace VietType::Telex;
 

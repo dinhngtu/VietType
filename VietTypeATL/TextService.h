@@ -17,7 +17,7 @@ using namespace ATL;
 namespace VietType {
 
 namespace Telex {
-class TelexEngine;
+class ITelexEngine;
 }
 
 class ThreadMgrEventSink;
@@ -61,7 +61,7 @@ private:
     TfClientId _clientId = TF_CLIENTID_NULL;
     DWORD _activateFlags = 0;
 
-    std::unique_ptr<Telex::TelexEngine> _engine;
+    std::unique_ptr<Telex::ITelexEngine> _engine;
 
     CComPtr<EngineController> _engineController;
 

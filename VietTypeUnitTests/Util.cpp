@@ -10,7 +10,7 @@ using namespace VietType::Telex;
 namespace VietType {
 namespace UnitTests {
 
-TelexStates FeedWord(TelexEngine& e, const wchar_t* input) {
+TelexStates FeedWord(ITelexEngine& e, const wchar_t* input) {
     e.Reset();
     for (auto c : std::wstring(input)) {
         e.PushChar(c);
@@ -18,7 +18,7 @@ TelexStates FeedWord(TelexEngine& e, const wchar_t* input) {
     return e.GetState();
 }
 
-void TestValidWord(TelexEngine& e, const wchar_t* expected, const wchar_t* input) {
+void TestValidWord(ITelexEngine& e, const wchar_t* expected, const wchar_t* input) {
     e.Reset();
     for (auto c : std::wstring(input)) {
         AssertTelexStatesEqual(TelexStates::Valid, e.PushChar(c));
@@ -28,7 +28,7 @@ void TestValidWord(TelexEngine& e, const wchar_t* expected, const wchar_t* input
     Assert::AreEqual(expected, e.Retrieve().c_str());
 }
 
-void TestInvalidWord(TelexEngine& e, const wchar_t* expected, const wchar_t* input) {
+void TestInvalidWord(ITelexEngine& e, const wchar_t* expected, const wchar_t* input) {
     e.Reset();
     for (auto c : std::wstring(input)) {
         e.PushChar(c);
@@ -37,7 +37,7 @@ void TestInvalidWord(TelexEngine& e, const wchar_t* expected, const wchar_t* inp
     Assert::AreEqual(expected, e.RetrieveRaw().c_str());
 }
 
-void TestPeekWord(TelexEngine& e, const wchar_t* expected, const wchar_t* input) {
+void TestPeekWord(ITelexEngine& e, const wchar_t* expected, const wchar_t* input) {
     FeedWord(e, input);
     Assert::AreEqual(expected, e.Peek().c_str());
 }

@@ -9,15 +9,6 @@
 namespace VietType {
 namespace Telex {
 
-enum class Tones {
-    Z,
-    F,
-    J,
-    R,
-    S,
-    X,
-};
-
 // State transition is as follows:
 
 // Valid (initial) -> Valid|Invalid (by pushing a character)
@@ -54,81 +45,31 @@ struct TelexConfig {
     bool autocorrect = false;
 };
 
-class TelexEngine {
+class ITelexEngine {
 public:
-    explicit TelexEngine(_In_ struct TelexConfig config);
-    TelexEngine(const TelexEngine&) = delete;
-    TelexEngine& operator=(const TelexEngine&) = delete;
-    TelexEngine(TelexEngine&&) = default;
-    TelexEngine& operator=(TelexEngine&&) = default;
-
-    const TelexConfig& GetConfig() const;
-    void SetConfig(const TelexConfig& config);
-
-    void Reset();
-    TelexStates PushChar(_In_ wchar_t c);
-    TelexStates Backspace();
-    TelexStates Commit();
-    TelexStates ForceCommit();
-    TelexStates Cancel();
-    TelexStates Backconvert(_In_ const std::wstring& s);
-
-    constexpr TelexStates GetState() const {
-        return _state;
-    }
-    std::wstring Retrieve() const;
-    std::wstring RetrieveRaw() const;
-    std::wstring Peek() const;
-    constexpr std::wstring::size_type Count() const {
-        return _keyBuffer.size();
-    }
-    constexpr Tones GetTone() const {
-        return _t;
-    }
-    constexpr const std::vector<int>& GetRespos() const {
-        return _respos;
-    }
-    constexpr bool IsBackconverted() const {
-        return _backconverted;
-    }
-    constexpr bool IsAutocorrected() const {
-        return _autocorrected;
+    virtual ~ITelexEngine() {
     }
 
-    bool CheckInvariants() const;
+    virtual const TelexConfig& GetConfig() const = 0;
+    virtual void SetConfig(const TelexConfig& configconfig) = 0;
 
-private:
-    struct TelexConfig _config;
+    virtual void Reset() = 0;
+    virtual TelexStates PushChar(_In_ wchar_t c) = 0;
+    virtual TelexStates Backspace() = 0;
+    virtual TelexStates Commit() = 0;
+    virtual TelexStates ForceCommit() = 0;
+    virtual TelexStates Cancel() = 0;
+    virtual TelexStates Backconvert(_In_ const std::wstring& s) = 0;
 
-    TelexStates _state = TelexStates::Valid;
-
-    std::wstring _keyBuffer;
-    std::wstring _c1;
-    std::wstring _v;
-    std::wstring _c2;
-    Tones _t = Tones::Z;
-    int _toneCount = 0;
-    // don't use bool vector since that's special cased in the STL
-    /// <summary>
-    /// only use when valid;
-    /// 1 = uppercase, 0 = lowercase
-    /// </summary>
-    std::vector<int> _cases;
-    /// <summary>
-    /// for each character in the _keyBuffer, record which output character it's responsible for,
-    /// e.g. 'đuống' (dduoongs) _respos = 00122342 (T = tone, C = transition _c1, V = transition _v)
-    ///                                    C  V  T
-    /// note that respos position masks are only valid if state is Valid
-    /// </summary>
-    std::vector<int> _respos;
-    int _respos_current = 0;
-    bool _backconverted = false;
-    bool _autocorrected = false;
-
-private:
-    friend struct TelexEngineImpl;
-    bool CheckInvariantsBackspace(TelexStates prevState) const;
+    virtual TelexStates GetState() const = 0;
+    virtual std::wstring Retrieve() const = 0;
+    virtual std::wstring RetrieveRaw() const = 0;
+    virtual std::wstring Peek() const = 0;
+    virtual std::wstring::size_type Count() const = 0;
 };
+
+ITelexEngine* TelexNew(const TelexConfig&);
+void TelexDelete(ITelexEngine*);
 
 } // namespace Telex
 } // namespace VietType

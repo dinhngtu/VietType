@@ -9,6 +9,7 @@
 #include "WordListIterator.hpp"
 #include "FileUtil.hpp"
 #include "Util.h"
+#include "TelexEngine.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace VietType::Telex;

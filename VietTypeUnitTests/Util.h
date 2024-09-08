@@ -15,13 +15,13 @@ inline void AssertTelexStatesEqual(VietType::Telex::TelexStates expected, VietTy
     Assert::AreEqual(static_cast<int>(expected), static_cast<int>(actual));
 }
 
-VietType::Telex::TelexStates FeedWord(VietType::Telex::TelexEngine& e, const wchar_t* input);
+VietType::Telex::TelexStates FeedWord(VietType::Telex::ITelexEngine& e, const wchar_t* input);
 
-void TestValidWord(VietType::Telex::TelexEngine& e, const wchar_t* expected, const wchar_t* input);
+void TestValidWord(VietType::Telex::ITelexEngine& e, const wchar_t* expected, const wchar_t* input);
 
-void TestInvalidWord(VietType::Telex::TelexEngine& e, const wchar_t* expected, const wchar_t* input);
+void TestInvalidWord(VietType::Telex::ITelexEngine& e, const wchar_t* expected, const wchar_t* input);
 
-void TestPeekWord(VietType::Telex::TelexEngine& e, const wchar_t* expected, const wchar_t* input);
+void TestPeekWord(VietType::Telex::ITelexEngine& e, const wchar_t* expected, const wchar_t* input);
 
 } // namespace UnitTests
 } // namespace VietType

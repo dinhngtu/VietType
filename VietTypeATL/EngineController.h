@@ -39,11 +39,11 @@ public:
     DECLARE_PROTECT_FINAL_CONSTRUCT()
 
     _Check_return_ HRESULT
-    Initialize(_In_ Telex::TelexEngine* engine, _In_ ITfThreadMgr* threadMgr, _In_ TfClientId clientid);
+    Initialize(_In_ Telex::ITelexEngine* engine, _In_ ITfThreadMgr* threadMgr, _In_ TfClientId clientid);
     HRESULT Uninitialize();
 
-    Telex::TelexEngine& GetEngine();
-    const Telex::TelexEngine& GetEngine() const;
+    Telex::ITelexEngine& GetEngine();
+    const Telex::ITelexEngine& GetEngine() const;
 
     DWORD IsBackconvertOnBackspace();
 
@@ -67,7 +67,7 @@ private:
 private:
     bool _initialized = false;
 
-    Telex::TelexEngine* _engine = nullptr;
+    Telex::ITelexEngine* _engine = nullptr;
     CComPtr<ITfLangBarItemMgr> _langBarItemMgr;
 
     TfClientId _clientid = TF_CLIENTID_NULL;

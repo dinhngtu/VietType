@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include <chrono>
 #include "Telex.h"
+#include "TelexEngine.h"
 #include "WordListIterator.hpp"
 #include "FileUtil.hpp"
 

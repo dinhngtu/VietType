@@ -3,8 +3,21 @@
 
 #pragma once
 
+#include <optional>
+#include <utility>
+#include <string>
+
 namespace VietType {
 namespace Telex {
+
+enum class Tones {
+    Z,
+    F,
+    J,
+    R,
+    S,
+    X,
+};
 
 enum class C2Mode {
     Either,
@@ -78,6 +91,104 @@ static const CharTypes letterClasses[26] = {
     CharTypes::Tone | CharTypes::ConsoC1,                            // x
     CharTypes::Vowel,                                                // y
     CharTypes::Tone,                                                 // z
+};
+
+class TelexEngine : public ITelexEngine {
+public:
+    explicit TelexEngine(const TelexConfig& config);
+    TelexEngine(const TelexEngine&) = delete;
+    TelexEngine& operator=(const TelexEngine&) = delete;
+    TelexEngine(TelexEngine&&) = default;
+    TelexEngine& operator=(TelexEngine&&) = default;
+    virtual ~TelexEngine() {
+    }
+
+    const TelexConfig& GetConfig() const override;
+    void SetConfig(const TelexConfig& config) override;
+
+    void Reset() override;
+    TelexStates PushChar(_In_ wchar_t c) override;
+    TelexStates Backspace() override;
+    TelexStates Commit() override;
+    TelexStates ForceCommit() override;
+    TelexStates Cancel() override;
+    TelexStates Backconvert(_In_ const std::wstring& s) override;
+
+    constexpr TelexStates GetState() const override {
+        return _state;
+    }
+    std::wstring Retrieve() const override;
+    std::wstring RetrieveRaw() const override;
+    std::wstring Peek() const override;
+    constexpr std::wstring::size_type Count() const override {
+        return _keyBuffer.size();
+    }
+
+    constexpr Tones GetTone() const {
+        return _t;
+    }
+    constexpr const std::vector<int>& GetRespos() const {
+        return _respos;
+    }
+    constexpr bool IsBackconverted() const {
+        return _backconverted;
+    }
+    constexpr bool IsAutocorrected() const {
+        return _autocorrected;
+    }
+
+    bool CheckInvariants() const;
+
+private:
+    struct TelexConfig _config;
+
+    TelexStates _state = TelexStates::Valid;
+
+    std::wstring _keyBuffer;
+    std::wstring _c1;
+    std::wstring _v;
+    std::wstring _c2;
+    Tones _t = Tones::Z;
+    int _toneCount = 0;
+    // don't use bool vector since that's special cased in the STL
+    /// <summary>
+    /// only use when valid;
+    /// 1 = uppercase, 0 = lowercase
+    /// </summary>
+    std::vector<int> _cases;
+    /// <summary>
+    /// for each character in the _keyBuffer, record which output character it's responsible for,
+    /// e.g. 'đuống' (dduoongs) _respos = 00122342 (T = tone, C = transition _c1, V = transition _v)
+    ///                                    C  V  T
+    /// note that respos position masks are only valid if state is Valid
+    /// </summary>
+    std::vector<int> _respos;
+    int _respos_current = 0;
+    bool _backconverted = false;
+    bool _autocorrected = false;
+
+private:
+    friend struct TelexEngineImpl;
+    bool CheckInvariantsBackspace(TelexStates prevState) const;
+
+    template <typename T>
+    bool TransitionV(const T& source, bool w_mode = false) {
+        auto it = source.find(_v);
+        if (it != source.end() &&
+            (!w_mode || ((_v != it->second || _c2.empty()) && !(_respos.back() & ResposTransitionW)))) {
+            _v = it->second;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    void Invalidate();
+    void InvalidateAndPopBack(wchar_t c);
+    std::optional<std::pair<std::wstring_view, VInfo>> FindTable() const;
+    bool GetTonePos(_In_ bool predict, _Out_ VInfo* vinfo) const;
+    void ReapplyTone();
+    bool HasValidRespos() const;
 };
 
 } // namespace Telex

@@ -54,7 +54,7 @@ STDMETHODIMP TextService::ActivateEx(_In_ ITfThreadMgr* ptim, _In_ TfClientId ti
     _clientId = tid;
     _activateFlags = dwFlags;
 
-    _engine = std::make_unique<Telex::TelexEngine>(Telex::TelexConfig{});
+    _engine = std::unique_ptr<Telex::ITelexEngine>(Telex::TelexNew(Telex::TelexConfig{}));
 
     hr = CreateInitialize(&_engineController, _engine.get(), ptim, tid);
     HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(&_engineController) failed");
