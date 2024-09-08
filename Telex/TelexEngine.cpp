@@ -397,7 +397,6 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
             wchar_t tmpc2[2] = {c, 0};
             auto testtone = valid_c2.find(tmpc2);
             // all the c2 that share a prefix have the same restrict value
-            // i.e. valid_c2["c"]->second == valid_c2["ch"]->second
             // so we should know from just the first character
             if (testtone != valid_c2.end() && testtone->second)
                 success = false;
