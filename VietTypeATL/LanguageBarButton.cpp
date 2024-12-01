@@ -6,18 +6,17 @@
 
 namespace VietType {
 
-static DWORD GetSystemLightTheme() {
+static DWORD SystemUsesLightTheme() {
     CRegKey key;
-    DWORD light = 0;
+    DWORD light;
     LSTATUS err = key.Open(
         HKEY_CURRENT_USER, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", KEY_QUERY_VALUE);
-    if (err == ERROR_SUCCESS) {
-        err = key.QueryDWORDValue(L"SystemUsesLightTheme", light);
-        if (err != ERROR_SUCCESS) {
-            light = 0;
-        }
-    } else {
-        light = 0;
+    if (err != ERROR_SUCCESS) {
+        return 0;
+    }
+    err = key.QueryDWORDValue(L"SystemUsesLightTheme", light);
+    if (err != ERROR_SUCCESS) {
+        return 0;
     }
     return light;
 }
@@ -106,7 +105,7 @@ STDMETHODIMP LanguageBarButton::GetIcon(__RPC__deref_out_opt HICON* phIcon) {
         return E_FAIL;
     }
 
-    DWORD light = GetSystemLightTheme();
+    DWORD light = SystemUsesLightTheme();
     auto old = SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
     auto dpi = GetDpiForSystem();
     int iconx = GetSystemMetricsForDpi(SM_CXSMICON, dpi);
