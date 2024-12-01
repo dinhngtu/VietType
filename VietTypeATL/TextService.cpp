@@ -30,13 +30,23 @@ namespace VietType {
 // {7AB7384D-F5C6-43F9-B13C-80DCC788EE1D}
 static const GUID ComposingAttributeGuid = {
     0x7ab7384d, 0xf5c6, 0x43f9, {0xb1, 0x3c, 0x80, 0xdc, 0xc7, 0x88, 0xee, 0x1d}};
-static const TF_DISPLAYATTRIBUTE ComposingAttribute = {
-    {TF_CT_NONE, 0}, // text foreground
-    {TF_CT_NONE, 0}, // text background
-    TF_LS_DOT,       // underline style
-    FALSE,           // bold underline
-    {TF_CT_NONE, 0}, // underline color
-    TF_ATTR_INPUT    // attribute info
+static const std::array<TF_DISPLAYATTRIBUTE, 2> ComposingAttributes = {
+    TF_DISPLAYATTRIBUTE{
+        {TF_CT_NONE, 0}, // text foreground
+        {TF_CT_NONE, 0}, // text background
+        TF_LS_NONE,      // underline style
+        FALSE,           // bold underline
+        {TF_CT_NONE, 0}, // underline color
+        TF_ATTR_INPUT    // attribute info
+    },
+    TF_DISPLAYATTRIBUTE{
+        {TF_CT_NONE, 0}, // text foreground
+        {TF_CT_NONE, 0}, // text background
+        TF_LS_DOT,       // underline style
+        FALSE,           // bold underline
+        {TF_CT_NONE, 0}, // underline color
+        TF_ATTR_INPUT    // attribute info
+    },
 };
 
 STDMETHODIMP TextService::Activate(_In_ ITfThreadMgr* ptim, _In_ TfClientId tid) {
@@ -64,11 +74,12 @@ STDMETHODIMP TextService::ActivateEx(_In_ ITfThreadMgr* ptim, _In_ TfClientId ti
     CComPtr<DisplayAttributeInfo> composingAttrib;
     DWORD showComposingAttr;
     _engineController->GetSettings()->IsShowingComposingAttr(&showComposingAttr);
-    if (showComposingAttr) {
-        hr = CreateInitialize(&composingAttrib, ComposingAttributeGuid, L"Composing", ComposingAttribute);
-        HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&attr1) failed");
-        _attributeStore->AddAttribute(composingAttrib);
-    }
+    if (showComposingAttr >= ComposingAttributes.size())
+        showComposingAttr = 0;
+    hr = CreateInitialize(
+        &composingAttrib, ComposingAttributeGuid, L"Composing", ComposingAttributes[showComposingAttr]);
+    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&attr1) failed");
+    _attributeStore->AddAttribute(composingAttrib);
 
     hr = CreateInitialize(
         &_compositionManager,
