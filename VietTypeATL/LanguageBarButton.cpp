@@ -136,11 +136,9 @@ STDMETHODIMP LanguageBarButton::GetTooltipString(__RPC__deref_out_opt BSTR* pbst
     if (!pbstrText) {
         return E_INVALIDARG;
     }
-    const wchar_t* status = L"";
-    if (_controller->GetBlocked() == EngineController::BlockedKind::Blocked) {
-        status = L"Paused";
-    } else {
-        status = _controller->IsEnabled() ? L"Vietnamese" : L"English";
+    const wchar_t* status = Globals::TextServiceDescription;
+    if (_controller->GetBlocked() != EngineController::BlockedKind::Blocked) {
+        status = _controller->IsEnabled() ? L"Ti\x1ebfng Vi\x1ec7t" : L"English";
     }
     *pbstrText = SysAllocString(status);
     return *pbstrText ? S_OK : E_OUTOFMEMORY;
