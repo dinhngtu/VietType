@@ -67,7 +67,7 @@ STDMETHODIMP LanguageBarButton::GetInfo(__RPC__out TF_LANGBARITEMINFO* pInfo) {
     pInfo->guidItem = _guidItem;
     pInfo->dwStyle = _style;
     pInfo->ulSort = _sort;
-    StringCchCopy(pInfo->szDescription, TF_LBI_DESC_MAXLEN, _description);
+    StringCchCopyW(pInfo->szDescription, TF_LBI_DESC_MAXLEN, _description.c_str());
 
     return S_OK;
 }

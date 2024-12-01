@@ -59,7 +59,7 @@ private:
     GUID _guidItem = {0};
     DWORD _style = 0;
     ULONG _sort = 0;
-    const wchar_t* _description;
+    std::wstring _description;
 
     EngineController* _controller = nullptr;
     CComPtr<ITfLangBarItemMgr> _langBarItemMgr;
