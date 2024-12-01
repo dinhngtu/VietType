@@ -31,7 +31,7 @@ STDMETHODIMP DisplayAttributeInfo::Reset(void) {
 }
 
 HRESULT DisplayAttributeInfo::Initialize(
-    _In_ const GUID& guid, _In_ std::wstring description, _In_ TF_DISPLAYATTRIBUTE attr) {
+    _In_ const GUID& guid, _In_z_ const wchar_t* description, _In_ const TF_DISPLAYATTRIBUTE& attr) {
     _guid = guid;
     _description = description;
     _attr = attr;

@@ -6,16 +6,16 @@
 #include <AccCtrl.h>
 #include <AclAPI.h>
 
-constexpr DWORD ILOT_UNINSTALL = 0x00000001;
+static constexpr DWORD ILOT_UNINSTALL = 0x00000001;
 using InstallLayoutOrTip_t = BOOL(CALLBACK*)(_In_ LPCWSTR psz, DWORD dwFlags);
 
-static std::vector<GUID> SupportedCategories = {
-    GUID_TFCAT_TIP_KEYBOARD,
-    GUID_TFCAT_TIPCAP_UIELEMENTENABLED,  // UI-less
-    GUID_TFCAT_TIPCAP_COMLESS,           // Google says this is required for WoW apps
-    GUID_TFCAT_TIPCAP_IMMERSIVESUPPORT,  // store apps?
-    GUID_TFCAT_TIPCAP_SYSTRAYSUPPORT,    // systray on win8+?
-    GUID_TFCAT_DISPLAYATTRIBUTEPROVIDER, // display attributes for composition
+static const std::array<const GUID*, 6> SupportedCategories = {
+    &GUID_TFCAT_TIP_KEYBOARD,
+    &GUID_TFCAT_TIPCAP_UIELEMENTENABLED,  // UI-less
+    &GUID_TFCAT_TIPCAP_COMLESS,           // Google says this is required for WoW apps
+    &GUID_TFCAT_TIPCAP_IMMERSIVESUPPORT,  // store apps?
+    &GUID_TFCAT_TIPCAP_SYSTRAYSUPPORT,    // systray on win8+?
+    &GUID_TFCAT_DISPLAYATTRIBUTEPROVIDER, // display attributes for composition
 };
 
 // allow ALL APPLICATION PACKAGES permissions to query value
@@ -150,10 +150,10 @@ static HRESULT RegisterCategories() {
     hr = categoryMgr.CoCreateInstance(CLSID_TF_CategoryMgr, NULL, CLSCTX_INPROC_SERVER);
     HRESULT_CHECK_RETURN(hr, L"%s", L"categoryMgr.CoCreateInstance failed");
 
-    for (const auto& cat : SupportedCategories) {
-        DBG_DPRINT(L"registering " GUID_WFORMAT, GUID_COMPONENTS(cat));
+    for (const auto cat : SupportedCategories) {
+        DBG_DPRINT(L"registering " GUID_WFORMAT, GUID_COMPONENTS(*cat));
         hr = categoryMgr->RegisterCategory(
-            VietType::Globals::CLSID_TextService, cat, VietType::Globals::CLSID_TextService);
+            VietType::Globals::CLSID_TextService, *cat, VietType::Globals::CLSID_TextService);
         HRESULT_CHECK_RETURN(hr, L"%s", L"categoryMgr->RegisterCategory failed");
     }
 
