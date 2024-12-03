@@ -20,8 +20,8 @@
     <SuppressSpecificWarnings>1103</SuppressSpecificWarnings>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="WixToolset.Util.wixext" Version="5.0.1" />
-    <PackageReference Include="WixToolset.UI.wixext" Version="5.0.1" />
+    <PackageReference Include="WixToolset.Util.wixext" Version="5.0.2" />
+    <PackageReference Include="WixToolset.UI.wixext" Version="5.0.2" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="licembed.rtf" />
