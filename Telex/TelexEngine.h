@@ -5,6 +5,7 @@
 
 #include <optional>
 #include <utility>
+#include <vector>
 #include <string>
 
 namespace VietType {
