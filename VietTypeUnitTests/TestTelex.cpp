@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 #include "stdafx.h"
-#include <functional>
 #include "Util.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -10,36 +9,6 @@ using namespace VietType::Telex;
 
 namespace VietType {
 namespace UnitTests {
-
-class MultiConfigTester {
-public:
-    MultiConfigTester(
-        const TelexConfig& config,
-        int optimizeMultilangMin = 0,
-        int optimizeMultilangMax = 3,
-        bool testAutocorrect = true)
-        : _config(config), _omMin(optimizeMultilangMin), _omMax(optimizeMultilangMax), _ac(testAutocorrect) {
-    }
-
-    void Invoke(std::function<void(ITelexEngine&)> f) const {
-        for (int level = _omMin; level <= _omMax; level++) {
-            for (int autocorrect = _ac ? 0 : 1; autocorrect <= 1; autocorrect++) {
-                auto config = _config;
-                config.optimize_multilang = level;
-                if (_ac)
-                    config.autocorrect = !!autocorrect;
-                std::unique_ptr<ITelexEngine> e(TelexNew(config));
-                f(*e);
-            }
-        }
-    }
-
-private:
-    TelexConfig _config;
-    int _omMin;
-    int _omMax;
-    bool _ac;
-};
 
 TEST_CLASS (TestTelex) {
     const TelexConfig config{};

@@ -13,11 +13,11 @@ namespace Telex {
 
 enum class Tones {
     Z,
-    F,
-    J,
-    R,
     S,
+    F,
+    R,
     X,
+    J,
 };
 
 enum class C2Mode {
@@ -55,6 +55,8 @@ enum class CharTypes : unsigned int {
     ConsoC2 = 1 << 5 | 1 << 7,
     ConsoContinue = 1 << 5 | 1 << 8,
     Tone = 1 << 9,
+    // vni
+    Dd = 1 << 10,
 };
 
 constexpr CharTypes operator|(CharTypes lhs, CharTypes rhs) {
@@ -69,7 +71,7 @@ static const CharTypes letterClasses[26] = {
     CharTypes::Vowel,                                                // a
     CharTypes::ConsoC1,                                              // b
     CharTypes::ConsoC1 | CharTypes::ConsoC2,                         // c
-    CharTypes::ConsoC1 | CharTypes::ConsoContinue,                   // d
+    CharTypes::ConsoC1 | CharTypes::ConsoContinue | CharTypes::Dd,   // d
     CharTypes::Vowel,                                                // e
     CharTypes::Tone,                                                 // f
     CharTypes::ConsoC1 | CharTypes::ConsoContinue,                   // g
@@ -92,6 +94,48 @@ static const CharTypes letterClasses[26] = {
     CharTypes::Tone | CharTypes::ConsoC1,                            // x
     CharTypes::Vowel,                                                // y
     CharTypes::Tone,                                                 // z
+};
+
+static const CharTypes letterClasses_vni[26] = {
+    CharTypes::Vowel,                              // a
+    CharTypes::ConsoC1,                            // b
+    CharTypes::ConsoC1 | CharTypes::ConsoC2,       // c
+    CharTypes::ConsoC1,                            // d
+    CharTypes::Vowel,                              // e
+    CharTypes::Uncategorized,                      // f
+    CharTypes::ConsoC1 | CharTypes::ConsoContinue, // g
+    CharTypes::ConsoC1 | CharTypes::ConsoContinue, // h
+    CharTypes::Vowel,                              // i
+    CharTypes::Uncategorized,                      // j
+    CharTypes::ConsoC1,                            // k
+    CharTypes::ConsoC1,                            // l
+    CharTypes::ConsoC1 | CharTypes::ConsoC2,       // m
+    CharTypes::ConsoC1 | CharTypes::ConsoC2,       // n
+    CharTypes::Vowel,                              // o
+    CharTypes::ConsoC1 | CharTypes::ConsoC2,       // p
+    CharTypes::ConsoC1,                            // q
+    CharTypes::ConsoC1 | CharTypes::ConsoContinue, // r
+    CharTypes::ConsoC1 | CharTypes::ConsoContinue, // s
+    CharTypes::ConsoC1 | CharTypes::ConsoC2,       // t
+    CharTypes::Vowel,                              // u
+    CharTypes::ConsoC1,                            // v
+    CharTypes::Uncategorized,                      // w
+    CharTypes::ConsoC1,                            // x
+    CharTypes::Vowel,                              // y
+    CharTypes::Uncategorized,                      // z
+};
+
+static const CharTypes digitClasses[10] = {
+    CharTypes::Tone,   // 0
+    CharTypes::Tone,   // 1
+    CharTypes::Tone,   // 2
+    CharTypes::Tone,   // 3
+    CharTypes::Tone,   // 4
+    CharTypes::Tone,   // 5
+    CharTypes::Vowel,  // 6
+    CharTypes::VowelW, // 7
+    CharTypes::VowelW, // 8
+    CharTypes::Dd,     // 9
 };
 
 class TelexEngine : public ITelexEngine {
@@ -184,6 +228,8 @@ private:
         }
     }
 
+    Tones GetCharTone(_In_ wchar_t c) const;
+    CharTypes ClassifyCharacter(_In_ wchar_t lc) const;
     void Invalidate();
     void InvalidateAndPopBack(wchar_t c);
     std::optional<std::pair<std::wstring_view, VInfo>> FindTable() const;

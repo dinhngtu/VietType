@@ -60,6 +60,36 @@ static_assert(std::all_of(transitions.begin(), transitions.end(), [](const auto&
 }));
 
 MAKE_SORTED_MAP(
+    transitions_vni,
+    std::wstring_view,
+    std::wstring_view,
+    P(L"a6", L"\xe2"),              //
+    P(L"au6", L"\xe2u"),            //
+    P(L"ay6", L"\xe2y"),            //
+    P(L"e6", L"\xea"),              //
+    P(L"eu6", L"\xeau"),            //
+    P(L"ie6", L"i\xea"),            //
+    P(L"ieu6", L"i\xeau"),          //
+    P(L"o6", L"\xf4"),              //
+    P(L"oi6", L"\xf4i"),            //
+    P(L"ua6", L"u\xe2"),            //
+    P(L"uay6", L"u\xe2y"),          //
+    P(L"ue6", L"u\xea"),            //
+    P(L"uo6", L"u\xf4"),            //
+    P(L"uoi6", L"u\xf4i"),          //
+    P(L"uye6", L"uy\xea"),          //
+    P(L"u\x1a1i", L"\x1b0\x1a1i"),  //
+    P(L"u\x1a1u", L"\x1b0\x1a1u"),  //
+    P(L"ye6", L"y\xea"),            //
+    P(L"yeu6", L"y\xeau"),          //
+    P(L"\xf4\x36", L"oo"),          //
+    P(L"\x1b0\x36", L"\x1b0\x1a1"), //
+);
+static_assert(std::all_of(transitions_vni.begin(), transitions_vni.end(), [](const auto& x) {
+    return x.second.length() <= x.first.length();
+}));
+
+MAKE_SORTED_MAP(
     respos,
     std::wstring_view,
     int,
@@ -167,18 +197,18 @@ MAKE_SORTED_MAP(
     transitions_tones,
     wchar_t,
     std::wstring_view,
-    P2(L'a', L"a\xe0\x1ea1\x1ea3\xe1\xe3"),               //
-    P2(L'e', L"e\xe8\x1eb9\x1ebb\xe9\x1ebd"),             //
-    P2(L'i', L"i\xec\x1ecb\x1ec9\xed\x129"),              //
-    P2(L'o', L"o\xf2\x1ecd\x1ecf\xf3\xf5"),               //
-    P2(L'u', L"u\xf9\x1ee5\x1ee7\xfa\x169"),              //
-    P2(L'y', L"y\x1ef3\x1ef5\x1ef7\xfd\x1ef9"),           //
-    P2(L'\xe2', L"\xe2\x1ea7\x1ead\x1ea9\x1ea5\x1eab"),   //
-    P2(L'\xea', L"\xea\x1ec1\x1ec7\x1ec3\x1ebf\x1ec5"),   //
-    P2(L'\xf4', L"\xf4\x1ed3\x1ed9\x1ed5\x1ed1\x1ed7"),   //
-    P2(L'\x103', L"\x103\x1eb1\x1eb7\x1eb3\x1eaf\x1eb5"), //
-    P2(L'\x1a1', L"\x1a1\x1edd\x1ee3\x1edf\x1edb\x1ee1"), //
-    P2(L'\x1b0', L"\x1b0\x1eeb\x1ef1\x1eed\x1ee9\x1eef"), //
+    P2(L'a', L"a\xe1\xe0\x1ea3\xe3\x1ea1"),               //
+    P2(L'e', L"e\xe9\xe8\x1ebb\x1ebd\x1eb9"),             //
+    P2(L'i', L"i\xed\xec\x1ec9\x129\x1ecb"),              //
+    P2(L'o', L"o\xf3\xf2\x1ecf\xf5\x1ecd"),               //
+    P2(L'u', L"u\xfa\xf9\x1ee7\x169\x1ee5"),              //
+    P2(L'y', L"y\xfd\x1ef3\x1ef7\x1ef9\x1ef5"),           //
+    P2(L'\xe2', L"\xe2\x1ea5\x1ea7\x1ea9\x1eab\x1ead"),   //
+    P2(L'\xea', L"\xea\x1ebf\x1ec1\x1ec3\x1ec5\x1ec7"),   //
+    P2(L'\xf4', L"\xf4\x1ed1\x1ed3\x1ed5\x1ed7\x1ed9"),   //
+    P2(L'\x103', L"\x103\x1eaf\x1eb1\x1eb3\x1eb5\x1eb7"), //
+    P2(L'\x1a1', L"\x1a1\x1edb\x1edd\x1edf\x1ee1\x1ee3"), //
+    P2(L'\x1b0', L"\x1b0\x1ee9\x1eeb\x1eed\x1eef\x1ef1"), //
 );
 static_assert(std::all_of(transitions_tones.begin(), transitions_tones.end(), [](const auto& x) {
     return x.second.length() == transitions_tones[0].second.length();

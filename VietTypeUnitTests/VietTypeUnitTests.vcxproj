@@ -121,6 +121,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TestTelex.cpp" />
+    <ClCompile Include="TestVni.cpp" />
     <ClCompile Include="TestWordList.cpp" />
     <ClCompile Include="Util.cpp" />
   </ItemGroup>

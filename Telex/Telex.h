@@ -32,6 +32,7 @@ enum class TelexStates {
 };
 
 struct TelexConfig {
+    bool vni = false;
     // put the tone in "oa"/"uy" in the second character instead of the first
     bool oa_uy_tone1 = true;
     // allow typing the second 'd' of 'dd' anywhere in the word

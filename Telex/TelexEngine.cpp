@@ -22,32 +22,6 @@ void TelexDelete(ITelexEngine* engine) {
 
 constexpr size_t MaxLength = 10; // enough for "nghieengsz" and "nhuwowngxf"
 
-static CharTypes ClassifyCharacter(_In_ wchar_t lc) {
-    if (lc >= L'a' && lc <= L'z') {
-        return letterClasses[lc - L'a'];
-    }
-    return CharTypes::Uncategorized;
-}
-
-static Tones GetCharTone(_In_ wchar_t c) {
-    switch (c) {
-    case L'z':
-        return Tones::Z;
-    case L'f':
-        return Tones::F;
-    case L'j':
-        return Tones::J;
-    case L'r':
-        return Tones::R;
-    case L's':
-        return Tones::S;
-    case L'x':
-        return Tones::X;
-    default:
-        return Tones::Z;
-    }
-}
-
 // case functions hardcode ranges of Vietnamese characters
 // the rest can be correctly transformed or not, doesn't matter
 
@@ -121,6 +95,46 @@ static void ApplyCases(_In_ std::wstring& str, _In_ const std::vector<int>& case
             str[i] = ToUpper(str[i]);
         }
     }
+}
+
+Tones TelexEngine::GetCharTone(_In_ wchar_t c) const {
+    if (_config.vni) {
+        if (c >= L'0' && c <= L'5') {
+            return static_cast<Tones>(c - L'0');
+        }
+    } else {
+        switch (c) {
+        case L'z':
+            return Tones::Z;
+        case L'f':
+            return Tones::F;
+        case L'j':
+            return Tones::J;
+        case L'r':
+            return Tones::R;
+        case L's':
+            return Tones::S;
+        case L'x':
+            return Tones::X;
+        }
+    }
+    return Tones::Z;
+}
+
+CharTypes TelexEngine::ClassifyCharacter(_In_ wchar_t lc) const {
+    if (_config.vni) {
+        if (lc >= L'a' && lc <= L'z') {
+            return letterClasses_vni[lc - L'a'];
+        }
+        if (lc >= L'0' && lc <= L'9') {
+            return digitClasses[lc - L'0'];
+        }
+    } else {
+        if (lc >= L'a' && lc <= L'z') {
+            return letterClasses[lc - L'a'];
+        }
+    }
+    return CharTypes::Uncategorized;
 }
 
 void TelexEngine::Invalidate() {
@@ -282,13 +296,13 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
         _cases.push_back(ccase);
         _respos.push_back(_respos_current++);
 
-    } else if (_c1 == L"d" && c == L'd' && (_config.accept_separate_dd || (_v.empty() && _c2.empty()))) {
+    } else if (_c1 == L"d" && IS(cat, CharTypes::Dd) && (_config.accept_separate_dd || (_v.empty() && _c2.empty()))) {
         // only used for 'dd'
         // relaxed constraint: _v.empty()
         _c1 = L"\x111";
         _respos.push_back(0 | ResposTransitionC1);
 
-    } else if (_c1 == L"\x111" && c == L'd') {
+    } else if (_c1 == L"\x111" && IS(cat, CharTypes::Dd)) {
         // only used for 'dd'
         // relaxed constraint: _v.empty()
         if (_keyBuffer.size() > 1 && ToLower(_keyBuffer.rbegin()[1]) == L'd')
@@ -307,7 +321,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
         // vowel parts (aeiouy)
         _v.push_back(c);
         auto before = _v.size();
-        if (TransitionV(transitions)) {
+        if (TransitionV(_config.vni ? transitions_vni : transitions)) {
             auto after = _v.size();
             if (_config.optimize_multilang >= 3 && _toneCount) {
                 Invalidate();

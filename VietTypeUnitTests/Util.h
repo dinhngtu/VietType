@@ -4,6 +4,7 @@
 #pragma once
 
 #include "stdafx.h"
+#include <functional>
 #include "Telex.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -22,6 +23,36 @@ void TestValidWord(VietType::Telex::ITelexEngine& e, const wchar_t* expected, co
 void TestInvalidWord(VietType::Telex::ITelexEngine& e, const wchar_t* expected, const wchar_t* input);
 
 void TestPeekWord(VietType::Telex::ITelexEngine& e, const wchar_t* expected, const wchar_t* input);
+
+class MultiConfigTester {
+public:
+    MultiConfigTester(
+        const VietType::Telex::TelexConfig& config,
+        int optimizeMultilangMin = 0,
+        int optimizeMultilangMax = 3,
+        bool testAutocorrect = true)
+        : _config(config), _omMin(optimizeMultilangMin), _omMax(optimizeMultilangMax), _ac(testAutocorrect) {
+    }
+
+    void Invoke(std::function<void(VietType::Telex::ITelexEngine&)> f) const {
+        for (int level = _omMin; level <= _omMax; level++) {
+            for (int autocorrect = _ac ? 0 : 1; autocorrect <= 1; autocorrect++) {
+                auto config = _config;
+                config.optimize_multilang = level;
+                if (_ac)
+                    config.autocorrect = !!autocorrect;
+                std::unique_ptr<VietType::Telex::ITelexEngine> e(VietType::Telex::TelexNew(config));
+                f(*e);
+            }
+        }
+    }
+
+private:
+    VietType::Telex::TelexConfig _config;
+    int _omMin;
+    int _omMax;
+    bool _ac;
+};
 
 } // namespace UnitTests
 } // namespace VietType
