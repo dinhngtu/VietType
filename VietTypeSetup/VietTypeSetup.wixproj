@@ -34,4 +34,5 @@
   <PropertyGroup>
     <PreBuildEvent>powershell.exe -noprofile -noninteractive -executionpolicy bypass $(SolutionDir)\UpdateVersionWix.ps1</PreBuildEvent>
   </PropertyGroup>
+  <Target Condition="'$(MSBuildProjectExtension)'=='.wixproj'" Name="CollectSuggestedVisualStudioComponentIds" />
 </Project>
