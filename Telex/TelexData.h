@@ -89,21 +89,19 @@ debug_ensure(std::all_of(respos.begin(), respos.end(), [](const auto& x) {
 
 MAKE_MAP(
     transitions_w,
-    true,
+    false,
     std::wstring_view,
     std::wstring_view,
-    P(L"a", L"\x103"),
-    P(L"o", L"\x1a1"),
-    P(L"oa", L"o\x103"),
-    P(L"oi", L"\x1a1i"),
-    P(L"u", L"\x1b0"),
-    P(L"ua", L"\x1b0\x61"),
-    P(L"ui", L"\x1b0i"),
-    P(L"uo", L"u\x1a1"),
-    P(L"uoi", L"\x1b0\x1a1i"),
-    P(L"uou", L"\x1b0\x1a1u"),
-    P(L"uu", L"\x1b0u"),
-    P(L"\x1b0o", L"\x1b0\x1a1"),
+    P(L"o", L"\x1a1"),           //
+    P(L"oi", L"\x1a1i"),         //
+    P(L"u", L"\x1b0"),           //
+    P(L"ua", L"\x1b0\x61"),      //
+    P(L"ui", L"\x1b0i"),         //
+    P(L"uo", L"u\x1a1"),         //
+    P(L"uoi", L"\x1b0\x1a1i"),   //
+    P(L"uou", L"\x1b0\x1a1u"),   //
+    P(L"uu", L"\x1b0u"),         //
+    P(L"\x1b0o", L"\x1b0\x1a1"), //
     // identical transitions are ignored if the last "w" is typed immediately after V without repeating (e.g.
     // "uwow")
     P(L"\x1b0\x1a1", L"\x1b0\x1a1"), //
@@ -118,12 +116,29 @@ MAKE_MAP(
     std::wstring_view,
     std::wstring_view,
     P(L"u", L"\x1b0"),
-    P(L"ua", L"u\x103"),
     P(L"uo", L"u\x1a1"),
     P(L"uoi", L"u\x1a1i"),
     P(L"\x1b0\x1a1", L"\x1b0\x1a1"), //
 );
 debug_ensure(std::all_of(transitions_w_q.begin(), transitions_w_q.end(), [](const auto& x) {
+    return x.second.length() == x.first.length();
+}));
+
+MAKE_MAP(
+    transitions_wa,
+    false,
+    std::wstring_view,
+    std::wstring_view,
+    P(L"a", L"\x103"),   //
+    P(L"oa", L"o\x103"), //
+    P(L"ua", L"u\x103"), //
+);
+debug_ensure(std::all_of(transitions_wa.begin(), transitions_wa.end(), [](const auto& x) {
+    return x.second.length() == x.first.length();
+}));
+
+MAKE_MAP(transitions_wa_q, false, std::wstring_view, std::wstring_view, P(L"ua", L"u\x103"));
+debug_ensure(std::all_of(transitions_wa.begin(), transitions_wa.end(), [](const auto& x) {
     return x.second.length() == x.first.length();
 }));
 
@@ -148,7 +163,7 @@ debug_ensure(std::all_of(respos_w.begin(), respos_w.end(), [](const auto& x) {
 }));
 
 MAKE_MAP(
-    transitions_v_c2,
+    transitions_wv_c2,
     false,
     std::wstring_view,
     std::wstring_view,
@@ -158,12 +173,12 @@ MAKE_MAP(
       L"u\x103"),                //
     P(L"\x1b0o", L"\x1b0\x1a1"), //
 );
-debug_ensure(std::all_of(transitions_v_c2.begin(), transitions_v_c2.end(), [](const auto& x) {
+debug_ensure(std::all_of(transitions_wv_c2.begin(), transitions_wv_c2.end(), [](const auto& x) {
     return x.second.length() == x.first.length();
 }));
 
-MAKE_MAP(transitions_v_c2_q, false, std::wstring_view, std::wstring_view, P(L"\x1b0o", L"\x1b0\x1a1"));
-debug_ensure(std::all_of(transitions_v_c2_q.begin(), transitions_v_c2_q.end(), [](const auto& x) {
+MAKE_MAP(transitions_wv_c2_q, false, std::wstring_view, std::wstring_view, P(L"\x1b0o", L"\x1b0\x1a1"));
+debug_ensure(std::all_of(transitions_wv_c2_q.begin(), transitions_wv_c2_q.end(), [](const auto& x) {
     return x.second.length() == x.first.length();
 }));
 
@@ -1175,7 +1190,7 @@ const std::array<const TypingStyle, 3> typing_styles = {
                 CharTypes::ConsoC1 | CharTypes::ConsoC2,                          // t
                 CharTypes::Vowel | CharTypes::Transition,                         // u
                 CharTypes::ConsoC1,                                               // v
-                CharTypes::W,                                                     // w
+                CharTypes::W | CharTypes::WA,                                     // w
                 CharTypes::ToneX | CharTypes::ConsoC1,                            // x
                 CharTypes::Vowel | CharTypes::Transition,                         // y
                 CharTypes::ToneZ,                                                 // z
@@ -1250,7 +1265,7 @@ const std::array<const TypingStyle, 3> typing_styles = {
                 CharTypes::ToneJ,      // 5
                 CharTypes::Transition, // 6
                 CharTypes::W,          // 7
-                CharTypes::W,          // 8
+                CharTypes::WA,         // 8
                 CharTypes::Dd,         // 9
                 CharTypes::Uncategorized,
                 CharTypes::Uncategorized,

@@ -367,21 +367,19 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
             InvalidateAndPopBack(c);
         }
 
-    } else if (IS(cat, CharTypes::W)) {
+    } else if (IS(cat, CharTypes::W | CharTypes::WA)) {
         if (!_v.empty()) {
-            bool tw;
-            if (_c1 == L"q") {
-                tw = TransitionV(transitions_w_q, true);
-            } else {
-                tw = TransitionV(transitions_w, true);
+            bool tw = false;
+            if (IS(cat, CharTypes::W)) {
+                tw = TransitionV(_c1 == L"q" ? transitions_w_q : transitions_w, true);
+            }
+            if (!tw && IS(cat, CharTypes::WA)) {
+                // with the dual-action "w" in telex, CharTypes::W takes priority
+                tw = TransitionV(_c1 == L"q" ? transitions_wa_q : transitions_wa, true);
             }
             if (tw) {
                 if (!_c2.empty()) {
-                    if (_c1 == L"q") {
-                        TransitionV(transitions_v_c2_q);
-                    } else {
-                        TransitionV(transitions_v_c2);
-                    }
+                    TransitionV(_c1 == L"q" ? transitions_wv_c2_q : transitions_wv_c2);
                 }
                 _respos.push_back(static_cast<int>(_c1.size() + _v.size() - 1) | ResposTransitionW);
             } else {
@@ -425,11 +423,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
                 success = false;
         }
         if (success) {
-            if (_c1 == L"q") {
-                TransitionV(transitions_v_c2_q);
-            } else {
-                TransitionV(transitions_v_c2);
-            }
+            TransitionV(_c1 == L"q" ? transitions_wv_c2_q : transitions_wv_c2);
             _c2.push_back(c);
             _cases.push_back(ccase);
             _respos.push_back(_respos_current++);

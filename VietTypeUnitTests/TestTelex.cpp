@@ -33,7 +33,7 @@ TEST_CLASS (TestTelex) {
 public:
     // reset
 
-    TEST_METHOD (TestEmpty) {
+    TEST_METHOD (TestTelexEmpty) {
         MultiConfigTester(config).Invoke([](auto& e) {
             e.Reset();
             Assert::AreEqual(L"", e.Retrieve().c_str());
@@ -45,7 +45,7 @@ public:
 
     // push char
 
-    TEST_METHOD (TestEmptyPushCharC1_1) {
+    TEST_METHOD (TestTelexEmptyPushCharC1_1) {
         MultiConfigTester(config).Invoke([](auto& e) {
             e.Reset();
             AssertTelexStatesEqual(TelexStates::Valid, e.PushChar(L'b'));
@@ -53,7 +53,7 @@ public:
         });
     }
 
-    TEST_METHOD (TestEmptyPushCharC1_2) {
+    TEST_METHOD (TestTelexEmptyPushCharC1_2) {
         MultiConfigTester(config).Invoke([](auto& e) {
             e.Reset();
             AssertTelexStatesEqual(TelexStates::Valid, e.PushChar(L'c'));
@@ -61,7 +61,7 @@ public:
         });
     }
 
-    TEST_METHOD (TestEmptyPushCharC1_3) {
+    TEST_METHOD (TestTelexEmptyPushCharC1_3) {
         MultiConfigTester(config).Invoke([](auto& e) {
             e.Reset();
             AssertTelexStatesEqual(TelexStates::Valid, e.PushChar(L'd'));
@@ -69,7 +69,7 @@ public:
         });
     }
 
-    TEST_METHOD (TestEmptyPushCharC1_4) {
+    TEST_METHOD (TestTelexEmptyPushCharC1_4) {
         MultiConfigTester(config).Invoke([](auto& e) {
             e.Reset();
             AssertTelexStatesEqual(TelexStates::Valid, e.PushChar(L'r'));
@@ -77,7 +77,7 @@ public:
         });
     }
 
-    TEST_METHOD (TestEmptyPushCharC1_5) {
+    TEST_METHOD (TestTelexEmptyPushCharC1_5) {
         MultiConfigTester(config).Invoke([](auto& e) {
             e.Reset();
             AssertTelexStatesEqual(TelexStates::Valid, e.PushChar(L'x'));
@@ -85,7 +85,7 @@ public:
         });
     }
 
-    TEST_METHOD (TestEmptyPushCharV) {
+    TEST_METHOD (TestTelexEmptyPushCharV) {
         MultiConfigTester(config).Invoke([](auto& e) {
             e.Reset();
             AssertTelexStatesEqual(TelexStates::Valid, e.PushChar(L'a'));
@@ -93,7 +93,7 @@ public:
         });
     }
 
-    TEST_METHOD (TestEmptyCommittedPushChar) {
+    TEST_METHOD (TestTelexEmptyCommittedPushChar) {
         MultiConfigTester(config).Invoke([](auto& e) {
             e.Reset();
             AssertTelexStatesEqual(TelexStates::Committed, e.Commit());
@@ -107,7 +107,7 @@ public:
 
     // uppercase
 
-    TEST_METHOD (TestEmptyPushCharUpC1) {
+    TEST_METHOD (TestTelexEmptyPushCharUpC1) {
         MultiConfigTester(config).Invoke([](auto& e) {
             e.Reset();
             AssertTelexStatesEqual(TelexStates::Valid, e.PushChar(L'B'));
@@ -115,7 +115,7 @@ public:
         });
     }
 
-    TEST_METHOD (TestEmptyPushCharUpV) {
+    TEST_METHOD (TestTelexEmptyPushCharUpV) {
         MultiConfigTester(config).Invoke([](auto& e) {
             e.Reset();
             AssertTelexStatesEqual(TelexStates::Valid, e.PushChar(L'A'));
@@ -123,37 +123,37 @@ public:
         });
     }
 
-    TEST_METHOD (TestTypingUpAai_1) {
+    TEST_METHOD (TestTelexTypingUpAai_1) {
         TestValidWord(L"\xc2n", L"AAn");
     }
 
-    TEST_METHOD (TestTypingUpAai_2) {
+    TEST_METHOD (TestTelexTypingUpAai_2) {
         TestValidWord(L"\xc2n", L"Aan");
     }
 
-    TEST_METHOD (TestTypingUpDdi_1) {
+    TEST_METHOD (TestTelexTypingUpDdi_1) {
         TestValidWord(L"\x110i", L"DDi");
     }
 
-    TEST_METHOD (TestTypingUpDdi_2) {
+    TEST_METHOD (TestTelexTypingUpDdi_2) {
         TestValidWord(L"\x110i", L"Ddi");
     }
 
-    TEST_METHOD (TestTypingUpAasn_1) {
+    TEST_METHOD (TestTelexTypingUpAasn_1) {
         TestValidWord(L"\x1ea4n", L"AASn");
     }
 
-    TEST_METHOD (TestTypingUpAasn_2) {
+    TEST_METHOD (TestTelexTypingUpAasn_2) {
         TestValidWord(L"\x1ea4n", L"Aasn");
     }
 
-    TEST_METHOD (TestTypingUpAasn_3) {
+    TEST_METHOD (TestTelexTypingUpAasn_3) {
         TestValidWord(L"\x1ea4n", L"AAsn");
     }
 
     // backspace
 
-    TEST_METHOD (TestEmptyBackspace) {
+    TEST_METHOD (TestTelexEmptyBackspace) {
         MultiConfigTester(config).Invoke([](auto& e) {
             e.Reset();
             // must leave the class in a valid state
@@ -164,7 +164,7 @@ public:
 
     // commit
 
-    TEST_METHOD (TestEmptyCommit) {
+    TEST_METHOD (TestTelexEmptyCommit) {
         MultiConfigTester(config).Invoke([](auto& e) {
             e.Reset();
             AssertTelexStatesEqual(TelexStates::Committed, e.Commit());
@@ -172,7 +172,7 @@ public:
         });
     }
 
-    TEST_METHOD (TestEmptyForceCommit) {
+    TEST_METHOD (TestTelexEmptyForceCommit) {
         MultiConfigTester(config).Invoke([](auto& e) {
             e.Reset();
             AssertTelexStatesEqual(TelexStates::Committed, e.ForceCommit());
@@ -180,7 +180,7 @@ public:
         });
     }
 
-    TEST_METHOD (TestEmptyCancel) {
+    TEST_METHOD (TestTelexEmptyCancel) {
         MultiConfigTester(config).Invoke([](auto& e) {
             e.Reset();
             AssertTelexStatesEqual(TelexStates::CommittedInvalid, e.Cancel());
@@ -188,7 +188,7 @@ public:
         });
     }
 
-    TEST_METHOD (TestEmptyBackconversion) {
+    TEST_METHOD (TestTelexEmptyBackconversion) {
         MultiConfigTester(config).Invoke([](auto& e) {
             e.Reset();
             AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(std::wstring()));
@@ -198,217 +198,217 @@ public:
 
     // word typing tests
 
-    TEST_METHOD (TestTypingDdoongf) {
+    TEST_METHOD (TestTelexTypingDdoongf) {
         TestValidWord(L"\x111\x1ed3ng", L"ddoongf");
     }
 
-    TEST_METHOD (TestTypingAans) {
+    TEST_METHOD (TestTelexTypingAans) {
         TestValidWord(L"\x1ea5n", L"aans");
     }
 
-    TEST_METHOD (TestTypingDdas) {
+    TEST_METHOD (TestTelexTypingDdas) {
         TestValidWord(L"\x111\xe1", L"ddas");
     }
 
-    TEST_METHOD (TestTypingNhuwonxg) {
+    TEST_METHOD (TestTelexTypingNhuwonxg) {
         TestValidWord(L"nh\x1b0\x1ee1ng", L"nhuwonxg");
     }
 
-    TEST_METHOD (TestTypingNguiw) {
+    TEST_METHOD (TestTelexTypingNguiw) {
         TestValidWord(L"ng\x1b0i", L"nguiw");
     }
 
-    TEST_METHOD (TestTypingThoio) {
+    TEST_METHOD (TestTelexTypingThoio) {
         TestValidWord(L"th\xf4i", L"thoio");
     }
 
-    TEST_METHOD (TestTypingNuaw) {
+    TEST_METHOD (TestTelexTypingNuaw) {
         TestValidWord(
             L"n\x1b0"
             "a",
             L"nuaw");
     }
 
-    TEST_METHOD (TestTypingQuawms) {
+    TEST_METHOD (TestTelexTypingQuawms) {
         TestValidWord(L"qu\x1eafm", L"quawms");
     }
 
-    TEST_METHOD (TestTypingQuets) {
+    TEST_METHOD (TestTelexTypingQuets) {
         TestValidWord(L"qu\xe9t", L"quets");
     }
 
-    TEST_METHOD (TestTypingQuauj) {
+    TEST_METHOD (TestTelexTypingQuauj) {
         TestValidWord(L"qu\x1ea1u", L"quauj");
     }
 
-    TEST_METHOD (TestTypingQuoj) {
+    TEST_METHOD (TestTelexTypingQuoj) {
         TestValidWord(L"qu\x1ecd", L"quoj");
     }
 
-    TEST_METHOD (TestTypingQuitj) {
+    TEST_METHOD (TestTelexTypingQuitj) {
         TestValidWord(L"qu\x1ecbt", L"quitj");
     }
 
-    TEST_METHOD (TestTypingQueof) {
+    TEST_METHOD (TestTelexTypingQueof) {
         TestValidWord(L"qu\xe8o", L"queof");
     }
 
-    TEST_METHOD (TestTypingQuowns) {
+    TEST_METHOD (TestTelexTypingQuowns) {
         TestValidWord(L"qu\x1edbn", L"quowns");
     }
 
-    TEST_METHOD (TestTypingQuwowns) {
+    TEST_METHOD (TestTelexTypingQuwowns) {
         TestValidWord(L"q\x1b0\x1edbn", L"quwowns");
     }
 
-    TEST_METHOD (TestTypingQuonwx) {
+    TEST_METHOD (TestTelexTypingQuonwx) {
         TestValidWord(L"qu\x1ee1n", L"quonwx");
     }
 
-    TEST_METHOD (TestTypingDduwowcj) {
+    TEST_METHOD (TestTelexTypingDduwowcj) {
         TestValidWord(L"\x111\x1b0\x1ee3\x63", L"dduwowcj");
     }
 
-    TEST_METHOD (TestTypingNguwoif) {
+    TEST_METHOD (TestTelexTypingNguwoif) {
         TestValidWord(L"ng\x1b0\x1eddi", L"nguwoif");
     }
 
-    TEST_METHOD (TestTypingThuees) {
+    TEST_METHOD (TestTelexTypingThuees) {
         TestValidWord(L"thu\x1ebf", L"thuees");
     }
 
-    TEST_METHOD (TestTypingKhuawngs) {
+    TEST_METHOD (TestTelexTypingKhuawngs) {
         TestValidWord(L"khu\x1eafng", L"khuawngs");
     }
 
-    TEST_METHOD (TestTypingKhuawsng) {
+    TEST_METHOD (TestTelexTypingKhuawsng) {
         TestValidWord(L"khu\x1eafng", L"khuawsng");
     }
 
-    TEST_METHOD (TestTypingRa) {
+    TEST_METHOD (TestTelexTypingRa) {
         TestValidWord(L"ra", L"ra");
     }
 
     // test variations of 'gi'
 
-    TEST_METHOD (TestTypingGif) {
+    TEST_METHOD (TestTelexTypingGif) {
         TestValidWord(L"g\xec", L"gif");
     }
 
-    TEST_METHOD (TestTypingGinf) {
+    TEST_METHOD (TestTelexTypingGinf) {
         TestValidWord(L"g\xecn", L"ginf");
     }
 
-    TEST_METHOD (TestTypingGiuowngf) {
+    TEST_METHOD (TestTelexTypingGiuowngf) {
         TestValidWord(L"gi\x1b0\x1eddng", L"giuowngf");
     }
 
-    TEST_METHOD (TestTypingGiowf) {
+    TEST_METHOD (TestTelexTypingGiowf) {
         TestValidWord(L"gi\x1edd", L"giowf");
     }
 
-    TEST_METHOD (TestTypingGiuwax) {
+    TEST_METHOD (TestTelexTypingGiuwax) {
         TestValidWord(
             L"gi\x1eef"
             "a",
             L"giuwax");
     }
 
-    TEST_METHOD (TestTypingGiux) {
+    TEST_METHOD (TestTelexTypingGiux) {
         TestValidWord(L"gi\x169", L"giux");
     }
 
-    TEST_METHOD (TestTypingGiuoocj) {
+    TEST_METHOD (TestTelexTypingGiuoocj) {
         TestValidWord(
             L"giu\x1ed9"
             "c",
             L"giuoocj");
     }
 
-    TEST_METHOD (TestTypingGiemf) {
+    TEST_METHOD (TestTelexTypingGiemf) {
         TestValidWord(L"gi\xe8m", L"giemf");
     }
 
-    TEST_METHOD (TestTypingGiee) {
+    TEST_METHOD (TestTelexTypingGiee) {
         TestValidWord(L"gi\xea", L"giee");
     }
 
     // test 'aua' and similar transitions
 
-    TEST_METHOD (TestTypingLauar) {
+    TEST_METHOD (TestTelexTypingLauar) {
         TestValidWord(L"l\x1ea9u", L"lauar");
     }
 
-    TEST_METHOD (TestTypingNguayar) {
+    TEST_METHOD (TestTelexTypingNguayar) {
         TestValidWord(L"ngu\x1ea9y", L"nguayar");
     }
 
-    TEST_METHOD (TestTypingLuuw) {
+    TEST_METHOD (TestTelexTypingLuuw) {
         TestValidWord(L"l\x1b0u", L"luuw");
     }
 
-    TEST_METHOD (TestTypingHuouw) {
+    TEST_METHOD (TestTelexTypingHuouw) {
         TestValidWord(L"h\x1b0\x1a1u", L"huouw");
     }
 
     // irregular
 
-    TEST_METHOD (TestTypingQuoiws) {
+    TEST_METHOD (TestTelexTypingQuoiws) {
         TestValidWord(L"qu\x1edbi", L"quoiws");
     }
 
-    TEST_METHOD (TestTypingDawks) {
+    TEST_METHOD (TestTelexTypingDawks) {
         TestValidWord(L"\x111\x1eafk", L"ddawks");
     }
 
     // peek tests
 
-    TEST_METHOD (TestPeekDd) {
+    TEST_METHOD (TestTelexPeekDd) {
         TestPeekWord(L"\x111", L"dd");
     }
 
-    TEST_METHOD (TestPeekDdd) {
+    TEST_METHOD (TestTelexPeekDdd) {
         TestPeekWord(L"dd", L"ddd");
     }
 
-    TEST_METHOD (TestPeekAd) {
+    TEST_METHOD (TestTelexPeekAd) {
         TestPeekWord(L"ad", L"ad");
     }
 
-    TEST_METHOD (TestPeekQuaw) {
+    TEST_METHOD (TestTelexPeekQuaw) {
         TestPeekWord(L"qu\x103", L"quaw");
     }
 
     // used to cause a crash
-    TEST_METHOD (TestPeekZ) {
+    TEST_METHOD (TestTelexPeekZ) {
         TestPeekWord(L"z", L"z");
     }
 
-    TEST_METHOD (TestPeekCarc) {
+    TEST_METHOD (TestTelexPeekCarc) {
         TestPeekWord(L"carc", L"carc");
     }
 
-    TEST_METHOD (TestPeekDdark) {
+    TEST_METHOD (TestTelexPeekDdark) {
         TestPeekWord(L"\x111\x1ea3k", L"ddark");
     }
 
     // test peek key ordering
 
-    TEST_METHOD (TestPeekCace) {
+    TEST_METHOD (TestTelexPeekCace) {
         TestPeekWord(L"cace", L"cace");
     }
 
     // peek shouldn't crash if tone position is not found
-    TEST_METHOD (TestPeekNhaeng) {
+    TEST_METHOD (TestTelexPeekNhaeng) {
         TestPeekWord(L"nhaeng", L"nhaeng");
     }
 
     // peek key ordering with tones
-    TEST_METHOD (TestPeekCafe) {
+    TEST_METHOD (TestTelexPeekCafe) {
         TestPeekWord(L"cafe", L"cafe");
     }
 
-    TEST_METHOD (TestPeekDand) {
+    TEST_METHOD (TestTelexPeekDand) {
         auto config1 = config;
         config1.accept_separate_dd = true;
         MultiConfigTester(config1).Invoke([](auto& e) {
@@ -422,89 +422,89 @@ public:
 
     // double key tests
 
-    TEST_METHOD (TestDoubleKeyXuaaan) {
+    TEST_METHOD (TestTelexDoubleKeyXuaaan) {
         TestInvalidWord(L"xuaan", L"xuaaan");
     }
 
-    TEST_METHOD (TestDoubleKeyIis) {
+    TEST_METHOD (TestTelexDoubleKeyIis) {
         TestInvalidWord(L"iis", L"iis");
     }
 
-    TEST_METHOD (TestDoubleKeyThooongf) {
+    TEST_METHOD (TestTelexDoubleKeyThooongf) {
         TestValidWord(L"tho\xf2ng", L"thooongf");
     }
 
-    TEST_METHOD (TestDoubleKeyThuongz) {
+    TEST_METHOD (TestTelexDoubleKeyThuongz) {
         TestInvalidWord(L"thuongz", L"thuongz");
     }
 
-    TEST_METHOD (TestDoubleKeySystem) {
+    TEST_METHOD (TestTelexDoubleKeySystem) {
         TestInvalidWord(L"system", L"system");
     }
 
-    TEST_METHOD (TestNhuwox) {
+    TEST_METHOD (TestTelexNhuwox) {
         TestInvalidWord(L"nhuwox", L"nhuwox");
     }
 
-    TEST_METHOD (TestToool) {
+    TEST_METHOD (TestTelexToool) {
         TestInvalidWord(L"tool", L"toool");
     }
 
-    TEST_METHOD (TestCuwowwcj) {
+    TEST_METHOD (TestTelexCuwowwcj) {
         TestInvalidWord(L"cuwowcj", L"cuwowwcj");
     }
 
-    TEST_METHOD (TestTypingQuwowwns) {
+    TEST_METHOD (TestTelexTypingQuwowwns) {
         TestInvalidWord(L"quwowns", L"quwowwns");
     }
 
-    TEST_METHOD (TestTypingCaasy) {
+    TEST_METHOD (TestTelexTypingCaasy) {
         TestValidWord(L"c\x1ea5y", L"caasy");
     }
 
     // caps
 
-    TEST_METHOD (TestCapsPeekD) {
+    TEST_METHOD (TestTelexCapsPeekD) {
         TestPeekWord(L"D", L"D");
     }
 
-    TEST_METHOD (TestCapsXuOwngf) {
+    TEST_METHOD (TestTelexCapsXuOwngf) {
         TestValidWord(L"X\x1b0\x1edcng", L"XuOwngf");
     }
 
-    TEST_METHOD (TestCapsXuOnWfWx) {
+    TEST_METHOD (TestTelexCapsXuOnWfWx) {
         TestInvalidWord(L"XuOnWfWx", L"XuOnWfWx");
     }
 
-    TEST_METHOD (TestAllCapsNguoiwf) {
+    TEST_METHOD (TestTelexAllCapsNguoiwf) {
         TestValidWord(L"NG\x1af\x1edcI", L"NGUOIWF");
     }
 
     // caps repeat
 
-    TEST_METHOD (TestCapsOSS) {
+    TEST_METHOD (TestTelexCapsOSS) {
         MultiConfigTester(config, 0, 1).Invoke([](auto& e) { VietType::UnitTests::TestPeekWord(e, L"OS", L"OSS"); });
     }
 
-    TEST_METHOD (TestCapsAAA) {
+    TEST_METHOD (TestTelexCapsAAA) {
         TestInvalidWord(L"AA", L"AAA");
     }
 
-    TEST_METHOD (TestCapsOWW) {
+    TEST_METHOD (TestTelexCapsOWW) {
         TestInvalidWord(L"OW", L"OWW");
     }
 
-    TEST_METHOD (TestCapsGIFF) {
+    TEST_METHOD (TestTelexCapsGIFF) {
         MultiConfigTester(config, 0, 1).Invoke([](auto& e) { VietType::UnitTests::TestPeekWord(e, L"GIF", L"GIFF"); });
     }
 
-    TEST_METHOD (TestCapsGISS) {
+    TEST_METHOD (TestTelexCapsGISS) {
         MultiConfigTester(config, 0, 1).Invoke([](auto& e) { VietType::UnitTests::TestPeekWord(e, L"GIS", L"GISS"); });
     }
 
     // backspace tests
 
-    TEST_METHOD (TestBackspaceDdoongf) {
+    TEST_METHOD (TestTelexBackspaceDdoongf) {
         MultiConfigTester(config).Invoke([](auto& e) {
             FeedWord(e, L"ddoongf");
             AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
@@ -518,7 +518,7 @@ public:
         });
     }
 
-    TEST_METHOD (TestBackspaceLeeen) {
+    TEST_METHOD (TestTelexBackspaceLeeen) {
         MultiConfigTester(config).Invoke([](auto& e) {
             FeedWord(e, L"leeen");
             Assert::AreEqual(L"leen", e.Peek().c_str());
@@ -527,7 +527,7 @@ public:
         });
     }
 
-    TEST_METHOD (TestBackspaceHuowng) {
+    TEST_METHOD (TestTelexBackspaceHuowng) {
         MultiConfigTester(config).Invoke([](auto& e) {
             FeedWord(e, L"huowng");
             Assert::AreEqual(L"h\x1b0\x1a1ng", e.Peek().c_str());
@@ -540,7 +540,7 @@ public:
         });
     }
 
-    TEST_METHOD (TestBackspaceAoas) {
+    TEST_METHOD (TestTelexBackspaceAoas) {
         MultiConfigTester(config).Invoke([](auto& e) {
             FeedWord(e, L"aoas");
             Assert::AreEqual(L"aoas", e.Peek().c_str());
@@ -549,7 +549,7 @@ public:
         });
     }
 
-    TEST_METHOD (TestBackspaceHeei) {
+    TEST_METHOD (TestTelexBackspaceHeei) {
         MultiConfigTester(config).Invoke([](auto& e) {
             FeedWord(e, L"heei");
             Assert::AreEqual(L"h\xeai", e.Peek().c_str());
@@ -558,7 +558,7 @@ public:
         });
     }
 
-    TEST_METHOD (TestBackspaceOwa) {
+    TEST_METHOD (TestTelexBackspaceOwa) {
         MultiConfigTester(config).Invoke([](auto& e) {
             FeedWord(e, L"owa");
             Assert::AreEqual(
@@ -570,7 +570,7 @@ public:
         });
     }
 
-    TEST_METHOD (TestBackspaceRuowi) {
+    TEST_METHOD (TestTelexBackspaceRuowi) {
         MultiConfigTester(config).Invoke([](auto& e) {
             FeedWord(e, L"ruowi");
             Assert::AreEqual(L"r\x1b0\x1a1i", e.Peek().c_str());
@@ -579,7 +579,7 @@ public:
         });
     }
 
-    TEST_METHOD (TestBackspaceQuee) {
+    TEST_METHOD (TestTelexBackspaceQuee) {
         MultiConfigTester(config).Invoke([](auto& e) {
             FeedWord(e, L"quee");
             Assert::AreEqual(L"qu\xea", e.Peek().c_str());
@@ -588,7 +588,7 @@ public:
         });
     }
 
-    TEST_METHOD (TestBackspaceQuys) {
+    TEST_METHOD (TestTelexBackspaceQuys) {
         MultiConfigTester(config).Invoke([](auto& e) {
             FeedWord(e, L"quys");
             Assert::AreEqual(L"qu\xfd", e.Peek().c_str());
@@ -597,7 +597,7 @@ public:
         });
     }
 
-    TEST_METHOD (TestBackspaceHieef) {
+    TEST_METHOD (TestTelexBackspaceHieef) {
         MultiConfigTester(config).Invoke([](auto& e) {
             FeedWord(e, L"hieef");
             Assert::AreEqual(L"hi\x1ec1", e.Peek().c_str());
@@ -606,7 +606,7 @@ public:
         });
     }
 
-    TEST_METHOD (TestBackspaceGifg) {
+    TEST_METHOD (TestTelexBackspaceGifg) {
         MultiConfigTester(config).Invoke([](auto& e) {
             FeedWord(e, L"gifg");
             Assert::AreEqual(L"g\xecg", e.Peek().c_str());
@@ -615,7 +615,7 @@ public:
         });
     }
 
-    TEST_METHOD (TestBackspaceXooong) {
+    TEST_METHOD (TestTelexBackspaceXooong) {
         MultiConfigTester(config).Invoke([](auto& e) {
             AssertTelexStatesEqual(TelexStates::Valid, FeedWord(e, L"xooong"));
             Assert::AreEqual(L"xoong", e.Peek().c_str());
@@ -626,7 +626,7 @@ public:
         });
     }
 
-    TEST_METHOD (TestBackspaceThooongf) {
+    TEST_METHOD (TestTelexBackspaceThooongf) {
         MultiConfigTester(config).Invoke([](auto& e) {
             AssertTelexStatesEqual(TelexStates::Valid, FeedWord(e, L"thooongf"));
             Assert::AreEqual(L"tho\xf2ng", e.Peek().c_str());
@@ -637,7 +637,7 @@ public:
         });
     }
 
-    TEST_METHOD (TestBackspaceAssi) {
+    TEST_METHOD (TestTelexBackspaceAssi) {
         auto config1 = config;
         config1.backspaced_word_stays_invalid = false;
         MultiConfigTester(config1, 0, 1).Invoke([](auto& e) {
@@ -650,7 +650,7 @@ public:
 
     // test tone and w movements
 
-    TEST_METHOD (TestBackspaceCuwsoc) {
+    TEST_METHOD (TestTelexBackspaceCuwsoc) {
         MultiConfigTester(config, 0, 2).Invoke([](auto& e) {
             AssertTelexStatesEqual(TelexStates::Valid, FeedWord(e, L"cuwsoc"));
             Assert::AreEqual(
@@ -665,7 +665,7 @@ public:
         });
     }
 
-    TEST_METHOD (TestBackspaceCuwocs) {
+    TEST_METHOD (TestTelexBackspaceCuwocs) {
         MultiConfigTester(config).Invoke([](auto& e) {
             AssertTelexStatesEqual(TelexStates::Valid, FeedWord(e, L"cuwocs"));
             Assert::AreEqual(
@@ -679,7 +679,7 @@ public:
         });
     }
 
-    TEST_METHOD (TestBackspaceCuocws) {
+    TEST_METHOD (TestTelexBackspaceCuocws) {
         MultiConfigTester(config).Invoke([](auto& e) {
             AssertTelexStatesEqual(TelexStates::Valid, FeedWord(e, L"cuocws"));
             Assert::AreEqual(
@@ -695,35 +695,35 @@ public:
 
     // test backconversions
 
-    TEST_METHOD (TestBackconversionDdoongf) {
+    TEST_METHOD (TestTelexBackconversionDdoongf) {
         MultiConfigTester(config).Invoke([](auto& e) {
             AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(L"\x111\x1ed3ng"));
             Assert::AreEqual(L"\x111\x1ed3ng", e.Peek().c_str());
         });
     }
 
-    TEST_METHOD (TestBackconversionSystem) {
+    TEST_METHOD (TestTelexBackconversionSystem) {
         MultiConfigTester(config).Invoke([](auto& e) {
             AssertTelexStatesEqual(TelexStates::Invalid, e.Backconvert(L"system"));
             Assert::AreEqual(L"system", e.Peek().c_str());
         });
     }
 
-    TEST_METHOD (TestBackconversionThees) {
+    TEST_METHOD (TestTelexBackconversionThees) {
         MultiConfigTester(config).Invoke([](auto& e) {
             AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(L"TH\x1ebe"));
             Assert::AreEqual(L"TH\x1ebe", e.Peek().c_str());
         });
     }
 
-    TEST_METHOD (TestBackconversionVirus) {
+    TEST_METHOD (TestTelexBackconversionVirus) {
         MultiConfigTester(config).Invoke([](auto& e) {
             AssertTelexStatesEqual(TelexStates::Invalid, e.Backconvert(L"virus"));
             Assert::AreEqual(L"virus", e.Peek().c_str());
         });
     }
 
-    TEST_METHOD (TestBackconversionDdoonfCtrlW) {
+    TEST_METHOD (TestTelexBackconversionDdoonfCtrlW) {
         MultiConfigTester(config).Invoke([](auto& e) {
             AssertTelexStatesEqual(TelexStates::BackconvertFailed, e.Backconvert(L"\x111\x1ed3nw"));
             Assert::AreEqual(L"\x111\x1ed3nw", e.Peek().c_str());
@@ -735,7 +735,7 @@ public:
         });
     }
 
-    TEST_METHOD (TestBackconversionDdCtrlW) {
+    TEST_METHOD (TestTelexBackconversionDdCtrlW) {
         MultiConfigTester(config, 0, 3, false).Invoke([](auto& e) {
             AssertTelexStatesEqual(TelexStates::BackconvertFailed, e.Backconvert(L"\x111w"));
             e.Backspace();
@@ -744,7 +744,7 @@ public:
         });
     }
 
-    TEST_METHOD (TestBackconversionXooong) {
+    TEST_METHOD (TestTelexBackconversionXooong) {
         MultiConfigTester(config).Invoke([](auto& e) {
             AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(L"xoong"));
             Assert::AreEqual(L"xoong", e.Peek().c_str());
@@ -753,14 +753,14 @@ public:
         });
     }
 
-    TEST_METHOD (TestBackconversionXooongUpper) {
+    TEST_METHOD (TestTelexBackconversionXooongUpper) {
         MultiConfigTester(config).Invoke([](auto& e) {
             AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(L"XOONG"));
             Assert::AreEqual(L"XOONG", e.Peek().c_str());
         });
     }
 
-    TEST_METHOD (TestBackconversionThooongf) {
+    TEST_METHOD (TestTelexBackconversionThooongf) {
         MultiConfigTester(config).Invoke([](auto& e) {
             AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(L"tho\xf2ng"));
             Assert::AreEqual(L"tho\xf2ng", e.Peek().c_str());
@@ -769,21 +769,21 @@ public:
         });
     }
 
-    TEST_METHOD (TestBackconversionThooongfUpper) {
+    TEST_METHOD (TestTelexBackconversionThooongfUpper) {
         MultiConfigTester(config).Invoke([](auto& e) {
             AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(L"THO\xd2NG"));
             Assert::AreEqual(L"THO\xd2NG", e.Peek().c_str());
         });
     }
 
-    TEST_METHOD (TestBackconversionXoooong) {
+    TEST_METHOD (TestTelexBackconversionXoooong) {
         MultiConfigTester(config).Invoke([](auto& e) {
             AssertTelexStatesEqual(TelexStates::BackconvertFailed, e.Backconvert(L"x\xf4\xf4ng"));
             Assert::AreEqual(L"x\xf4\xf4ng", e.Peek().c_str());
         });
     }
 
-    TEST_METHOD (TestBackconversionXo_oong) {
+    TEST_METHOD (TestTelexBackconversionXo_oong) {
         MultiConfigTester(config).Invoke([](auto& e) {
             AssertTelexStatesEqual(TelexStates::BackconvertFailed, e.Backconvert(L"xo\xf4ng"));
             Assert::AreEqual(L"xo\xf4ng", e.Peek().c_str());
@@ -796,7 +796,7 @@ public:
         });
     }
 
-    TEST_METHOD (TestBackconversionCaays) {
+    TEST_METHOD (TestTelexBackconversionCaays) {
         MultiConfigTester(config).Invoke([](auto& e) {
             AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(L"c\x1ea5y"));
             e.Commit();
@@ -804,7 +804,7 @@ public:
         });
     }
 
-    TEST_METHOD (TestBackconversionQuaays) {
+    TEST_METHOD (TestTelexBackconversionQuaays) {
         MultiConfigTester(config).Invoke([](auto& e) {
             AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(L"qu\x1ea5y"));
             e.Commit();
@@ -814,13 +814,13 @@ public:
 
     // test oa/oe/uy
 
-    TEST_METHOD (TestTypingOaUy) {
+    TEST_METHOD (TestTelexTypingOaUy) {
         TestValidWord(L"ho\xe0", L"hoaf");
         TestValidWord(L"ho\xe8", L"hoef");
         TestValidWord(L"lu\x1ef5", L"luyj");
     }
 
-    TEST_METHOD (TestTypingOaUyOff) {
+    TEST_METHOD (TestTelexTypingOaUyOff) {
         auto config1 = config;
         config1.oa_uy_tone1 = false;
         MultiConfigTester(config1).Invoke([](auto& e) {
@@ -840,18 +840,18 @@ public:
 
     // test dd accept
 
-    TEST_METHOD (TestValidDodongf) {
+    TEST_METHOD (TestTelexValidDodongf) {
         TestValidWord(L"\x111\x1ed3ng", L"dodongf");
     }
 
-    TEST_METHOD (TestInvalidDodongf) {
+    TEST_METHOD (TestTelexInvalidDodongf) {
         auto config1 = config;
         config1.accept_separate_dd = false;
         MultiConfigTester(config1).Invoke(
             [](auto& e) { VietType::UnitTests::TestInvalidWord(e, L"dodongf", L"dodongf"); });
     }
 
-    TEST_METHOD (TestConfigOaUy) {
+    TEST_METHOD (TestTelexConfigOaUy) {
         auto config1 = config;
         config1.oa_uy_tone1 = false;
         MultiConfigTester(config1).Invoke([](auto& e) { VietType::UnitTests::TestValidWord(e, L"to\xe0n", L"toanf"); });
@@ -859,35 +859,35 @@ public:
 
     // test multilang optimizations
 
-    TEST_METHOD (TestMultilangVirus) {
+    TEST_METHOD (TestTelexMultilangVirus) {
         auto config1 = config;
         config1.optimize_multilang = 1;
         std::unique_ptr<ITelexEngine> e(TelexNew(config1));
         VietType::UnitTests::TestInvalidWord(*e, L"virus", L"virus");
     }
 
-    TEST_METHOD (TestMultilangDense) {
+    TEST_METHOD (TestTelexMultilangDense) {
         auto config1 = config;
         config1.optimize_multilang = 2;
         std::unique_ptr<ITelexEngine> e(TelexNew(config1));
         VietType::UnitTests::TestInvalidWord(*e, L"dense", L"dense");
     }
 
-    TEST_METHOD (TestMultilangDefe) {
+    TEST_METHOD (TestTelexMultilangDefe) {
         auto config1 = config;
         config1.optimize_multilang = 3;
         std::unique_ptr<ITelexEngine> e(TelexNew(config1));
         AssertTelexStatesEqual(TelexStates::Invalid, FeedWord(*e, L"defe"));
     }
 
-    TEST_METHOD (TestMultilangVirusUpper) {
+    TEST_METHOD (TestTelexMultilangVirusUpper) {
         auto config1 = config;
         config1.optimize_multilang = 1;
         std::unique_ptr<ITelexEngine> e(TelexNew(config1));
         VietType::UnitTests::TestInvalidWord(*e, L"VIRUS", L"VIRUS");
     }
 
-    TEST_METHOD (TestMultilangDenseUpper) {
+    TEST_METHOD (TestTelexMultilangDenseUpper) {
         auto config1 = config;
         config1.optimize_multilang = 2;
         std::unique_ptr<ITelexEngine> e(TelexNew(config1));
@@ -896,7 +896,7 @@ public:
 
     // test doublekey backspace
 
-    TEST_METHOD (TestBackspaceMooo) {
+    TEST_METHOD (TestTelexBackspaceMooo) {
         MultiConfigTester(config).Invoke([](auto& e) {
             FeedWord(e, L"mooo");
             AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
@@ -904,7 +904,7 @@ public:
         });
     }
 
-    TEST_METHOD (TestBackspaceMooof) {
+    TEST_METHOD (TestTelexBackspaceMooof) {
         MultiConfigTester(config).Invoke([](auto& e) {
             FeedWord(e, L"mooof");
             AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
@@ -912,7 +912,7 @@ public:
         });
     }
 
-    TEST_METHOD (TestAutocorrectHwuogn) {
+    TEST_METHOD (TestTelexAutocorrectHwuogn) {
         auto config1 = config;
         config1.autocorrect = true;
         MultiConfigTester(config1, 0, 3, false).Invoke([](auto& e) {
