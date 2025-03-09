@@ -19,7 +19,7 @@
 #define unique(t) concat(t, __LINE__)
 
 #ifdef TM_USE_CONSTEXPR
-#define debug_ensure static_assert
+#define debug_ensure(cond) static_assert(cond)
 #else
 #ifdef NDEBUG
 #define debug_ensure(cond)
@@ -34,19 +34,13 @@
 #endif
 #endif
 
-#define MAKE_MAP(n, K, V, ...)                                                                                         \
+#define MAKE_MAP(n, sorted, K, V, ...)                                                                                 \
     static constexpr const std::array<std::pair<K, V>, std::initializer_list<std::pair<K, V>>{__VA_ARGS__}.size()>     \
         unique(array) = {__VA_ARGS__};                                                                                 \
-    static TM_CONSTEXPR const ArrayMap<K, V, false> n(&unique(array)[0], &unique(array)[unique(array).size()])
-#define MAKE_SET(n, K, ...)                                                                                            \
+    static TM_CONSTEXPR const ArrayMap<K, V, sorted> n(unique(array).data(), unique(array).size())
+#define MAKE_SET(n, sorted, K, ...)                                                                                    \
     static constexpr const std::array<K, std::initializer_list<K>{__VA_ARGS__}.size()> unique(array) = {__VA_ARGS__};  \
-    static TM_CONSTEXPR const ArraySet<K, false> n(&unique(array)[0], &unique(array)[unique(array).size()])
-#define MAKE_SORTED_MAP(n, K, V, ...)                                                                                  \
-    MAKE_MAP(n, K, V, __VA_ARGS__);                                                                                    \
-    debug_ensure(std::is_sorted(n.begin(), n.end(), twopair_less<K, V>))
-#define MAKE_SORTED_SET(n, K, ...)                                                                                     \
-    MAKE_SET(n, K, __VA_ARGS__);                                                                                       \
-    debug_ensure(std::is_sorted(n.begin(), n.end()))
+    static TM_CONSTEXPR const ArraySet<K, sorted> n(unique(array).data(), unique(array).size())
 #define P(a, b) std::make_pair(std::wstring_view(a), std::wstring_view(b))
 #define P1(a, b) std::make_pair(std::wstring_view(a), b)
 #define P2(a, b) std::make_pair(a, std::wstring_view(b))
@@ -57,8 +51,9 @@ namespace Telex {
 
 // maps that are too short are kept as generic
 
-MAKE_SORTED_MAP(
+MAKE_MAP(
     transitions,
+    true,
     std::wstring_view,
     std::wstring_view,
     P(L"aa", L"\xe2"),     //
@@ -88,8 +83,9 @@ debug_ensure(std::all_of(transitions.begin(), transitions.end(), [](const auto& 
     return x.second.length() <= x.first.length();
 }));
 
-MAKE_SORTED_MAP(
+MAKE_MAP(
     transitions_vni,
+    true,
     std::wstring_view,
     std::wstring_view,
     P(L"a6", L"\xe2"),              //
@@ -118,8 +114,9 @@ debug_ensure(std::all_of(transitions_vni.begin(), transitions_vni.end(), [](cons
     return x.second.length() <= x.first.length();
 }));
 
-MAKE_SORTED_MAP(
+MAKE_MAP(
     respos,
+    true,
     std::wstring_view,
     int,
     P1(L"i\xea", 1),       //
@@ -147,8 +144,9 @@ debug_ensure(std::all_of(respos.begin(), respos.end(), [](const auto& x) {
     return std::cmp_less_equal(x.second, x.first.length());
 }));
 
-MAKE_SORTED_MAP(
+MAKE_MAP(
     transitions_w,
+    true,
     std::wstring_view,
     std::wstring_view,
     P(L"a", L"\x103"),
@@ -173,6 +171,7 @@ debug_ensure(std::all_of(transitions_w.begin(), transitions_w.end(), [](const au
 
 MAKE_MAP(
     transitions_w_q,
+    false,
     std::wstring_view,
     std::wstring_view,
     P(L"u", L"\x1b0"),
@@ -185,8 +184,9 @@ debug_ensure(std::all_of(transitions_w_q.begin(), transitions_w_q.end(), [](cons
     return x.second.length() == x.first.length();
 }));
 
-MAKE_SORTED_MAP(
+MAKE_MAP(
     respos_w,
+    true,
     std::wstring_view,
     int,
     P1(L"o\x103", 1),      //
@@ -206,6 +206,7 @@ debug_ensure(std::all_of(respos_w.begin(), respos_w.end(), [](const auto& x) {
 
 MAKE_MAP(
     transitions_v_c2,
+    false,
     std::wstring_view,
     std::wstring_view,
     P(L"u\x1a1", L"\x1b0\x1a1"), //
@@ -218,13 +219,14 @@ debug_ensure(std::all_of(transitions_v_c2.begin(), transitions_v_c2.end(), [](co
     return x.second.length() == x.first.length();
 }));
 
-MAKE_MAP(transitions_v_c2_q, std::wstring_view, std::wstring_view, P(L"\x1b0o", L"\x1b0\x1a1"));
+MAKE_MAP(transitions_v_c2_q, false, std::wstring_view, std::wstring_view, P(L"\x1b0o", L"\x1b0\x1a1"));
 debug_ensure(std::all_of(transitions_v_c2_q.begin(), transitions_v_c2_q.end(), [](const auto& x) {
     return x.second.length() == x.first.length();
 }));
 
-MAKE_SORTED_MAP(
+MAKE_MAP(
     transitions_tones,
+    true,
     wchar_t,
     std::wstring_view,
     P2(L'a', L"a\xe1\xe0\x1ea3\xe3\x1ea1"),               //
@@ -244,8 +246,9 @@ debug_ensure(std::all_of(transitions_tones.begin(), transitions_tones.end(), [](
     return x.second.length() == transitions_tones[0].second.length();
 }));
 
-MAKE_SORTED_SET(
+MAKE_SET(
     valid_c1,
+    true,
     std::wstring_view,
     L"",    //
     L"b",   //
@@ -278,8 +281,9 @@ MAKE_SORTED_SET(
     L"\x111", //
 );
 
-MAKE_SORTED_MAP(
+MAKE_MAP(
     valid_v,
+    true,
     std::wstring_view,
     VInfo,
     // oa_uy must be 1 as default since 0 can only be used if there is no c2
@@ -346,8 +350,9 @@ debug_ensure(std::all_of(valid_v.begin(), valid_v.end(), [](const auto& x) {
     return std::cmp_less_equal(x.second.tonepos, x.first.length());
 }));
 
-MAKE_SORTED_MAP(
+MAKE_MAP(
     valid_v_q,
+    true,
     std::wstring_view,
     VInfo,
     P1(L"ua", VI(1, C2Mode::Either)),         // c2 either with qu
@@ -375,8 +380,9 @@ debug_ensure(std::all_of(valid_v_q.begin(), valid_v_q.end(), [](const auto& x) {
     return std::cmp_less_equal(x.second.tonepos, x.first.length());
 }));
 
-MAKE_SORTED_MAP(
+MAKE_MAP(
     valid_v_gi,
+    true,
     std::wstring_view,
     VInfo,
     P1(L"", VI(-1, C2Mode::Either)),          //
@@ -415,8 +421,9 @@ debug_ensure(std::all_of(valid_v_gi.begin(), valid_v_gi.end(), [](const auto& x)
 // bool is whether tones are restricted to s/j or not
 // note: all the c2 that share a prefix must have the same restrict value
 // i.e. valid_c2["c"]->second == valid_c2["ch"]->second
-MAKE_SORTED_MAP(
+MAKE_MAP(
     valid_c2,
+    true,
     std::wstring_view,
     bool,
     P1(L"", false),   //
@@ -433,6 +440,7 @@ MAKE_SORTED_MAP(
 
 MAKE_MAP(
     valid_v_oa_uy,
+    false,
     std::wstring_view,
     VInfo,
     P1(L"oa", VI(0, C2Mode::Either)), //
@@ -443,8 +451,9 @@ debug_ensure(std::all_of(valid_v_oa_uy.begin(), valid_v_oa_uy.end(), [](const au
     return std::cmp_less_equal(x.second.tonepos, x.first.length());
 }));
 
-MAKE_SORTED_MAP(
+MAKE_MAP(
     backconversions,
+    true,
     wchar_t,
     std::wstring_view,
     P2(L'\xe0', L"af"),    //
@@ -517,8 +526,9 @@ MAKE_SORTED_MAP(
 );
 
 // generated from engscan (optimize=0) doubletone words
-MAKE_SORTED_SET(
+MAKE_SET(
     wlist_en,
+    true,
     std::wstring_view,
     L"airs",     //
     L"arms",     //
@@ -650,8 +660,9 @@ MAKE_SORTED_SET(
 );
 
 // generated from dualscan mode 0 (optimize=1)
-MAKE_SORTED_SET(
+MAKE_SET(
     wlist_en_2,
+    true,
     std::wstring_view,
     L"ask",    //
     L"bask",   //
@@ -890,8 +901,9 @@ MAKE_SORTED_SET(
 );
 
 // generated from dualscan mode 1 (optimize=0, autocorrect=1)
-MAKE_SORTED_SET(
+MAKE_SET(
     wlist_en_ac,
+    true,
     std::wstring_view,
     L"ah",     //
     L"ash",    //
@@ -956,8 +968,6 @@ MAKE_SORTED_SET(
 
 #undef MAKE_MAP
 #undef MAKE_SET
-#undef MAKE_SORTED_MAP
-#undef MAKE_SORTED_SET
 #undef P
 #undef P1
 #undef P2

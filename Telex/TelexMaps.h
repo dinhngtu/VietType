@@ -8,6 +8,7 @@
 #include <array>
 #include <vector>
 #include <optional>
+#include <cassert>
 
 namespace VietType {
 namespace Telex {
@@ -42,25 +43,29 @@ public:
         return _begin;
     }
     constexpr const_iterator end() const {
-        return _end;
+        return _begin + _size;
     }
     constexpr const_iterator cend() const {
-        return _end;
+        return _begin + _size;
     }
     constexpr size_t size() const {
-        return _end - _begin;
+        return _size;
     }
     constexpr bool empty() const {
-        return _end == _begin;
+        return _size == 0;
     }
     constexpr const_pointer data() const {
         return _begin;
     }
     constexpr const_reference operator[](size_t pos) const {
+        assert(pos < _size);
         return _begin[pos];
     }
 
-    constexpr ArrayMap(const_pointer begin, const_pointer end) : _begin(begin), _end(end) {
+    constexpr ArrayMap(const_pointer begin, size_t size) : _begin(begin), _size(size) {
+        if constexpr (sorted) {
+            assert(std::is_sorted(_begin, _begin + _size, twopair_less<K, V>));
+        }
     }
 
     template <typename KK>
@@ -88,7 +93,8 @@ public:
     }
 
 private:
-    const_pointer _begin, _end;
+    const const_pointer _begin;
+    const size_t _size;
 };
 
 template <typename K, bool sorted = false>
@@ -106,25 +112,29 @@ public:
         return _begin;
     }
     constexpr const_iterator end() const {
-        return _end;
+        return _begin + _size;
     }
     constexpr const_iterator cend() const {
-        return _end;
+        return _begin + _size;
     }
     constexpr size_t size() const {
-        return _end - _begin;
+        return _size;
     }
     constexpr bool empty() const {
-        return _end == _begin;
+        return _size == 0;
     }
     constexpr const_pointer data() const {
         return _begin;
     }
     constexpr const_reference operator[](size_t pos) const {
+        assert(pos < _size);
         return _begin[pos];
     }
 
-    constexpr ArraySet(const_pointer begin, const_pointer end) : _begin(begin), _end(end) {
+    constexpr ArraySet(const_pointer begin, size_t size) : _begin(begin), _size(size) {
+        if constexpr (sorted) {
+            assert(std::is_sorted(_begin, _begin + _size));
+        }
     }
 
     template <typename KK>
@@ -152,7 +162,8 @@ public:
     }
 
 private:
-    const_pointer _begin, _end;
+    const const_pointer _begin;
+    const size_t _size;
 };
 
 #undef TM_INHERIT_MEMBER
