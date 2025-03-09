@@ -11,7 +11,7 @@ namespace VietType {
 namespace UnitTests {
 
 TEST_CLASS (TestVni) {
-    const TelexConfig config{.vni = true};
+    const TelexConfig config{.typing_style = TypingStyles::Vni};
 
     void TestValidWord(const wchar_t* expected, const wchar_t* input) const {
         MultiConfigTester(config).Invoke([=](auto& e) { VietType::UnitTests::TestValidWord(e, expected, input); });

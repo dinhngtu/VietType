@@ -10,7 +10,9 @@
 
 #include "targetver.h"
 
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#include "Windows.h"
+
 // Headers for CppUnitTest
 #include "CppUnitTest.h"
-
-// TODO: reference additional headers your program requires here

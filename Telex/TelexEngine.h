@@ -3,10 +3,13 @@
 
 #pragma once
 
+#include <algorithm>
 #include <optional>
 #include <utility>
 #include <vector>
 #include <string>
+#include "Telex.h"
+#include "TelexMaps.h"
 
 namespace VietType {
 namespace Telex {
@@ -48,15 +51,21 @@ enum ResposTransitions {
 
 enum class CharTypes : unsigned int {
     Uncategorized = 0,
-    Vowel = 1 << 3,
-    VowelW = 1 << 4,
-    Conso = 1 << 5,
-    ConsoC1 = 1 << 5 | 1 << 6,
-    ConsoC2 = 1 << 5 | 1 << 7,
-    ConsoContinue = 1 << 5 | 1 << 8,
-    Tone = 1 << 9,
-    // vni
-    Dd = 1 << 10,
+    Vowel = 1 << 0,
+    ConsoC1 = 1 << 1,
+    ConsoC2 = 1 << 2,
+    ConsoContinue = 1 << 3,
+    Conso = ConsoC1 | ConsoC2 | ConsoContinue,
+    W = 1 << 4,
+    Dd = 1 << 5,
+    // tones
+    ToneZ = 1 << 16,
+    ToneS = 1 << 17,
+    ToneF = 1 << 18,
+    ToneR = 1 << 19,
+    ToneX = 1 << 20,
+    ToneJ = 1 << 21,
+    Tone = ToneZ | ToneS | ToneF | ToneR | ToneX | ToneJ,
 };
 
 constexpr CharTypes operator|(CharTypes lhs, CharTypes rhs) {
@@ -67,79 +76,11 @@ constexpr CharTypes operator&(CharTypes lhs, CharTypes rhs) {
     return static_cast<CharTypes>(static_cast<unsigned int>(lhs) & static_cast<unsigned int>(rhs));
 }
 
-static const CharTypes letterClasses[26] = {
-    CharTypes::Vowel,                                                // a
-    CharTypes::ConsoC1,                                              // b
-    CharTypes::ConsoC1 | CharTypes::ConsoC2,                         // c
-    CharTypes::ConsoC1 | CharTypes::ConsoContinue | CharTypes::Dd,   // d
-    CharTypes::Vowel,                                                // e
-    CharTypes::Tone,                                                 // f
-    CharTypes::ConsoC1 | CharTypes::ConsoContinue,                   // g
-    CharTypes::ConsoC1 | CharTypes::ConsoContinue,                   // h
-    CharTypes::Vowel,                                                // i
-    CharTypes::Tone,                                                 // j
-    CharTypes::ConsoC1,                                              // k
-    CharTypes::ConsoC1,                                              // l
-    CharTypes::ConsoC1 | CharTypes::ConsoC2,                         // m
-    CharTypes::ConsoC1 | CharTypes::ConsoC2,                         // n
-    CharTypes::Vowel,                                                // o
-    CharTypes::ConsoC1 | CharTypes::ConsoC2,                         // p
-    CharTypes::ConsoC1,                                              // q
-    CharTypes::Tone | CharTypes::ConsoC1 | CharTypes::ConsoContinue, // r
-    CharTypes::Tone | CharTypes::ConsoC1 | CharTypes::ConsoContinue, // s
-    CharTypes::ConsoC1 | CharTypes::ConsoC2,                         // t
-    CharTypes::Vowel,                                                // u
-    CharTypes::ConsoC1,                                              // v
-    CharTypes::VowelW,                                               // w
-    CharTypes::Tone | CharTypes::ConsoC1,                            // x
-    CharTypes::Vowel,                                                // y
-    CharTypes::Tone,                                                 // z
-};
-
-static const CharTypes letterClasses_vni[26] = {
-    CharTypes::Vowel,                              // a
-    CharTypes::ConsoC1,                            // b
-    CharTypes::ConsoC1 | CharTypes::ConsoC2,       // c
-    CharTypes::ConsoC1,                            // d
-    CharTypes::Vowel,                              // e
-    CharTypes::Uncategorized,                      // f
-    CharTypes::ConsoC1 | CharTypes::ConsoContinue, // g
-    CharTypes::ConsoC1 | CharTypes::ConsoContinue, // h
-    CharTypes::Vowel,                              // i
-    CharTypes::Uncategorized,                      // j
-    CharTypes::ConsoC1,                            // k
-    CharTypes::ConsoC1,                            // l
-    CharTypes::ConsoC1 | CharTypes::ConsoC2,       // m
-    CharTypes::ConsoC1 | CharTypes::ConsoC2,       // n
-    CharTypes::Vowel,                              // o
-    CharTypes::ConsoC1 | CharTypes::ConsoC2,       // p
-    CharTypes::ConsoC1,                            // q
-    CharTypes::ConsoC1 | CharTypes::ConsoContinue, // r
-    CharTypes::ConsoC1 | CharTypes::ConsoContinue, // s
-    CharTypes::ConsoC1 | CharTypes::ConsoC2,       // t
-    CharTypes::Vowel,                              // u
-    CharTypes::ConsoC1,                            // v
-    CharTypes::Uncategorized,                      // w
-    CharTypes::ConsoC1,                            // x
-    CharTypes::Vowel,                              // y
-    CharTypes::Uncategorized,                      // z
-};
-
-static const CharTypes digitClasses[10] = {
-    CharTypes::Tone,   // 0
-    CharTypes::Tone,   // 1
-    CharTypes::Tone,   // 2
-    CharTypes::Tone,   // 3
-    CharTypes::Tone,   // 4
-    CharTypes::Tone,   // 5
-    CharTypes::Vowel,  // 6
-    CharTypes::VowelW, // 7
-    CharTypes::VowelW, // 8
-    CharTypes::Dd,     // 9
-};
-
-class TypingStyle {
-    const CharTypes CharTypes[128];
+struct TypingStyle {
+    CharTypes chartypes[128];
+    ArrayMap<std::wstring_view, std::wstring_view, true> transitions;
+    ArrayMap<wchar_t, std::wstring_view, true> backconversions;
+    unsigned long max_optimize = 0;
 };
 
 class TelexEngine : public ITelexEngine {
@@ -217,7 +158,6 @@ private:
     bool _autocorrected = false;
 
 private:
-    friend struct TelexEngineImpl;
     bool CheckInvariantsBackspace(TelexStates prevState) const;
 
     template <typename T>
@@ -232,7 +172,10 @@ private:
         }
     }
 
-    Tones GetCharTone(_In_ wchar_t c) const;
+    const TypingStyle* GetTypingStyle() const;
+    unsigned long GetOptimizeLevel() const {
+        return std::min(GetTypingStyle()->max_optimize, _config.optimize_multilang);
+    }
     CharTypes ClassifyCharacter(_In_ wchar_t lc) const;
     void Invalidate();
     void InvalidateAndPopBack(wchar_t c);

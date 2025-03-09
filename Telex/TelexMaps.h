@@ -62,11 +62,15 @@ public:
         return _begin[pos];
     }
 
+    constexpr ArrayMap() = default;
     constexpr ArrayMap(const_pointer begin, size_t size) : _begin(begin), _size(size) {
         if constexpr (sorted) {
             assert(std::is_sorted(_begin, _begin + _size, twopair_less<K, V>));
         }
     }
+    constexpr ArrayMap(const ArrayMap&) = default;
+    constexpr ArrayMap& operator=(const ArrayMap&) = default;
+    ~ArrayMap() = default;
 
     template <typename KK>
     constexpr const_iterator find(const KK& key) const {
@@ -93,8 +97,8 @@ public:
     }
 
 private:
-    const const_pointer _begin;
-    const size_t _size;
+    const_pointer _begin = nullptr;
+    size_t _size = 0;
 };
 
 template <typename K, bool sorted = false>
@@ -131,11 +135,15 @@ public:
         return _begin[pos];
     }
 
+    constexpr ArraySet() = default;
     constexpr ArraySet(const_pointer begin, size_t size) : _begin(begin), _size(size) {
         if constexpr (sorted) {
             assert(std::is_sorted(_begin, _begin + _size));
         }
     }
+    constexpr ArraySet(const ArraySet&) = default;
+    constexpr ArraySet& operator=(const ArraySet&) = default;
+    ~ArraySet() = default;
 
     template <typename KK>
     constexpr const_iterator find(const KK& key) const {
@@ -162,8 +170,8 @@ public:
     }
 
 private:
-    const const_pointer _begin;
-    const size_t _size;
+    const_pointer _begin = nullptr;
+    size_t _size = 0;
 };
 
 #undef TM_INHERIT_MEMBER

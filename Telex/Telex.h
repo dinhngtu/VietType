@@ -31,18 +31,24 @@ enum class TelexStates {
     TxError = -1,      // can never be a state, returned when PushChar encounters an error
 };
 
+enum class TypingStyles : unsigned int {
+    Telex,
+    Vni,
+    Max,
+};
+
 struct TelexConfig {
-    bool vni = false;
+    TypingStyles typing_style = TypingStyles::Telex;
     // put the tone in "oa"/"uy" in the second character instead of the first
     bool oa_uy_tone1 = true;
     // allow typing the second 'd' of 'dd' anywhere in the word
     bool accept_separate_dd = true;
     // whether backspacing from invalid state preserves that invalid state
     bool backspaced_word_stays_invalid = true;
-    // optimize key engine for foreign language typing
-    unsigned long optimize_multilang = 1;
     // enable certain autocorrect rules
     bool autocorrect = false;
+    // optimize key engine for foreign language typing
+    unsigned long optimize_multilang = 1;
 };
 
 class ITelexEngine {

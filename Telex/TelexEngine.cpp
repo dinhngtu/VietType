@@ -3,11 +3,13 @@
 
 #include <utility>
 #include <cassert>
-#include "Telex.h"
-#include "TelexData.h"
+#include <stdexcept>
+#include <intrin.h>
+#include "TelexMaps.h"
 #include "TelexEngine.h"
+#include "TelexData.h"
 
-#define IS(cat, type) (static_cast<bool>((cat) & (type)))
+#define IS(cat, type) (!!static_cast<unsigned int>((cat) & (type)))
 
 namespace VietType {
 namespace Telex {
@@ -97,47 +99,22 @@ static void ApplyCases(_In_ std::wstring& str, _In_ const std::vector<int>& case
     }
 }
 
-Tones TelexEngine::GetCharTone(_In_ wchar_t c) const {
-    if (_config.vni) {
-        if (c >= L'0' && c <= L'5') {
-            return static_cast<Tones>(c - L'0');
-        }
-    } else {
-        switch (c) {
-        case L'z':
-            return Tones::Z;
-        case L'f':
-            return Tones::F;
-        case L'j':
-            return Tones::J;
-        case L'r':
-            return Tones::R;
-        case L's':
-            return Tones::S;
-        case L'x':
-            return Tones::X;
-        }
-    }
-    return Tones::Z;
+static inline Tones GetCharTone(_In_ CharTypes cat) {
+    assert(IS(cat, CharTypes::Tone));
+    unsigned long bit;
+    [[maybe_unused]] auto flag = _BitScanForward(&bit, (static_cast<unsigned int>(cat) >> 16));
+    assert(flag && bit < 6);
+    return static_cast<Tones>(bit);
 }
 
-CharTypes TelexEngine::ClassifyCharacter(_In_ wchar_t lc) const {
-    if (_config.vni) {
-        if (lc >= L'a' && lc <= L'z') {
-            return letterClasses_vni[lc - L'a'];
-        }
-        if (lc >= L'0' && lc <= L'9') {
-            return digitClasses[lc - L'0'];
-        }
-    } else {
-        if (lc >= L'a' && lc <= L'z') {
-            return letterClasses[lc - L'a'];
-        }
-    }
-    return CharTypes::Uncategorized;
+inline CharTypes TelexEngine::ClassifyCharacter(_In_ wchar_t lc) const {
+    const auto& ct = GetTypingStyle()->chartypes;
+    if (lc >= std::size(ct))
+        return CharTypes::Uncategorized;
+    return ct[lc];
 }
 
-void TelexEngine::Invalidate() {
+inline void TelexEngine::Invalidate() {
     _respos.push_back(_respos_current++ | ResposInvalidate);
     _state = TelexStates::Invalid;
 }
@@ -223,7 +200,14 @@ bool TelexEngine::HasValidRespos() const {
     return std::any_of(_respos.begin(), _respos.end(), [](auto rp) { return rp & ResposValidMask; });
 }
 
+inline const TypingStyle* TelexEngine::GetTypingStyle() const {
+    return &typing_styles[static_cast<unsigned int>(_config.typing_style)];
+}
+
 TelexEngine::TelexEngine(const TelexConfig& config) {
+    if (config.typing_style >= TypingStyles::Max) {
+        throw std::invalid_argument("invalid typing style");
+    }
     _config = config;
     _keyBuffer.reserve(MaxLength);
     _c1.reserve(MaxLength);
@@ -239,7 +223,14 @@ const TelexConfig& TelexEngine::GetConfig() const {
 }
 
 void TelexEngine::SetConfig(const TelexConfig& config) {
+    if (config.typing_style >= TypingStyles::Max) {
+        throw std::invalid_argument("invalid typing style");
+    }
+    auto last = _config.typing_style;
     _config = config;
+    if (last != config.typing_style) {
+        Reset();
+    }
 }
 
 void TelexEngine::Reset() {
@@ -321,9 +312,9 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
         // vowel parts (aeiouy)
         _v.push_back(c);
         auto before = _v.size();
-        if (TransitionV(_config.vni ? transitions_vni : transitions)) {
+        if (TransitionV(GetTypingStyle()->transitions)) {
             auto after = _v.size();
-            if (_config.optimize_multilang >= 3 && _toneCount) {
+            if (GetOptimizeLevel() >= 3 && _toneCount) {
                 Invalidate();
             } else if (
                 _keyBuffer.size() > 1 && _respos.back() & ResposTransitionV && c == ToLower(_keyBuffer.rbegin()[1])) {
@@ -354,7 +345,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
             }
         }
 
-    } else if (IS(cat, CharTypes::VowelW)) {
+    } else if (IS(cat, CharTypes::W)) {
         if (!_v.empty()) {
             bool tw;
             if (_c1 == L"q") {
@@ -375,7 +366,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
                 InvalidateAndPopBack(c);
             }
             // 'w' always keeps V size constant, don't push case
-        } else if (_config.autocorrect && !_toneCount && (!_c1.empty() || _config.optimize_multilang == 0)) {
+        } else if (_config.autocorrect && !_toneCount && (!_c1.empty() || GetOptimizeLevel() == 0)) {
             _v.push_back(c);
             _cases.push_back(ccase);
             _respos.push_back(_respos_current++ | ResposAutocorrect);
@@ -385,9 +376,9 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
 
     } else if ((_c1 == L"gi" || !_v.empty()) && IS(cat, CharTypes::Tone)) {
         // tones
-        auto newtone = GetCharTone(c);
+        auto newtone = GetCharTone(cat);
         if (newtone != _t) {
-            if (_config.optimize_multilang >= 3 && _toneCount) {
+            if (GetOptimizeLevel() >= 3 && _toneCount) {
                 Invalidate();
             } else {
                 _t = newtone;
@@ -397,7 +388,7 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
             InvalidateAndPopBack(c);
         }
 
-    } else if (((_c1 == L"gi" && _v.empty()) || !_v.empty()) && _c2.empty() && IS(cat, CharTypes::ConsoC2)) {
+    } else if ((_c1 == L"gi" || !_v.empty()) && _c2.empty() && IS(cat, CharTypes::ConsoC2)) {
         // word-ending consonants (cnpt)
         bool success = true;
         // special teencode exception
@@ -424,6 +415,12 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
 
     } else if (_c2.size() && IS(cat, CharTypes::ConsoContinue)) {
         // consonant continuation (dgh)
+        _c2.push_back(c);
+        _cases.push_back(ccase);
+        _respos.push_back(_respos_current++);
+
+    } else if ((_c1 == L"gi" || !_v.empty()) && IS(cat, CharTypes::Conso)) {
+        // special case for delaying the invalidation of invalid c2 until commit
         _c2.push_back(c);
         _cases.push_back(ccase);
         _respos.push_back(_respos_current++);
@@ -544,8 +541,8 @@ TelexStates TelexEngine::Commit() {
         return _state;
     }
 
-    if (_state == TelexStates::Valid && _config.optimize_multilang >= 1) {
-        auto wordBuffer = _keyBuffer;
+    if (_state == TelexStates::Valid && GetOptimizeLevel() >= 1) {
+        std::wstring wordBuffer = _keyBuffer;
         for (auto& c : wordBuffer) {
             c = ToLower(c);
         }
@@ -559,7 +556,7 @@ TelexStates TelexEngine::Commit() {
             assert(CheckInvariants());
             return _state;
         }
-        if (_config.optimize_multilang >= 2 && wlist_en_2.find(wordBuffer) != wlist_en_2.end()) {
+        if (GetOptimizeLevel() >= 2 && wlist_en_2.find(wordBuffer) != wlist_en_2.end()) {
             _state = TelexStates::CommittedInvalid;
             assert(CheckInvariants());
             return _state;
@@ -568,28 +565,31 @@ TelexStates TelexEngine::Commit() {
 
     if (_config.autocorrect && _state == TelexStates::Valid && !_backconverted && _toneCount < 2) {
         // fixing respos might not be necessary here but fixing cases is
-        if (_v == L"wu") {
-            _v = L"\x1b0u";
-            _autocorrected = true;
-        } else if (!_c1.empty() && _v == L"wo") {
-            _v = L"\x1a1";
-            for (auto& rp : _respos)
-                if (rp & ResposAutocorrect)
-                    _cases.erase(_cases.begin() + (rp & ResposMask));
-            _autocorrected = true;
-        } else if (_v == L"wuo") {
-            _v = L"\x1b0\x1a1";
-            for (auto& rp : _respos)
-                if (rp & ResposAutocorrect)
-                    _cases.erase(_cases.begin() + (rp & ResposMask));
-            _autocorrected = true;
+        // HACK
+        if (_config.typing_style == TypingStyles::Telex) {
+            if (_v == L"wu") {
+                _v = L"\x1b0u";
+                _autocorrected = true;
+            } else if (!_c1.empty() && _v == L"wo") {
+                _v = L"\x1a1";
+                for (auto& rp : _respos)
+                    if (rp & ResposAutocorrect)
+                        _cases.erase(_cases.begin() + (rp & ResposMask));
+                _autocorrected = true;
+            } else if (_v == L"wuo") {
+                _v = L"\x1b0\x1a1";
+                for (auto& rp : _respos)
+                    if (rp & ResposAutocorrect)
+                        _cases.erase(_cases.begin() + (rp & ResposMask));
+                _autocorrected = true;
+            }
         }
         if (_c2 == L"h" && (_v == L"a" || _v == L"\xea")) {
             if (_t == Tones::S || _t == Tones::J) {
                 _c2 = L"ch";
                 _cases.push_back(_cases[_c1.length() + _v.length()]);
                 _autocorrected = true;
-            } else if (_config.optimize_multilang <= 1 || HasValidRespos()) {
+            } else if (GetOptimizeLevel() <= 1 || HasValidRespos()) {
                 _c2 = L"nh";
                 _cases.push_back(_cases[_c1.length() + _v.length()]);
                 _autocorrected = true;
@@ -599,7 +599,7 @@ TelexStates TelexEngine::Commit() {
             if (_c2 == L"gn") {
                 _c2 = L"ng";
                 _autocorrected = true;
-            } else if (_config.optimize_multilang <= 1 && _c2 == L"g") {
+            } else if (GetOptimizeLevel() <= 1 && _c2 == L"g") {
                 _c2 = L"ng";
                 _cases.push_back(_cases.back());
                 _autocorrected = true;
