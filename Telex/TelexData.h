@@ -6,6 +6,8 @@
 #include "TelexMaps.h"
 #include "TelexEngine.h"
 
+#pragma region setup macros
+
 // #define TM_USE_CONSTEXPR
 
 #ifdef TM_USE_CONSTEXPR
@@ -46,73 +48,14 @@
 #define P2(a, b) std::make_pair(a, std::wstring_view(b))
 #define VI(a, b) (VInfo{a, b})
 
+#pragma endregion
+
 namespace VietType {
 namespace Telex {
 
 // maps that are too short are kept as generic
 
-MAKE_MAP(
-    transitions,
-    true,
-    std::wstring_view,
-    std::wstring_view,
-    P(L"aa", L"\xe2"),     //
-    P(L"aua", L"\xe2u"),   // relaxed transformations
-    P(L"aya", L"\xe2y"),   // relaxed transformations
-    P(L"ee", L"\xea"),     //
-    P(L"eue", L"\xeau"),   // relaxed transformations
-    P(L"iee", L"i\xea"),   //
-    P(L"ieue", L"i\xeau"), // relaxed transformations
-    P(L"oio", L"\xf4i"),   // relaxed transformations
-    P(L"oo", L"\xf4"),     //
-    P(L"uaa", L"u\xe2"),   //
-    P(L"uaya", L"u\xe2y"), // relaxed transformations
-    P(L"uee", L"u\xea"),   //
-    P(L"uoio", L"u\xf4i"), // relaxed transformations
-    P(L"uoo", L"u\xf4"),   //
-    P(L"uyee", L"uy\xea"), //
-    //{ L"u\x1a1" , L"\x1b0\x1a1" }, // transition in v_c2 only
-    P(L"u\x1a1i", L"\x1b0\x1a1i"), //
-    P(L"u\x1a1u", L"\x1b0\x1a1u"), //
-    P(L"yee", L"y\xea"),           //
-    P(L"yeue", L"y\xeau"),         // relaxed transformations
-    P(L"\xf4o", L"oo"),            // only for 'xoong', etc.
-    P(L"\x1b0o", L"\x1b0\x1a1"),   // relaxed transformations
-);
-debug_ensure(std::all_of(transitions.begin(), transitions.end(), [](const auto& x) {
-    return x.second.length() <= x.first.length();
-}));
-
-MAKE_MAP(
-    transitions_vni,
-    true,
-    std::wstring_view,
-    std::wstring_view,
-    P(L"a6", L"\xe2"),              //
-    P(L"au6", L"\xe2u"),            //
-    P(L"ay6", L"\xe2y"),            //
-    P(L"e6", L"\xea"),              //
-    P(L"eu6", L"\xeau"),            //
-    P(L"ie6", L"i\xea"),            //
-    P(L"ieu6", L"i\xeau"),          //
-    P(L"o6", L"\xf4"),              //
-    P(L"oi6", L"\xf4i"),            //
-    P(L"ua6", L"u\xe2"),            //
-    P(L"uay6", L"u\xe2y"),          //
-    P(L"ue6", L"u\xea"),            //
-    P(L"uo6", L"u\xf4"),            //
-    P(L"uoi6", L"u\xf4i"),          //
-    P(L"uye6", L"uy\xea"),          //
-    P(L"u\x1a1i", L"\x1b0\x1a1i"),  //
-    P(L"u\x1a1u", L"\x1b0\x1a1u"),  //
-    P(L"ye6", L"y\xea"),            //
-    P(L"yeu6", L"y\xeau"),          //
-    P(L"\xf4\x36", L"oo"),          //
-    P(L"\x1b0\x36", L"\x1b0\x1a1"), //
-);
-debug_ensure(std::all_of(transitions_vni.begin(), transitions_vni.end(), [](const auto& x) {
-    return x.second.length() <= x.first.length();
-}));
+#pragma region generic
 
 MAKE_MAP(
     respos,
@@ -451,153 +394,9 @@ debug_ensure(std::all_of(valid_v_oa_uy.begin(), valid_v_oa_uy.end(), [](const au
     return std::cmp_less_equal(x.second.tonepos, x.first.length());
 }));
 
-MAKE_MAP(
-    backconversions,
-    true,
-    wchar_t,
-    std::wstring_view,
-    P2(L'\xe0', L"af"),    //
-    P2(L'\xe1', L"as"),    //
-    P2(L'\xe2', L"aa"),    //
-    P2(L'\xe3', L"ax"),    //
-    P2(L'\xe8', L"ef"),    //
-    P2(L'\xe9', L"es"),    //
-    P2(L'\xea', L"ee"),    //
-    P2(L'\xec', L"if"),    //
-    P2(L'\xed', L"is"),    //
-    P2(L'\xf2', L"of"),    //
-    P2(L'\xf3', L"os"),    //
-    P2(L'\xf4', L"oo"),    //
-    P2(L'\xf5', L"ox"),    //
-    P2(L'\xf9', L"uf"),    //
-    P2(L'\xfa', L"us"),    //
-    P2(L'\xfd', L"ys"),    //
-    P2(L'\x103', L"aw"),   //
-    P2(L'\x111', L"dd"),   //
-    P2(L'\x129', L"ix"),   //
-    P2(L'\x169', L"ux"),   //
-    P2(L'\x1a1', L"ow"),   //
-    P2(L'\x1b0', L"uw"),   //
-    P2(L'\x1ea1', L"aj"),  //
-    P2(L'\x1ea3', L"ar"),  //
-    P2(L'\x1ea5', L"aas"), //
-    P2(L'\x1ea7', L"aaf"), //
-    P2(L'\x1ea9', L"aar"), //
-    P2(L'\x1eab', L"aax"), //
-    P2(L'\x1ead', L"aaj"), //
-    P2(L'\x1eaf', L"aws"), //
-    P2(L'\x1eb1', L"awf"), //
-    P2(L'\x1eb3', L"awr"), //
-    P2(L'\x1eb5', L"awx"), //
-    P2(L'\x1eb7', L"awj"), //
-    P2(L'\x1eb9', L"ej"),  //
-    P2(L'\x1ebb', L"er"),  //
-    P2(L'\x1ebd', L"ex"),  //
-    P2(L'\x1ebf', L"ees"), //
-    P2(L'\x1ec1', L"eef"), //
-    P2(L'\x1ec3', L"eer"), //
-    P2(L'\x1ec5', L"eex"), //
-    P2(L'\x1ec7', L"eej"), //
-    P2(L'\x1ec9', L"ir"),  //
-    P2(L'\x1ecb', L"ij"),  //
-    P2(L'\x1ecd', L"oj"),  //
-    P2(L'\x1ecf', L"or"),  //
-    P2(L'\x1ed1', L"oos"), //
-    P2(L'\x1ed3', L"oof"), //
-    P2(L'\x1ed5', L"oor"), //
-    P2(L'\x1ed7', L"oox"), //
-    P2(L'\x1ed9', L"ooj"), //
-    P2(L'\x1edb', L"ows"), //
-    P2(L'\x1edd', L"owf"), //
-    P2(L'\x1edf', L"owr"), //
-    P2(L'\x1ee1', L"owx"), //
-    P2(L'\x1ee3', L"owj"), //
-    P2(L'\x1ee5', L"uj"),  //
-    P2(L'\x1ee7', L"ur"),  //
-    P2(L'\x1ee9', L"uws"), //
-    P2(L'\x1eeb', L"uwf"), //
-    P2(L'\x1eed', L"uwr"), //
-    P2(L'\x1eef', L"uwx"), //
-    P2(L'\x1ef1', L"uwj"), //
-    P2(L'\x1ef3', L"yf"),  //
-    P2(L'\x1ef5', L"yj"),  //
-    P2(L'\x1ef7', L"yr"),  //
-    P2(L'\x1ef9', L"yx"),  //
-);
+#pragma endregion
 
-MAKE_MAP(
-    backconversions_vni,
-    true,
-    wchar_t,
-    std::wstring_view,
-    P2(L'\xe0', L"a2"),    //
-    P2(L'\xe1', L"a1"),    //
-    P2(L'\xe2', L"a6"),    //
-    P2(L'\xe3', L"a4"),    //
-    P2(L'\xe8', L"e2"),    //
-    P2(L'\xe9', L"e1"),    //
-    P2(L'\xea', L"e6"),    //
-    P2(L'\xec', L"i2"),    //
-    P2(L'\xed', L"i1"),    //
-    P2(L'\xf2', L"o2"),    //
-    P2(L'\xf3', L"o1"),    //
-    P2(L'\xf4', L"o6"),    //
-    P2(L'\xf5', L"o4"),    //
-    P2(L'\xf9', L"u2"),    //
-    P2(L'\xfa', L"u1"),    //
-    P2(L'\xfd', L"y1"),    //
-    P2(L'\x103', L"a7"),   //
-    P2(L'\x111', L"dd"),   //
-    P2(L'\x129', L"i4"),   //
-    P2(L'\x169', L"u4"),   //
-    P2(L'\x1a1', L"o7"),   //
-    P2(L'\x1b0', L"u7"),   //
-    P2(L'\x1ea1', L"a5"),  //
-    P2(L'\x1ea3', L"a3"),  //
-    P2(L'\x1ea5', L"a61"), //
-    P2(L'\x1ea7', L"a62"), //
-    P2(L'\x1ea9', L"a63"), //
-    P2(L'\x1eab', L"a64"), //
-    P2(L'\x1ead', L"a65"), //
-    P2(L'\x1eaf', L"a71"), //
-    P2(L'\x1eb1', L"a72"), //
-    P2(L'\x1eb3', L"a73"), //
-    P2(L'\x1eb5', L"a74"), //
-    P2(L'\x1eb7', L"a75"), //
-    P2(L'\x1eb9', L"e5"),  //
-    P2(L'\x1ebb', L"e3"),  //
-    P2(L'\x1ebd', L"e4"),  //
-    P2(L'\x1ebf', L"e61"), //
-    P2(L'\x1ec1', L"e62"), //
-    P2(L'\x1ec3', L"e63"), //
-    P2(L'\x1ec5', L"e64"), //
-    P2(L'\x1ec7', L"e65"), //
-    P2(L'\x1ec9', L"i3"),  //
-    P2(L'\x1ecb', L"i5"),  //
-    P2(L'\x1ecd', L"o5"),  //
-    P2(L'\x1ecf', L"o3"),  //
-    P2(L'\x1ed1', L"o61"), //
-    P2(L'\x1ed3', L"o62"), //
-    P2(L'\x1ed5', L"o63"), //
-    P2(L'\x1ed7', L"o64"), //
-    P2(L'\x1ed9', L"o65"), //
-    P2(L'\x1edb', L"o71"), //
-    P2(L'\x1edd', L"o72"), //
-    P2(L'\x1edf', L"o73"), //
-    P2(L'\x1ee1', L"o74"), //
-    P2(L'\x1ee3', L"o75"), //
-    P2(L'\x1ee5', L"u5"),  //
-    P2(L'\x1ee7', L"u3"),  //
-    P2(L'\x1ee9', L"u71"), //
-    P2(L'\x1eeb', L"u72"), //
-    P2(L'\x1eed', L"u73"), //
-    P2(L'\x1eef', L"u74"), //
-    P2(L'\x1ef1', L"u75"), //
-    P2(L'\x1ef3', L"y2"),  //
-    P2(L'\x1ef5', L"y5"),  //
-    P2(L'\x1ef7', L"y3"),  //
-    P2(L'\x1ef9', L"y4"),  //
-);
+#pragma region telex optimize dict
 
 // generated from engscan (optimize=0) doubletone words
 MAKE_SET(
@@ -1037,7 +836,221 @@ MAKE_SET(
     L"verge",  //
 );
 
-namespace {
+#pragma endregion
+
+#pragma region typing styles
+
+MAKE_MAP(
+    transitions_telex,
+    true,
+    std::wstring_view,
+    std::wstring_view,
+    P(L"aa", L"\xe2"),     //
+    P(L"aua", L"\xe2u"),   // relaxed transformations
+    P(L"aya", L"\xe2y"),   // relaxed transformations
+    P(L"ee", L"\xea"),     //
+    P(L"eue", L"\xeau"),   // relaxed transformations
+    P(L"iee", L"i\xea"),   //
+    P(L"ieue", L"i\xeau"), // relaxed transformations
+    P(L"oio", L"\xf4i"),   // relaxed transformations
+    P(L"oo", L"\xf4"),     //
+    P(L"uaa", L"u\xe2"),   //
+    P(L"uaya", L"u\xe2y"), // relaxed transformations
+    P(L"uee", L"u\xea"),   //
+    P(L"uoio", L"u\xf4i"), // relaxed transformations
+    P(L"uoo", L"u\xf4"),   //
+    P(L"uyee", L"uy\xea"), //
+    //{ L"u\x1a1" , L"\x1b0\x1a1" }, // transition in v_c2 only
+    P(L"u\x1a1i", L"\x1b0\x1a1i"), //
+    P(L"u\x1a1u", L"\x1b0\x1a1u"), //
+    P(L"yee", L"y\xea"),           //
+    P(L"yeue", L"y\xeau"),         // relaxed transformations
+    P(L"\xf4o", L"oo"),            // only for 'xoong', etc.
+    P(L"\x1b0o", L"\x1b0\x1a1"),   // relaxed transformations
+);
+debug_ensure(std::all_of(transitions_telex.begin(), transitions_telex.end(), [](const auto& x) {
+    return x.second.length() <= x.first.length();
+}));
+
+MAKE_MAP(
+    transitions_vni,
+    true,
+    std::wstring_view,
+    std::wstring_view,
+    P(L"a6", L"\xe2"),             //
+    P(L"au6", L"\xe2u"),           //
+    P(L"ay6", L"\xe2y"),           //
+    P(L"e6", L"\xea"),             //
+    P(L"eu6", L"\xeau"),           //
+    P(L"ie6", L"i\xea"),           //
+    P(L"ieu6", L"i\xeau"),         //
+    P(L"o6", L"\xf4"),             //
+    P(L"oi6", L"\xf4i"),           //
+    P(L"ua6", L"u\xe2"),           //
+    P(L"uay6", L"u\xe2y"),         //
+    P(L"ue6", L"u\xea"),           //
+    P(L"uo6", L"u\xf4"),           //
+    P(L"uoi6", L"u\xf4i"),         //
+    P(L"uye6", L"uy\xea"),         //
+    P(L"u\x1a1i", L"\x1b0\x1a1i"), //
+    P(L"u\x1a1u", L"\x1b0\x1a1u"), //
+    P(L"ye6", L"y\xea"),           //
+    P(L"yeu6", L"y\xeau"),         //
+    P(L"\xf4\x36", L"oo"),         //
+    P(L"\x1b0o", L"\x1b0\x1a1"),   //
+);
+debug_ensure(std::all_of(transitions_vni.begin(), transitions_vni.end(), [](const auto& x) {
+    return x.second.length() <= x.first.length();
+}));
+
+MAKE_MAP(
+    backconversions_telex,
+    true,
+    wchar_t,
+    std::wstring_view,
+    P2(L'\xe0', L"af"),    //
+    P2(L'\xe1', L"as"),    //
+    P2(L'\xe2', L"aa"),    //
+    P2(L'\xe3', L"ax"),    //
+    P2(L'\xe8', L"ef"),    //
+    P2(L'\xe9', L"es"),    //
+    P2(L'\xea', L"ee"),    //
+    P2(L'\xec', L"if"),    //
+    P2(L'\xed', L"is"),    //
+    P2(L'\xf2', L"of"),    //
+    P2(L'\xf3', L"os"),    //
+    P2(L'\xf4', L"oo"),    //
+    P2(L'\xf5', L"ox"),    //
+    P2(L'\xf9', L"uf"),    //
+    P2(L'\xfa', L"us"),    //
+    P2(L'\xfd', L"ys"),    //
+    P2(L'\x103', L"aw"),   //
+    P2(L'\x111', L"dd"),   //
+    P2(L'\x129', L"ix"),   //
+    P2(L'\x169', L"ux"),   //
+    P2(L'\x1a1', L"ow"),   //
+    P2(L'\x1b0', L"uw"),   //
+    P2(L'\x1ea1', L"aj"),  //
+    P2(L'\x1ea3', L"ar"),  //
+    P2(L'\x1ea5', L"aas"), //
+    P2(L'\x1ea7', L"aaf"), //
+    P2(L'\x1ea9', L"aar"), //
+    P2(L'\x1eab', L"aax"), //
+    P2(L'\x1ead', L"aaj"), //
+    P2(L'\x1eaf', L"aws"), //
+    P2(L'\x1eb1', L"awf"), //
+    P2(L'\x1eb3', L"awr"), //
+    P2(L'\x1eb5', L"awx"), //
+    P2(L'\x1eb7', L"awj"), //
+    P2(L'\x1eb9', L"ej"),  //
+    P2(L'\x1ebb', L"er"),  //
+    P2(L'\x1ebd', L"ex"),  //
+    P2(L'\x1ebf', L"ees"), //
+    P2(L'\x1ec1', L"eef"), //
+    P2(L'\x1ec3', L"eer"), //
+    P2(L'\x1ec5', L"eex"), //
+    P2(L'\x1ec7', L"eej"), //
+    P2(L'\x1ec9', L"ir"),  //
+    P2(L'\x1ecb', L"ij"),  //
+    P2(L'\x1ecd', L"oj"),  //
+    P2(L'\x1ecf', L"or"),  //
+    P2(L'\x1ed1', L"oos"), //
+    P2(L'\x1ed3', L"oof"), //
+    P2(L'\x1ed5', L"oor"), //
+    P2(L'\x1ed7', L"oox"), //
+    P2(L'\x1ed9', L"ooj"), //
+    P2(L'\x1edb', L"ows"), //
+    P2(L'\x1edd', L"owf"), //
+    P2(L'\x1edf', L"owr"), //
+    P2(L'\x1ee1', L"owx"), //
+    P2(L'\x1ee3', L"owj"), //
+    P2(L'\x1ee5', L"uj"),  //
+    P2(L'\x1ee7', L"ur"),  //
+    P2(L'\x1ee9', L"uws"), //
+    P2(L'\x1eeb', L"uwf"), //
+    P2(L'\x1eed', L"uwr"), //
+    P2(L'\x1eef', L"uwx"), //
+    P2(L'\x1ef1', L"uwj"), //
+    P2(L'\x1ef3', L"yf"),  //
+    P2(L'\x1ef5', L"yj"),  //
+    P2(L'\x1ef7', L"yr"),  //
+    P2(L'\x1ef9', L"yx"),  //
+);
+
+MAKE_MAP(
+    backconversions_vni,
+    true,
+    wchar_t,
+    std::wstring_view,
+    P2(L'\xe0', L"a2"),    //
+    P2(L'\xe1', L"a1"),    //
+    P2(L'\xe2', L"a6"),    //
+    P2(L'\xe3', L"a4"),    //
+    P2(L'\xe8', L"e2"),    //
+    P2(L'\xe9', L"e1"),    //
+    P2(L'\xea', L"e6"),    //
+    P2(L'\xec', L"i2"),    //
+    P2(L'\xed', L"i1"),    //
+    P2(L'\xf2', L"o2"),    //
+    P2(L'\xf3', L"o1"),    //
+    P2(L'\xf4', L"o6"),    //
+    P2(L'\xf5', L"o4"),    //
+    P2(L'\xf9', L"u2"),    //
+    P2(L'\xfa', L"u1"),    //
+    P2(L'\xfd', L"y1"),    //
+    P2(L'\x103', L"a7"),   //
+    P2(L'\x111', L"dd"),   //
+    P2(L'\x129', L"i4"),   //
+    P2(L'\x169', L"u4"),   //
+    P2(L'\x1a1', L"o7"),   //
+    P2(L'\x1b0', L"u7"),   //
+    P2(L'\x1ea1', L"a5"),  //
+    P2(L'\x1ea3', L"a3"),  //
+    P2(L'\x1ea5', L"a61"), //
+    P2(L'\x1ea7', L"a62"), //
+    P2(L'\x1ea9', L"a63"), //
+    P2(L'\x1eab', L"a64"), //
+    P2(L'\x1ead', L"a65"), //
+    P2(L'\x1eaf', L"a71"), //
+    P2(L'\x1eb1', L"a72"), //
+    P2(L'\x1eb3', L"a73"), //
+    P2(L'\x1eb5', L"a74"), //
+    P2(L'\x1eb7', L"a75"), //
+    P2(L'\x1eb9', L"e5"),  //
+    P2(L'\x1ebb', L"e3"),  //
+    P2(L'\x1ebd', L"e4"),  //
+    P2(L'\x1ebf', L"e61"), //
+    P2(L'\x1ec1', L"e62"), //
+    P2(L'\x1ec3', L"e63"), //
+    P2(L'\x1ec5', L"e64"), //
+    P2(L'\x1ec7', L"e65"), //
+    P2(L'\x1ec9', L"i3"),  //
+    P2(L'\x1ecb', L"i5"),  //
+    P2(L'\x1ecd', L"o5"),  //
+    P2(L'\x1ecf', L"o3"),  //
+    P2(L'\x1ed1', L"o61"), //
+    P2(L'\x1ed3', L"o62"), //
+    P2(L'\x1ed5', L"o63"), //
+    P2(L'\x1ed7', L"o64"), //
+    P2(L'\x1ed9', L"o65"), //
+    P2(L'\x1edb', L"o71"), //
+    P2(L'\x1edd', L"o72"), //
+    P2(L'\x1edf', L"o73"), //
+    P2(L'\x1ee1', L"o74"), //
+    P2(L'\x1ee3', L"o75"), //
+    P2(L'\x1ee5', L"u5"),  //
+    P2(L'\x1ee7', L"u3"),  //
+    P2(L'\x1ee9', L"u71"), //
+    P2(L'\x1eeb', L"u72"), //
+    P2(L'\x1eed', L"u73"), //
+    P2(L'\x1eef', L"u74"), //
+    P2(L'\x1ef1', L"u75"), //
+    P2(L'\x1ef3', L"y2"),  //
+    P2(L'\x1ef5', L"y5"),  //
+    P2(L'\x1ef7', L"y3"),  //
+    P2(L'\x1ef9', L"y4"),  //
+);
+
 const std::array<const TypingStyle, 3> typing_styles = {
     // telex
     TypingStyle{
@@ -1140,31 +1153,31 @@ const std::array<const TypingStyle, 3> typing_styles = {
                 CharTypes::Uncategorized,
                 CharTypes::Uncategorized,
                 CharTypes::Uncategorized,
-                CharTypes::Vowel,                                                 // a
+                CharTypes::Vowel | CharTypes::Transition,                         // a
                 CharTypes::ConsoC1,                                               // b
                 CharTypes::ConsoC1 | CharTypes::ConsoC2,                          // c
                 CharTypes::ConsoC1 | CharTypes::ConsoContinue | CharTypes::Dd,    // d
-                CharTypes::Vowel,                                                 // e
+                CharTypes::Vowel | CharTypes::Transition,                         // e
                 CharTypes::ToneF,                                                 // f
                 CharTypes::ConsoC1 | CharTypes::ConsoContinue,                    // g
                 CharTypes::ConsoC1 | CharTypes::ConsoContinue,                    // h
-                CharTypes::Vowel,                                                 // i
+                CharTypes::Vowel | CharTypes::Transition,                         // i
                 CharTypes::ToneJ,                                                 // j
                 CharTypes::ConsoC1,                                               // k
                 CharTypes::ConsoC1,                                               // l
                 CharTypes::ConsoC1 | CharTypes::ConsoC2,                          // m
                 CharTypes::ConsoC1 | CharTypes::ConsoC2,                          // n
-                CharTypes::Vowel,                                                 // o
+                CharTypes::Vowel | CharTypes::Transition,                         // o
                 CharTypes::ConsoC1 | CharTypes::ConsoC2,                          // p
                 CharTypes::ConsoC1,                                               // q
                 CharTypes::ToneR | CharTypes::ConsoC1 | CharTypes::ConsoContinue, // r
                 CharTypes::ToneS | CharTypes::ConsoC1 | CharTypes::ConsoContinue, // s
                 CharTypes::ConsoC1 | CharTypes::ConsoC2,                          // t
-                CharTypes::Vowel,                                                 // u
+                CharTypes::Vowel | CharTypes::Transition,                         // u
                 CharTypes::ConsoC1,                                               // v
                 CharTypes::W,                                                     // w
                 CharTypes::ToneX | CharTypes::ConsoC1,                            // x
-                CharTypes::Vowel,                                                 // y
+                CharTypes::Vowel | CharTypes::Transition,                         // y
                 CharTypes::ToneZ,                                                 // z
                 CharTypes::Uncategorized,
                 CharTypes::Uncategorized,
@@ -1172,8 +1185,8 @@ const std::array<const TypingStyle, 3> typing_styles = {
                 CharTypes::Uncategorized,
                 CharTypes::Uncategorized,
             },
-        .transitions = transitions,
-        .backconversions = backconversions,
+        .transitions = transitions_telex,
+        .backconversions = backconversions_telex,
         .max_optimize = 3,
     },
 
@@ -1229,16 +1242,16 @@ const std::array<const TypingStyle, 3> typing_styles = {
                 CharTypes::Uncategorized,
                 CharTypes::Uncategorized,
                 CharTypes::Uncategorized,
-                CharTypes::ToneZ, // 0
-                CharTypes::ToneS, // 1
-                CharTypes::ToneF, // 2
-                CharTypes::ToneR, // 3
-                CharTypes::ToneX, // 4
-                CharTypes::ToneJ, // 5
-                CharTypes::Vowel, // 6
-                CharTypes::W,     // 7
-                CharTypes::W,     // 8
-                CharTypes::Dd,    // 9
+                CharTypes::ToneZ,      // 0
+                CharTypes::ToneS,      // 1
+                CharTypes::ToneF,      // 2
+                CharTypes::ToneR,      // 3
+                CharTypes::ToneX,      // 4
+                CharTypes::ToneJ,      // 5
+                CharTypes::Transition, // 6
+                CharTypes::W,          // 7
+                CharTypes::W,          // 8
+                CharTypes::Dd,         // 9
                 CharTypes::Uncategorized,
                 CharTypes::Uncategorized,
                 CharTypes::Uncategorized,
@@ -1315,7 +1328,8 @@ const std::array<const TypingStyle, 3> typing_styles = {
         .max_optimize = 0,
     },
 };
-}
+
+#pragma endregion
 
 } // namespace Telex
 } // namespace VietType

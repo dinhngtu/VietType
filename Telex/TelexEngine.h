@@ -58,6 +58,7 @@ enum class CharTypes : unsigned int {
     Conso = ConsoC1 | ConsoC2 | ConsoContinue,
     W = 1 << 4,
     Dd = 1 << 5,
+    Transition = 1 << 6,
     // tones
     ToneZ = 1 << 16,
     ToneS = 1 << 17,

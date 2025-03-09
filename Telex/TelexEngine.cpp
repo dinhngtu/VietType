@@ -120,9 +120,8 @@ inline void TelexEngine::Invalidate() {
 }
 
 void TelexEngine::InvalidateAndPopBack(wchar_t c) {
-    assert(_keyBuffer.length() > 1);
     // pop back only if same char entered twice in a row
-    if (c == ToLower(_keyBuffer.rbegin()[1]))
+    if (_keyBuffer.length() > 1 && c == ToLower(_keyBuffer.rbegin()[1]))
         _respos.push_back(_respos_current++ | ResposDoubleUndo);
     else
         _respos.push_back(_respos_current++ | ResposInvalidate);
@@ -345,6 +344,29 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
             }
         }
 
+    } else if (IS(cat, CharTypes::Transition)) {
+        _v.push_back(c);
+        auto before = _v.size();
+        if (TransitionV(GetTypingStyle()->transitions)) {
+            auto after = _v.size();
+            if (GetOptimizeLevel() >= 3 && _toneCount) {
+                Invalidate();
+            } else if (
+                _keyBuffer.size() > 1 && _respos.back() & ResposTransitionV && c == ToLower(_keyBuffer.rbegin()[1])) {
+                _cases.push_back(ccase);
+                _respos.push_back(_respos_current++ | ResposDoubleUndo);
+            } else if (after < before) {
+                _respos.push_back(static_cast<int>(_c1.size() + _v.size() - 1) | ResposTransitionV);
+            } else if (after == before) {
+                // see above
+                _cases.push_back(ccase);
+                _respos.push_back(_respos_current++ | ResposTransitionV);
+            }
+        } else {
+            _v.pop_back();
+            InvalidateAndPopBack(c);
+        }
+
     } else if (IS(cat, CharTypes::W)) {
         if (!_v.empty()) {
             bool tw;
@@ -366,7 +388,9 @@ TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
                 InvalidateAndPopBack(c);
             }
             // 'w' always keeps V size constant, don't push case
-        } else if (_config.autocorrect && !_toneCount && (!_c1.empty() || GetOptimizeLevel() == 0)) {
+        } else if (
+            _config.typing_style == TypingStyles::Telex && _config.autocorrect && !_toneCount &&
+            (!_c1.empty() || GetOptimizeLevel() == 0)) {
             _v.push_back(c);
             _cases.push_back(ccase);
             _respos.push_back(_respos_current++ | ResposAutocorrect);
@@ -708,40 +732,41 @@ TelexStates TelexEngine::Backconvert(_In_ const std::wstring& s) {
     if (_keyBuffer.size())
         return _state;
     bool found_backconversion = false;
+    bool failed = false;
     for (auto c : s) {
         auto double_flag = !_c2.size() && (_v == L"e" || _v == L"o");
-        if (c >= L'a' && c <= L'z') {
-            if (double_flag && c == _v[0])
-                PushChar(c);
-            PushChar(c);
-        } else if (c >= L'A' && c <= L'Z') {
-            if (double_flag && ToLower(c) == _v[0])
+        auto clow = ToLower(c);
+        auto cat = ClassifyCharacter(clow);
+        if (cat != CharTypes::Uncategorized) {
+            if (double_flag && clow == _v[0])
                 PushChar(c);
             PushChar(c);
         } else {
-            auto clow = ToLower(c);
-            auto it = backconversions.find(clow);
-            assert(it != backconversions.end());
-            if (double_flag && it->second[0] == _v[0]) {
-                if (c != clow) {
-                    // c is upper
-                    PushChar(ToUpper(it->second[0]));
-                } else {
-                    PushChar(it->second[0]);
+            auto it = GetTypingStyle()->backconversions.find(clow);
+            if (it != GetTypingStyle()->backconversions.end()) {
+                if (double_flag && it->second[0] == _v[0]) {
+                    if (c != clow) {
+                        // c is upper
+                        PushChar(ToUpper(it->second[0]));
+                    } else {
+                        PushChar(it->second[0]);
+                    }
                 }
-            }
-            for (auto backc : it->second) {
-                if (c != clow) {
-                    // c is upper
-                    PushChar(ToUpper(backc));
-                } else {
-                    PushChar(backc);
+                for (auto backc : it->second) {
+                    if (c != clow) {
+                        // c is upper
+                        PushChar(ToUpper(backc));
+                    } else {
+                        PushChar(backc);
+                    }
                 }
+                found_backconversion = true;
+            } else {
+                failed = true;
             }
-            found_backconversion = true;
         }
     }
-    if (_c1.size() + _v.size() + _c2.size() != s.size()) {
+    if (failed || (_c1.size() + _v.size() + _c2.size() != s.size())) {
         if (found_backconversion) {
             _keyBuffer = s;
             _state = TelexStates::BackconvertFailed;
