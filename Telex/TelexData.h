@@ -6,18 +6,47 @@
 #include "TelexMaps.h"
 #include "TelexEngine.h"
 
+// #define TM_USE_CONSTEXPR
+
+#ifdef TM_USE_CONSTEXPR
+#define TM_CONSTEXPR constexpr
+#else
+#define TM_CONSTEXPR
+#endif
+
+#define _concat(a, b) _telexdata_##a##b
+#define concat(a, b) _concat(a, b)
+#define unique(t) concat(t, __LINE__)
+
+#ifdef TM_USE_CONSTEXPR
+#define debug_ensure static_assert
+#else
+#ifdef NDEBUG
+#define debug_ensure(cond)
+#else
+#include <cassert>
+#define debug_ensure(cond)                                                                                             \
+    static bool unique(func)() {                                                                                       \
+        assert(cond);                                                                                                  \
+        return true;                                                                                                   \
+    }                                                                                                                  \
+    static const bool unique(var) = unique(func)();
+#endif
+#endif
+
 #define MAKE_MAP(n, K, V, ...)                                                                                         \
-    static constexpr const ArrayMap<K, V, std::initializer_list<std::pair<K, V>>{__VA_ARGS__}.size(), false> n = {     \
-        __VA_ARGS__}
+    static constexpr const std::array<std::pair<K, V>, std::initializer_list<std::pair<K, V>>{__VA_ARGS__}.size()>     \
+        unique(array) = {__VA_ARGS__};                                                                                 \
+    static TM_CONSTEXPR const ArrayMap<K, V, false> n(&unique(array)[0], &unique(array)[unique(array).size()])
 #define MAKE_SET(n, K, ...)                                                                                            \
-    static constexpr const ArraySet<K, std::initializer_list<K>{__VA_ARGS__}.size(), false> n = {__VA_ARGS__}
+    static constexpr const std::array<K, std::initializer_list<K>{__VA_ARGS__}.size()> unique(array) = {__VA_ARGS__};  \
+    static TM_CONSTEXPR const ArraySet<K, false> n(&unique(array)[0], &unique(array)[unique(array).size()])
 #define MAKE_SORTED_MAP(n, K, V, ...)                                                                                  \
-    static constexpr const ArrayMap<K, V, std::initializer_list<std::pair<K, V>>{__VA_ARGS__}.size(), true> n = {      \
-        __VA_ARGS__};                                                                                                  \
-    static_assert(std::is_sorted(n.begin(), n.end(), twopair_less<K, V>))
+    MAKE_MAP(n, K, V, __VA_ARGS__);                                                                                    \
+    debug_ensure(std::is_sorted(n.begin(), n.end(), twopair_less<K, V>))
 #define MAKE_SORTED_SET(n, K, ...)                                                                                     \
-    static constexpr const ArraySet<K, std::initializer_list<K>{__VA_ARGS__}.size(), true> n = {__VA_ARGS__};          \
-    static_assert(std::is_sorted(n.begin(), n.end()))
+    MAKE_SET(n, K, __VA_ARGS__);                                                                                       \
+    debug_ensure(std::is_sorted(n.begin(), n.end()))
 #define P(a, b) std::make_pair(std::wstring_view(a), std::wstring_view(b))
 #define P1(a, b) std::make_pair(std::wstring_view(a), b)
 #define P2(a, b) std::make_pair(a, std::wstring_view(b))
@@ -55,7 +84,7 @@ MAKE_SORTED_MAP(
     P(L"\xf4o", L"oo"),            // only for 'xoong', etc.
     P(L"\x1b0o", L"\x1b0\x1a1"),   // relaxed transformations
 );
-static_assert(std::all_of(transitions.begin(), transitions.end(), [](const auto& x) {
+debug_ensure(std::all_of(transitions.begin(), transitions.end(), [](const auto& x) {
     return x.second.length() <= x.first.length();
 }));
 
@@ -85,7 +114,7 @@ MAKE_SORTED_MAP(
     P(L"\xf4\x36", L"oo"),          //
     P(L"\x1b0\x36", L"\x1b0\x1a1"), //
 );
-static_assert(std::all_of(transitions_vni.begin(), transitions_vni.end(), [](const auto& x) {
+debug_ensure(std::all_of(transitions_vni.begin(), transitions_vni.end(), [](const auto& x) {
     return x.second.length() <= x.first.length();
 }));
 
@@ -114,7 +143,7 @@ MAKE_SORTED_MAP(
     P1(L"\x1b0\x1a1i", 0), //
     P1(L"\x1b0\x1a1u", 0), //
 );
-static_assert(std::all_of(respos.begin(), respos.end(), [](const auto& x) {
+debug_ensure(std::all_of(respos.begin(), respos.end(), [](const auto& x) {
     return std::cmp_less_equal(x.second, x.first.length());
 }));
 
@@ -134,10 +163,11 @@ MAKE_SORTED_MAP(
     P(L"uou", L"\x1b0\x1a1u"),
     P(L"uu", L"\x1b0u"),
     P(L"\x1b0o", L"\x1b0\x1a1"),
-    // identical transitions are ignored if the last "w" is typed immediately after V without repeating (e.g. "uwow")
+    // identical transitions are ignored if the last "w" is typed immediately after V without repeating (e.g.
+    // "uwow")
     P(L"\x1b0\x1a1", L"\x1b0\x1a1"), //
 );
-static_assert(std::all_of(transitions_w.begin(), transitions_w.end(), [](const auto& x) {
+debug_ensure(std::all_of(transitions_w.begin(), transitions_w.end(), [](const auto& x) {
     return x.second.length() == x.first.length();
 }));
 
@@ -151,7 +181,7 @@ MAKE_MAP(
     P(L"uoi", L"u\x1a1i"),
     P(L"\x1b0\x1a1", L"\x1b0\x1a1"), //
 );
-static_assert(std::all_of(transitions_w_q.begin(), transitions_w_q.end(), [](const auto& x) {
+debug_ensure(std::all_of(transitions_w_q.begin(), transitions_w_q.end(), [](const auto& x) {
     return x.second.length() == x.first.length();
 }));
 
@@ -170,7 +200,7 @@ MAKE_SORTED_MAP(
     P1(L"\x1b0\x1a1", 1),  //
     P1(L"\x1b0\x1a1i", 1), //
 );
-static_assert(std::all_of(respos_w.begin(), respos_w.end(), [](const auto& x) {
+debug_ensure(std::all_of(respos_w.begin(), respos_w.end(), [](const auto& x) {
     return std::cmp_less_equal(x.second, x.first.length());
 }));
 
@@ -184,12 +214,12 @@ MAKE_MAP(
       L"u\x103"),                //
     P(L"\x1b0o", L"\x1b0\x1a1"), //
 );
-static_assert(std::all_of(transitions_v_c2.begin(), transitions_v_c2.end(), [](const auto& x) {
+debug_ensure(std::all_of(transitions_v_c2.begin(), transitions_v_c2.end(), [](const auto& x) {
     return x.second.length() == x.first.length();
 }));
 
 MAKE_MAP(transitions_v_c2_q, std::wstring_view, std::wstring_view, P(L"\x1b0o", L"\x1b0\x1a1"));
-static_assert(std::all_of(transitions_v_c2_q.begin(), transitions_v_c2_q.end(), [](const auto& x) {
+debug_ensure(std::all_of(transitions_v_c2_q.begin(), transitions_v_c2_q.end(), [](const auto& x) {
     return x.second.length() == x.first.length();
 }));
 
@@ -210,7 +240,7 @@ MAKE_SORTED_MAP(
     P2(L'\x1a1', L"\x1a1\x1edb\x1edd\x1edf\x1ee1\x1ee3"), //
     P2(L'\x1b0', L"\x1b0\x1ee9\x1eeb\x1eed\x1eef\x1ef1"), //
 );
-static_assert(std::all_of(transitions_tones.begin(), transitions_tones.end(), [](const auto& x) {
+debug_ensure(std::all_of(transitions_tones.begin(), transitions_tones.end(), [](const auto& x) {
     return x.second.length() == transitions_tones[0].second.length();
 }));
 
@@ -312,7 +342,7 @@ MAKE_SORTED_MAP(
     P1(L"\x1b0\x1a1i", VI(1, C2Mode::NoC2)),  // ươi
     P1(L"\x1b0\x1a1u", VI(1, C2Mode::NoC2)),  // ươu
 );
-static_assert(std::all_of(valid_v.begin(), valid_v.end(), [](const auto& x) {
+debug_ensure(std::all_of(valid_v.begin(), valid_v.end(), [](const auto& x) {
     return std::cmp_less_equal(x.second.tonepos, x.first.length());
 }));
 
@@ -341,7 +371,7 @@ MAKE_SORTED_MAP(
     P1(L"u\x1a1i", VI(1, C2Mode::NoC2)),      // uơi
     P1(L"\x1b0\x1a1", VI(1, C2Mode::MustC2)), // ươ
 );
-static_assert(std::all_of(valid_v_q.begin(), valid_v_q.end(), [](const auto& x) {
+debug_ensure(std::all_of(valid_v_q.begin(), valid_v_q.end(), [](const auto& x) {
     return std::cmp_less_equal(x.second.tonepos, x.first.length());
 }));
 
@@ -378,7 +408,7 @@ MAKE_SORTED_MAP(
     P1(L"\x1b0\x61", VI(0, C2Mode::NoC2)),    // ưa
     P1(L"\x1b0\x1a1", VI(1, C2Mode::MustC2)), // ươ
 );
-static_assert(std::all_of(valid_v_gi.begin(), valid_v_gi.end(), [](const auto& x) {
+debug_ensure(std::all_of(valid_v_gi.begin(), valid_v_gi.end(), [](const auto& x) {
     return x.second.tonepos <= static_cast<int>(x.first.length());
 }));
 
@@ -409,7 +439,7 @@ MAKE_MAP(
     P1(L"oe", VI(0, C2Mode::Either)), //
     P1(L"uy", VI(0, C2Mode::Either)), //
 );
-static_assert(std::all_of(valid_v_oa_uy.begin(), valid_v_oa_uy.end(), [](const auto& x) {
+debug_ensure(std::all_of(valid_v_oa_uy.begin(), valid_v_oa_uy.end(), [](const auto& x) {
     return std::cmp_less_equal(x.second.tonepos, x.first.length());
 }));
 
@@ -932,3 +962,12 @@ MAKE_SORTED_SET(
 #undef P1
 #undef P2
 #undef VI
+
+#undef debug_ensure
+
+#undef unique
+#undef concat
+#undef _concat
+
+#undef TM_CONSTEXPR
+#undef TM_USE_CONSTEXPR

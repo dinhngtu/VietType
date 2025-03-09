@@ -138,6 +138,10 @@ static const CharTypes digitClasses[10] = {
     CharTypes::Dd,     // 9
 };
 
+class TypingStyle {
+    const CharTypes CharTypes[128];
+};
+
 class TelexEngine : public ITelexEngine {
 public:
     explicit TelexEngine(const TelexConfig& config);
