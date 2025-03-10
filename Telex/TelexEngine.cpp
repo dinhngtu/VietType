@@ -728,7 +728,7 @@ TelexStates TelexEngine::Backconvert(_In_ const std::wstring& s) {
     bool found_backconversion = false;
     bool failed = false;
     for (auto c : s) {
-        auto double_flag = !_c2.size() && (_v == L"e" || _v == L"o");
+        auto double_flag = _config.typing_style == TypingStyles::Telex && !_c2.size() && (_v == L"e" || _v == L"o");
         auto clow = ToLower(c);
         auto cat = ClassifyCharacter(clow);
         if (cat != CharTypes::Uncategorized) {
@@ -761,7 +761,7 @@ TelexStates TelexEngine::Backconvert(_In_ const std::wstring& s) {
         }
     }
     if (failed || (_c1.size() + _v.size() + _c2.size() != s.size())) {
-        if (found_backconversion) {
+        if (failed || found_backconversion) {
             _keyBuffer = s;
             _state = TelexStates::BackconvertFailed;
         } else {
