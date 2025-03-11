@@ -60,18 +60,20 @@ public:
     virtual void SetConfig(const TelexConfig& configconfig) = 0;
 
     virtual void Reset() = 0;
-    virtual TelexStates PushChar(_In_ wchar_t c) = 0;
+    virtual TelexStates PushChar(wchar_t c) = 0;
     virtual TelexStates Backspace() = 0;
     virtual TelexStates Commit() = 0;
     virtual TelexStates ForceCommit() = 0;
     virtual TelexStates Cancel() = 0;
-    virtual TelexStates Backconvert(_In_ const std::wstring& s) = 0;
+    virtual TelexStates Backconvert(const std::wstring& s) = 0;
 
     virtual TelexStates GetState() const = 0;
     virtual std::wstring Retrieve() const = 0;
     virtual std::wstring RetrieveRaw() const = 0;
     virtual std::wstring Peek() const = 0;
     virtual std::wstring::size_type Count() const = 0;
+
+    virtual bool AcceptsChar(wchar_t c) const = 0;
 };
 
 ITelexEngine* TelexNew(const TelexConfig&);

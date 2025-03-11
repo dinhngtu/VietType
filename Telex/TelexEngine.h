@@ -82,6 +82,7 @@ struct TypingStyle {
     CharTypes chartypes[128];
     ArrayMap<std::wstring_view, std::wstring_view, true> transitions;
     ArrayMap<wchar_t, std::wstring_view, true> backconversions;
+    const std::wstring_view charlist;
     unsigned long max_optimize = 0;
 };
 
@@ -99,12 +100,12 @@ public:
     void SetConfig(const TelexConfig& config) override;
 
     void Reset() override;
-    TelexStates PushChar(_In_ wchar_t c) override;
+    TelexStates PushChar(wchar_t c) override;
     TelexStates Backspace() override;
     TelexStates Commit() override;
     TelexStates ForceCommit() override;
     TelexStates Cancel() override;
-    TelexStates Backconvert(_In_ const std::wstring& s) override;
+    TelexStates Backconvert(const std::wstring& s) override;
 
     constexpr TelexStates GetState() const override {
         return _state;
@@ -115,6 +116,8 @@ public:
     constexpr std::wstring::size_type Count() const override {
         return _keyBuffer.size();
     }
+
+    bool AcceptsChar(wchar_t c) const override;
 
     constexpr Tones GetTone() const {
         return _t;

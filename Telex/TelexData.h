@@ -1202,6 +1202,7 @@ const std::array<const TypingStyle, 3> typing_styles = {
             },
         .transitions = transitions_telex,
         .backconversions = backconversions_telex,
+        .charlist = L"abcdefghijklmnopqrstuvwxyz",
         .max_optimize = 3,
     },
 
@@ -1340,6 +1341,7 @@ const std::array<const TypingStyle, 3> typing_styles = {
             },
         .transitions = transitions_vni,
         .backconversions = backconversions_vni,
+        .charlist = L"0123456789abcdefghijklmnopqrstuvwxyz",
         .max_optimize = 0,
     },
 };

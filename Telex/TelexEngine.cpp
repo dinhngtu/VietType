@@ -249,7 +249,7 @@ void TelexEngine::Reset() {
 }
 
 // remember to push into _cases when adding a new character
-TelexStates TelexEngine::PushChar(_In_ wchar_t corig) {
+TelexStates TelexEngine::PushChar(wchar_t corig) {
     // PushChar at any committed/error state is illegal, but fail softly anyway
     if (_state != TelexStates::Valid && _state != TelexStates::Invalid) {
         return _state;
@@ -721,7 +721,7 @@ TelexStates TelexEngine::Cancel() {
     return _state;
 }
 
-TelexStates TelexEngine::Backconvert(_In_ const std::wstring& s) {
+TelexStates TelexEngine::Backconvert(const std::wstring& s) {
     assert(!_keyBuffer.size());
     if (_keyBuffer.size())
         return _state;
@@ -834,6 +834,11 @@ std::wstring TelexEngine::Peek() const {
     ApplyCases(result, _cases);
 
     return result;
+}
+
+bool TelexEngine::AcceptsChar(wchar_t c) const {
+    const auto& charlist = GetTypingStyle()->charlist;
+    return charlist.find(ToLower(c)) != std::wstring_view::npos;
 }
 
 bool TelexEngine::CheckInvariants() const {
