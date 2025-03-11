@@ -44,9 +44,7 @@ _Check_return_ HRESULT CompositionManager::Initialize(
 
 HRESULT CompositionManager::Uninitialize() {
     _categoryMgr.Release();
-    if (_composingAttribute) {
-        _composingAttribute.Release();
-    }
+    _composingAttribute.Release();
     return S_OK;
 }
 
