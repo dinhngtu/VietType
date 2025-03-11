@@ -100,7 +100,7 @@ finish:
     } else {
         hr = compBackconvert.SetValue(0);
         DBG_HRESULT_CHECK(hr, L"%s", L"compBackconvert reset failed");
-        *pfEaten = IsKeyEaten(_compositionManager->IsComposing(), wParam, lParam, _keyState);
+        *pfEaten = IsKeyEaten(&_controller->GetEngine(), _compositionManager->IsComposing(), wParam, lParam, _keyState);
     }
 
     return S_OK;
@@ -134,7 +134,7 @@ STDMETHODIMP KeyEventSink::OnTestKeyUp(
             WINERROR_GLE_RETURN_HRESULT(L"%s", L"GetKeyboardState failed");
         }
 
-        *pfEaten = IsKeyEaten(_compositionManager->IsComposing(), wParam, lParam, _keyState);
+        *pfEaten = IsKeyEaten(&_controller->GetEngine(), _compositionManager->IsComposing(), wParam, lParam, _keyState);
     } else {
         *pfEaten = FALSE;
     }
