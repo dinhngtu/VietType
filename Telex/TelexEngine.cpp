@@ -602,6 +602,10 @@ TelexStates TelexEngine::Commit() {
                 _autocorrected = true;
             }
         }
+        if (!_c1.empty() && _v == L"ie" && !_c2.empty() && (_t == Tones::S || _t == Tones::J)) {
+            _v = L"i\xea";
+            _autocorrected = true;
+        }
         if (_c2 == L"h" && (_v == L"a" || _v == L"\xea")) {
             if (_t == Tones::S || _t == Tones::J) {
                 _c2 = L"ch";

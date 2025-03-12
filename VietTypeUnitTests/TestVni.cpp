@@ -713,6 +713,18 @@ public:
         });
     }
 
+    // autocorrect
+
+    TEST_METHOD (TestVniAutocorrectViet1) {
+        auto config1 = config;
+        config1.autocorrect = true;
+        MultiConfigTester(config1, 0, 3, false).Invoke([](auto& e) {
+            FeedWord(e, L"viet1");
+            AssertTelexStatesEqual(TelexStates::Committed, e.Commit());
+            Assert::AreEqual(L"vi\x1ebft", e.Retrieve().c_str());
+        });
+    }
+
     // TODO: test w/wa
 };
 

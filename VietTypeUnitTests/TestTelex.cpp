@@ -921,6 +921,16 @@ public:
             Assert::AreEqual(L"h\x1b0\x1a1ng", e.Retrieve().c_str());
         });
     }
+
+    TEST_METHOD (TestTelexAutocorrectViets) {
+        auto config1 = config;
+        config1.autocorrect = true;
+        MultiConfigTester(config1, 0, 3, false).Invoke([](auto& e) {
+            FeedWord(e, L"viets");
+            AssertTelexStatesEqual(TelexStates::Committed, e.Commit());
+            Assert::AreEqual(L"vi\x1ebft", e.Retrieve().c_str());
+        });
+    }
 };
 
 } // namespace UnitTests
