@@ -22,6 +22,13 @@ HRESULT EngineSettingsController::Uninitialize() {
 }
 
 HRESULT EngineSettingsController::LoadTelexSettings(Telex::TelexConfig& cfg) {
+    DWORD typing_style;
+    SettingsStore::GetValueOrDefault(
+        _settingsKey, L"typing_style", &typing_style, static_cast<DWORD>(_ec->GetEngine().GetConfig().typing_style));
+    if (typing_style >= static_cast<DWORD>(Telex::TypingStyles::Max))
+        typing_style = static_cast<DWORD>(Telex::TypingStyles::Telex);
+    cfg.typing_style = static_cast<Telex::TypingStyles>(typing_style);
+
     DWORD oa_uy_tone1;
     SettingsStore::GetValueOrDefault(
         _settingsKey, L"oa_uy_tone1", &oa_uy_tone1, static_cast<DWORD>(_ec->GetEngine().GetConfig().oa_uy_tone1));
