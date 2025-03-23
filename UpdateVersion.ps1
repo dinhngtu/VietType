@@ -8,8 +8,8 @@ $vcsOld = Get-Content -ErrorAction Ignore -Raw $vcsFile
 $vcsRev = git describe --tags --long --dirty --always
 $vcsNew = "#pragma once`n`n#define VCS_REVISION L""$vcsRev""`n"
 if ($Force -or ($vcsOld -ne $vcsNew)) {
-    echo "Updating revision: $vcsRev"
-    [System.IO.File]::WriteAllText($vcsFile, [string]::Join("`n", $vcsNew))
+    Write-Output "Updating revision: $vcsRev"
+    Set-Content -Path $vcsFile -Value $vcsNew -NoNewline
 }
 
 . "$PSScriptRoot\Version.ps1"
@@ -28,6 +28,6 @@ $hNew = `
 
 "@
 if ($Force -or ($hOld -ne $hNew)) {
-    echo "Updating version header"
-    [System.IO.File]::WriteAllText($hFile, [string]::Join("`n", $hNew))
+    Write-Output "Updating version header"
+    Set-Content -Path $hFile -Value $hNew -NoNewline
 }

@@ -25,6 +25,6 @@ namespace VietTypeConfig2 {
 }
 "@
 if ($Force -or ($csOld -ne $csNew)) {
-    echo "Updating Version.cs"
-    [System.IO.File]::WriteAllText($csFile, [string]::Join("`n", $csNew))
+    Write-Output "Updating Version.cs"
+    Set-Content -Path $csFile -Value $csNew -NoNewline
 }

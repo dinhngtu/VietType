@@ -20,6 +20,6 @@ $wixNew = `
 
 "@
 if ($Force -or ($wixOld -ne $wixNew)) {
-    echo "Updating Wix version include: $vcsRev"
-    [System.IO.File]::WriteAllText($wixFile, [string]::Join("`n", $wixNew))
+    Write-Output "Updating Wix version include: $vcsRev"
+    Set-Content -Path $wixFile -Value $wixNew -NoNewline
 }
