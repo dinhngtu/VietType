@@ -69,7 +69,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="AppCommands.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="AppSettings.cs" />
     <Compile Include="ComposingAttributes.cs" />

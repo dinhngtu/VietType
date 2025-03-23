@@ -3,10 +3,7 @@
 
 using System;
 using System.ComponentModel;
-using System.Runtime.InteropServices;
-using System.Windows;
 using System.Windows.Input;
-using VietTypeConfig2.Properties;
 
 namespace VietTypeConfig2 {
     internal class MainWindowViewModel : INotifyPropertyChanged {

@@ -2,9 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 using System.Runtime.InteropServices;
-using System;
 using System.Windows;
-using VietTypeConfig2.Properties;
 
 namespace VietTypeConfig2 {
     /// <summary>
