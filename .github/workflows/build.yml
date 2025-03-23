@@ -7,6 +7,11 @@ on:
 env:
   SOLUTION_FILE_PATH: .
 
+permissions:
+  id-token: write
+  contents: read
+  attestations: write
+
 jobs:
   build:
     runs-on: windows-latest
@@ -42,3 +47,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           path: VietTypeSetup/bin/
+          name: artifact.zip
+
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-name: artifact.zip
+          subject-digest: sha256:${{ steps.upload.outputs.artifact-digest }}
