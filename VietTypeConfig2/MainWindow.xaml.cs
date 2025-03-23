@@ -24,6 +24,12 @@ namespace VietTypeConfig2 {
         }
 
         private void Vm_RequestAbout(object sender, System.EventArgs e) {
+            MessageBox.Show(
+                string.Format(
+                    "VietType {0} ({1})\nCopyright © 2018 Dinh Ngoc Tu.\nVietType is free software, licensed under the GNU General Public License. VietType is distributed WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the included LICENSE file for more details.",
+                    Version.ProductVersion, Version.VcsRevision),
+                "VietType",
+                MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void Vm_ToggleEnabledCompleted(object sender, MainWindowViewModel.ToggleEventArgs e) {

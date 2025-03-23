@@ -17,7 +17,7 @@ using System.Reflection;
 [assembly: AssemblyFileVersion("$productVersionText")]
 [assembly: AssemblyInformationalVersion("$productVersionText")]
 
-namespace VietTypeConfig {
+namespace VietTypeConfig2 {
     internal static class Version {
         public const string ProductVersion = "$productVersionText";
         public const string VcsRevision = "$vcsRev";
