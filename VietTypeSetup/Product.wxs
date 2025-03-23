@@ -118,7 +118,7 @@ SPDX-License-Identifier: GPL-3.0-only
     <DirectoryRef Id="INSTALLFOLDER" />
     <ComponentGroup Id="Config2Components">
       <Component Directory="INSTALLFOLDER" Bitness="always32">
-        <File Id="VietTypeConfig2.exe" Source="$(VietTypeConfig.TargetPath)" />
+        <File Id="VietTypeConfig2.exe" Source="$(VietTypeConfig2.TargetPath)" />
         <Shortcut Directory="ProgramMenuFolder" Name="VietType Settings" WorkingDirectory="INSTALLFOLDER" Advertise="yes" Icon="logo.exe">
           <Icon Id="logo.exe" SourceFile="$(VietTypeConfig2.ProjectDir)\logo.ico" />
         </Shortcut>
@@ -152,7 +152,7 @@ SPDX-License-Identifier: GPL-3.0-only
   <Fragment>
     <ComponentGroup Id="ConfigDebugSymbols">
       <Component Directory="INSTALLFOLDER" Bitness="always32">
-        <File Source="$(VietTypeConfig.TargetDir)\VietTypeConfig.pdb"
+        <File Source="$(VietTypeConfig2.TargetDir)\VietTypeConfig2.pdb"
               DefaultLanguage="0" DefaultVersion="$(productVersion)" />
       </Component>
     </ComponentGroup>
@@ -179,7 +179,7 @@ SPDX-License-Identifier: GPL-3.0-only
   <Fragment>
     <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
     <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Open VietType Settings" />
-    <Property Id="WixShellExecTarget" Value="[#VietTypeConfig.exe]" />
+    <Property Id="WixShellExecTarget" Value="[#VietTypeConfig2.exe]" />
     <CustomAction Id="OpenSettingsAfterInstall" Impersonate="yes" DllEntry="WixShellExec" BinaryRef="Wix4UtilCA_X86" />
   </Fragment>
 </Wix>
