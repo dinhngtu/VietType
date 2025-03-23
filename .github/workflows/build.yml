@@ -48,10 +48,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           path: VietTypeSetup/bin/
-          name: artifact.zip
+          name: artifact
 
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v2
         with:
-          subject-name: artifact.zip
+          subject-name: artifact
           subject-digest: sha256:${{ steps.upload.outputs.artifact-digest }}
