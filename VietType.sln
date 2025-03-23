@@ -38,6 +38,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WordLister", "WordLister\Wo
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestLib", "TestLib\TestLib.vcxproj", "{39086F5E-94A0-4DE8-9FB0-3DF69721A97C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VietTypeConfig2", "VietTypeConfig2\VietTypeConfig2.csproj", "{1B708A01-724B-41C5-B177-93844708E24D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -106,6 +108,14 @@ Global
 		{39086F5E-94A0-4DE8-9FB0-3DF69721A97C}.Release|Win32.Build.0 = Release|Win32
 		{39086F5E-94A0-4DE8-9FB0-3DF69721A97C}.Release|x64.ActiveCfg = Release|x64
 		{39086F5E-94A0-4DE8-9FB0-3DF69721A97C}.Release|x64.Build.0 = Release|x64
+		{1B708A01-724B-41C5-B177-93844708E24D}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{1B708A01-724B-41C5-B177-93844708E24D}.Debug|Win32.Build.0 = Debug|Any CPU
+		{1B708A01-724B-41C5-B177-93844708E24D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{1B708A01-724B-41C5-B177-93844708E24D}.Debug|x64.Build.0 = Debug|Any CPU
+		{1B708A01-724B-41C5-B177-93844708E24D}.Release|Win32.ActiveCfg = Release|Any CPU
+		{1B708A01-724B-41C5-B177-93844708E24D}.Release|Win32.Build.0 = Release|Any CPU
+		{1B708A01-724B-41C5-B177-93844708E24D}.Release|x64.ActiveCfg = Release|Any CPU
+		{1B708A01-724B-41C5-B177-93844708E24D}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

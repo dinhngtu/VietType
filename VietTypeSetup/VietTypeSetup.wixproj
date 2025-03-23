@@ -28,7 +28,7 @@
     <Content Include="Version.wxi" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\VietTypeConfig\VietTypeConfig.csproj" />
+    <ProjectReference Include="..\VietTypeConfig2\VietTypeConfig2.csproj" />
   </ItemGroup>
   <Import Project="Sdk.targets" Sdk="WixToolset.Sdk" Version="5.0.1" />
   <PropertyGroup>

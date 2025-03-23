@@ -1,0 +1,183 @@
+<Window x:Class="VietTypeConfig2.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:VietTypeConfig2"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        mc:Ignorable="d"
+        Title="VietType Settings" MinWidth="450" Width="450" ResizeMode="CanMinimize" SizeToContent="Height">
+    <Window.DataContext>
+        <local:MainWindowViewModel />
+    </Window.DataContext>
+    <Window.Resources>
+        <Style TargetType="{x:Type Button}">
+            <Setter Property="MinWidth" Value="75" />
+            <Setter Property="MinHeight" Value="23" />
+        </Style>
+        <Style TargetType="{x:Type ComboBox}">
+            <Setter Property="Height" Value="23" />
+        </Style>
+        <Style TargetType="{x:Type Slider}">
+            <Setter Property="Height" Value="24" />
+        </Style>
+        <ObjectDataProvider x:Key="TypingStylesDataSource" ObjectType="{x:Type sys:Enum}" MethodName="GetValues">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="local:TypingStyles" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        <ObjectDataProvider x:Key="ShowComposingAttrsDataSource" ObjectType="{x:Type sys:Enum}" MethodName="GetValues">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="local:ComposingAttributes" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        <ObjectDataProvider x:Key="ToggleModifiersDataSource" ObjectType="{x:Type sys:Enum}" MethodName="GetValues">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="local:ToggleModifiers" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        <ObjectDataProvider x:Key="ToggleKeysDataSource" ObjectType="{x:Type sys:Enum}" MethodName="GetValues">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="local:ToggleKeys" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+    </Window.Resources>
+    <Grid Margin="11">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <Button Width="135" Content="{Binding IsEnabledText}" Command="{Binding ToggleEnabledCommand}" />
+        </StackPanel>
+        <GroupBox Grid.Row="1" Margin="0,7,0,0" Header="Engine settings">
+            <StackPanel Margin="3,7,3,7">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="160" />
+                    </Grid.ColumnDefinitions>
+                    <Label
+                        Grid.Column="0"
+                        Margin="-5,0,0,0"
+                        Target="{Binding ElementName=comboboxTypingStyle}">
+                        Typing _style:
+                    </Label>
+                    <ComboBox
+                        Grid.Column="2"
+                        Name="comboboxTypingStyle" 
+                        ItemsSource="{Binding Source={StaticResource ResourceKey=TypingStylesDataSource}}"
+                        SelectedValue="{Binding TypingStyle}" />
+                </Grid>
+                <CheckBox Margin="0,7,0,0" IsChecked="{Binding OaUyTone1}">
+                    _Use &quot;oà&quot;, &quot;uý&quot; instead of &quot;òa&quot;, &quot;úy&quot;
+                </CheckBox>
+                <CheckBox Margin="0,7,0,0" IsChecked="{Binding AcceptDd}">
+                    Accept 'd' any_where
+                </CheckBox>
+                <CheckBox Margin="0,7,0,0" IsChecked="{Binding BackspaceInvalid}">
+                    Backspaced _invalid word stays invalid
+                </CheckBox>
+                <Grid Margin="0,7,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="120" />
+                        <ColumnDefinition Width="40" />
+                    </Grid.ColumnDefinitions>
+                    <Label
+                        Grid.Column="0"
+                        Margin="-5,0,0,0"
+                        Target="{Binding ElementName=sliderOptimizeMultilang}">
+                        Multilingual typing _optimization level:
+                    </Label>
+                    <Slider
+                        Grid.Column="2"
+                        Minimum="0"
+                        Maximum="3"
+                        TickFrequency="1"
+                        IsSnapToTickEnabled="True"
+                        SmallChange="1"
+                        LargeChange="1"
+                        Width="Auto"
+                        TickPlacement="BottomRight"
+                        Name="sliderOptimizeMultilang"
+                        Value="{Binding OptimizeMultilang}" />
+                    <TextBox Grid.Column="3" IsReadOnly="True" Margin="7,0,0,0" Text="{Binding OptimizeMultilang}" />
+                </Grid>
+                <CheckBox Margin="0,7,0,0" IsChecked="{Binding Autocorrect}">
+                    Enable _autocorrect
+                </CheckBox>
+            </StackPanel>
+        </GroupBox>
+        <GroupBox Grid.Row="2" Margin="0,7,0,0" Header="Control settings">
+            <StackPanel Margin="3,7,3,7">
+                <CheckBox IsChecked="{Binding DefaultEnabled}">
+                    Vietnamese mode by de_fault
+                </CheckBox>
+                <CheckBox Margin="0,7,0,0" IsChecked="{Binding BackconvertOnBackspace}">
+                    _Reconvert word on Backspace
+                </CheckBox>
+                <Grid Margin="0,7,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="110" />
+                        <ColumnDefinition Width="140" />
+                    </Grid.ColumnDefinitions>
+                    <Label
+                        Grid.Column="0"
+                        Margin="-5,0,0,0"
+                        Target="{Binding ElementName=comboboxToggleMod}">
+                        _Toggle key:
+                    </Label>
+                    <ComboBox
+                        Grid.Column="2"
+                        Name="comboboxToggleMod"
+                        ItemsSource="{Binding Source={StaticResource ResourceKey=ToggleModifiersDataSource}}"
+                        SelectedValue="{Binding ToggleModifiers}"/>
+                    <ComboBox
+                        Grid.Column="3" 
+                        Margin="7,0,0,0"
+                        ItemsSource="{Binding Source={StaticResource ResourceKey=ToggleKeysDataSource}}"
+                        SelectedValue="{Binding ToggleKeys}" />
+                </Grid>
+                <Grid Margin="0,7,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="160" />
+                    </Grid.ColumnDefinitions>
+                    <Label
+                        Grid.Column="0"
+                        Margin="-5,0,0,0"
+                        Target="{Binding ElementName=comboboxShowComposingAttr}">
+                        Current word _highlight mode:
+                    </Label>
+                    <ComboBox
+                        Grid.Column="2"
+                        Name="comboboxShowComposingAttr"
+                        ItemsSource="{Binding Source={StaticResource ResourceKey=ShowComposingAttrsDataSource}}"
+                        SelectedValue="{Binding ShowComposingAttr}" />
+                </Grid>
+            </StackPanel>
+        </GroupBox>
+        <Grid Grid.Row="4" Margin="0,11,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" Orientation="Horizontal">
+                <Button>A_bout</Button>
+            </StackPanel>
+            <StackPanel Grid.Column="2" Orientation="Horizontal">
+                <Button IsDefault="True" Command="{Binding OkCommand}">OK</Button>
+                <Button Margin="7,0,0,0" IsCancel="True" Command="{Binding CancelCommand}">Cancel</Button>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

@@ -115,26 +115,17 @@ SPDX-License-Identifier: GPL-3.0-only
 
   <Fragment>
     <StandardDirectory Id="ProgramMenuFolder" />
-    <DirectoryRef Id="INSTALLFOLDER">
-      <Directory Id="ConfigRes_en" Name="en" />
-      <Directory Id="ConfigRes_vi" Name="vi" />
-    </DirectoryRef>
-    <ComponentGroup Id="ConfigComponents">
+    <DirectoryRef Id="INSTALLFOLDER" />
+    <ComponentGroup Id="Config2Components">
       <Component Directory="INSTALLFOLDER" Bitness="always32">
-        <File Id="VietTypeConfig.exe" Source="$(VietTypeConfig.TargetPath)" />
+        <File Id="VietTypeConfig2.exe" Source="$(VietTypeConfig.TargetPath)" />
         <Shortcut Directory="ProgramMenuFolder" Name="VietType Settings" WorkingDirectory="INSTALLFOLDER" Advertise="yes" Icon="logo.exe">
-          <Icon Id="logo.exe" SourceFile="$(VietTypeConfig.ProjectDir)\logo.ico" />
+          <Icon Id="logo.exe" SourceFile="$(VietTypeConfig2.ProjectDir)\logo.ico" />
         </Shortcut>
       </Component>
       <Component Directory="INSTALLFOLDER" Bitness="always32">
-        <File Source="$(VietTypeConfig.TargetPath).config"
+        <File Source="$(VietTypeConfig2.TargetPath).config"
               DefaultLanguage="0" DefaultVersion="$(productVersion)" />
-      </Component>
-      <Component Directory="ConfigRes_en" Bitness="always32">
-        <File Source="$(VietTypeConfig.TargetDir)\en\VietTypeConfig.resources.dll" />
-      </Component>
-      <Component Directory="ConfigRes_vi" Bitness="always32">
-        <File Source="$(VietTypeConfig.TargetDir)\vi\VietTypeConfig.resources.dll" />
       </Component>
     </ComponentGroup>
   </Fragment>

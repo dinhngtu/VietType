@@ -17,4 +17,5 @@ VietTypeATL/VersionVCS.h
 VietTypeATL/VersionNumbers.h
 VietTypeSetup/Version.wxi
 VietTypeConfig/Properties/Version.cs
+VietTypeConfig2/Properties/Version.cs
 VietTypeBundle/*.exe
