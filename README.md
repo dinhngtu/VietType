@@ -5,7 +5,7 @@ VietType là bộ gõ tiếng Việt nguồn mở dành cho Windows 10.
 
 ## Tại sao sử dụng VietType?
 - VietType là phần mềm nguồn mở. Bất cứ ai có thể sử dụng, sửa đổi và lưu hành VietType theo Giấy phép Công cộng GNU (GNU GPL).
-- VietType không chứa quảng cáo, các tính năng theo dõi người dùng, mã độc hay phần mềm gián điệp. Bạn có thể kiểm chứng bằng cách xem mã nguồn của VietType.
+- VietType không chứa quảng cáo, các tính năng theo dõi người dùng, mã độc hay phần mềm gián điệp. Bạn có thể kiểm chứng bằng cách xem mã nguồn của VietType, và kiểm tra "chứng nhận xuất xứ" (provenance attestation) của GitHub Actions trong mỗi build của VietType (v1.11.1 trở lên).
 - Tôi cung cấp VietType hoàn toàn miễn phí, không vì lợi lộc.
 - VietType sử dụng phương thức nhập liệu có sẵn của Windows nên tương thích với nhiều ứng dụng như Chrome, Skype, HTKK, v.v.
 
@@ -24,12 +24,20 @@ VietType sử dụng cách gõ Telex tự do. VietType thể hiện trạng thá
 - Esc (trong lúc gõ từ): Huỷ bỏ gõ từ, chuyển về phím được gõ ban đầu.
 
 Chương trình VietType Settings cho phép cài đặt lựa chọn của VietType. VietType có những lựa chọn sau:
-- *Vietnamese mode by default/Mặc định bật tiếng Việt:* bật/tắt tiếng Việt khi khởi động máy tính;
+
+**Lựa chọn kiểu gõ:**
+- *Typing style/Kiểu gõ:* lựa chọn kiểu gõ Telex hoặc VNI;
 - *Use "oà", "uý" instead of "òa", "úy"/Gõ "oà", "uý" thay vì "òa", "úy:"* lựa chọn cách bỏ dấu cho các vần "oà", "uý", v.v.;
 - *Accept 'd' anywhere/Gõ 'đ' tự do:* cho phép gõ "d" để chuyển "d" -> "đ" tại bất cứ nơi nào trong từ;
 - *Backspaced invalid word stays invalid/Giữ trạng thái sai khi xóa từ sai:* quy định có giữ tiếng Việt khi xóa từ sai hay không;
+- *Multilingual typing optimization level/Mức tối ưu gõ nhiều ngôn ngữ:* thay đổi phương pháp gõ để phù hợp với người thường xuyên gõ nhiều ngôn ngữ (đặc biệt là tiếng Anh);
+- *Enable autocorrect/Bật tự sửa từ*: Bật một số phương pháp sửa từ tự động khi gõ sai (ví dụ: "miếgn" -> "miếng").
+
+**Lựa chọn hệ thống:**
+- *Vietnamese mode by default/Mặc định bật tiếng Việt:* bật/tắt tiếng Việt khi khởi động máy tính;
 - *Reconvert word on Backspace/Chuyển ngược từ khi Backspace:* cho phép sửa từ sau khi đã gõ xong từ đó bằng cách dùng phím Backspace;
-- *Multilingual typing optimization level/Mức tối ưu gõ nhiều ngôn ngữ:* thay đổi phương pháp gõ để phù hợp với người thường xuyên gõ nhiều ngôn ngữ (đặc biệt là tiếng Anh).
+- *Toggle key/Phím chuyển:* chọn phím chuyển Anh/Việt;
+- *Current word highlight mode/Gạch chân từ đang gõ:* chọn kiểu gạch chân dưới từ đang gõ.
 
 ## Câu hỏi thường gặp
 - Tại sao VietType ít tính năng vậy? Tại sao VietType không có các tính năng như gõ tắt, chuyển mã, v.v.? \
