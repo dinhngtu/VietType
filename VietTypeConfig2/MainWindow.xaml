@@ -126,7 +126,7 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="110" />
-                        <ColumnDefinition Width="140" />
+                        <ColumnDefinition Width="167" />
                     </Grid.ColumnDefinitions>
                     <Label
                         Grid.Column="0"
