@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:VietTypeConfig2"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
-        Title="VietType Settings" MinWidth="450" Width="450" ResizeMode="CanMinimize" SizeToContent="Height">
+        Title="VietType Settings" MinWidth="450" Width="450" ResizeMode="CanMinimize" SizeToContent="Height" WindowStartupLocation="CenterScreen">
     <Window.DataContext>
         <local:MainWindowViewModel />
     </Window.DataContext>
@@ -172,7 +172,7 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <StackPanel Grid.Column="0" Orientation="Horizontal">
-                <Button>A_bout</Button>
+                <Button Command="{Binding AboutCommand}">A_bout</Button>
             </StackPanel>
             <StackPanel Grid.Column="2" Orientation="Horizontal">
                 <Button IsDefault="True" Command="{Binding OkCommand}">OK</Button>
