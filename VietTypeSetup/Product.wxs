@@ -116,7 +116,7 @@ SPDX-License-Identifier: GPL-3.0-only
   <Fragment>
     <StandardDirectory Id="ProgramMenuFolder" />
     <DirectoryRef Id="INSTALLFOLDER" />
-    <ComponentGroup Id="Config2Components">
+    <ComponentGroup Id="ConfigComponents">
       <Component Directory="INSTALLFOLDER" Bitness="always32">
         <File Id="VietTypeConfig2.exe" Source="$(VietTypeConfig2.TargetPath)" />
         <Shortcut Directory="ProgramMenuFolder" Name="VietType Settings" WorkingDirectory="INSTALLFOLDER" Advertise="yes" Icon="logo.exe">
