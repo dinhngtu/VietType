@@ -200,7 +200,9 @@ bool TelexEngine::HasValidRespos() const {
 }
 
 inline const TypingStyle* TelexEngine::GetTypingStyle() const {
-    return &typing_styles[static_cast<unsigned int>(_config.typing_style)];
+    auto typing_style = static_cast<unsigned int>(_config.typing_style);
+    assert(typing_style < typing_styles.size());
+    return &typing_styles[typing_style];
 }
 
 TelexEngine::TelexEngine(const TelexConfig& config) {

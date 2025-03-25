@@ -1066,7 +1066,7 @@ MAKE_MAP(
     P2(L'\x1ef9', L"y4"),  //
 );
 
-const std::array<const TypingStyle, 3> typing_styles = {
+const std::array<const TypingStyle, static_cast<size_t>(TypingStyles::Max)> typing_styles = {
     // telex
     TypingStyle{
         .chartypes =
