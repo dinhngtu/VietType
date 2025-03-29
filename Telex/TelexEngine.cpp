@@ -256,6 +256,7 @@ TelexStates TelexEngine::PushChar(wchar_t corig) {
     if (_state != TelexStates::Valid && _state != TelexStates::Invalid) {
         return _state;
     }
+    // don't let respos overflow into flags
     if (_keyBuffer.size() > 250) {
         _state = TelexStates::Invalid;
         assert(CheckInvariants());
@@ -371,15 +372,15 @@ TelexStates TelexEngine::PushChar(wchar_t corig) {
 
     } else if (IS(cat, CharTypes::W | CharTypes::WA)) {
         if (!_v.empty()) {
-            bool tw = false;
+            bool vw_transitioned = false;
             if (IS(cat, CharTypes::W)) {
-                tw = TransitionV(_c1 == L"q" ? transitions_w_q : transitions_w, true);
+                vw_transitioned = TransitionV(_c1 == L"q" ? transitions_w_q : transitions_w, true);
             }
-            if (!tw && IS(cat, CharTypes::WA)) {
+            if (!vw_transitioned && IS(cat, CharTypes::WA)) {
                 // with the dual-action "w" in telex, CharTypes::W takes priority
-                tw = TransitionV(_c1 == L"q" ? transitions_wa_q : transitions_wa, true);
+                vw_transitioned = TransitionV(_c1 == L"q" ? transitions_wa_q : transitions_wa, true);
             }
-            if (tw) {
+            if (vw_transitioned) {
                 if (!_c2.empty()) {
                     TransitionV(_c1 == L"q" ? transitions_wv_c2_q : transitions_wv_c2);
                 }
@@ -391,6 +392,7 @@ TelexStates TelexEngine::PushChar(wchar_t corig) {
         } else if (
             _config.typing_style == TypingStyles::Telex && _config.autocorrect && !_toneCount &&
             (!_c1.empty() || GetOptimizeLevel() == 0)) {
+            // at high optimization, autocorrecting "nwuocs" is desirable but "wuocs" not
             _v.push_back(c);
             _cases.push_back(ccase);
             _respos.push_back(_respos_current++ | ResposAutocorrect);
@@ -505,8 +507,6 @@ TelexStates TelexEngine::Backspace() {
 
     assert(_keyBuffer.size() == _respos.size());
     rp = _respos;
-    std::wstring oldc1(_c1);
-    std::wstring oldv(_v);
     bool oldBackconverted = _backconverted;
 
     auto toDelete = static_cast<int>(_c1.size() + _v.size() + _c2.size()) - 1;
@@ -525,6 +525,7 @@ TelexStates TelexEngine::Backspace() {
         rp[lastTone] = (rp[lastTone] & ResposMask) | ResposTone;
     }
 
+    // scan word for respos that should be expunged
     for (size_t i = 0; i < buf.size(); i++) {
         if (rp[i] & ResposDoubleUndo && (rp[i] & ResposMask) >= toDelete) {
             assert(i > 0);
@@ -734,6 +735,7 @@ TelexStates TelexEngine::Backconvert(const std::wstring& s) {
     bool found_backconversion = false;
     bool failed = false;
     for (auto c : s) {
+        // for emulating double key outcomes ("xoong")
         auto double_flag = _config.typing_style == TypingStyles::Telex && !_c2.size() && (_v == L"e" || _v == L"o");
         auto clow = ToLower(c);
         auto cat = ClassifyCharacter(clow);
@@ -864,6 +866,9 @@ bool TelexEngine::CheckInvariants() const {
         if (_backconverted)
             return false;
     }
+    // ResposExpunged is not meant to survive beyond Backspace()
+    if (std::any_of(_respos.begin(), _respos.end(), [](auto r) { return r & ResposExpunged; }))
+        return false;
     if (_state == TelexStates::Valid || _state == TelexStates::Invalid) {
         if (_c1.size() + _v.size() + _c2.size() > _keyBuffer.size())
             return false;

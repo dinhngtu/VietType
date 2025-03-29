@@ -35,17 +35,31 @@ struct VInfo {
 };
 
 enum ResposTransitions {
+    // transitions to Invalid:
+
+    // removed by backspace (e.g. excessive tones), valid within Backspace only
     ResposExpunged = 0x40000000,
+    // caused transition to Invalid through double key
     ResposDoubleUndo = 0x20000000,
+    // caused transition to Invalid
     ResposInvalidate = 0x10000000,
-    //
+
+    // transitions findable in valid words:
+
+    // caused a C1 transition
     ResposTransitionC1 = 0x800000,
+    // caused a V transition
     ResposTransitionV = 0x400000,
+    // caused a W/WA transition
     ResposTransitionW = 0x200000,
+    // is a tone
     ResposTone = 0x100000,
+
+    // cached by autocorrect (e.g. the W in "nwuocs"), needs expunging/reordering at commit time
     ResposAutocorrect = 0x80000,
-    //
+    // position inside final word corresponding to this respos
     ResposMask = 0xff,
+    // mask of transitions findable in valid words
     ResposValidMask = 0xff0000,
 };
 
