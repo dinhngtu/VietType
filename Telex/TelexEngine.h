@@ -202,6 +202,8 @@ private:
     bool GetTonePos(_In_ bool predict, _Out_ VInfo* vinfo) const;
     void ReapplyTone();
     bool HasValidRespos() const;
+    void FeedNewResultChar(std::wstring& target, wchar_t c, bool ccase, int respos_flags = 0);
+    TelexStates DoOptimizeAndAutocorrect();
 };
 
 } // namespace Telex

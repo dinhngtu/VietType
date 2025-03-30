@@ -199,6 +199,12 @@ bool TelexEngine::HasValidRespos() const {
     return std::any_of(_respos.begin(), _respos.end(), [](auto rp) { return rp & ResposValidMask; });
 }
 
+void TelexEngine::FeedNewResultChar(std::wstring& target, wchar_t c, bool ccase, int respos_flags) {
+    target.push_back(c);
+    _cases.push_back(ccase);
+    _respos.push_back(_respos_current++ | respos_flags);
+}
+
 inline const TypingStyle* TelexEngine::GetTypingStyle() const {
     auto typing_style = static_cast<unsigned int>(_config.typing_style);
     assert(typing_style < typing_styles.size());
@@ -279,39 +285,27 @@ TelexStates TelexEngine::PushChar(wchar_t corig) {
 
     } else if (_c1.empty() && _v.empty() && IS(cat, CharTypes::ConsoC1)) {
         // ConsoContinue is a subset of ConsoC1, no need to check
-        _c1.push_back(c);
-        _cases.push_back(ccase);
-        _respos.push_back(_respos_current++);
+        FeedNewResultChar(_c1, c, ccase);
 
     } else if (_v.empty() && _c1 == L"g" && c == L'i') {
         // special treatment for 'gi'
-        _c1.push_back(c);
-        _cases.push_back(ccase);
-        _respos.push_back(_respos_current++);
+        FeedNewResultChar(_c1, c, ccase);
 
     } else if (_c1 == L"d" && IS(cat, CharTypes::Dd) && (_config.accept_separate_dd || (_v.empty() && _c2.empty()))) {
         // only used for 'dd'
-        // relaxed constraint: _v.empty()
         _c1 = L"\x111";
         _respos.push_back(0 | ResposTransitionC1);
 
     } else if (_c1 == L"\x111" && IS(cat, CharTypes::Dd)) {
         // only used for 'dd'
         // relaxed constraint: _v.empty()
-        if (_keyBuffer.size() > 1 && ToLower(_keyBuffer.rbegin()[1]) == L'd')
-            _respos.push_back(_respos_current++ | ResposDoubleUndo);
-        else
-            _respos.push_back(_respos_current++ | ResposInvalidate);
-        _state = TelexStates::Invalid;
+        InvalidateAndPopBack(c);
 
     } else if (_v.empty() && _c2.empty() && _c1 != L"gi" && IS(cat, CharTypes::ConsoContinue)) {
-        _c1.push_back(c);
-        _cases.push_back(ccase);
-        _respos.push_back(_respos_current++);
+        FeedNewResultChar(_c1, c, ccase);
 
-    } else if (IS(cat, CharTypes::Vowel)) {
+    } else if (IS(cat, CharTypes::Vowel | CharTypes::Transition)) {
         // relaxed vowel position constraint: _c2.empty()
-        // vowel parts (aeiouy)
         _v.push_back(c);
         auto before = _v.size();
         if (TransitionV(GetTypingStyle()->transitions)) {
@@ -323,6 +317,8 @@ TelexStates TelexEngine::PushChar(wchar_t corig) {
                 _cases.push_back(ccase);
                 _respos.push_back(_respos_current++ | ResposDoubleUndo);
             } else if (after < before) {
+                // make sure transitions will only consume the typed character in this case
+                assert(after == before - 1);
                 _respos.push_back(static_cast<int>(_c1.size() + _v.size() - 1) | ResposTransitionV);
             } else if (after == before) {
                 // in case of 'uơi' -> 'ươi', the transition char itself is a normal character
@@ -330,7 +326,7 @@ TelexStates TelexEngine::PushChar(wchar_t corig) {
                 _cases.push_back(ccase);
                 _respos.push_back(_respos_current++ | ResposTransitionV);
             }
-        } else {
+        } else if (IS(cat, CharTypes::Vowel)) {
             // if there is no transition, there must be a new character -> must push case
             _cases.push_back(ccase);
             // invalidate if same char entered twice in a row in order to undo transition
@@ -344,26 +340,6 @@ TelexStates TelexEngine::PushChar(wchar_t corig) {
                 // in case there exists no transition when _c2 is already typed
                 // e.g. 'cace'
                 _state = TelexStates::Invalid;
-            }
-        }
-
-    } else if (IS(cat, CharTypes::Transition)) {
-        _v.push_back(c);
-        auto before = _v.size();
-        if (TransitionV(GetTypingStyle()->transitions)) {
-            auto after = _v.size();
-            if (GetOptimizeLevel() >= 3 && _toneCount) {
-                Invalidate();
-            } else if (
-                _keyBuffer.size() > 1 && _respos.back() & ResposTransitionV && c == ToLower(_keyBuffer.rbegin()[1])) {
-                _cases.push_back(ccase);
-                _respos.push_back(_respos_current++ | ResposDoubleUndo);
-            } else if (after < before) {
-                _respos.push_back(static_cast<int>(_c1.size() + _v.size() - 1) | ResposTransitionV);
-            } else if (after == before) {
-                // see above
-                _cases.push_back(ccase);
-                _respos.push_back(_respos_current++ | ResposTransitionV);
             }
         } else {
             _v.pop_back();
@@ -392,10 +368,8 @@ TelexStates TelexEngine::PushChar(wchar_t corig) {
         } else if (
             _config.typing_style == TypingStyles::Telex && _config.autocorrect && !_toneCount &&
             (!_c1.empty() || GetOptimizeLevel() == 0)) {
-            // at high optimization, autocorrecting "nwuocs" is desirable but "wuocs" not
-            _v.push_back(c);
-            _cases.push_back(ccase);
-            _respos.push_back(_respos_current++ | ResposAutocorrect);
+            // at >=1 optimization, autocorrecting "nwuocs" is desirable but "wuocs" not
+            FeedNewResultChar(_v, c, ccase, ResposAutocorrect);
         } else {
             Invalidate();
         }
@@ -428,24 +402,18 @@ TelexStates TelexEngine::PushChar(wchar_t corig) {
         }
         if (success) {
             TransitionV(_c1 == L"q" ? transitions_wv_c2_q : transitions_wv_c2);
-            _c2.push_back(c);
-            _cases.push_back(ccase);
-            _respos.push_back(_respos_current++);
+            FeedNewResultChar(_c2, c, ccase);
         } else {
             Invalidate();
         }
 
     } else if (_c2.size() && IS(cat, CharTypes::ConsoContinue)) {
         // consonant continuation (dgh)
-        _c2.push_back(c);
-        _cases.push_back(ccase);
-        _respos.push_back(_respos_current++);
+        FeedNewResultChar(_c2, c, ccase);
 
     } else if ((_c1 == L"gi" || !_v.empty()) && IS(cat, CharTypes::Conso)) {
         // special case for delaying the invalidation of invalid c2 until commit
-        _c2.push_back(c);
-        _cases.push_back(ccase);
-        _respos.push_back(_respos_current++);
+        FeedNewResultChar(_c2, c, ccase);
 
     } else {
         Invalidate();
@@ -549,23 +517,11 @@ TelexStates TelexEngine::Backspace() {
     return _state;
 }
 
-TelexStates TelexEngine::Commit() {
-    if (_state == TelexStates::Committed || _state == TelexStates::CommittedInvalid ||
-        _state == TelexStates::BackconvertFailed) {
-        return _state;
-    }
+TelexStates TelexEngine::DoOptimizeAndAutocorrect() {
+    // precondition
+    assert(_state == TelexStates::Valid);
 
-    if (_state == TelexStates::Invalid) {
-        _state = TelexStates::CommittedInvalid;
-        return _state;
-    }
-
-    if (!_keyBuffer.size()) {
-        _state = TelexStates::Committed;
-        return _state;
-    }
-
-    if (_state == TelexStates::Valid && GetOptimizeLevel() >= 1) {
+    if (GetOptimizeLevel() >= 1) {
         std::wstring wordBuffer = _keyBuffer;
         for (auto& c : wordBuffer) {
             c = ToLower(c);
@@ -587,7 +543,7 @@ TelexStates TelexEngine::Commit() {
         }
     }
 
-    if (_config.autocorrect && _state == TelexStates::Valid && !_backconverted && _toneCount < 2) {
+    if (_config.autocorrect && !_backconverted && _toneCount < 2) {
         // fixing respos might not be necessary here but fixing cases is
         // HACK
         if (_config.typing_style == TypingStyles::Telex) {
@@ -633,6 +589,29 @@ TelexStates TelexEngine::Commit() {
                 _autocorrected = true;
             }
         }
+    }
+
+    return _state;
+}
+
+TelexStates TelexEngine::Commit() {
+    if (_state == TelexStates::Committed || _state == TelexStates::CommittedInvalid ||
+        _state == TelexStates::BackconvertFailed) {
+        return _state;
+    }
+
+    if (_state == TelexStates::Invalid) {
+        _state = TelexStates::CommittedInvalid;
+        return _state;
+    }
+
+    if (!_keyBuffer.size()) {
+        _state = TelexStates::Committed;
+        return _state;
+    }
+
+    if (_state == TelexStates::Valid && DoOptimizeAndAutocorrect() != TelexStates::Valid) {
+        return _state;
     }
 
     // validate c1
