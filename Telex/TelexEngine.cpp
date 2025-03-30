@@ -473,6 +473,9 @@ TelexStates TelexEngine::Backspace() {
         return _state;
     } else if (_state == TelexStates::Invalid) {
         Reset();
+        if (!rp.empty() && rp.back() & ResposDoubleUndo) {
+            buf.pop_back();
+        }
         if (buf.size()) {
             buf.pop_back();
         }

@@ -911,7 +911,6 @@ MAKE_MAP(
     P(L"u\x1a1u", L"\x1b0\x1a1u"), //
     P(L"ye6", L"y\xea"),           //
     P(L"yeu6", L"y\xeau"),         //
-    P(L"\xf4\x36", L"oo"),         //
     P(L"\x1b0o", L"\x1b0\x1a1"),   //
 );
 debug_ensure(std::all_of(transitions_vni.begin(), transitions_vni.end(), [](const auto& x) {

@@ -301,7 +301,7 @@ public:
     }
 
     TEST_METHOD (TestVniPeekDdd) {
-        TestPeekWord(L"d99", L"d99");
+        TestPeekWord(L"d9", L"d99");
     }
 
     TEST_METHOD (TestVniPeekAd) {
@@ -310,6 +310,10 @@ public:
 
     TEST_METHOD (TestVniPeekQuaw) {
         TestPeekWord(L"qu\x103", L"qua8");
+    }
+
+    TEST_METHOD (TestVniPeekXo66) {
+        TestPeekWord(L"xo6", L"xo66");
     }
 
     // used to cause a crash
@@ -352,10 +356,6 @@ public:
 
     TEST_METHOD (TestVniDoubleKeyIis) {
         TestInvalidWord(L"iis", L"iis");
-    }
-
-    TEST_METHOD (TestVniDoubleKeyThooongf) {
-        TestValidWord(L"tho\xf2ng", L"tho66ng2");
     }
 
     TEST_METHOD (TestVniDoubleKeyThuongz) {
@@ -700,7 +700,8 @@ public:
     TEST_METHOD (TestVniBackspaceMooo) {
         MultiConfigTester(config).Invoke([](auto& e) {
             FeedWord(e, L"mo66");
-            AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+            Assert::AreEqual(L"mo6", e.Peek().c_str());
+            AssertTelexStatesEqual(TelexStates::Invalid, e.Backspace());
             Assert::AreEqual(L"mo", e.Peek().c_str());
         });
     }
@@ -708,8 +709,9 @@ public:
     TEST_METHOD (TestVniBackspaceMooof) {
         MultiConfigTester(config).Invoke([](auto& e) {
             FeedWord(e, L"mo662");
-            AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-            Assert::AreEqual(L"mo", e.Peek().c_str());
+            Assert::AreEqual(L"mo62", e.Peek().c_str());
+            AssertTelexStatesEqual(TelexStates::Invalid, e.Backspace());
+            Assert::AreEqual(L"mo6", e.Peek().c_str());
         });
     }
 
