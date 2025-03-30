@@ -134,7 +134,7 @@ std::optional<std::pair<std::wstring_view, VInfo>> TelexEngine::FindTable() cons
     } else if (_c1 == L"gi") {
         return valid_v_gi.find_opt(_v);
     } else {
-        if (!_c2.size() && !_config.oa_uy_tone1) {
+        if (_c2.empty() && !_config.oa_uy_tone1) {
             auto it = valid_v_oa_uy.find(_v);
             if (it != valid_v_oa_uy.end())
                 return *it;
@@ -407,7 +407,7 @@ TelexStates TelexEngine::PushChar(wchar_t corig) {
             Invalidate();
         }
 
-    } else if (_c2.size() && IS(cat, CharTypes::ConsoContinue)) {
+    } else if (!_c2.empty() && IS(cat, CharTypes::ConsoContinue)) {
         // consonant continuation (dgh)
         FeedNewResultChar(_c2, c, ccase);
 
@@ -444,10 +444,10 @@ TelexStates TelexEngine::Backspace() {
         if (!rp.empty() && rp.back() & ResposDoubleUndo) {
             buf.pop_back();
         }
-        if (buf.size()) {
+        if (!buf.empty()) {
             buf.pop_back();
         }
-        if (buf.size() && _config.backspaced_word_stays_invalid) {
+        if (!buf.empty() && _config.backspaced_word_stays_invalid) {
             _state = TelexStates::Invalid;
         }
         for (size_t i = 0; i < buf.size(); i++)
@@ -466,7 +466,7 @@ TelexStates TelexEngine::Backspace() {
     auto found = GetTonePos(false, &vinfo);
     if (!found && _t != Tones::Z) {
         Reset();
-        if (buf.size()) {
+        if (!buf.empty()) {
             buf.pop_back();
         }
         for (auto c : buf) {
@@ -509,7 +509,7 @@ TelexStates TelexEngine::Backspace() {
         if (!(rp[i] & ResposExpunged) && (rp[i] & ResposMask) < toDelete)
             PushChar(buf[i]);
 
-    if (_keyBuffer.size()) {
+    if (!_keyBuffer.empty()) {
         _backconverted = oldBackconverted;
     }
 
@@ -605,7 +605,7 @@ TelexStates TelexEngine::Commit() {
         return _state;
     }
 
-    if (!_keyBuffer.size()) {
+    if (_keyBuffer.empty()) {
         _state = TelexStates::Committed;
         return _state;
     }
@@ -651,11 +651,11 @@ TelexStates TelexEngine::Commit() {
         _c1.pop_back();
         _v.push_back(L'i');
         vinfo.tonepos = 0;
-    } else if (vinfo.c2mode == C2Mode::MustC2 && !_c2.size()) {
+    } else if (vinfo.c2mode == C2Mode::MustC2 && _c2.empty()) {
         _state = TelexStates::CommittedInvalid;
         assert(CheckInvariants());
         return _state;
-    } else if (vinfo.c2mode == C2Mode::NoC2 && _c2.size()) {
+    } else if (vinfo.c2mode == C2Mode::NoC2 && !_c2.empty()) {
         _state = TelexStates::CommittedInvalid;
         assert(CheckInvariants());
         return _state;
@@ -679,7 +679,7 @@ TelexStates TelexEngine::ForceCommit() {
         return _state;
     }
 
-    if (!_keyBuffer.size()) {
+    if (_keyBuffer.empty()) {
         _state = TelexStates::Committed;
         return _state;
     }
@@ -711,14 +711,14 @@ TelexStates TelexEngine::Cancel() {
 }
 
 TelexStates TelexEngine::Backconvert(const std::wstring& s) {
-    assert(!_keyBuffer.size());
-    if (_keyBuffer.size())
+    assert(_keyBuffer.empty());
+    if (!_keyBuffer.empty())
         return _state;
     bool found_backconversion = false;
     bool failed = false;
     for (auto c : s) {
         // for emulating double key outcomes ("xoong")
-        auto double_flag = _config.typing_style == TypingStyles::Telex && !_c2.size() && (_v == L"e" || _v == L"o");
+        auto double_flag = _config.typing_style == TypingStyles::Telex && _c2.empty() && (_v == L"e" || _v == L"o");
         auto clow = ToLower(c);
         auto cat = ClassifyCharacter(clow);
         if (cat != CharTypes::Uncategorized) {
@@ -758,7 +758,7 @@ TelexStates TelexEngine::Backconvert(const std::wstring& s) {
             _state = TelexStates::Invalid;
         }
     }
-    if (_keyBuffer.size()) {
+    if (!_keyBuffer.empty()) {
         _backconverted = true;
     }
     assert(CheckInvariants());
@@ -835,15 +835,15 @@ bool TelexEngine::CheckInvariants() const {
     if (_state == TelexStates::TxError) {
         return false;
     }
-    if (!_keyBuffer.size()) {
+    if (_keyBuffer.empty()) {
         if (_state != TelexStates::Valid && _state != TelexStates::Committed && _state != TelexStates::CommittedInvalid)
             // CommittedInvalid might be caused by Cancel()
             return false;
-        if (_c1.size() || _v.size() || _c2.size())
+        if (!(_c1.empty() && _v.empty() && _c2.empty()))
             return false;
-        if (_t != Tones::Z || _toneCount)
+        if (_t != Tones::Z || _toneCount > 0)
             return false;
-        if (_cases.size() || _respos.size() || _respos_current != 0)
+        if (!(_cases.empty() && _respos.empty() && _respos_current == 0))
             return false;
         if (_backconverted)
             return false;
