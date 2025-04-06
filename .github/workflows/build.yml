@@ -29,6 +29,9 @@ jobs:
       - name: Build DLL x64
         run: msbuild -m -target:VietTypeATL:Rebuild -p:Configuration=Release -p:Platform=x64 .
 
+      - name: Build DLL ARM64X
+        run: msbuild -m -target:VietTypeATL:Rebuild -p:Configuration=Release -p:Platform=ARM64EC .
+
       - name: Build Config
         run: msbuild -m -target:VietTypeConfig2:Rebuild -p:Configuration=Release -p:Platform=Win32 .
 
@@ -37,6 +40,9 @@ jobs:
 
       - name: Build x64
         run: msbuild -m -target:VietTypeSetup:Rebuild -p:Configuration=Release -p:Platform=x64 .
+
+      - name: Build ARM64X
+        run: msbuild -m -target:VietTypeSetup:Rebuild -p:Configuration=Release -p:Platform=ARM64EC .
 
       - name: Upload a Build Artifact
         id: upload

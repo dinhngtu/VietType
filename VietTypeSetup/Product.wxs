@@ -9,6 +9,8 @@ SPDX-License-Identifier: GPL-3.0-only
   <?define upgradeCode = "{9AD3C40D-774F-4150-829A-F69ED4BE5A59}" ?>
   <?elseif $(Platform) = x64 ?>
   <?define upgradeCode = "{E00AC838-881D-4301-AAC5-0A723BB0B0EF}" ?>
+  <?elseif $(Platform) = ARM64 ?>
+  <?define upgradeCode = "{468FC6E7-0916-4BE9-85BE-86ED48BE642A}" ?>
   <?endif?>
 
   <Package
@@ -17,7 +19,7 @@ SPDX-License-Identifier: GPL-3.0-only
     Version="$(productVersion)"
     Manufacturer="Dinh Ngoc Tu"
     UpgradeCode="$(var.upgradeCode)"
-    InstallerVersion="400">
+    InstallerVersion="500">
     <SummaryInformation Description="VietType $(Configuration) Ver-$(productVersion) Rev-$(vcsRev) $(Platform)" />
     <MajorUpgrade AllowSameVersionUpgrades="yes" DowngradeErrorMessage="A newer version of [ProductName] is already installed." Schedule="afterInstallInitialize" />
     <?if $(Platform) = x86 ?>
@@ -103,6 +105,13 @@ SPDX-License-Identifier: GPL-3.0-only
         <Class Id="{C0DD01A1-0DEB-454B-8B42-D22CED1B4B23}" Context="InprocServer32" Description="VietType" ThreadingModel="apartment" Advertise="yes" />
       </Component>
       <?endif?>
+      
+      <?if $(Platform) = ARM64 ?>
+      <Component Directory="INSTALLFOLDER64" Bitness="always64">
+        <File Id="VietTypeATLARM64.dll" Source="$(SolutionDir)\ARM64EC\$(Configuration)\VietTypeATLARM64.dll" />
+        <Class Id="{C0DD01A1-0DEB-454B-8B42-D22CED1B4B23}" Context="InprocServer32" Description="VietType" ThreadingModel="apartment" Advertise="yes" />
+      </Component>
+      <?endif?>
 
       <Component Directory="INSTALLFOLDER" Bitness="always32">
         <File Source="$(SolutionDir)\LICENSE" DefaultLanguage="1033" DefaultVersion="$(productVersion)" />
@@ -117,6 +126,19 @@ SPDX-License-Identifier: GPL-3.0-only
     <StandardDirectory Id="ProgramMenuFolder" />
     <DirectoryRef Id="INSTALLFOLDER" />
     <ComponentGroup Id="ConfigComponents">
+      <?if $(Platform) = ARM64 ?>
+      <Component Directory="INSTALLFOLDER64" Bitness="always64">
+        <File Id="VietTypeConfig2.exe" Source="$(VietTypeConfig2.TargetPath)" />
+        <Shortcut Directory="ProgramMenuFolder" Name="VietType Settings" WorkingDirectory="INSTALLFOLDER64" Advertise="yes" Icon="logo.exe">
+          <Icon Id="logo.exe" SourceFile="$(VietTypeConfig2.ProjectDir)\logo.ico" />
+        </Shortcut>
+      </Component>
+      <Component Directory="INSTALLFOLDER64" Bitness="always64">
+        <File Source="$(VietTypeConfig2.TargetPath).config"
+              DefaultLanguage="0" DefaultVersion="$(productVersion)" />
+      </Component>
+      
+      <?else?>
       <Component Directory="INSTALLFOLDER" Bitness="always32">
         <File Id="VietTypeConfig2.exe" Source="$(VietTypeConfig2.TargetPath)" />
         <Shortcut Directory="ProgramMenuFolder" Name="VietType Settings" WorkingDirectory="INSTALLFOLDER" Advertise="yes" Icon="logo.exe">
@@ -127,6 +149,8 @@ SPDX-License-Identifier: GPL-3.0-only
         <File Source="$(VietTypeConfig2.TargetPath).config"
               DefaultLanguage="0" DefaultVersion="$(productVersion)" />
       </Component>
+      
+      <?endif?>
     </ComponentGroup>
   </Fragment>
 
@@ -143,6 +167,13 @@ SPDX-License-Identifier: GPL-3.0-only
       <?if $(Platform) = x64 ?>
       <Component Directory="INSTALLFOLDER64" Bitness="always64">
         <File Source="$(SolutionDir)\x64\$(Configuration)\VietTypeATL64.pdb"
+              DefaultLanguage="1033" DefaultVersion="$(fileVersion)" />
+      </Component>
+      <?endif?>
+
+      <?if $(Platform) = ARM64 ?>
+      <Component Directory="INSTALLFOLDER64" Bitness="always64">
+        <File Source="$(SolutionDir)\ARM64EC\$(Configuration)\VietTypeATLARM64.pdb"
               DefaultLanguage="1033" DefaultVersion="$(fileVersion)" />
       </Component>
       <?endif?>

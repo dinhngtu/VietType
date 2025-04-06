@@ -68,14 +68,11 @@
   <ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
     <ClCompile>
       <ControlFlowGuard>Guard</ControlFlowGuard>
+      <GuardEHContMetadata Condition="'$(Platform)' == 'ARM64' Or '$(Platform)' == 'ARM64EC' Or '$(Platform)' == 'x64'">true</GuardEHContMetadata>
+      <GuardSignedReturns Condition="'$(Platform)' == 'ARM64' Or '$(Platform)' == 'ARM64EC'">true</GuardSignedReturns>
     </ClCompile>
     <Link>
-      <CETCompat>true</CETCompat>
+      <CETCompat Condition="'$(Platform)' == 'Win32' Or '$(Platform)' == 'x64'">true</CETCompat>
     </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Platform)'=='x64'">
-    <ClCompile>
-      <GuardEHContMetadata>true</GuardEHContMetadata>
-    </ClCompile>
   </ItemDefinitionGroup>
 </Project>

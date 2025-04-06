@@ -42,14 +42,20 @@ namespace VietTypeConfig2 {
     internal static class VietTypeRegistrar {
         public const int S_OK = 0;
         public const int S_FALSE = 1;
+#if _M_IX86
+        const string DllName = "VietTypeATL32.dll";
+#endif
+#if _M_ARM64
+        const string DllName = "VietTypeATLARM64.dll";
+#endif
 
-        [DllImport("VietTypeATL32.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
         public static extern int ActivateProfiles();
 
-        [DllImport("VietTypeATL32.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
         public static extern int DeactivateProfiles();
 
-        [DllImport("VietTypeATL32.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
         public static extern int IsProfileActivated();
     }
 
