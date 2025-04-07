@@ -127,7 +127,7 @@ namespace VietTypeConfig2 {
                 return _settings.BackconvertOnBackspace;
             }
             set {
-                if (!_settings.BackconvertOnBackspace != value) {
+                if (_settings.BackconvertOnBackspace != value) {
                     _settings.BackconvertOnBackspace = value;
                     OnPropertyChanged(nameof(BackconvertOnBackspace));
                 }
