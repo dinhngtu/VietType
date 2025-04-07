@@ -413,6 +413,9 @@ TelexStates TelexEngine::PushChar(wchar_t corig) {
 
     } else if ((_c1 == L"gi" || !_v.empty()) && IS(cat, CharTypes::Conso)) {
         // special case for delaying the invalidation of invalid c2 until commit
+        if (_c2.empty()) {
+            TransitionV(_c1 == L"q" ? transitions_wv_c2_q : transitions_wv_c2);
+        }
         FeedNewResultChar(_c2, c, ccase);
 
     } else {

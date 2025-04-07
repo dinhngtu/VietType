@@ -931,6 +931,16 @@ public:
             Assert::AreEqual(L"vi\x1ebft", e.Retrieve().c_str());
         });
     }
+
+    TEST_METHOD (TestTelexTypingThuowgnf) {
+        auto config1 = config;
+        config1.autocorrect = true;
+        MultiConfigTester(config1, 0, 3, false).Invoke([](auto& e) {
+            FeedWord(e, L"thuowgnf");
+            AssertTelexStatesEqual(TelexStates::Committed, e.Commit());
+            Assert::AreEqual(L"th\x1b0\x1eddng", e.Retrieve().c_str());
+        });
+    }
 };
 
 } // namespace UnitTests
