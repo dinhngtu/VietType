@@ -32,9 +32,6 @@ jobs:
       - name: Build DLL ARM64X
         run: msbuild -m -target:VietTypeATL:Rebuild -p:Configuration=Release -p:Platform=ARM64EC .
 
-      - name: Build Config
-        run: msbuild -m -target:VietTypeConfig2:Rebuild -p:Configuration=Release -p:Platform=Win32 .
-
       - name: Build Win32
         run: msbuild -m -target:VietTypeSetup:Rebuild -p:Configuration=Release -p:Platform=Win32 .
 
