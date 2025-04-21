@@ -458,6 +458,10 @@ public:
         TestInvalidWord(L"quwowns", L"quwowwns");
     }
 
+    TEST_METHOD (TestTelexKhongoo) {
+        TestInvalidWord(L"khongoo", L"khongoo");
+    }
+
     TEST_METHOD (TestTelexTypingCaasy) {
         TestValidWord(L"c\x1ea5y", L"caasy");
     }

@@ -308,7 +308,10 @@ TelexStates TelexEngine::PushChar(wchar_t corig) {
         // relaxed vowel position constraint: _c2.empty()
         _v.push_back(c);
         auto before = _v.size();
-        if (TransitionV(GetTypingStyle()->transitions)) {
+        // HACK: single special case for "khongoo"
+        if (!_c2.empty() && _config.typing_style == TypingStyles::Telex && c == L'o' && _v == L"oo") {
+            Invalidate();
+        } else if (TransitionV(GetTypingStyle()->transitions)) {
             auto after = _v.size();
             if (GetOptimizeLevel() >= 3 && _toneCount) {
                 Invalidate();
