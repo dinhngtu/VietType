@@ -95,6 +95,11 @@
     <Compile Include="ComposingAttributes.cs" />
     <Compile Include="Properties\Version.cs" />
     <Compile Include="RelayCommand.cs" />
+    <Compile Include="Localized\MainWindow.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MainWindow.resx</DependentUpon>
+    </Compile>
     <Compile Include="ToggleKeys.cs" />
     <Compile Include="ToggleModifiers.cs" />
     <Compile Include="TypingStyles.cs" />
@@ -121,6 +126,11 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Localized\MainWindow.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>MainWindow.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="app.manifest" />
     <None Include="Properties\Settings.settings">

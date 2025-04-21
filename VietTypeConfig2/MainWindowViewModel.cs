@@ -30,7 +30,9 @@ namespace VietTypeConfig2 {
 
         public string IsEnabledText {
             get {
-                return IsEnabled ? "_Disable VietType" : "_Enable VietType";
+                return IsEnabled
+                    ? Localized.MainWindow.ViewModel_IsEnabledText_True
+                    : Localized.MainWindow.ViewModel_IsEnabledText_False;
             }
         }
         #endregion

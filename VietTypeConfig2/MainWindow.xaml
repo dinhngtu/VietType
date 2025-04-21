@@ -1,12 +1,18 @@
-<Window x:Class="VietTypeConfig2.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:VietTypeConfig2"
-        xmlns:sys="clr-namespace:System;assembly=mscorlib"
-        mc:Ignorable="d"
-        Title="VietType Settings" MinWidth="450" Width="450" ResizeMode="CanMinimize" SizeToContent="Height" WindowStartupLocation="CenterScreen">
+<Window
+    x:Class="VietTypeConfig2.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="clr-namespace:VietTypeConfig2"
+    xmlns:loc="clr-namespace:VietTypeConfig2.Localized"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    mc:Ignorable="d"
+    Title="{x:Static loc:MainWindow.Window_Title}"
+    MinWidth="450" Width="450"
+    ResizeMode="CanMinimize"
+    SizeToContent="Height"
+    WindowStartupLocation="CenterScreen">
     <Window.DataContext>
         <local:MainWindowViewModel />
     </Window.DataContext>
@@ -52,7 +58,7 @@
         <StackPanel Grid.Row="0" Orientation="Horizontal">
             <Button Width="135" Content="{Binding IsEnabledText}" Command="{Binding ToggleEnabledCommand}" />
         </StackPanel>
-        <GroupBox Grid.Row="1" Margin="0,7,0,0" Header="Engine settings">
+        <GroupBox Grid.Row="1" Margin="0,7,0,0" Header="{x:Static loc:MainWindow.GroupBox_EngineSettings_Header}">
             <StackPanel Margin="3,7,3,7">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -63,24 +69,26 @@
                     <Label
                         Grid.Column="0"
                         Margin="-5,0,0,0"
-                        Target="{Binding ElementName=comboboxTypingStyle}">
-                        Typing _style:
-                    </Label>
+                        Target="{Binding ElementName=comboboxTypingStyle}"
+                        Content="{x:Static loc:MainWindow.Label_TypingStyle_Content}" />
                     <ComboBox
                         Grid.Column="2"
                         Name="comboboxTypingStyle" 
                         ItemsSource="{Binding Source={StaticResource ResourceKey=TypingStylesDataSource}}"
                         SelectedValue="{Binding TypingStyle}" />
                 </Grid>
-                <CheckBox Margin="0,7,0,0" IsChecked="{Binding OaUyTone1}">
-                    _Use &quot;oà&quot;, &quot;uý&quot; instead of &quot;òa&quot;, &quot;úy&quot;
-                </CheckBox>
-                <CheckBox Margin="0,7,0,0" IsChecked="{Binding AcceptDd}">
-                    Accept 'd' any_where
-                </CheckBox>
-                <CheckBox Margin="0,7,0,0" IsChecked="{Binding BackspaceInvalid}">
-                    Backspaced _invalid word stays invalid
-                </CheckBox>
+                <CheckBox
+                    Margin="0,7,0,0"
+                    IsChecked="{Binding OaUyTone1}"
+                    Content="{x:Static loc:MainWindow.CheckBox_OaUyTone1_Content}" />
+                <CheckBox
+                    Margin="0,7,0,0"
+                    IsChecked="{Binding AcceptDd}"
+                    Content="{x:Static loc:MainWindow.CheckBox_AcceptDd_Content}" />
+                <CheckBox
+                    Margin="0,7,0,0"
+                    IsChecked="{Binding BackspaceInvalid}"
+                    Content="{x:Static loc:MainWindow.CheckBox_BackspaceInvalid_Content}" />
                 <Grid Margin="0,7,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -91,9 +99,8 @@
                     <Label
                         Grid.Column="0"
                         Margin="-5,0,0,0"
-                        Target="{Binding ElementName=sliderOptimizeMultilang}">
-                        Multilingual typing _optimization level:
-                    </Label>
+                        Target="{Binding ElementName=sliderOptimizeMultilang}"
+                        Content="{x:Static loc:MainWindow.Label_OptimizeMultilang_Content}" />
                     <Slider
                         Grid.Column="2"
                         Minimum="0"
@@ -108,19 +115,21 @@
                         Value="{Binding OptimizeMultilang}" />
                     <TextBox Grid.Column="3" IsReadOnly="True" Margin="7,0,0,0" Text="{Binding OptimizeMultilang}" />
                 </Grid>
-                <CheckBox Margin="0,7,0,0" IsChecked="{Binding Autocorrect}">
-                    Enable _autocorrect
-                </CheckBox>
+                <CheckBox
+                    Margin="0,7,0,0"
+                    IsChecked="{Binding Autocorrect}"
+                    Content="{x:Static loc:MainWindow.CheckBox_Autocorrect_Content}" />
             </StackPanel>
         </GroupBox>
         <GroupBox Grid.Row="2" Margin="0,7,0,0" Header="Control settings">
             <StackPanel Margin="3,7,3,7">
-                <CheckBox IsChecked="{Binding DefaultEnabled}">
-                    Vietnamese mode by de_fault
-                </CheckBox>
-                <CheckBox Margin="0,7,0,0" IsChecked="{Binding BackconvertOnBackspace}">
-                    _Reconvert word on Backspace
-                </CheckBox>
+                <CheckBox
+                    IsChecked="{Binding DefaultEnabled}"
+                    Content="{x:Static loc:MainWindow.CheckBox_DefaultEnabled_Content}" />
+                <CheckBox
+                    Margin="0,7,0,0"
+                    IsChecked="{Binding BackconvertOnBackspace}"
+                    Content="{x:Static loc:MainWindow.CheckBox_BackconvertOnBackspace_Content}" />
                 <Grid Margin="0,7,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -131,9 +140,8 @@
                     <Label
                         Grid.Column="0"
                         Margin="-5,0,0,0"
-                        Target="{Binding ElementName=comboboxToggleMod}">
-                        _Toggle key:
-                    </Label>
+                        Target="{Binding ElementName=comboboxToggleMod}"
+                        Content="{x:Static loc:MainWindow.Label_Toggle_Content}" />
                     <ComboBox
                         Grid.Column="2"
                         Name="comboboxToggleMod"
@@ -154,9 +162,8 @@
                     <Label
                         Grid.Column="0"
                         Margin="-5,0,0,0"
-                        Target="{Binding ElementName=comboboxShowComposingAttr}">
-                        Current word _highlight mode:
-                    </Label>
+                        Target="{Binding ElementName=comboboxShowComposingAttr}"
+                        Content="{x:Static loc:MainWindow.Label_ShowComposingAttr_Content}" />
                     <ComboBox
                         Grid.Column="2"
                         Name="comboboxShowComposingAttr"
@@ -172,11 +179,20 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <StackPanel Grid.Column="0" Orientation="Horizontal">
-                <Button Command="{Binding AboutCommand}">A_bout</Button>
+                <Button
+                    Command="{Binding AboutCommand}"
+                    Content="{x:Static loc:MainWindow.Button_About_Content}" />
             </StackPanel>
             <StackPanel Grid.Column="2" Orientation="Horizontal">
-                <Button IsDefault="True" Command="{Binding OkCommand}">OK</Button>
-                <Button Margin="7,0,0,0" IsCancel="True" Command="{Binding CancelCommand}">Cancel</Button>
+                <Button
+                    IsDefault="True"
+                    Command="{Binding OkCommand}"
+                    Content="{x:Static loc:MainWindow.Button_OK_Content}" />
+                <Button
+                    Margin="7,0,0,0"
+                    IsCancel="True"
+                    Command="{Binding CancelCommand}"
+                    Content="{x:Static loc:MainWindow.Button_Cancel_Content}" />
             </StackPanel>
         </Grid>
     </Grid>

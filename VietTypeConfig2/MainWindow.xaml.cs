@@ -23,23 +23,30 @@ namespace VietTypeConfig2 {
 
         private void Vm_RequestAbout(object sender, System.EventArgs e) {
             MessageBox.Show(
-                string.Format(
-                    "VietType {0} ({1})\nCopyright © 2018 Dinh Ngoc Tu.\nVietType is free software, licensed under the GNU General Public License. VietType is distributed WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the included LICENSE file for more details.",
-                    Version.ProductVersion, Version.VcsRevision),
-                "VietType",
+                string.Format(Localized.MainWindow.MainWindow_AboutFormat, Version.ProductVersion, Version.VcsRevision),
+                Localized.MainWindow.MainWindow_ProgramName,
                 MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void Vm_ToggleEnabledCompleted(object sender, MainWindowViewModel.ToggleEventArgs e) {
             if (e.ErrorCode == 0) {
                 if (e.IsEnabled) {
-                    MessageBox.Show("Successfully enabled VietType. Switch to VietType in the language bar to start using it.", "VietType", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show(
+                        Localized.MainWindow.MainWindow_EnableOkText,
+                        Localized.MainWindow.MainWindow_ProgramName,
+                        MessageBoxButton.OK, MessageBoxImage.Information);
                 } else {
-                    MessageBox.Show("Successfully disabled VietType.", "VietType", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show(
+                        Localized.MainWindow.MainWindow_DisableOkText,
+                        Localized.MainWindow.MainWindow_ProgramName,
+                        MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             } else {
                 var message = Marshal.GetExceptionForHR(e.ErrorCode).Message;
-                MessageBox.Show(string.Format("Cannot configure VietType: {0}", message), "VietType", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(
+                    string.Format(Localized.MainWindow.MainWindow_ToggleFailFormat, message),
+                    Localized.MainWindow.MainWindow_ProgramName,
+                    MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }
