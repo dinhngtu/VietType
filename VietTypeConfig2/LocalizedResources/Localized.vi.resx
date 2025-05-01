@@ -117,72 +117,78 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="CheckBox_AcceptDd_Content" xml:space="preserve">
-    <value>Accept 'd' any_where</value>
+  <data name="MainWindow_CheckBox_AcceptDd_Content" xml:space="preserve">
+    <value>Gõ 'đ' tự do (_W)</value>
   </data>
-  <data name="CheckBox_Autocorrect_Content" xml:space="preserve">
-    <value>Enable _autocorrect</value>
+  <data name="MainWindow_CheckBox_Autocorrect_Content" xml:space="preserve">
+    <value>Tự động sửa từ (_A)</value>
   </data>
-  <data name="CheckBox_BackconvertOnBackspace_Content" xml:space="preserve">
-    <value>_Reconvert word on Backspace</value>
+  <data name="MainWindow_CheckBox_BackconvertOnBackspace_Content" xml:space="preserve">
+    <value>Chuyển ngược từ khi Backspace (_R)</value>
   </data>
-  <data name="CheckBox_BackspaceInvalid_Content" xml:space="preserve">
-    <value>Backspaced _invalid word stays invalid</value>
+  <data name="MainWindow_CheckBox_BackspaceInvalid_Content" xml:space="preserve">
+    <value>Giữ trạng thái sai khi xóa từ sai (_I)</value>
   </data>
-  <data name="CheckBox_DefaultEnabled_Content" xml:space="preserve">
-    <value>Vietnamese mode by de_fault</value>
+  <data name="MainWindow_CheckBox_DefaultEnabled_Content" xml:space="preserve">
+    <value>Mặc định bật tiếng Việt (_F)</value>
   </data>
-  <data name="CheckBox_OaUyTone1_Content" xml:space="preserve">
-    <value>_Use "oà", "uý" instead of "òa", "úy"</value>
+  <data name="MainWindow_CheckBox_OaUyTone1_Content" xml:space="preserve">
+    <value>Gõ "oà", "uý" thay vì "òa", "úy" (_U)</value>
   </data>
-  <data name="GroupBox_EngineSettings_Header" xml:space="preserve">
-    <value>Engine settings</value>
+  <data name="MainWindow_GroupBox_EngineSettings_Header" xml:space="preserve">
+    <value>Cài đặt bộ gõ</value>
   </data>
-  <data name="Label_OptimizeMultilang_Content" xml:space="preserve">
-    <value>Multilingual typing _optimization level:</value>
+  <data name="MainWindow_Label_OptimizeMultilang_Content" xml:space="preserve">
+    <value>Mức tối ưu gõ nhiều ngôn ngữ (_O):</value>
   </data>
-  <data name="Label_TypingStyle_Content" xml:space="preserve">
-    <value>Typing _style:</value>
+  <data name="MainWindow_Label_TypingStyle_Content" xml:space="preserve">
+    <value>Kiểu gõ (_S):</value>
   </data>
-  <data name="Window_Title" xml:space="preserve">
-    <value>VietType Settings</value>
+  <data name="MainWindow_Title" xml:space="preserve">
+    <value>Cài đặt VietType</value>
   </data>
-  <data name="Label_Toggle_Content" xml:space="preserve">
-    <value>_Toggle key:</value>
+  <data name="MainWindow_Label_Toggle_Content" xml:space="preserve">
+    <value>Phím bật tắt (_T):</value>
   </data>
-  <data name="Label_ShowComposingAttr_Content" xml:space="preserve">
-    <value>Current word _highlight mode:</value>
+  <data name="MainWindow_Label_ShowComposingAttr_Content" xml:space="preserve">
+    <value>Kiểu hiển thị từ đang gõ (_H):</value>
   </data>
-  <data name="Button_OK_Content" xml:space="preserve">
+  <data name="MainWindow_Button_OK_Content" xml:space="preserve">
     <value>OK</value>
   </data>
-  <data name="Button_Cancel_Content" xml:space="preserve">
-    <value>Cancel</value>
+  <data name="MainWindow_Button_Cancel_Content" xml:space="preserve">
+    <value>Hủy bỏ</value>
   </data>
-  <data name="Button_About_Content" xml:space="preserve">
-    <value>A_bout</value>
+  <data name="MainWindow_Button_About_Content" xml:space="preserve">
+    <value>Thông tin (_B)</value>
   </data>
   <data name="MainWindow_AboutFormat" xml:space="preserve">
     <value>VietType {0} ({1})
-Copyright © 2018 Dinh Ngoc Tu.
-VietType is free software, licensed under the GNU General Public License. VietType is distributed WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the included LICENSE file for more details.</value>
+Bản quyền © 2018 Đinh Ngọc Tú.
+VietType là phần mềm tự do, bạn có thể cung cấp lại và/hoặc chỉnh sửa nó theo những điều khoản của Giấy phép Công cộng GNU phiên bản 3 do Tổ chức Phần mềm Tự do công bố. VietType không cung cấp bất cứ bảo hành hay bảo đảm nào. Bạn tự chấp nhận mọi rủi ro và trách nhiệm khi sử dụng VietType. Tham khảo tập tin LICENSE đi kèm VietType để biết chính xác các điều khoản.</value>
   </data>
   <data name="MainWindow_ProgramName" xml:space="preserve">
     <value>VietType</value>
   </data>
-  <data name="ViewModel_IsEnabledText_True" xml:space="preserve">
-    <value>_Disable VietType</value>
+  <data name="MainWindowViewModel_IsEnabledText_True" xml:space="preserve">
+    <value>Tắt VietType (_D)</value>
   </data>
-  <data name="ViewModel_IsEnabledText_False" xml:space="preserve">
-    <value>_Enable VietType</value>
+  <data name="MainWindowViewModel_IsEnabledText_False" xml:space="preserve">
+    <value>Bật VietType (_E)</value>
   </data>
   <data name="MainWindow_EnableOkText" xml:space="preserve">
-    <value>Successfully enabled VietType. Switch to VietType in the language bar to start using it.</value>
+    <value>Đã bật VietType. Hãy tìm VietType trong thanh ngôn ngữ của Windows.</value>
   </data>
   <data name="MainWindow_DisableOkText" xml:space="preserve">
-    <value>Successfully disabled VietType.</value>
+    <value>Đã tắt VietType.</value>
   </data>
   <data name="MainWindow_ToggleFailFormat" xml:space="preserve">
-    <value>Cannot configure VietType: {0}</value>
+    <value>Không bật/tắt được VietType: {0}</value>
+  </data>
+  <data name="MainWindow_CheckBox_VietnameseInterface_Content" xml:space="preserve">
+    <value>Giao diện tiếng _Việt</value>
+  </data>
+  <data name="MainWindow_GroupBox_ControlSettings_Header" xml:space="preserve">
+    <value>Cài đặt giao diện</value>
   </data>
 </root>

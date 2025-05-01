@@ -90,15 +90,22 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="LocalizationManager.cs" />
+    <Compile Include="LocalizedExtension.cs" />
+    <Compile Include="LocalizedResources\Localized.vi.Designer.cs">
+      <DependentUpon>Localized.vi.resx</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
     <Compile Include="NativeMethods.cs" />
     <Compile Include="AppSettings.cs" />
     <Compile Include="ComposingAttributes.cs" />
     <Compile Include="Properties\Version.cs" />
     <Compile Include="RelayCommand.cs" />
-    <Compile Include="Localized\MainWindow.Designer.cs">
+    <Compile Include="LocalizedResources\Localized.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>MainWindow.resx</DependentUpon>
+      <DependentUpon>Localized.resx</DependentUpon>
     </Compile>
     <Compile Include="ToggleKeys.cs" />
     <Compile Include="ToggleModifiers.cs" />
@@ -123,13 +130,18 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <EmbeddedResource Include="LocalizedResources\Localized.vi.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Localized.vi.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="Localized\MainWindow.resx">
+    <EmbeddedResource Include="LocalizedResources\Localized.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>MainWindow.Designer.cs</LastGenOutput>
+      <LastGenOutput>Localized.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="app.manifest" />

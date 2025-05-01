@@ -5,10 +5,10 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:VietTypeConfig2"
-    xmlns:loc="clr-namespace:VietTypeConfig2.Localized"
+    xmlns:loc="clr-namespace:VietTypeConfig2.LocalizedResources"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     mc:Ignorable="d"
-    Title="{x:Static loc:MainWindow.Window_Title}"
+    Title="{local:Localized Key=MainWindow_Title}"
     MinWidth="450" Width="450"
     ResizeMode="CanMinimize"
     SizeToContent="Height"
@@ -55,10 +55,24 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0" Orientation="Horizontal">
-            <Button Width="135" Content="{Binding IsEnabledText}" Command="{Binding ToggleEnabledCommand}" />
-        </StackPanel>
-        <GroupBox Grid.Row="1" Margin="0,7,0,0" Header="{x:Static loc:MainWindow.GroupBox_EngineSettings_Header}">
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Button
+                Grid.Column="0"
+                Width="135"
+                Command="{Binding ToggleEnabledCommand}"
+                Content="{Binding IsEnabledText}" />
+            <CheckBox
+                Grid.Column="2"
+                Margin="0,7,0,0"
+                IsChecked="{Binding VietnameseInterface}"
+                Content="{local:Localized Key=MainWindow_CheckBox_VietnameseInterface_Content}" />
+        </Grid>
+        <GroupBox Grid.Row="1" Margin="0,7,0,0" Header="{local:Localized Key=MainWindow_GroupBox_EngineSettings_Header}">
             <StackPanel Margin="3,7,3,7">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -70,25 +84,25 @@
                         Grid.Column="0"
                         Margin="-5,0,0,0"
                         Target="{Binding ElementName=comboboxTypingStyle}"
-                        Content="{x:Static loc:MainWindow.Label_TypingStyle_Content}" />
+                        Content="{local:Localized Key=MainWindow_Label_TypingStyle_Content}" />
                     <ComboBox
                         Grid.Column="2"
-                        Name="comboboxTypingStyle" 
+                        Name="comboboxTypingStyle"
                         ItemsSource="{Binding Source={StaticResource ResourceKey=TypingStylesDataSource}}"
                         SelectedValue="{Binding TypingStyle}" />
                 </Grid>
                 <CheckBox
                     Margin="0,7,0,0"
                     IsChecked="{Binding OaUyTone1}"
-                    Content="{x:Static loc:MainWindow.CheckBox_OaUyTone1_Content}" />
+                    Content="{local:Localized Key=MainWindow_CheckBox_OaUyTone1_Content}" />
                 <CheckBox
                     Margin="0,7,0,0"
                     IsChecked="{Binding AcceptDd}"
-                    Content="{x:Static loc:MainWindow.CheckBox_AcceptDd_Content}" />
+                    Content="{local:Localized Key=MainWindow_CheckBox_AcceptDd_Content}" />
                 <CheckBox
                     Margin="0,7,0,0"
                     IsChecked="{Binding BackspaceInvalid}"
-                    Content="{x:Static loc:MainWindow.CheckBox_BackspaceInvalid_Content}" />
+                    Content="{local:Localized Key=MainWindow_CheckBox_BackspaceInvalid_Content}" />
                 <Grid Margin="0,7,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -100,7 +114,7 @@
                         Grid.Column="0"
                         Margin="-5,0,0,0"
                         Target="{Binding ElementName=sliderOptimizeMultilang}"
-                        Content="{x:Static loc:MainWindow.Label_OptimizeMultilang_Content}" />
+                        Content="{local:Localized Key=MainWindow_Label_OptimizeMultilang_Content}" />
                     <Slider
                         Grid.Column="2"
                         Minimum="0"
@@ -118,18 +132,18 @@
                 <CheckBox
                     Margin="0,7,0,0"
                     IsChecked="{Binding Autocorrect}"
-                    Content="{x:Static loc:MainWindow.CheckBox_Autocorrect_Content}" />
+                    Content="{local:Localized Key=MainWindow_CheckBox_Autocorrect_Content}" />
             </StackPanel>
         </GroupBox>
-        <GroupBox Grid.Row="2" Margin="0,7,0,0" Header="Control settings">
+        <GroupBox Grid.Row="2" Margin="0,7,0,0" Header="{local:Localized Key=MainWindow_GroupBox_ControlSettings_Header}">
             <StackPanel Margin="3,7,3,7">
                 <CheckBox
                     IsChecked="{Binding DefaultEnabled}"
-                    Content="{x:Static loc:MainWindow.CheckBox_DefaultEnabled_Content}" />
+                    Content="{local:Localized Key=MainWindow_CheckBox_DefaultEnabled_Content}" />
                 <CheckBox
                     Margin="0,7,0,0"
                     IsChecked="{Binding BackconvertOnBackspace}"
-                    Content="{x:Static loc:MainWindow.CheckBox_BackconvertOnBackspace_Content}" />
+                    Content="{local:Localized Key=MainWindow_CheckBox_BackconvertOnBackspace_Content}" />
                 <Grid Margin="0,7,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -141,14 +155,14 @@
                         Grid.Column="0"
                         Margin="-5,0,0,0"
                         Target="{Binding ElementName=comboboxToggleMod}"
-                        Content="{x:Static loc:MainWindow.Label_Toggle_Content}" />
+                        Content="{local:Localized Key=MainWindow_Label_Toggle_Content}" />
                     <ComboBox
                         Grid.Column="2"
                         Name="comboboxToggleMod"
                         ItemsSource="{Binding Source={StaticResource ResourceKey=ToggleModifiersDataSource}}"
                         SelectedValue="{Binding ToggleModifiers}"/>
                     <ComboBox
-                        Grid.Column="3" 
+                        Grid.Column="3"
                         Margin="7,0,0,0"
                         ItemsSource="{Binding Source={StaticResource ResourceKey=ToggleKeysDataSource}}"
                         SelectedValue="{Binding ToggleKeys}" />
@@ -163,7 +177,7 @@
                         Grid.Column="0"
                         Margin="-5,0,0,0"
                         Target="{Binding ElementName=comboboxShowComposingAttr}"
-                        Content="{x:Static loc:MainWindow.Label_ShowComposingAttr_Content}" />
+                        Content="{local:Localized Key=MainWindow_Label_ShowComposingAttr_Content}" />
                     <ComboBox
                         Grid.Column="2"
                         Name="comboboxShowComposingAttr"
@@ -180,19 +194,20 @@
             </Grid.ColumnDefinitions>
             <StackPanel Grid.Column="0" Orientation="Horizontal">
                 <Button
+                    MinWidth="90"
                     Command="{Binding AboutCommand}"
-                    Content="{x:Static loc:MainWindow.Button_About_Content}" />
+                    Content="{local:Localized Key=MainWindow_Button_About_Content}" />
             </StackPanel>
             <StackPanel Grid.Column="2" Orientation="Horizontal">
                 <Button
                     IsDefault="True"
                     Command="{Binding OkCommand}"
-                    Content="{x:Static loc:MainWindow.Button_OK_Content}" />
+                    Content="{local:Localized Key=MainWindow_Button_OK_Content}" />
                 <Button
                     Margin="7,0,0,0"
                     IsCancel="True"
                     Command="{Binding CancelCommand}"
-                    Content="{x:Static loc:MainWindow.Button_Cancel_Content}" />
+                    Content="{local:Localized Key=MainWindow_Button_Cancel_Content}" />
             </StackPanel>
         </Grid>
     </Grid>

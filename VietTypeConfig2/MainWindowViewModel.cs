@@ -3,6 +3,8 @@
 
 using System;
 using System.ComponentModel;
+using System.Globalization;
+using System.Threading;
 using System.Windows.Input;
 
 namespace VietTypeConfig2 {
@@ -12,11 +14,19 @@ namespace VietTypeConfig2 {
 
         public MainWindowViewModel() {
             _settings = AppSettings.LoadSettings();
+            LocalizationManager.Instance.CurrentCulture = new CultureInfo(_settings.VietnameseInterface ? "vi" : "en");
+            LocalizationManager.Instance.PropertyChanged += OnLocalizationManagerPropertyChanged;
             _activatedStatus = VietTypeRegistrar.IsProfileActivated() == VietTypeRegistrar.S_OK;
             OkCommand = new RelayCommand((_) => OnOkCommand());
             CancelCommand = new RelayCommand((_) => OnCancelCommand());
             AboutCommand = new RelayCommand((_) => OnAboutCommand());
             ToggleEnabledCommand = new RelayCommand((_) => OnToggleEnabledCommand());
+        }
+
+        private void OnLocalizationManagerPropertyChanged(object sender, PropertyChangedEventArgs e) {
+            if (e.PropertyName == "Item[]") {
+                OnPropertyChanged(nameof(IsEnabledText));
+            }
         }
 
         void OnPropertyChanged(string propertyName) {
@@ -31,8 +41,21 @@ namespace VietTypeConfig2 {
         public string IsEnabledText {
             get {
                 return IsEnabled
-                    ? Localized.MainWindow.ViewModel_IsEnabledText_True
-                    : Localized.MainWindow.ViewModel_IsEnabledText_False;
+                    ? LocalizationManager.Instance["MainWindowViewModel_IsEnabledText_True"]
+                    : LocalizationManager.Instance["MainWindowViewModel_IsEnabledText_False"];
+            }
+        }
+
+        public bool VietnameseInterface {
+            get {
+                return _settings.VietnameseInterface;
+            }
+            set {
+                if (_settings.VietnameseInterface != value) {
+                    _settings.VietnameseInterface = value;
+                    LocalizationManager.Instance.CurrentCulture = new CultureInfo(value ? "vi" : "en");
+                    OnPropertyChanged(nameof(VietnameseInterface));
+                }
             }
         }
         #endregion

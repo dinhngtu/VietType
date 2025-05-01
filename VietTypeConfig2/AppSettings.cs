@@ -3,7 +3,6 @@
 
 using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace VietTypeConfig2 {
@@ -167,6 +166,19 @@ namespace VietTypeConfig2 {
             }
         }
 
+        bool vietnamese_interface = true;
+        public bool VietnameseInterface {
+            get {
+                return vietnamese_interface;
+            }
+            set {
+                if (vietnamese_interface != value) {
+                    vietnamese_interface = value;
+                    OnPropertyChanged(nameof(VietnameseInterface));
+                }
+            }
+        }
+
         public static AppSettings LoadSettings() {
             using (var regKey = Registry.CurrentUser.CreateSubKey(Subkey)) {
                 var setting = new AppSettings();
@@ -180,6 +192,7 @@ namespace VietTypeConfig2 {
                 setting.Autocorrect = ToBool(regKey.GetValue(nameof(autocorrect))) ?? setting.Autocorrect;
                 setting.ShowComposingAttr = ToInt(regKey.GetValue(nameof(show_composing_attr))) ?? setting.ShowComposingAttr;
                 setting.PkToggle = ToInt(regKey.GetValue(nameof(pk_toggle))) ?? setting.PkToggle;
+                setting.VietnameseInterface = "en" != (string)regKey.GetValue("ui_language");
                 return setting;
             }
         }
@@ -196,6 +209,7 @@ namespace VietTypeConfig2 {
                 regKey.SetValue(nameof(autocorrect), settings.Autocorrect ? 1 : 0);
                 regKey.SetValue(nameof(show_composing_attr), settings.ShowComposingAttr);
                 regKey.SetValue(nameof(pk_toggle), settings.PkToggle);
+                regKey.SetValue("ui_language", settings.VietnameseInterface ? "vi" : "en");
 
                 var threadMgr = Activator.CreateInstance(Type.GetTypeFromCLSID(CLSID_TF_ThreadMgr, true)) as ITfThreadMgr;
                 if (threadMgr.Activate(out uint tid) >= 0) {

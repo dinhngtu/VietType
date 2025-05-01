@@ -23,8 +23,8 @@ namespace VietTypeConfig2 {
 
         private void Vm_RequestAbout(object sender, System.EventArgs e) {
             MessageBox.Show(
-                string.Format(Localized.MainWindow.MainWindow_AboutFormat, Version.ProductVersion, Version.VcsRevision),
-                Localized.MainWindow.MainWindow_ProgramName,
+                string.Format(LocalizationManager.Instance["MainWindow_AboutFormat"], Version.ProductVersion, Version.VcsRevision),
+                LocalizationManager.Instance["MainWindow_ProgramName"],
                 MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
@@ -32,20 +32,20 @@ namespace VietTypeConfig2 {
             if (e.ErrorCode == 0) {
                 if (e.IsEnabled) {
                     MessageBox.Show(
-                        Localized.MainWindow.MainWindow_EnableOkText,
-                        Localized.MainWindow.MainWindow_ProgramName,
+                        LocalizationManager.Instance["MainWindow_EnableOkText"],
+                        LocalizationManager.Instance["MainWindow_ProgramName"],
                         MessageBoxButton.OK, MessageBoxImage.Information);
                 } else {
                     MessageBox.Show(
-                        Localized.MainWindow.MainWindow_DisableOkText,
-                        Localized.MainWindow.MainWindow_ProgramName,
+                        LocalizationManager.Instance["MainWindow_DisableOkText"],
+                        LocalizationManager.Instance["MainWindow_ProgramName"],
                         MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             } else {
                 var message = Marshal.GetExceptionForHR(e.ErrorCode).Message;
                 MessageBox.Show(
-                    string.Format(Localized.MainWindow.MainWindow_ToggleFailFormat, message),
-                    Localized.MainWindow.MainWindow_ProgramName,
+                    string.Format(LocalizationManager.Instance["MainWindow_ToggleFailFormat"], message),
+                    LocalizationManager.Instance["MainWindow_ProgramName"],
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
