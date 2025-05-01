@@ -5,7 +5,7 @@ if ($Env:GITHUB_ACTIONS -eq "true") {
     $fileVersion[3] = [int]$Env:GITHUB_RUN_NUMBER
     $productVersion[3] = [int]$Env:GITHUB_RUN_NUMBER
 
-    if ($Env:GITHUB_REF_NAME -match '^v(\d+)(?:\.(\d+))?(?:\.(\d+))?(?:\.(\d+))?$') {
+    if ($Env:GITHUB_REF_TYPE -ieq "tag" -and $Env:GITHUB_REF_NAME -match '^v(\d+)(?:\.(\d+))?(?:\.(\d+))?(?:\.(\d+))?$') {
         $fileVersion[0] = [int]$Matches[1]
         $productVersion[0] = [int]$Matches[1]
         if ($null -ne $Matches[2]) {
