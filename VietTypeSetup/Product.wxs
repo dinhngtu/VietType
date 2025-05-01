@@ -105,7 +105,7 @@ SPDX-License-Identifier: GPL-3.0-only
         <Class Id="{C0DD01A1-0DEB-454B-8B42-D22CED1B4B23}" Context="InprocServer32" Description="VietType" ThreadingModel="apartment" Advertise="yes" />
       </Component>
       <?endif?>
-      
+
       <?if $(Platform) = ARM64 ?>
       <Component Directory="INSTALLFOLDER64" Bitness="always64">
         <File Id="VietTypeATLARM64.dll" Source="$(SolutionDir)\ARM64EC\$(Configuration)\VietTypeATLARM64.dll" />
@@ -124,33 +124,32 @@ SPDX-License-Identifier: GPL-3.0-only
 
   <Fragment>
     <StandardDirectory Id="ProgramMenuFolder" />
-    <DirectoryRef Id="INSTALLFOLDER" />
+
+    <?if $(Platform) = ARM64 ?>
+    <?define ConfigDir = "INSTALLFOLDER64" ?>
+    <?define ConfigBitness = "always64" ?>
+    <?else?>
+    <?define ConfigDir = "INSTALLFOLDER" ?>
+    <?define ConfigBitness = "always32" ?>
+    <?endif?>
+    <DirectoryRef Id="$(var.ConfigDir)">
+      <Directory Id="ConfigRes_vi" Name="vi" />
+    </DirectoryRef>
+
     <ComponentGroup Id="ConfigComponents">
-      <?if $(Platform) = ARM64 ?>
-      <Component Directory="INSTALLFOLDER64" Bitness="always64">
+      <Component Directory="$(var.ConfigDir)" Bitness="$(var.ConfigBitness)">
         <File Id="VietTypeConfig2.exe" Source="$(VietTypeConfig2.TargetPath)" />
-        <Shortcut Directory="ProgramMenuFolder" Name="VietType Settings" WorkingDirectory="INSTALLFOLDER64" Advertise="yes" Icon="logo.exe">
+        <Shortcut Directory="ProgramMenuFolder" Name="VietType Settings" WorkingDirectory="$(var.ConfigDir)" Advertise="yes" Icon="logo.exe">
           <Icon Id="logo.exe" SourceFile="$(VietTypeConfig2.ProjectDir)\logo.ico" />
         </Shortcut>
       </Component>
-      <Component Directory="INSTALLFOLDER64" Bitness="always64">
+      <Component Directory="$(var.ConfigDir)" Bitness="$(var.ConfigBitness)">
         <File Source="$(VietTypeConfig2.TargetPath).config"
               DefaultLanguage="0" DefaultVersion="$(productVersion)" />
       </Component>
-      
-      <?else?>
-      <Component Directory="INSTALLFOLDER" Bitness="always32">
-        <File Id="VietTypeConfig2.exe" Source="$(VietTypeConfig2.TargetPath)" />
-        <Shortcut Directory="ProgramMenuFolder" Name="VietType Settings" WorkingDirectory="INSTALLFOLDER" Advertise="yes" Icon="logo.exe">
-          <Icon Id="logo.exe" SourceFile="$(VietTypeConfig2.ProjectDir)\logo.ico" />
-        </Shortcut>
+      <Component Directory="ConfigRes_vi" Bitness="$(var.ConfigBitness)">
+        <File Source="$(VietTypeConfig2.TargetDir)\vi\VietTypeConfig2.resources.dll" />
       </Component>
-      <Component Directory="INSTALLFOLDER" Bitness="always32">
-        <File Source="$(VietTypeConfig2.TargetPath).config"
-              DefaultLanguage="0" DefaultVersion="$(productVersion)" />
-      </Component>
-      
-      <?endif?>
     </ComponentGroup>
   </Fragment>
 
