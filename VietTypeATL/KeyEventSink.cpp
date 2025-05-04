@@ -81,9 +81,8 @@ HRESULT KeyEventSink::OnKeyDownCommon(
         goto finish;
     }
 
-    if (wParam == VK_BACK && !_compositionManager->IsComposing() &&
-        !((_keyState[VK_CONTROL] & 0x80) || (_keyState[VK_MENU] & 0x80) || (_keyState[VK_LWIN] & 0x80) ||
-          (_keyState[VK_RWIN] & 0x80))) {
+    if (wParam == VK_BACK && !_compositionManager->IsComposing() && !(_keyState[VK_CONTROL] & 0x80) &&
+        !(_keyState[VK_MENU] & 0x80) && !(_keyState[VK_LWIN] & 0x80) && !(_keyState[VK_RWIN] & 0x80)) {
         long backspacing;
         hr = compBackconvert.GetValue(&backspacing);
         if (FAILED(hr)) {
