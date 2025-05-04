@@ -6,7 +6,7 @@
 #include <Windows.h>
 #include <strsafe.h>
 
-#define VIETTYPE_QUIET
+// comment out the following line to write logs to the system debugger (warning: noisy, includes keystroke data)
 
 /// <summary>support function, do not use directly</summary>
 template <typename... Args>
@@ -110,5 +110,5 @@ void _errorprint(_In_ LPCWSTR func, _In_ int line, _In_ DWORD err, _In_ LPCWSTR 
 
 #define GUID_WFORMAT L"%08lx-%04hx-%04hx-%02hhx%02hhx-%02hhx%02hhx%02hhx%02hhx%02hhx%02hhx"
 #define GUID_COMPONENTS(guid)                                                                                          \
-    guid.Data1, guid.Data2, guid.Data3, guid.Data4[0], guid.Data4[1], guid.Data4[2], guid.Data4[3], guid.Data4[4],     \
-        guid.Data4[5], guid.Data4[6], guid.Data4[7]
+    (guid).Data1, (guid).Data2, (guid).Data3, (guid).Data4[0], (guid).Data4[1], (guid).Data4[2], (guid).Data4[3],      \
+        (guid).Data4[4], (guid).Data4[5], (guid).Data4[6], (guid).Data4[7]

@@ -25,7 +25,7 @@ STDMETHODIMP KeyHandlerEditSession::DoEditSession(_In_ TfEditCookie ec) {
     if (_wParam == 0) {
         Commit(ec);
     } else if (IsEditKey(_wParam, _lParam, _keyState)) {
-        DBG_DPRINT(L"%d not edit key, not eating", _wParam);
+        DBG_DPRINT(L"%d edit key, not eating", _wParam);
         // uneaten, ends composition
         _controller->GetEngine().Reset();
         return _compositionManager->EndCompositionNow(ec);
