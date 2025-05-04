@@ -458,9 +458,16 @@ public:
         TestInvalidWord(L"quwowns", L"quwowwns");
     }
 
+    // to simplify the implementation, "khongoo"->"khongoo" was chosen instead of "khongoo"->"khongo"
     TEST_METHOD (TestTelexKhongoo) {
         TestInvalidWord(L"khongoo", L"khongoo");
     }
+
+    TEST_METHOD (TestTelexKhongo) {
+        TestValidWord(L"kh\xf4ng", L"khongo");
+    }
+
+    // not sure what "khoongo" should be, leave it undefined for now
 
     TEST_METHOD (TestTelexTypingCaasy) {
         TestValidWord(L"c\x1ea5y", L"caasy");

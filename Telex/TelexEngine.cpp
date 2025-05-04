@@ -309,7 +309,8 @@ TelexStates TelexEngine::PushChar(wchar_t corig) {
         _v.push_back(c);
         auto before = _v.size();
         // HACK: single special case for "khongoo"
-        if (!_c2.empty() && _config.typing_style == TypingStyles::Telex && c == L'o' && _v == L"oo") {
+        // note that _v here is post-append but pre-transition
+        if (!_c2.empty() && _config.typing_style == TypingStyles::Telex && c == L'o' && _v == L"\xf4o") {
             Invalidate();
         } else if (TransitionV(GetTypingStyle()->transitions)) {
             auto after = _v.size();
