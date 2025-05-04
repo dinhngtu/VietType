@@ -54,6 +54,9 @@ EngineController::Initialize(_In_ Telex::ITelexEngine* engine, _In_ ITfThreadMgr
     hr = InitLanguageBar();
     HRESULT_CHECK_RETURN(hr, L"%s", L"InitLanguageBar failed");
 
+    hr = UpdateStates(true);
+    HRESULT_CHECK(hr, L"%s", L"UpdateStates failed");
+
     return S_OK;
 }
 
