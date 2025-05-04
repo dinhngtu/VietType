@@ -7,6 +7,7 @@
 #include <strsafe.h>
 
 // comment out the following line to write logs to the system debugger (warning: noisy, includes keystroke data)
+#define VIETTYPE_QUIET
 
 /// <summary>support function, do not use directly</summary>
 template <typename... Args>
