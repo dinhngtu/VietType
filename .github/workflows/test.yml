@@ -38,3 +38,30 @@ jobs:
 
       - name: Run tests
         run: vstest.console.exe ${{matrix.platform}}/${{matrix.configuration}}/VietTypeUnitTests.dll
+
+  test-arm64X:
+    runs-on: windows-11-arm
+    strategy:
+      matrix:
+        configuration:
+          - Debug
+          - Release
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Setup VSTest.console.exe
+        shell: powershell
+        run: |
+          $ErrorActionPreference = "Stop"
+          $vs = & "${Env:ProgramFiles(x86)}/Microsoft Visual Studio/Installer/vswhere.exe" -latest -property installationPath
+          Add-Content $Env:GITHUB_PATH "$vs/Common7/IDE/CommonExtensions/Microsoft/TestWindow"
+
+      - name: Build unit tests
+        run: msbuild.exe -m -target:VietTypeUnitTests:Rebuild -p:Configuration=${{matrix.configuration}} -p:Platform=ARM64EC .
+
+      - name: Run tests
+        run: vstest.console.exe ARM64EC/${{matrix.configuration}}/VietTypeUnitTests.dll
