@@ -3,6 +3,9 @@ name: MSBuild
 on:
   release:
     types: [published]
+  push:
+    branches:
+      - master
 
 env:
   SOLUTION_FILE_PATH: .
@@ -53,6 +56,7 @@ jobs:
       subject-digest: sha256:${{ steps.upload.outputs.artifact-digest }}
 
   attest:
+    if: ${{ github.event_name == 'release' && github.event.action == 'published' }}
     needs: [build]
     uses: dinhngtu/github-workflows/.github/workflows/attest.yml@af4b127febded0600cafa4f5935f99a24e267a8c
     permissions:
