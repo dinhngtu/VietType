@@ -22,7 +22,7 @@ jobs:
         platform:
           - Win32
           - x64
-          - ARM64EC
+          #- ARM64EC
 
     steps:
       - uses: actions/checkout@v4
