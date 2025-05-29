@@ -1,9 +1,14 @@
 name: MSBuild
 
 on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
   release:
     types: [published]
-  push:
   workflow_dispatch:
 
 env:
