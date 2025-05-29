@@ -6,6 +6,125 @@
 
 namespace VietType {
 
+struct MenuDeleter {
+    void operator()(HMENU menu) {
+        if (menu) {
+            DestroyMenu(menu);
+        }
+    }
+};
+
+using Menu = std::unique_ptr<std::remove_pointer_t<HMENU>, MenuDeleter>;
+
+static Menu GetMenu() {
+    if (!Globals::DllInstance) {
+        DBG_DPRINT(L"%s", L"cannot obtain instance");
+        return Menu();
+    }
+    HMENU menu = LoadMenu(Globals::DllInstance, MAKEINTRESOURCE(IDR_MENU_TRAY));
+    if (!menu) {
+        WINERROR_PRINT(GetLastError(), L"%s", L"GetMenu failed");
+        return Menu();
+    }
+    return Menu(menu);
+}
+
+static int PopMenu(POINT pt, const RECT* area) {
+    auto menuSource = GetMenu();
+    if (!menuSource) {
+        DBG_DPRINT(L"%s", L"load menu failed");
+        return 0;
+    }
+    auto trayMenu = GetSubMenu(menuSource.get(), 0);
+    if (!trayMenu) {
+        DBG_DPRINT(L"%s", L"load tray menu failed");
+        return 0;
+    }
+    UINT flags = TPM_NONOTIFY | TPM_RETURNCMD;
+    if (GetSystemMetrics(SM_MENUDROPALIGNMENT)) {
+        flags |= TPM_RIGHTALIGN;
+    }
+    int itemId = TrackPopupMenuEx(trayMenu, flags, pt.x, pt.y, /* doesn't matter */ GetFocus(), NULL);
+    return itemId;
+}
+
+static HRESULT CopyTfMenu(_In_ ITfMenu* menu) {
+    HRESULT hr;
+
+    auto menuSource = GetMenu();
+    if (!menuSource) {
+        return E_FAIL;
+    }
+    auto trayMenu = GetSubMenu(menuSource.get(), 0);
+    if (!trayMenu) {
+        return E_FAIL;
+    }
+    for (int i = 0; i < GetMenuItemCount(trayMenu); i++) {
+        MENUITEMINFO mii{.cbSize = sizeof(MENUITEMINFO), .fMask = MIIM_STRING};
+        if (!GetMenuItemInfo(trayMenu, i, TRUE, &mii)) {
+            WINERROR_GLE_RETURN_HRESULT(L"%s", L"GetMenuItemInfo failed");
+        }
+
+        std::vector<WCHAR> buf(mii.cch + 1);
+        mii = {
+            .cbSize = sizeof(MENUITEMINFO),
+            .fMask = MIIM_CHECKMARKS | MIIM_FTYPE | MIIM_ID | MIIM_STATE | MIIM_STRING,
+            .dwTypeData = &buf[0],
+            .cch = mii.cch + 1,
+        };
+        if (!GetMenuItemInfo(trayMenu, i, TRUE, &mii)) {
+            WINERROR_GLE_RETURN_HRESULT(L"%s", L"GetMenuItemInfo failed");
+        }
+
+        DWORD tfFlags = 0;
+        if (mii.fState & MFS_CHECKED) {
+            tfFlags |= TF_LBMENUF_CHECKED;
+        }
+        if (mii.fType & MFT_SEPARATOR) {
+            tfFlags |= TF_LBMENUF_SEPARATOR;
+        }
+        if (mii.fType & MFT_RADIOCHECK) {
+            tfFlags |= TF_LBMENUF_RADIOCHECKED;
+        }
+        if (mii.fState & MFS_GRAYED) {
+            tfFlags |= TF_LBMENUF_GRAYED;
+        }
+
+#pragma warning(suppress : 6387)
+        hr = menu->AddMenuItem(mii.wID, tfFlags, NULL, NULL, &buf[0], static_cast<ULONG>(buf.size()), NULL);
+        DBG_HRESULT_CHECK(hr, L"%s", L"menu->AddMenuItem failed");
+    }
+
+    return S_OK;
+}
+
+static HRESULT GetSettingsProgPath(std::wstring& path) {
+    PWSTR pathStr;
+    HRESULT_CHECK_RETURN(SHGetKnownFolderPath(FOLDERID_ProgramFilesX86, 0, NULL, &pathStr), L"SHGetKnownFolderPath");
+    path = std::wstring(pathStr) + Globals::SettingsProgSubpath;
+    LocalFree(pathStr);
+    return S_OK;
+}
+
+static HRESULT OnMenuSelectAll(_In_ UINT id, _In_ EngineController* controller) {
+    HRESULT hr;
+
+    switch (id) {
+    case ID_FILE_SETTINGS: {
+        std::wstring path;
+        hr = GetSettingsProgPath(path);
+        HRESULT_CHECK_RETURN(hr, L"GetSettingsProgPath");
+
+        ShellExecute(NULL, L"open", path.c_str(), NULL, NULL, SW_SHOW);
+        WINERROR_GLE_RETURN_HRESULT(L"ShellExecute %s", path.c_str());
+        return S_OK;
+    }
+
+    default:
+        return S_OK;
+    }
+}
+
 static DWORD SystemUsesLightTheme() {
     CRegKey key;
     DWORD light;
@@ -83,6 +202,9 @@ STDMETHODIMP LanguageBarButton::Show(_In_ BOOL fShow) {
 STDMETHODIMP LanguageBarButton::OnClick(_In_ TfLBIClick click, _In_ POINT pt, __RPC__in const RECT* prcArea) {
     if (click == TF_LBI_CLK_LEFT) {
         return _controller->ToggleUserEnabled();
+    } else if (click == TF_LBI_CLK_RIGHT) {
+        int itemId = PopMenu(pt, prcArea);
+        return OnMenuSelectAll(itemId, _controller);
     }
     return S_OK;
 }
@@ -91,11 +213,12 @@ STDMETHODIMP LanguageBarButton::InitMenu(__RPC__in_opt ITfMenu* pMenu) {
     if (!pMenu) {
         return E_INVALIDARG;
     }
+    CopyTfMenu(pMenu);
     return S_OK;
 }
 
 STDMETHODIMP LanguageBarButton::OnMenuSelect(_In_ UINT wID) {
-    return S_OK;
+    return OnMenuSelectAll(wID, _controller);
 }
 
 STDMETHODIMP LanguageBarButton::GetIcon(__RPC__deref_out_opt HICON* phIcon) {

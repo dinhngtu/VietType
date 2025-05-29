@@ -11,13 +11,15 @@
 #define IDI_ICONVL                      223
 #define IDI_ICONXD                      224
 #define IDI_ICONXL                      225
+#define IDR_MENU_TRAY                   226
+#define ID_FILE_SETTINGS                32773
 
 // Next default values for new objects
-// 
+//
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        226
-#define _APS_NEXT_COMMAND_VALUE         32773
+#define _APS_NEXT_RESOURCE_VALUE        227
+#define _APS_NEXT_COMMAND_VALUE         32774
 #define _APS_NEXT_CONTROL_VALUE         208
 #define _APS_NEXT_SYMED_VALUE           108
 #endif

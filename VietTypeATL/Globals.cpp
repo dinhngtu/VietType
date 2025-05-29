@@ -30,5 +30,7 @@ const wchar_t* ConfigKeyName = L"Software\\VietType";
 
 const LANGID TextServiceLangId = MAKELANGID(LANG_VIETNAMESE, SUBLANG_VIETNAMESE_VIETNAM);
 
+const wchar_t* SettingsProgSubpath = L"\\VietType\\VietTypeConfig2.exe";
+
 } // namespace Globals
 } // namespace VietType

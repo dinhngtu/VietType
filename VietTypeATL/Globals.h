@@ -23,5 +23,7 @@ extern const wchar_t* ConfigKeyName;
 
 extern const LANGID TextServiceLangId;
 
+extern const wchar_t* SettingsProgSubpath;
+
 } // namespace Globals
 } // namespace VietType
