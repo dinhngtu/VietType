@@ -35,7 +35,7 @@ STDMETHODIMP KeyHandlerEditSession::DoEditSession(_In_ TfEditCookie ec) {
         auto str = _controller->GetEngine().Retrieve();
         _controller->GetEngine().Reset();
         hr = _compositionManager->SetCompositionText(ec, &str[0], static_cast<LONG>(str.length()));
-        DBG_HRESULT_CHECK(hr, L"%s", L"_compositionManager->SetCompositionText failed");
+        DBG_HRESULT_CHECK(hr, L"_compositionManager->SetCompositionText failed");
         return _compositionManager->EndCompositionNow(ec);
     } else if (IsKeyEaten(&_controller->GetEngine(), _compositionManager->IsComposing(), _wParam, _lParam, _keyState)) {
         // eaten, updates composition
@@ -76,22 +76,22 @@ HRESULT KeyHandlerEditSession::Uninitialize() {
 HRESULT KeyHandlerEditSession::ComposeKey(_In_ TfEditCookie ec) {
     HRESULT hr;
 
-    DBG_DPRINT(L"%s", L"");
+    DBG_DPRINT(L"");
 
     switch (PushKey(&_controller->GetEngine(), _wParam, _lParam, _keyState)) {
     case Telex::TelexStates::Valid: {
         if (_controller->GetEngine().Count()) {
             auto str = _controller->GetEngine().Peek();
             hr = _compositionManager->EnsureCompositionText(ec, _context, &str[0], static_cast<LONG>(str.length()));
-            DBG_HRESULT_CHECK(hr, L"%s", L"_compositionManager->EnsureCompositionText failed");
+            DBG_HRESULT_CHECK(hr, L"_compositionManager->EnsureCompositionText failed");
         } else {
             // backspace returns Valid on an empty buffer
             _controller->GetEngine().Reset();
             // EndComposition* will not empty composition text so we have to do it manually
             hr = _compositionManager->EmptyCompositionText(ec);
-            HRESULT_CHECK_RETURN(hr, L"%s", L"_compositionManager->EmptyCompositionText failed");
+            HRESULT_CHECK_RETURN(hr, L"_compositionManager->EmptyCompositionText failed");
             hr = _compositionManager->EndCompositionNow(ec);
-            HRESULT_CHECK_RETURN(hr, L"%s", L"_compositionManager->EndCompositionNow failed");
+            HRESULT_CHECK_RETURN(hr, L"_compositionManager->EndCompositionNow failed");
         }
         break;
     }
@@ -100,12 +100,12 @@ HRESULT KeyHandlerEditSession::ComposeKey(_In_ TfEditCookie ec) {
         assert(_controller->GetEngine().Count() > 0);
         auto str = _controller->GetEngine().RetrieveRaw();
         hr = _compositionManager->EnsureCompositionText(ec, _context, &str[0], static_cast<LONG>(str.length()));
-        DBG_HRESULT_CHECK(hr, L"%s", L"_compositionManager->EnsureCompositionText failed");
+        DBG_HRESULT_CHECK(hr, L"_compositionManager->EnsureCompositionText failed");
         break;
     }
 
     default:
-        DBG_DPRINT(L"%s", L"PushKey returned unexpected value");
+        DBG_DPRINT(L"PushKey returned unexpected value");
         assert(0);
         break;
     }
@@ -121,7 +121,7 @@ HRESULT KeyHandlerEditSession::Commit(_In_ TfEditCookie ec) {
         if (txstate == Telex::TelexStates::Committed || txstate == Telex::TelexStates::CommittedInvalid) {
             auto str = _controller->GetEngine().Retrieve();
             hr = _compositionManager->SetCompositionText(ec, &str[0], static_cast<LONG>(str.length()));
-            DBG_HRESULT_CHECK(hr, L"%s", L"_compositionManager->EnsureCompositionText failed");
+            DBG_HRESULT_CHECK(hr, L"_compositionManager->EnsureCompositionText failed");
         } else {
             assert(txstate == Telex::TelexStates::Committed || txstate == Telex::TelexStates::CommittedInvalid);
             hr = E_FAIL;

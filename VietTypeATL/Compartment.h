@@ -61,7 +61,7 @@ public:
         v.vt = variantInfo<T>::vartype;
         variantInfo<T>::accessor(v) = val;
         hr = _compartment->SetValue(_clientid, &v);
-        HRESULT_CHECK_RETURN(hr, L"%s", L"_compartment->SetValue failed");
+        HRESULT_CHECK_RETURN(hr, L"_compartment->SetValue failed");
 
         return S_OK;
     }

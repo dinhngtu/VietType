@@ -32,28 +32,28 @@ _Check_return_ HRESULT CompartmentBase::Initialize(
     if (global) {
         CComPtr<ITfThreadMgr> threadMgr;
         hr = punk->QueryInterface(&threadMgr);
-        HRESULT_CHECK_RETURN(hr, L"%s", L"punk->QueryInterface failed");
+        HRESULT_CHECK_RETURN(hr, L"punk->QueryInterface failed");
 
         hr = threadMgr->GetGlobalCompartment(&compartmentMgr);
-        HRESULT_CHECK_RETURN(hr, L"%s", L"threadMgr->GetGlobalCompartment failed");
+        HRESULT_CHECK_RETURN(hr, L"threadMgr->GetGlobalCompartment failed");
     } else {
         hr = punk->QueryInterface(&compartmentMgr);
-        HRESULT_CHECK_RETURN(hr, L"%s", L"punk->QueryInterface failed");
+        HRESULT_CHECK_RETURN(hr, L"punk->QueryInterface failed");
     }
 
     hr = compartmentMgr->GetCompartment(guidCompartment, &_compartment);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"compartmentMgr->GetCompartment failed");
+    HRESULT_CHECK_RETURN(hr, L"compartmentMgr->GetCompartment failed");
 
 #ifdef _DEBUG
     if (global) {
         HRESULT dbgHr;
         CComVariant v;
         dbgHr = _compartment->GetValue(&v);
-        DBG_HRESULT_CHECK(dbgHr, L"%s", L"test _compartment->GetValue failed");
+        DBG_HRESULT_CHECK(dbgHr, L"test _compartment->GetValue failed");
         DBG_DPRINT(L"created global compartment vartype=%u long=%ld", v.vt, v.lVal);
         CComPtr<IEnumGUID> globalCompartments;
         dbgHr = compartmentMgr->EnumCompartments(&globalCompartments);
-        DBG_HRESULT_CHECK(dbgHr, L"%s", L"compartmentMgr->EnumCompartments failed");
+        DBG_HRESULT_CHECK(dbgHr, L"compartmentMgr->EnumCompartments failed");
         while (1) {
             GUID guid;
             dbgHr = globalCompartments->Next(1, &guid, NULL);

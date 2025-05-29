@@ -14,11 +14,11 @@ static HRESULT IsContextEmpty(_In_ ITfContext* context, _In_ TfClientId clientid
 
     Compartment<long> compEmpty;
     hr = compEmpty.Initialize(context, clientid, GUID_COMPARTMENT_EMPTYCONTEXT);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"compEmpty->Initialize failed");
+    HRESULT_CHECK_RETURN(hr, L"compEmpty->Initialize failed");
 
     long contextEmpty;
     hr = compEmpty.GetValue(&contextEmpty);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"compDisabled->GetValue failed");
+    HRESULT_CHECK_RETURN(hr, L"compDisabled->GetValue failed");
 
     *isempty = hr == S_OK && contextEmpty;
     return hr;
@@ -35,7 +35,7 @@ HRESULT OnNewContext(
 
     bool isempty;
     hr = IsContextEmpty(context, compositionManager->GetClientId(), &isempty);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"IsContextEmpty failed");
+    HRESULT_CHECK_RETURN(hr, L"IsContextEmpty failed");
     if (isempty) {
         controller->SetBlocked(EngineController::BlockedKind::Blocked);
         return S_OK;
@@ -44,7 +44,7 @@ HRESULT OnNewContext(
 #ifdef _DEBUG
     TF_STATUS st;
     hr = context->GetStatus(&st);
-    DBG_HRESULT_CHECK(hr, L"%s", L"context->GetStatus failed") else {
+    DBG_HRESULT_CHECK(hr, L"context->GetStatus failed") else {
         DBG_DPRINT(
             L"d=%c%c%c%c%c%c%c%c%c s=%c%c%c%c%c%c%c",
             (st.dwDynamicFlags & TS_SD_READONLY) ? L'R' : L'r',
@@ -71,12 +71,12 @@ HRESULT OnNewContext(
     if (SUCCEEDED(hr)) {
         compBackconvert.SetValue(0);
     } else {
-        DBG_HRESULT_CHECK(hr, L"%s", L"compBackconvert.Initialize failed");
+        DBG_HRESULT_CHECK(hr, L"compBackconvert.Initialize failed");
     }
 
     hr = CompositionManager::RequestEditSession(EditSessions::EditBlocked, compositionManager, context, controller);
     if (FAILED(hr)) {
-        DBG_HRESULT_CHECK(hr, L"%s", L"CompositionManager::RequestEditSession failed");
+        DBG_HRESULT_CHECK(hr, L"CompositionManager::RequestEditSession failed");
         controller->SetBlocked(EngineController::BlockedKind::Free);
     }
 

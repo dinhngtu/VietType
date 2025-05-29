@@ -21,7 +21,7 @@ STDMETHODIMP EnumDisplayAttributeInfo::Clone(__RPC__deref_out_opt IEnumTfDisplay
 
     CComPtr<EnumDisplayAttributeInfo> ret;
     hr = CreateInitialize(&ret, _items, _index);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(&ret) failed");
+    HRESULT_CHECK_RETURN(hr, L"CreateInitialize(&ret) failed");
 
     *ppEnum = ret;
     (*ppEnum)->AddRef();
@@ -84,7 +84,7 @@ EnumDisplayAttributeInfo::FindAttributeByGuid(_In_ const GUID& guid, _COM_Outptr
     for (const auto& attr : _items) {
         GUID aguid;
         hr = attr->GetGUID(&aguid);
-        HRESULT_CHECK_RETURN(hr, L"%s", L"attr->GetGUID");
+        HRESULT_CHECK_RETURN(hr, L"attr->GetGUID");
         if (guid == aguid) {
             *info = attr;
             (*info)->AddRef();

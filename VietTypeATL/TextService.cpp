@@ -66,10 +66,10 @@ STDMETHODIMP TextService::ActivateEx(_In_ ITfThreadMgr* ptim, _In_ TfClientId ti
     _engine = std::unique_ptr<Telex::ITelexEngine>(Telex::TelexNew(Telex::TelexConfig{}));
 
     hr = CreateInitialize(&_engineController, _engine.get(), ptim, tid);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(&_engineController) failed");
+    HRESULT_CHECK_RETURN(hr, L"CreateInitialize(&_engineController) failed");
 
     hr = CreateInstance2(&_attributeStore);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&_attributeStore) failed");
+    HRESULT_CHECK_RETURN(hr, L"CreateInstance2(&_attributeStore) failed");
 
     CComPtr<DisplayAttributeInfo> composingAttrib;
     DWORD showComposingAttr;
@@ -78,7 +78,7 @@ STDMETHODIMP TextService::ActivateEx(_In_ ITfThreadMgr* ptim, _In_ TfClientId ti
         showComposingAttr = 0;
     hr = CreateInitialize(
         &composingAttrib, ComposingAttributeGuid, L"Composing", ComposingAttributes[showComposingAttr]);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInstance2(&attr1) failed");
+    HRESULT_CHECK_RETURN(hr, L"CreateInstance2(&attr1) failed");
     _attributeStore->AddAttribute(composingAttrib);
 
     hr = CreateInitialize(
@@ -86,19 +86,19 @@ STDMETHODIMP TextService::ActivateEx(_In_ ITfThreadMgr* ptim, _In_ TfClientId ti
         tid,
         static_cast<ITfDisplayAttributeInfo*>(composingAttrib),
         static_cast<bool>(dwFlags & TF_TMAE_COMLESS));
-    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(&_compositionManager) failed");
+    HRESULT_CHECK_RETURN(hr, L"CreateInitialize(&_compositionManager) failed");
 
     long enabled;
     // this already sets enabled state if the compartment is empty
     hr = _engineController->IsUserEnabled(&enabled);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_engineController->IsUserEnabled failed");
+    HRESULT_CHECK_RETURN(hr, L"_engineController->IsUserEnabled failed");
     DBG_DPRINT(L"init hr = %ld, enabled = %ld", hr, enabled);
 
     hr = CreateInitialize(&_keyEventSink, ptim, tid, _compositionManager, _engineController);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(&_keyEventSink) failed");
+    HRESULT_CHECK_RETURN(hr, L"CreateInitialize(&_keyEventSink) failed");
 
     hr = CreateInitialize(&_threadMgrEventSink, ptim, tid, _compositionManager, _engineController);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(&_threadMgrEventSink) failed");
+    HRESULT_CHECK_RETURN(hr, L"CreateInitialize(&_threadMgrEventSink) failed");
 
     return S_OK;
 }
@@ -109,11 +109,11 @@ STDMETHODIMP TextService::Deactivate(void) {
     HRESULT hr;
 
     hr = _threadMgrEventSink->Uninitialize();
-    DBG_HRESULT_CHECK(hr, L"%s", L"_threadMgrEventSink->Uninitialize failed");
+    DBG_HRESULT_CHECK(hr, L"_threadMgrEventSink->Uninitialize failed");
     _threadMgrEventSink.Release();
 
     hr = _keyEventSink->Uninitialize();
-    DBG_HRESULT_CHECK(hr, L"%s", L"_keyEventSink->Uninitialize failed");
+    DBG_HRESULT_CHECK(hr, L"_keyEventSink->Uninitialize failed");
     _keyEventSink.Release();
 
     _compositionManager->Uninitialize();
@@ -122,7 +122,7 @@ STDMETHODIMP TextService::Deactivate(void) {
     _attributeStore.Release();
 
     hr = _engineController->Uninitialize();
-    DBG_HRESULT_CHECK(hr, L"%s", L"_engineController->Uninitialize failed");
+    DBG_HRESULT_CHECK(hr, L"_engineController->Uninitialize failed");
     _engineController.Release();
 
     return S_OK;

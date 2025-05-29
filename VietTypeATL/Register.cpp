@@ -24,7 +24,7 @@ static HRESULT SetSettingsKeyAcl() {
 
     CRegKey key;
     err = key.Create(HKEY_CURRENT_USER, VietType::Globals::ConfigKeyName, nullptr, 0, READ_CONTROL | WRITE_DAC);
-    WINERROR_CHECK_RETURN_HRESULT(err, L"%s", L"key.Create failed");
+    WINERROR_CHECK_RETURN_HRESULT(err, L"key.Create failed");
 
     std::vector<BYTE> sdbuf;
     DWORD sdbufsize = SECURITY_DESCRIPTOR_MIN_LENGTH * 2;
@@ -35,18 +35,18 @@ static HRESULT SetSettingsKeyAcl() {
             break;
         }
     }
-    WINERROR_CHECK_RETURN_HRESULT(err, L"%s", L"key.GetKeySecurity failed");
+    WINERROR_CHECK_RETURN_HRESULT(err, L"key.GetKeySecurity failed");
 
     PACL dacl;
     BOOL daclPresent, daclDefaulted;
     if (!GetSecurityDescriptorDacl(&sdbuf[0], &daclPresent, &dacl, &daclDefaulted)) {
-        WINERROR_GLE_RETURN_HRESULT(L"%s", L"GetSecurityDescriptorDacl failed");
+        WINERROR_GLE_RETURN_HRESULT(L"GetSecurityDescriptorDacl failed");
     }
 
     std::array<BYTE, SECURITY_MAX_SID_SIZE> sid;
     DWORD cbSid = static_cast<DWORD>(sid.size());
     if (!CreateWellKnownSid(WinBuiltinAnyPackageSid, NULL, &sid[0], &cbSid)) {
-        WINERROR_GLE_RETURN_HRESULT(L"%s", L"CreateWellKnownSid failed");
+        WINERROR_GLE_RETURN_HRESULT(L"CreateWellKnownSid failed");
     }
 
     std::array<EXPLICIT_ACCESS, 2> ea{};
@@ -67,20 +67,20 @@ static HRESULT SetSettingsKeyAcl() {
 
     PACL pNewAcl;
     err = SetEntriesInAcl(static_cast<ULONG>(ea.size()), ea.data(), dacl, &pNewAcl);
-    WINERROR_CHECK_RETURN_HRESULT(err, L"%s", L"SetEntriesInAcl failed");
+    WINERROR_CHECK_RETURN_HRESULT(err, L"SetEntriesInAcl failed");
     std::unique_ptr<ACL, decltype(&LocalFree)> newAcl(pNewAcl, &LocalFree);
 
     std::vector<BYTE> newSdBuf(SECURITY_DESCRIPTOR_MIN_LENGTH);
     if (!InitializeSecurityDescriptor(&newSdBuf[0], SECURITY_DESCRIPTOR_REVISION)) {
-        WINERROR_GLE_RETURN_HRESULT(L"%s", L"InitializeSecurityDescriptor failed");
+        WINERROR_GLE_RETURN_HRESULT(L"InitializeSecurityDescriptor failed");
     }
 
     if (!SetSecurityDescriptorDacl(&newSdBuf[0], TRUE, newAcl.get(), daclDefaulted)) {
-        WINERROR_GLE_RETURN_HRESULT(L"%s", L"SetSecurityDescriptorDacl failed");
+        WINERROR_GLE_RETURN_HRESULT(L"SetSecurityDescriptorDacl failed");
     }
 
     err = key.SetKeySecurity(DACL_SECURITY_INFORMATION, &newSdBuf[0]);
-    WINERROR_CHECK_RETURN_HRESULT(err, L"%s", L"key.SetKeySecurity failed");
+    WINERROR_CHECK_RETURN_HRESULT(err, L"key.SetKeySecurity failed");
 
     return S_OK;
 }
@@ -89,7 +89,7 @@ static HRESULT RegisterProfiles() {
     HRESULT hr;
 
     if (!VietType::Globals::DllInstance) {
-        DBG_DPRINT(L"%s", L"VietType::Globals::DllInstance is invalid");
+        DBG_DPRINT(L"VietType::Globals::DllInstance is invalid");
         return E_UNEXPECTED;
     }
 
@@ -97,7 +97,7 @@ static HRESULT RegisterProfiles() {
 
     auto dllPathLength = GetModuleFileName(VietType::Globals::DllInstance, dllPath, MAX_PATH);
     if (dllPathLength == 0) {
-        WINERROR_GLE_RETURN_HRESULT(L"%s", L"GetModuleFileName failed");
+        WINERROR_GLE_RETURN_HRESULT(L"GetModuleFileName failed");
     }
     if (dllPathLength >= MAX_PATH) {
         dllPathLength--;
@@ -107,7 +107,7 @@ static HRESULT RegisterProfiles() {
 
     CComPtr<ITfInputProcessorProfileMgr> profileMgr;
     hr = profileMgr.CoCreateInstance(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"profileMgr.CoCreateInstance failed");
+    HRESULT_CHECK_RETURN(hr, L"profileMgr.CoCreateInstance failed");
 
     hr = profileMgr->RegisterProfile(
         VietType::Globals::CLSID_TextService,
@@ -122,7 +122,7 @@ static HRESULT RegisterProfiles() {
         0,
         FALSE,
         0);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"profileMgr->RegisterProfile failed");
+    HRESULT_CHECK_RETURN(hr, L"profileMgr->RegisterProfile failed");
 
     return S_OK;
 }
@@ -132,7 +132,7 @@ static HRESULT UnregisterProfiles() {
 
     CComPtr<ITfInputProcessorProfileMgr> profileMgr;
     hr = profileMgr.CoCreateInstance(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"profileMgr.CoCreateInstance failed");
+    HRESULT_CHECK_RETURN(hr, L"profileMgr.CoCreateInstance failed");
 
     hr = profileMgr->UnregisterProfile(
         VietType::Globals::CLSID_TextService,
@@ -148,13 +148,13 @@ static HRESULT RegisterCategories() {
 
     CComPtr<ITfCategoryMgr> categoryMgr;
     hr = categoryMgr.CoCreateInstance(CLSID_TF_CategoryMgr, NULL, CLSCTX_INPROC_SERVER);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"categoryMgr.CoCreateInstance failed");
+    HRESULT_CHECK_RETURN(hr, L"categoryMgr.CoCreateInstance failed");
 
     for (const auto cat : SupportedCategories) {
         DBG_DPRINT(L"registering " GUID_WFORMAT, GUID_COMPONENTS(*cat));
         hr = categoryMgr->RegisterCategory(
             VietType::Globals::CLSID_TextService, *cat, VietType::Globals::CLSID_TextService);
-        HRESULT_CHECK_RETURN(hr, L"%s", L"categoryMgr->RegisterCategory failed");
+        HRESULT_CHECK_RETURN(hr, L"categoryMgr->RegisterCategory failed");
     }
 
     return S_OK;
@@ -165,11 +165,11 @@ static HRESULT UnregisterCategories() {
 
     CComPtr<ITfCategoryMgr> categoryMgr;
     hr = categoryMgr.CoCreateInstance(CLSID_TF_CategoryMgr, NULL, CLSCTX_INPROC_SERVER);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"categoryMgr.CoCreateInstance failed");
+    HRESULT_CHECK_RETURN(hr, L"categoryMgr.CoCreateInstance failed");
 
     CComPtr<IEnumGUID> registeredCategories;
     hr = categoryMgr->EnumCategoriesInItem(VietType::Globals::CLSID_TextService, &registeredCategories);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"categoryMgr->EnumCategoriesInItem failed");
+    HRESULT_CHECK_RETURN(hr, L"categoryMgr->EnumCategoriesInItem failed");
 
     GUID cat = {0};
     ULONG fetched = 0;
@@ -179,7 +179,7 @@ static HRESULT UnregisterCategories() {
             DBG_DPRINT(L"unregistering " GUID_WFORMAT, GUID_COMPONENTS(cat));
             hr = categoryMgr->UnregisterCategory(
                 VietType::Globals::CLSID_TextService, cat, VietType::Globals::CLSID_TextService);
-            HRESULT_CHECK_RETURN(hr, L"%s", L"categoryMgr->UnregisterCategory failed");
+            HRESULT_CHECK_RETURN(hr, L"categoryMgr->UnregisterCategory failed");
         } else {
             break;
         }
@@ -263,21 +263,21 @@ extern "C" HRESULT __cdecl ActivateProfiles() {
     {
         CRegKey key;
         err = key.Create(HKEY_CURRENT_USER, L"Keyboard Layout\\Substitutes", nullptr, 0, KEY_SET_VALUE);
-        WINERROR_CHECK_RETURN_HRESULT(err, L"%s", L"key.Create(Keyboard Layout\\Substitutes) failed");
+        WINERROR_CHECK_RETURN_HRESULT(err, L"key.Create(Keyboard Layout\\Substitutes) failed");
 
         err = key.SetStringValue(L"0000042a", L"00000409");
-        WINERROR_CHECK_RETURN_HRESULT(err, L"%s", L"key.SetStringValue failed");
+        WINERROR_CHECK_RETURN_HRESULT(err, L"key.SetStringValue failed");
     }
 
     hr = SetSettingsKeyAcl();
-    HRESULT_CHECK_RETURN(hr, L"%s", L"SetSettingsKeyAcl failed");
+    HRESULT_CHECK_RETURN(hr, L"SetSettingsKeyAcl failed");
 
     hr = InstallTip(true);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"InstallTip failed");
+    HRESULT_CHECK_RETURN(hr, L"InstallTip failed");
 
     CComPtr<ITfInputProcessorProfileMgr> profileMgr;
     hr = profileMgr.CoCreateInstance(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"profileMgr.CoCreateInstance failed");
+    HRESULT_CHECK_RETURN(hr, L"profileMgr.CoCreateInstance failed");
 
     hr = profileMgr->ActivateProfile(
         TF_PROFILETYPE_INPUTPROCESSOR,
@@ -295,12 +295,12 @@ extern "C" HRESULT __cdecl DeactivateProfiles() {
     LSTATUS err;
 
     hr = InstallTip(false);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"InstallTip failed");
+    HRESULT_CHECK_RETURN(hr, L"InstallTip failed");
 
     {
         CRegKey key;
         err = key.Create(HKEY_CURRENT_USER, L"Keyboard Layout\\Substitutes", nullptr, 0, KEY_SET_VALUE);
-        WINERROR_CHECK_RETURN_HRESULT(err, L"%s", L"key.Create(Keyboard Layout\\Substitutes) failed");
+        WINERROR_CHECK_RETURN_HRESULT(err, L"key.Create(Keyboard Layout\\Substitutes) failed");
         key.DeleteValue(L"0000042a");
     }
 
@@ -312,7 +312,7 @@ extern "C" HRESULT __cdecl IsProfileActivated() {
 
     CComPtr<ITfInputProcessorProfileMgr> profileMgr;
     hr = profileMgr.CoCreateInstance(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"profileMgr.CoCreateInstance failed");
+    HRESULT_CHECK_RETURN(hr, L"profileMgr.CoCreateInstance failed");
 
     TF_INPUTPROCESSORPROFILE profile;
     hr = profileMgr->GetProfile(
@@ -322,7 +322,7 @@ extern "C" HRESULT __cdecl IsProfileActivated() {
         VietType::Globals::GUID_Profile,
         NULL,
         &profile);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"profileMgr->GetProfile failed");
+    HRESULT_CHECK_RETURN(hr, L"profileMgr->GetProfile failed");
 
     return (profile.dwFlags & TF_IPP_FLAG_ENABLED) ? S_OK : S_FALSE;
 }

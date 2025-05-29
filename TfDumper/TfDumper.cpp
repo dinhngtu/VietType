@@ -126,11 +126,11 @@ static HRESULT EnumProfileMgr() {
 
     CComPtr<ITfInputProcessorProfileMgr> pm;
     hr = pm.CoCreateInstance(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER);
-    CHECK(hr, L"%s", L"pm.CoCreate");
+    CHECK(hr, L"pm.CoCreate");
 
     CComPtr<IEnumTfInputProcessorProfiles> profiles;
     hr = pm->EnumProfiles(0, &profiles);
-    CHECK(hr, L"%s", L"pm->EnumProfiles");
+    CHECK(hr, L"pm->EnumProfiles");
 
     TF_INPUTPROCESSORPROFILE p;
     while (1) {
@@ -154,11 +154,11 @@ static HRESULT EnumDefaultKeyboardLanguageProfiles() {
 
     CComPtr<ITfInputProcessorProfiles> profiles;
     hr = profiles.CoCreateInstance(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER);
-    CHECK(hr, L"%s", L"profiles.CoCreate");
+    CHECK(hr, L"profiles.CoCreate");
 
     LANGID curlangid;
     hr = profiles->GetCurrentLanguage(&curlangid);
-    CHECK(hr, L"%s", L"profiles->GetCurrentLanguage");
+    CHECK(hr, L"profiles->GetCurrentLanguage");
     wprintf(L"Current language: 0x%04x\n", curlangid);
 
     wprintf(L"Default keyboard language profiles:\n");
@@ -166,7 +166,7 @@ static HRESULT EnumDefaultKeyboardLanguageProfiles() {
     CComHeapPtr<LANGID> langids;
     ULONG numlangids;
     hr = profiles->GetLanguageList(&langids, &numlangids);
-    CHECK(hr, L"%s", L"profiles->GetLanguageList");
+    CHECK(hr, L"profiles->GetLanguageList");
 
     for (ULONG i = 0; i < numlangids; i++) {
         LANGID lid = (static_cast<LANGID*>(langids))[i];
@@ -174,7 +174,7 @@ static HRESULT EnumDefaultKeyboardLanguageProfiles() {
         CLSID clsid;
         GUID guidProfile;
         hr = profiles->GetDefaultLanguageProfile(lid, GUID_TFCAT_TIP_KEYBOARD, &clsid, &guidProfile);
-        CHECK(hr, L"%s", L"profiles->GetDefaultLanguageProfile");
+        CHECK(hr, L"profiles->GetDefaultLanguageProfile");
         if (hr == S_FALSE) {
             wprintf(L"no default\n");
         } else {
@@ -192,13 +192,13 @@ int main() {
     HRESULT hr;
 
     hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
-    CHECK(hr, L"%s", L"CoInitializeEx");
+    CHECK(hr, L"CoInitializeEx");
 
     hr = EnumProfileMgr();
-    CHECK(hr, L"%s", L"EnumProfileMgr");
+    CHECK(hr, L"EnumProfileMgr");
 
     hr = EnumDefaultKeyboardLanguageProfiles();
-    CHECK(hr, L"%s", L"EnumDefaultKeyboardLanguageProfiles");
+    CHECK(hr, L"EnumDefaultKeyboardLanguageProfiles");
 
     CoUninitialize();
 

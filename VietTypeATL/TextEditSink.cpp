@@ -9,7 +9,7 @@ namespace VietType {
 
 STDMETHODIMP TextEditSink::OnEndEdit(
     __RPC__in_opt ITfContext* pic, _In_ TfEditCookie ecReadOnly, __RPC__in_opt ITfEditRecord* pEditRecord) {
-    DBG_DPRINT(L"%s", L"");
+    DBG_DPRINT(L"");
 
     return S_OK;
 }
@@ -22,7 +22,7 @@ _Check_return_ HRESULT TextEditSink::Initialize(
     _controller = controller;
 
     hr = _textEditSinkAdvisor.Unadvise();
-    DBG_HRESULT_CHECK(hr, L"%s", L"_textEditSinkAdvisor.Unadvise failed");
+    DBG_HRESULT_CHECK(hr, L"_textEditSinkAdvisor.Unadvise failed");
 
     if (!documentMgr) {
         // caller just wanted to clear the previous sink
@@ -30,7 +30,7 @@ _Check_return_ HRESULT TextEditSink::Initialize(
     }
 
     hr = documentMgr->GetTop(&_editContext);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"documentMgr->GetTop failed");
+    HRESULT_CHECK_RETURN(hr, L"documentMgr->GetTop failed");
 
     if (!_editContext) {
         // empty document, no sink possible
@@ -39,10 +39,10 @@ _Check_return_ HRESULT TextEditSink::Initialize(
 
     CComPtr<ITfSource> source;
     hr = _editContext->QueryInterface(&source);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_editContext->QueryInterface failed");
+    HRESULT_CHECK_RETURN(hr, L"_editContext->QueryInterface failed");
 
     hr = _textEditSinkAdvisor.Advise(source, this);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_textEditSinkAdvisor.Advise failed");
+    HRESULT_CHECK_RETURN(hr, L"_textEditSinkAdvisor.Advise failed");
 
     return S_OK;
 }
@@ -51,7 +51,7 @@ HRESULT TextEditSink::Uninitialize() {
     HRESULT hr;
 
     hr = _textEditSinkAdvisor.Unadvise();
-    DBG_HRESULT_CHECK(hr, L"%s", L"_textEditSinkAdvisor.Unadvise failed");
+    DBG_HRESULT_CHECK(hr, L"_textEditSinkAdvisor.Unadvise failed");
 
     _editContext.Release();
 

@@ -18,12 +18,12 @@ using Menu = std::unique_ptr<std::remove_pointer_t<HMENU>, MenuDeleter>;
 
 static Menu GetMenu() {
     if (!Globals::DllInstance) {
-        DBG_DPRINT(L"%s", L"cannot obtain instance");
+        DBG_DPRINT(L"cannot obtain instance");
         return Menu();
     }
     HMENU menu = LoadMenu(Globals::DllInstance, MAKEINTRESOURCE(IDR_MENU_TRAY));
     if (!menu) {
-        WINERROR_PRINT(GetLastError(), L"%s", L"GetMenu failed");
+        WINERROR_PRINT(GetLastError(), L"GetMenu failed");
         return Menu();
     }
     return Menu(menu);
@@ -32,12 +32,12 @@ static Menu GetMenu() {
 static int PopMenu(POINT pt, const RECT* area) {
     auto menuSource = GetMenu();
     if (!menuSource) {
-        DBG_DPRINT(L"%s", L"load menu failed");
+        DBG_DPRINT(L"load menu failed");
         return 0;
     }
     auto trayMenu = GetSubMenu(menuSource.get(), 0);
     if (!trayMenu) {
-        DBG_DPRINT(L"%s", L"load tray menu failed");
+        DBG_DPRINT(L"load tray menu failed");
         return 0;
     }
     UINT flags = TPM_NONOTIFY | TPM_RETURNCMD;
@@ -62,7 +62,7 @@ static HRESULT CopyTfMenu(_In_ ITfMenu* menu) {
     for (int i = 0; i < GetMenuItemCount(trayMenu); i++) {
         MENUITEMINFO mii{.cbSize = sizeof(MENUITEMINFO), .fMask = MIIM_STRING};
         if (!GetMenuItemInfo(trayMenu, i, TRUE, &mii)) {
-            WINERROR_GLE_RETURN_HRESULT(L"%s", L"GetMenuItemInfo failed");
+            WINERROR_GLE_RETURN_HRESULT(L"GetMenuItemInfo failed");
         }
 
         std::vector<WCHAR> buf(mii.cch + 1);
@@ -73,7 +73,7 @@ static HRESULT CopyTfMenu(_In_ ITfMenu* menu) {
             .cch = mii.cch + 1,
         };
         if (!GetMenuItemInfo(trayMenu, i, TRUE, &mii)) {
-            WINERROR_GLE_RETURN_HRESULT(L"%s", L"GetMenuItemInfo failed");
+            WINERROR_GLE_RETURN_HRESULT(L"GetMenuItemInfo failed");
         }
 
         DWORD tfFlags = 0;
@@ -92,7 +92,7 @@ static HRESULT CopyTfMenu(_In_ ITfMenu* menu) {
 
 #pragma warning(suppress : 6387)
         hr = menu->AddMenuItem(mii.wID, tfFlags, NULL, NULL, &buf[0], static_cast<ULONG>(buf.size()), NULL);
-        DBG_HRESULT_CHECK(hr, L"%s", L"menu->AddMenuItem failed");
+        DBG_HRESULT_CHECK(hr, L"menu->AddMenuItem failed");
     }
 
     return S_OK;
@@ -224,7 +224,7 @@ STDMETHODIMP LanguageBarButton::OnMenuSelect(_In_ UINT wID) {
 STDMETHODIMP LanguageBarButton::GetIcon(__RPC__deref_out_opt HICON* phIcon) {
     // Windows docs is a liar, icons are mandatory
     if (!Globals::DllInstance) {
-        DBG_DPRINT(L"%s", L"cannot obtain instance");
+        DBG_DPRINT(L"cannot obtain instance");
         return E_FAIL;
     }
 
@@ -284,7 +284,7 @@ _Check_return_ HRESULT LanguageBarButton::Initialize(
     _description = description;
 
     hr = _langBarItemMgr->AddItem(this);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_langBarItemMgr->AddItem failed");
+    HRESULT_CHECK_RETURN(hr, L"_langBarItemMgr->AddItem failed");
 
     return S_OK;
 }
@@ -292,7 +292,7 @@ _Check_return_ HRESULT LanguageBarButton::Initialize(
 HRESULT LanguageBarButton::Uninitialize() {
     HRESULT hr;
     hr = _langBarItemMgr->RemoveItem(this);
-    DBG_HRESULT_CHECK(hr, L"%s", L"langBarItemMgr->RemoveItem failed");
+    DBG_HRESULT_CHECK(hr, L"langBarItemMgr->RemoveItem failed");
     _langBarItemMgr.Release();
     return S_OK;
 }
@@ -300,7 +300,7 @@ HRESULT LanguageBarButton::Uninitialize() {
 HRESULT LanguageBarButton::NotifyUpdate(_In_ DWORD flags) {
     if (_itemSink) {
         HRESULT hr = _itemSink->OnUpdate(flags);
-        HRESULT_CHECK_RETURN(hr, L"%s", L"_itemSink->OnUpdate failed");
+        HRESULT_CHECK_RETURN(hr, L"_itemSink->OnUpdate failed");
     }
 
     return S_OK;

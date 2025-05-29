@@ -65,19 +65,19 @@ public:
         Args... args) {
 
         if (compositionManager->_clientid == TF_CLIENTID_NULL || !context) {
-            DBG_DPRINT(L"%s", L"bad edit session request");
+            DBG_DPRINT(L"bad edit session request");
             return E_FAIL;
         }
         HRESULT hr;
 
         CComPtr<EditSession<CompositionManager*, ITfContext*, Args...>> session;
         hr = CreateInitialize(&session, callback, compositionManager, context, args...);
-        HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(&session) failed");
+        HRESULT_CHECK_RETURN(hr, L"CreateInitialize(&session) failed");
 
         HRESULT hrSession;
         hr = context->RequestEditSession(
             compositionManager->_clientid, session, TF_ES_ASYNCDONTCARE | TF_ES_READWRITE, &hrSession);
-        HRESULT_CHECK_RETURN(hr, L"%s", L"context->RequestEditSession failed");
+        HRESULT_CHECK_RETURN(hr, L"context->RequestEditSession failed");
 
         return S_OK;
     }
@@ -94,17 +94,17 @@ public:
         Args... args) {
 
         if (compositionManager->_clientid == TF_CLIENTID_NULL || !context) {
-            DBG_DPRINT(L"%s", L"bad edit session request");
+            DBG_DPRINT(L"bad edit session request");
             return E_FAIL;
         }
         HRESULT hr;
 
         CComPtr<EditSession<CompositionManager*, ITfContext*, Args...>> session;
         hr = CreateInitialize(&session, callback, compositionManager, context, args...);
-        HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(&session) failed");
+        HRESULT_CHECK_RETURN(hr, L"CreateInitialize(&session) failed");
 
         hr = context->RequestEditSession(compositionManager->_clientid, session, flags, hrSession);
-        HRESULT_CHECK_RETURN(hr, L"%s", L"context->RequestEditSession failed");
+        HRESULT_CHECK_RETURN(hr, L"context->RequestEditSession failed");
 
         return hr;
     }

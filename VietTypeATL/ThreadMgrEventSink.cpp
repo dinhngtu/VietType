@@ -43,10 +43,10 @@ STDMETHODIMP ThreadMgrEventSink::OnSetFocus(
 
     CComPtr<ITfContext> context;
     hr = _docMgrFocus->GetTop(&context);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"pdimFocus->GetTop failed");
+    HRESULT_CHECK_RETURN(hr, L"pdimFocus->GetTop failed");
 
     hr = OnNewContext(context, _compositionManager, _controller);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"OnNewContext failed");
+    HRESULT_CHECK_RETURN(hr, L"OnNewContext failed");
 
     return S_OK;
 }
@@ -71,11 +71,11 @@ _Check_return_ HRESULT ThreadMgrEventSink::Initialize(
     _controller = controller;
 
     hr = _threadMgrEventSinkAdvisor.Advise(threadMgr, this);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_threadMgrEventSinkAdvisor.Advise failed");
+    HRESULT_CHECK_RETURN(hr, L"_threadMgrEventSinkAdvisor.Advise failed");
 
     CComPtr<ITfDocumentMgr> documentMgr;
     hr = threadMgr->GetFocus(&documentMgr);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"threadMgr->GetFocus failed");
+    HRESULT_CHECK_RETURN(hr, L"threadMgr->GetFocus failed");
 
     return hr;
 }
@@ -84,7 +84,7 @@ HRESULT ThreadMgrEventSink::Uninitialize() {
     HRESULT hr;
 
     hr = _threadMgrEventSinkAdvisor.Unadvise();
-    DBG_HRESULT_CHECK(hr, L"%s", L"_threadMgrEventSinkAdvisor.Unadvise failed");
+    DBG_HRESULT_CHECK(hr, L"_threadMgrEventSinkAdvisor.Unadvise failed");
 
     _controller.Release();
     _compositionManager.Release();

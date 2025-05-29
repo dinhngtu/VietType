@@ -211,7 +211,7 @@ private:
     HRESULT CachingCallback() {
         T val;
         HRESULT hr = _dataCompartment.GetValue(&val);
-        HRESULT_CHECK_RETURN(hr, L"%s", L"_dataCompartment.GetValue failed");
+        HRESULT_CHECK_RETURN(hr, L"_dataCompartment.GetValue failed");
         if (hr == S_OK) {
             _cache = val;
         }

@@ -28,21 +28,21 @@ EngineController::Initialize(_In_ Telex::ITelexEngine* engine, _In_ ITfThreadMgr
     _clientid = clientid;
 
     hr = threadMgr->QueryInterface(&_langBarItemMgr);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"threadMgr->QueryInterface failed");
+    HRESULT_CHECK_RETURN(hr, L"threadMgr->QueryInterface failed");
 
     // init settings compartment & listener
     hr = CreateInitialize(&_settings, this, threadMgr, clientid);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"CreateInitialize(_settings) failed");
+    HRESULT_CHECK_RETURN(hr, L"CreateInitialize(_settings) failed");
     hr = CreateInitialize(
         &_systemNotify, threadMgr, clientid, GUID_SystemNotifyCompartment, true, [this] { return UpdateStates(true); });
-    DBG_HRESULT_CHECK(hr, L"%s", L"_systemNotify->Initialize failed");
+    DBG_HRESULT_CHECK(hr, L"_systemNotify->Initialize failed");
     // must cache defaultEnabled early since it's used right away
     _settings->IsDefaultEnabled(&_defaultEnabled);
 
     // GUID_SettingsCompartment_Toggle is global
     hr = CreateInitialize(
         &_enabled, threadMgr, clientid, GUID_SettingsCompartment_Toggle, true, [this] { return UpdateStates(false); });
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_enabled->Initialize failed");
+    HRESULT_CHECK_RETURN(hr, L"_enabled->Initialize failed");
 #ifdef _DEBUG
     long dbgEnabled = 0;
     HRESULT dbgHr = _enabled->GetValueDirect(&dbgEnabled);
@@ -52,10 +52,10 @@ EngineController::Initialize(_In_ Telex::ITelexEngine* engine, _In_ ITfThreadMgr
     this->_initialized = true;
 
     hr = InitLanguageBar();
-    HRESULT_CHECK_RETURN(hr, L"%s", L"InitLanguageBar failed");
+    HRESULT_CHECK_RETURN(hr, L"InitLanguageBar failed");
 
     hr = UpdateStates(true);
-    HRESULT_CHECK(hr, L"%s", L"UpdateStates failed");
+    HRESULT_CHECK(hr, L"UpdateStates failed");
 
     return S_OK;
 }
@@ -64,18 +64,18 @@ HRESULT EngineController::Uninitialize() {
     HRESULT hr;
 
     hr = _enabled->Uninitialize();
-    DBG_HRESULT_CHECK(hr, L"%s", L"_enabled->Uninitialize failed");
+    DBG_HRESULT_CHECK(hr, L"_enabled->Uninitialize failed");
     _enabled.Release();
 
     hr = _systemNotify->Uninitialize();
-    DBG_HRESULT_CHECK(hr, L"%s", L"_systemNotify->Uninitialize failed");
+    DBG_HRESULT_CHECK(hr, L"_systemNotify->Uninitialize failed");
     _systemNotify.Release();
     hr = _settings->Uninitialize();
-    DBG_HRESULT_CHECK(hr, L"%s", L"_settings->Uninitialize failed");
+    DBG_HRESULT_CHECK(hr, L"_settings->Uninitialize failed");
     _settings.Release();
 
     hr = UninitLanguageBar();
-    DBG_HRESULT_CHECK(hr, L"%s", L"UninitLanguageBar failed");
+    DBG_HRESULT_CHECK(hr, L"UninitLanguageBar failed");
 
     _langBarItemMgr.Release();
     _engine = nullptr;
@@ -103,7 +103,7 @@ _Check_return_ HRESULT EngineController::IsUserEnabled(_Out_ long* penabled) con
         DBG_DPRINT(L"resetting enabled from %ld to %ld", *penabled, _defaultEnabled);
         // _enabled may contain garbage value, reset if it's the case
         *penabled = _defaultEnabled == 0 ? 0 : -1;
-        DBG_HRESULT_CHECK(_enabled->SetValue(*penabled), L"%s", L"_enabled reset failed");
+        DBG_HRESULT_CHECK(_enabled->SetValue(*penabled), L"_enabled reset failed");
     }
     return hr;
 }
@@ -118,16 +118,16 @@ HRESULT EngineController::ToggleUserEnabled() {
 
     long enabled;
     hr = this->IsUserEnabled(&enabled);
-    HRESULT_CHECK(hr, L"%s", L"this->IsUserEnabled failed");
+    HRESULT_CHECK(hr, L"this->IsUserEnabled failed");
     if (FAILED(hr)) {
         enabled = false;
     }
 
     DBG_DPRINT(L"toggling enabled from %ld", enabled);
     hr = _enabled->SetValue(enabled == 0 ? -1 : 0);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_enabled->SetValue failed");
+    HRESULT_CHECK_RETURN(hr, L"_enabled->SetValue failed");
     hr = UpdateStates(true);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"UpdateEnabled failed");
+    HRESULT_CHECK_RETURN(hr, L"UpdateEnabled failed");
 
     return S_OK;
 }
@@ -135,7 +135,7 @@ HRESULT EngineController::ToggleUserEnabled() {
 long EngineController::IsEnabled() const {
     long enabled;
     HRESULT hr = this->IsUserEnabled(&enabled);
-    HRESULT_CHECK(hr, L"%s", L"this->IsUserEnabled failed");
+    HRESULT_CHECK(hr, L"this->IsUserEnabled failed");
     return !!enabled && _blocked == BlockedKind::Free;
 }
 
@@ -155,7 +155,7 @@ EngineSettingsController* EngineController::GetSettings() const {
 HRESULT EngineController::UpdateStates(bool foreground) {
     HRESULT hr;
 
-    DBG_DPRINT(L"%s", L"called");
+    DBG_DPRINT(L"called");
 
     if (!this->_initialized) {
         return S_FALSE;
@@ -163,7 +163,7 @@ HRESULT EngineController::UpdateStates(bool foreground) {
 
     long enabled;
     hr = this->IsUserEnabled(&enabled);
-    DBG_HRESULT_CHECK(hr, L"%s", L"this->IsUserEnabled failed");
+    DBG_HRESULT_CHECK(hr, L"this->IsUserEnabled failed");
 
     DBG_DPRINT(L"enabled = %ld, blocked = %d", enabled, static_cast<int>(_blocked));
 
@@ -173,15 +173,15 @@ HRESULT EngineController::UpdateStates(bool foreground) {
 
         Telex::TelexConfig cfg = GetEngine().GetConfig();
         hr = _settings->LoadTelexSettings(cfg);
-        DBG_HRESULT_CHECK(hr, L"%s", L"_settings->LoadSettings failed") else {
+        DBG_HRESULT_CHECK(hr, L"_settings->LoadSettings failed") else {
             GetEngine().SetConfig(cfg);
         }
     }
 
     hr = _indicatorButton->Refresh();
-    DBG_HRESULT_CHECK(hr, L"%s", L"_indicatorButton->Refresh failed");
+    DBG_HRESULT_CHECK(hr, L"_indicatorButton->Refresh failed");
     hr = _langBarButton->Refresh();
-    DBG_HRESULT_CHECK(hr, L"%s", L"_langBarButton->Refresh failed");
+    DBG_HRESULT_CHECK(hr, L"_langBarButton->Refresh failed");
 
     return S_OK;
 }
@@ -197,7 +197,7 @@ _Check_return_ HRESULT EngineController::InitLanguageBar() {
         TF_LBI_STYLE_BTN_BUTTON | TF_LBI_STYLE_SHOWNINTRAY,
         0,
         Globals::TextServiceDescription);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_indicatorButton->Initialize failed");
+    HRESULT_CHECK_RETURN(hr, L"_indicatorButton->Initialize failed");
 
     hr = CreateInitialize(
         &_langBarButton,
@@ -207,7 +207,7 @@ _Check_return_ HRESULT EngineController::InitLanguageBar() {
         TF_LBI_STYLE_BTN_BUTTON | TF_LBI_STYLE_BTN_MENU | TF_LBI_STYLE_SHOWNINTRAY,
         0,
         Globals::TextServiceDescription);
-    HRESULT_CHECK_RETURN(hr, L"%s", L"_langBarButton->Initialize failed");
+    HRESULT_CHECK_RETURN(hr, L"_langBarButton->Initialize failed");
 
     return S_OK;
 }

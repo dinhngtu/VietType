@@ -35,14 +35,14 @@ HRESULT EditBlocked(
 
     Compartment<long> compDisabled;
     hr = compDisabled.Initialize(context, compositionManager->GetClientId(), GUID_COMPARTMENT_KEYBOARD_DISABLED);
-    EB_HRESULT_CHECK_COMMIT(hr, controller, L"%s", L"compDisabled.Initialize failed");
+    EB_HRESULT_CHECK_COMMIT(hr, controller, L"compDisabled.Initialize failed");
 
     long contextDisabled;
     hr = compDisabled.GetValue(&contextDisabled);
-    EB_HRESULT_CHECK_COMMIT(hr, controller, L"%s", L"compDisabled.GetValue failed");
+    EB_HRESULT_CHECK_COMMIT(hr, controller, L"compDisabled.GetValue failed");
 
     if (hr == S_OK && contextDisabled) {
-        DBG_DPRINT(L"%s", L"scopeBlocked: context disabled");
+        DBG_DPRINT(L"scopeBlocked: context disabled");
         controller->SetBlocked(BlockedKind::Blocked);
         return S_OK;
     }
@@ -51,10 +51,10 @@ HRESULT EditBlocked(
 
     TF_STATUS st;
     hr = context->GetStatus(&st);
-    EB_HRESULT_CHECK_COMMIT(hr, controller, L"%s", L"context->GetStatus failed");
+    EB_HRESULT_CHECK_COMMIT(hr, controller, L"context->GetStatus failed");
     if (st.dwStaticFlags & TF_SS_TRANSITORY) {
         // transitory context doesn't seem to support input scopes, free right away
-        DBG_DPRINT(L"%s", L"free: transitory context");
+        DBG_DPRINT(L"free: transitory context");
         controller->SetBlocked(BlockedKind::Free);
         return S_OK;
     }
@@ -63,10 +63,10 @@ HRESULT EditBlocked(
 
     CComPtr<ITfReadOnlyProperty> prop;
     hr = context->GetAppProperty(Globals::GUID_PROP_INPUTSCOPE, &prop);
-    EB_HRESULT_CHECK_COMMIT(hr, controller, L"%s", L"context->GetAppProperty failed");
+    EB_HRESULT_CHECK_COMMIT(hr, controller, L"context->GetAppProperty failed");
 
     if (!prop) {
-        DBG_DPRINT(L"%s", L"GUID_PROP_INPUTSCOPE prop is null, blocking");
+        DBG_DPRINT(L"GUID_PROP_INPUTSCOPE prop is null, blocking");
         controller->SetBlocked(BlockedKind::Blocked);
         return S_OK;
     }
@@ -74,14 +74,14 @@ HRESULT EditBlocked(
     TF_SELECTION sel;
     ULONG fetched;
     hr = context->GetSelection(ec, TF_DEFAULT_SELECTION, 1, &sel, &fetched);
-    EB_HRESULT_CHECK_COMMIT(hr, controller, L"%s", L"context->GetSelection failed");
+    EB_HRESULT_CHECK_COMMIT(hr, controller, L"context->GetSelection failed");
 
     CComPtr<ITfRange> range;
     range.Attach(sel.range);
 
     CComVariant var;
     hr = prop->GetValue(ec, range, &var);
-    EB_HRESULT_CHECK_COMMIT(hr, controller, L"%s", L"prop->GetValue failed");
+    EB_HRESULT_CHECK_COMMIT(hr, controller, L"prop->GetValue failed");
 
     if (var.vt != VT_UNKNOWN) {
         hr = E_NOINTERFACE;
@@ -90,12 +90,12 @@ HRESULT EditBlocked(
 
     CComPtr<ITfInputScope> iis;
     hr = var.punkVal->QueryInterface(&iis);
-    EB_HRESULT_CHECK_COMMIT(hr, controller, L"%s", L"var.punkVal->QueryInterface failed");
+    EB_HRESULT_CHECK_COMMIT(hr, controller, L"var.punkVal->QueryInterface failed");
 
     CComHeapPtr<InputScope> pscopes;
     UINT scount;
     hr = iis->GetInputScopes(&pscopes, &scount);
-    EB_HRESULT_CHECK_COMMIT(hr, controller, L"%s", L"iis->GetInputScopes failed");
+    EB_HRESULT_CHECK_COMMIT(hr, controller, L"iis->GetInputScopes failed");
 
     BlockedKind scopeBlocked;
     InputScope* scopes = pscopes;
