@@ -12,10 +12,10 @@ namespace EditSessions {
 // workaround for annoying IntelliSense error when the full enum name is used in a macro
 using BlockedKind = EngineController::BlockedKind;
 
-#define EB_HRESULT_CHECK_COMMIT(hr, controller, fmt, msg)                                                              \
+#define EB_HRESULT_CHECK_COMMIT(hr, controller, fmt, ...)                                                              \
     do {                                                                                                               \
         if (FAILED(hr)) {                                                                                              \
-            DPRINT(L"HRESULT error %lx: " fmt, hr, msg);                                                               \
+            DPRINT(L"HRESULT error %lx: " fmt, hr, __VA_ARGS__);                                                       \
             controller->SetBlocked(BlockedKind::Free);                                                                 \
             return hr;                                                                                                 \
         }                                                                                                              \
