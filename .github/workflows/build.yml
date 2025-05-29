@@ -4,8 +4,7 @@ on:
   release:
     types: [published]
   push:
-    branches:
-      - master
+  workflow_dispatch:
 
 env:
   SOLUTION_FILE_PATH: .

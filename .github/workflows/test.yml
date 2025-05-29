@@ -2,15 +2,13 @@ name: test
 
 on:
   push:
-    branches:
-      - master
 
 env:
   SOLUTION_FILE_PATH: .
 
 jobs:
   test:
-    runs-on: ${{matrix.platform == "ARM64EC" && "windows-11-arm" || "windows-latest"}}
+    runs-on: "${{matrix.platform == 'ARM64EC' && 'windows-11-arm' || 'windows-latest'}}"
     strategy:
       matrix:
         configuration:
@@ -38,4 +36,4 @@ jobs:
         run: msbuild.exe -m -target:VietTypeUnitTests:Rebuild -p:Configuration=${{matrix.configuration}} -p:Platform=${{matrix.platform}} .
 
       - name: Run tests
-        run: ${{matrix.platform == "ARM64EC" && "vstest.console.arm64.exe" || "vstest.console.exe"}} ${{matrix.platform}}/${{matrix.configuration}}/VietTypeUnitTests.dll
+        run: ${{matrix.platform == 'ARM64EC' && 'vstest.console.arm64.exe' || 'vstest.console.exe'}} ${{matrix.platform}}/${{matrix.configuration}}/VietTypeUnitTests.dll
