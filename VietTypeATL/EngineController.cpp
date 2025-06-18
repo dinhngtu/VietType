@@ -67,6 +67,12 @@ EngineController::Initialize(_In_ Telex::ITelexEngine* engine, _In_ ITfThreadMgr
 HRESULT EngineController::Uninitialize() {
     HRESULT hr;
 
+    this->_initialized = false;
+
+    hr = _openclose->Uninitialize();
+    DBG_HRESULT_CHECK(hr, L"_openclose->Uninitialize failed");
+    _openclose.Release();
+
     hr = _enabled->Uninitialize();
     DBG_HRESULT_CHECK(hr, L"_enabled->Uninitialize failed");
     _enabled.Release();
