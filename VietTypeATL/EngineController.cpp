@@ -49,6 +49,10 @@ EngineController::Initialize(_In_ Telex::ITelexEngine* engine, _In_ ITfThreadMgr
     DBG_DPRINT(L"dbgHr %ld dbgEnabled %ld", dbgHr, dbgEnabled);
 #endif // _DEBUG
 
+    hr = CreateInitialize(
+        &_openclose, threadMgr, clientid, GUID_COMPARTMENT_KEYBOARD_OPENCLOSE, false, [this] { return OnOpenClose(); });
+    HRESULT_CHECK_RETURN(hr, L"_openclose->Initialize failed");
+
     this->_initialized = true;
 
     hr = InitLanguageBar();
@@ -132,6 +136,32 @@ HRESULT EngineController::ToggleUserEnabled() {
     return S_OK;
 }
 
+HRESULT EngineController::OnOpenClose() {
+    HRESULT hr;
+
+    if (!this->_initialized) {
+        return S_FALSE;
+    }
+
+    long enabled;
+    hr = this->IsUserEnabled(&enabled);
+    DBG_HRESULT_CHECK(hr, L"this->IsUserEnabled failed");
+
+    long openclose;
+    hr = _openclose->GetValue(&openclose);
+    HRESULT_CHECK_RETURN(hr, L"_openclose->GetValue failed");
+
+    if (!!enabled != !!openclose) {
+        hr = _enabled->SetValue(openclose ? 0 : -1);
+        HRESULT_CHECK_RETURN(hr, L"_enabled->SetValue failed");
+
+        hr = UpdateStates(false);
+        HRESULT_CHECK_RETURN(hr, L"UpdateEnabled failed");
+    }
+
+    return S_OK;
+}
+
 long EngineController::IsEnabled() const {
     long enabled;
     HRESULT hr = this->IsUserEnabled(&enabled);
@@ -168,6 +198,9 @@ HRESULT EngineController::UpdateStates(bool foreground) {
     DBG_DPRINT(L"enabled = %ld, blocked = %d", enabled, static_cast<int>(_blocked));
 
     if (foreground) {
+        hr = _openclose->SetValue(!!enabled);
+        DBG_HRESULT_CHECK(hr, L"_openclose->SetValue failed");
+
         _settings->IsDefaultEnabled(&_defaultEnabled);
         _settings->IsBackconvertOnBackspace(&_backconvertOnBackspace);
 

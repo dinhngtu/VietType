@@ -49,6 +49,7 @@ public:
 
     _Check_return_ HRESULT IsUserEnabled(_Out_ long* penabled) const;
     HRESULT ToggleUserEnabled();
+    HRESULT OnOpenClose();
 
     // effective enabled status, from the combination of user setting and blocked state
     long IsEnabled() const;
@@ -73,6 +74,7 @@ private:
     TfClientId _clientid = TF_CLIENTID_NULL;
 
     CComPtr<CachedCompartmentSetting<long>> _enabled;
+    CComPtr<CachedCompartmentSetting<long>> _openclose;
 
     CComPtr<LanguageBarButton> _indicatorButton;
     CComPtr<LanguageBarButton> _langBarButton;
