@@ -40,6 +40,7 @@ STDMETHODIMP KeyEventSink::OnSetFocus(_In_ BOOL fForeground) {
     hr = _threadMgr->GetFocus(&docMgr);
     if (FAILED(hr)) {
         // we don't care about the error since there might be no focused document manager
+        _controller->SetBlocked(EngineController::BlockedKind::Blocked);
         return S_OK;
     }
 
@@ -51,6 +52,7 @@ STDMETHODIMP KeyEventSink::OnSetFocus(_In_ BOOL fForeground) {
     CComPtr<ITfContext> context;
     hr = docMgr->GetTop(&context);
     if (FAILED(hr)) {
+        _controller->SetBlocked(EngineController::BlockedKind::Blocked);
         return S_OK;
     }
 
