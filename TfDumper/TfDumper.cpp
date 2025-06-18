@@ -1,11 +1,9 @@
 // SPDX-FileCopyrightText: Copyright (c) 2018 Dinh Ngoc Tu
 // SPDX-License-Identifier: GPL-3.0-only
 
-// TfDumper.cpp : Defines the entry point for the console application.
-//
-
 #include "stdafx.h"
 #include "Common.h"
+#include "Compartment.h"
 
 #define CHECK(hr, fmt, ...)                                                                                            \
     if (FAILED(hr)) {                                                                                                  \
@@ -188,17 +186,101 @@ static HRESULT EnumDefaultKeyboardLanguageProfiles() {
     return S_OK;
 }
 
-int main() {
+enum TfDumperModes {
+    DefaultMode,
+    ProfileMode,
+    ImmStatusMode,
+};
+
+static HRESULT doit_immstatus() {
+    HRESULT hr = S_OK;
+    HWND hwnd = NULL;
+    LRESULT status;
+
+    hwnd = ImmGetDefaultIMEWnd(GetForegroundWindow());
+    if (hwnd == NULL) {
+        hr = E_FAIL;
+        wprintf(L"ImmGetDefaultIMEWnd\n");
+        goto fail;
+    }
+
+    status = SendMessage(hwnd, WM_IME_CONTROL, 5 /* IMC_GETOPENSTATUS */, 0);
+    wprintf(L"openstatus %llx\n", status);
+
+    status = SendMessage(hwnd, WM_IME_CONTROL, 1 /* IMC_GETCONVERSIONMODE */, 0);
+    wprintf(L"conversionmode %llx\n", status);
+    if (status & IME_CMODE_NATIVE)
+        wprintf(L"IME_CMODE_NATIVE\n");
+    if (status & IME_CMODE_KATAKANA)
+        wprintf(L"IME_CMODE_KATAKANA\n");
+    if (status & IME_CMODE_FULLSHAPE)
+        wprintf(L"IME_CMODE_FULLSHAPE\n");
+    if (status & IME_CMODE_ROMAN)
+        wprintf(L"IME_CMODE_ROMAN\n");
+    if (status & IME_CMODE_CHARCODE)
+        wprintf(L"IME_CMODE_CHARCODE\n");
+    if (status & IME_CMODE_HANJACONVERT)
+        wprintf(L"IME_CMODE_HANJACONVERT\n");
+    if (status & IME_CMODE_NATIVESYMBOL)
+        wprintf(L"IME_CMODE_NATIVESYMBOL\n");
+    if (status & IME_CMODE_NOCONVERSION)
+        wprintf(L"IME_CMODE_NOCONVERSION\n");
+    if (status & IME_CMODE_EUDC)
+        wprintf(L"IME_CMODE_EUDC\n");
+    if (status & IME_CMODE_SYMBOL)
+        wprintf(L"IME_CMODE_SYMBOL\n");
+    if (status & IME_CMODE_FIXED)
+        wprintf(L"IME_CMODE_FIXED\n");
+
+    return S_OK;
+
+fail:
+    return hr;
+}
+
+static HRESULT doit(int mode) {
+    HRESULT hr = S_OK;
+
+    switch (mode) {
+    case ProfileMode:
+        hr = EnumProfileMgr();
+        CHECK(hr, L"EnumProfileMgr");
+
+        hr = EnumDefaultKeyboardLanguageProfiles();
+        CHECK(hr, L"EnumDefaultKeyboardLanguageProfiles");
+
+        break;
+
+    case ImmStatusMode:
+        hr = doit_immstatus();
+        CHECK(hr, L"doit_immstatus");
+        break;
+
+    default:
+        hr = E_FAIL;
+        CHECK(hr, L"Specify a mode\n");
+        break;
+    }
+
+    return hr;
+}
+
+int wmain(int argc, wchar_t** argv) {
     HRESULT hr;
+    int mode = DefaultMode;
+
+    for (int i = 1; i < argc; i++) {
+        if (!_wcsicmp(argv[i], L"profile"))
+            mode = ProfileMode;
+        else if (!_wcsicmp(argv[i], L"immstatus"))
+            mode = ImmStatusMode;
+    }
 
     hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
     CHECK(hr, L"CoInitializeEx");
 
-    hr = EnumProfileMgr();
-    CHECK(hr, L"EnumProfileMgr");
-
-    hr = EnumDefaultKeyboardLanguageProfiles();
-    CHECK(hr, L"EnumDefaultKeyboardLanguageProfiles");
+    hr = doit(mode);
+    CHECK(hr, L"doit %d", mode);
 
     CoUninitialize();
 
