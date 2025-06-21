@@ -12,6 +12,7 @@ on:
       - 'TfDumper/**'
       - 'WordLister/**'
       - 'data/**'
+      - 'docs/**'
   pull_request:
     branches:
       - master
