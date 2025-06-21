@@ -1,15 +1,15 @@
 Tự sửa từ và tối ưu gõ nhiều ngôn ngữ
 =====================================
 
-Xem [`TelexEngine.cpp`](Telex/TelexEngine.cpp) để biết logic cụ thể của 2 tính năng này.
+Xem [`TelexEngine.cpp`](/Telex/TelexEngine.cpp) để biết logic cụ thể của 2 tính năng này.
 
 Tự sửa từ
 ---------
 
-- (Telex) "wu" = "ư"
+- (Telex) "wu" = "ưu"
 - (Telex) "wo" = "ơ" (khi có phụ âm đầu)
 - (Telex) "wuo" = "ươ"
-- "ie" + dấu = "iê" (khi có phụ âm đầu/cuối)
+- "ie" + dấu sắc/nặng = "iê" (khi có phụ âm đầu+cuối)
 - "ah"/"êh" + dấu sắc/nặng = "ach"/"êch"
 - "ah"/"êh" + không dấu = "anh"/"ênh" (Optimize=0)
 - "gn" = "ng"
