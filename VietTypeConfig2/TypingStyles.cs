@@ -5,5 +5,6 @@ namespace VietTypeConfig2 {
     internal enum TypingStyles {
         Telex = 0,
         Vni = 1,
+        TelexComplicated = 2,
     }
 }
