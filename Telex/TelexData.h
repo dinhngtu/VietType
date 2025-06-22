@@ -1482,11 +1482,19 @@ const std::array<const TypingStyle, static_cast<size_t>(TypingStyles::Max)> typi
             },
         .transitions = transitions_telex,
         .backconversions = backconversions_telex,
-        .charlist = L"abcdefghijklmnopqrstuvwxyz",
+        .charlist = L"[]abcdefghijklmnopqrstuvwxyz{}",
         .max_optimize = 3,
         .is_telex = true,
     },
 };
+debug_ensure(std::all_of(typing_styles.begin(), typing_styles.end(), [](const auto& x) {
+    for (int i = 0; i < std::size(x.chartypes); i++) {
+        if (x.chartypes[i] != CharTypes::Uncategorized && x.charlist.find((wchar_t)i) == std::wstring_view::npos)
+            return false;
+    }
+    // charlist might be more liberal than chartypes so we don't test the converse
+    return true;
+}));
 
 #pragma endregion
 
