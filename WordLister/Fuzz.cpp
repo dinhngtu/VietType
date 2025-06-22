@@ -8,35 +8,40 @@
 
 using namespace VietType::Telex;
 
-static void DoFuzz(int len, wchar_t start = 0) {
+static constexpr const int skip = 4;
+static constexpr const std::wstring_view table = L"abcdefghijklmnopqrstuvwxyzACDEFGHJKLMNOPQRSTUVWXYZ0123456789[]{}";
+
+static void DoFuzz(int len, int start = 0, int end = table.size()) {
     for (int level = 0; level <= 3; level++) {
         for (int autocorrect = 0; autocorrect <= 1; autocorrect++) {
-            wprintf(L"len %d level %d autocorrect %d\n", len, level, autocorrect);
-            TelexConfig config;
-            config.optimize_multilang = level;
-            config.autocorrect = !!autocorrect;
-            TelexEngine e(config);
-            size_t max = 1;
-            for (auto i = start ? 1 : 0; i < len; i++) {
-                max *= 26;
-            }
-            for (size_t i = 0; i < max; i++) {
-                std::wstring word(len, start ? start : L'a');
-                size_t cur = i;
-                for (auto j = start ? 1 : 0; j < len; j++) {
-                    word[j] = L'a' + cur % 26;
-                    cur /= 26;
-                }
-                e.Reset();
-                for (auto c : word) {
-                    e.PushChar(c);
-                }
-                if (!e.CheckInvariants()) {
-                    wprintf(L"word failed: %s\n", word.c_str());
-                }
-                e.Commit();
-                if (!e.CheckInvariants()) {
-                    wprintf(L"word failed commit: %s\n", word.c_str());
+            for (int style = 0; style < (int)TypingStyles::Max; style++) {
+                wprintf(L"len %d level %d autocorrect %d\n", len, level, autocorrect);
+                TelexConfig config;
+                config.optimize_multilang = level;
+                config.autocorrect = !!autocorrect;
+                config.typing_style = (TypingStyles)style;
+                TelexEngine e(config);
+                for (int prefix = start; prefix < end; prefix++) {
+                    size_t max = 1;
+                    for (auto i = 1; i < len; i++) {
+                        max *= table.size();
+                    }
+                    for (size_t i = 0; i < max; i++) {
+                        e.Reset();
+                        size_t cur = i;
+                        e.PushChar(table[prefix]);
+                        for (auto j = 1; j < len; j++) {
+                            e.PushChar(table[cur % table.size()]);
+                            cur /= table.size();
+                        }
+                        if (!e.CheckInvariants()) {
+                            wprintf(L"word failed: %s\n", e.RetrieveRaw().c_str());
+                        }
+                        e.Commit();
+                        if (!e.CheckInvariants()) {
+                            wprintf(L"word failed commit: %s\n", e.RetrieveRaw().c_str());
+                        }
+                    }
                 }
             }
         }
@@ -44,21 +49,19 @@ static void DoFuzz(int len, wchar_t start = 0) {
 }
 
 static void DoFuzzThreaded(int len) {
-    std::vector<std::thread> workers;
-    for (wchar_t i = L'a'; i <= L'z'; i++) {
-        workers.emplace_back(DoFuzz, len, i);
+    std::vector<std::jthread> workers;
+    for (int i = 0; i < table.size(); i += skip) {
+        workers.emplace_back(DoFuzz, len, i, std::min(i + skip, (int)table.size()));
     }
-    for (auto& w : workers)
-        w.join();
 }
 
 bool fuzz() {
     SetPriorityClass(GetCurrentProcess(), IDLE_PRIORITY_CLASS);
     SetThreadExecutionState(ES_SYSTEM_REQUIRED | ES_CONTINUOUS);
-    for (auto len = 1; len <= 4; len++) {
+    for (auto len = 1; len <= 3; len++) {
         DoFuzz(len);
     }
-    for (auto len = 5; len <= 7; len++) {
+    for (auto len = 4; len <= 7; len++) {
         DoFuzzThreaded(len);
     }
     return true;
