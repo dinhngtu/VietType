@@ -1203,6 +1203,7 @@ const std::array<const TypingStyle, static_cast<size_t>(TypingStyles::Max)> typi
         .backconversions = backconversions_telex,
         .charlist = L"abcdefghijklmnopqrstuvwxyz",
         .max_optimize = 3,
+        .is_telex = true,
     },
 
     // vni
@@ -1342,6 +1343,147 @@ const std::array<const TypingStyle, static_cast<size_t>(TypingStyles::Max)> typi
         .backconversions = backconversions_vni,
         .charlist = L"0123456789abcdefghijklmnopqrstuvwxyz",
         .max_optimize = 0,
+        .is_telex = false,
+    },
+
+    // complicated telex
+    TypingStyle{
+        .chartypes =
+            {
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::UW,            // [
+                CharTypes::Uncategorized, //
+                CharTypes::OW,            // ]
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+                CharTypes::Vowel | CharTypes::Transition,                         // a
+                CharTypes::ConsoC1,                                               // b
+                CharTypes::ConsoC1 | CharTypes::ConsoC2,                          // c
+                CharTypes::ConsoC1 | CharTypes::ConsoContinue | CharTypes::Dd,    // d
+                CharTypes::Vowel | CharTypes::Transition,                         // e
+                CharTypes::ToneF,                                                 // f
+                CharTypes::ConsoC1 | CharTypes::ConsoContinue,                    // g
+                CharTypes::ConsoC1 | CharTypes::ConsoContinue,                    // h
+                CharTypes::Vowel | CharTypes::Transition,                         // i
+                CharTypes::ToneJ,                                                 // j
+                CharTypes::ConsoC1,                                               // k
+                CharTypes::ConsoC1,                                               // l
+                CharTypes::ConsoC1 | CharTypes::ConsoC2,                          // m
+                CharTypes::ConsoC1 | CharTypes::ConsoC2,                          // n
+                CharTypes::Vowel | CharTypes::Transition,                         // o
+                CharTypes::ConsoC1 | CharTypes::ConsoC2,                          // p
+                CharTypes::ConsoC1,                                               // q
+                CharTypes::ToneR | CharTypes::ConsoC1 | CharTypes::ConsoContinue, // r
+                CharTypes::ToneS | CharTypes::ConsoC1 | CharTypes::ConsoContinue, // s
+                CharTypes::ConsoC1 | CharTypes::ConsoC2,                          // t
+                CharTypes::Vowel | CharTypes::Transition,                         // u
+                CharTypes::ConsoC1,                                               // v
+                CharTypes::LeadingW | CharTypes::W | CharTypes::WA,               // w
+                CharTypes::ToneX | CharTypes::ConsoC1,                            // x
+                CharTypes::Vowel | CharTypes::Transition,                         // y
+                CharTypes::ToneZ,                                                 // z
+                CharTypes::UW,                                                    // {
+                CharTypes::Uncategorized,                                         //
+                CharTypes::OW,                                                    // }
+                CharTypes::Uncategorized,
+                CharTypes::Uncategorized,
+            },
+        .transitions = transitions_telex,
+        .backconversions = backconversions_telex,
+        .charlist = L"abcdefghijklmnopqrstuvwxyz",
+        .max_optimize = 3,
+        .is_telex = true,
     },
 };
 

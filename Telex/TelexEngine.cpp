@@ -304,13 +304,20 @@ TelexStates TelexEngine::PushChar(wchar_t corig) {
     } else if (_v.empty() && _c2.empty() && _c1 != L"gi" && IS(cat, CharTypes::ConsoContinue)) {
         FeedNewResultChar(_c1, c, ccase);
 
-    } else if (IS(cat, CharTypes::Vowel | CharTypes::Transition)) {
+    } else if (IS(cat, CharTypes::Vowel | CharTypes::Transition | CharTypes::UW | CharTypes::OW)) {
         // relaxed vowel position constraint: _c2.empty()
+        if (IS(cat, CharTypes::UW)) {
+            ccase = c != L'[';
+            c = L'\x1b0';
+        } else if (IS(cat, CharTypes::OW)) {
+            ccase = c != L']';
+            c = L'\x1a1';
+        }
         _v.push_back(c);
         auto before = _v.size();
         // HACK: single special case for "khongoo"
         // note that _v here is post-append but pre-transition
-        if (!_c2.empty() && _config.typing_style == TypingStyles::Telex && c == L'o' && _v == L"\xf4o") {
+        if (!_c2.empty() && GetTypingStyle()->is_telex && c == L'o' && _v == L"\xf4o") {
             Invalidate();
         } else if (TransitionV(GetTypingStyle()->transitions)) {
             auto after = _v.size();
@@ -345,13 +352,20 @@ TelexStates TelexEngine::PushChar(wchar_t corig) {
                 // e.g. 'cace'
                 _state = TelexStates::Invalid;
             }
+        } else if (IS(cat, CharTypes::UW | CharTypes::OW)) {
+            _cases.push_back(ccase);
+            _respos.push_back(_respos_current++);
         } else {
             _v.pop_back();
             InvalidateAndPopBack(c);
         }
 
-    } else if (IS(cat, CharTypes::W | CharTypes::WA)) {
-        if (!_v.empty()) {
+    } else if (IS(cat, CharTypes::W | CharTypes::WA | CharTypes::LeadingW)) {
+        if (_c1.empty() && IS(cat, CharTypes::LeadingW)) {
+            _v.push_back(L'\x1b0');
+            _cases.push_back(ccase);
+            _respos.push_back(_respos_current++);
+        } else if (!_v.empty()) {
             bool vw_transitioned = false;
             if (IS(cat, CharTypes::W)) {
                 vw_transitioned = TransitionV(_c1 == L"q" ? transitions_w_q : transitions_w, true);
@@ -370,7 +384,7 @@ TelexStates TelexEngine::PushChar(wchar_t corig) {
             }
             // 'w' always keeps V size constant, don't push case
         } else if (
-            _config.typing_style == TypingStyles::Telex && _config.autocorrect && !_toneCount &&
+            GetTypingStyle()->is_telex && _config.autocorrect && !_toneCount &&
             (!_c1.empty() || GetOptimizeLevel() == 0)) {
             // at >=1 optimization, autocorrecting "nwuocs" is desirable but "wuocs" not
             FeedNewResultChar(_v, c, ccase, ResposAutocorrect);
@@ -553,7 +567,7 @@ TelexStates TelexEngine::DoOptimizeAndAutocorrect() {
     if (_config.autocorrect && !_backconverted && _toneCount < 2) {
         // fixing respos might not be necessary here but fixing cases is
         // HACK
-        if (_config.typing_style == TypingStyles::Telex) {
+        if (GetTypingStyle()->is_telex) {
             if (_v == L"wu") {
                 _v = L"\x1b0u";
                 _autocorrected = true;
@@ -725,7 +739,7 @@ TelexStates TelexEngine::Backconvert(const std::wstring& s) {
     bool failed = false;
     for (auto c : s) {
         // for emulating double key outcomes ("xoong")
-        auto double_flag = _config.typing_style == TypingStyles::Telex && _c2.empty() && (_v == L"e" || _v == L"o");
+        auto double_flag = GetTypingStyle()->is_telex && _c2.empty() && (_v == L"e" || _v == L"o");
         auto clow = ToLower(c);
         auto cat = ClassifyCharacter(clow);
         if (cat != CharTypes::Uncategorized) {

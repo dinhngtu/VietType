@@ -34,6 +34,7 @@ enum class TelexStates {
 enum class TypingStyles : unsigned int {
     Telex,
     Vni,
+    TelexComplicated,
     Max,
 };
 

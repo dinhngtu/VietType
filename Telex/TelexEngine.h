@@ -74,6 +74,9 @@ enum class CharTypes : unsigned int {
     WA = 1 << 5,
     Dd = 1 << 6,
     Transition = 1 << 7,
+    UW = 1 << 8,
+    OW = 1 << 9,
+    LeadingW = 1 << 10,
     // tones
     ToneZ = 1 << 16,
     ToneS = 1 << 17,
@@ -97,7 +100,8 @@ struct TypingStyle {
     ArrayMap<std::wstring_view, std::wstring_view, true> transitions;
     ArrayMap<wchar_t, std::wstring_view, true> backconversions;
     const std::wstring_view charlist;
-    unsigned long max_optimize = 0;
+    unsigned long max_optimize;
+    bool is_telex;
 };
 
 class TelexEngine : public ITelexEngine {
