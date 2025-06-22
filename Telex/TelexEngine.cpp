@@ -304,8 +304,7 @@ TelexStates TelexEngine::PushChar(wchar_t corig) {
     } else if (_v.empty() && _c2.empty() && _c1 != L"gi" && IS(cat, CharTypes::ConsoContinue)) {
         FeedNewResultChar(_c1, c, ccase);
 
-    } else if (IS(cat, CharTypes::Vowel | CharTypes::Transition | CharTypes::UW | CharTypes::OW)) {
-        // relaxed vowel position constraint: _c2.empty()
+    } else if (IS(cat, CharTypes::UW | CharTypes::OW)) {
         if (IS(cat, CharTypes::UW)) {
             ccase = c != L'[';
             c = L'\x1b0';
@@ -313,6 +312,10 @@ TelexStates TelexEngine::PushChar(wchar_t corig) {
             ccase = c != L']';
             c = L'\x1a1';
         }
+        FeedNewResultChar(_v, c, ccase);
+
+    } else if (IS(cat, CharTypes::Vowel | CharTypes::Transition)) {
+        // relaxed vowel position constraint: _c2.empty()
         _v.push_back(c);
         auto before = _v.size();
         // HACK: single special case for "khongoo"
@@ -352,9 +355,6 @@ TelexStates TelexEngine::PushChar(wchar_t corig) {
                 // e.g. 'cace'
                 _state = TelexStates::Invalid;
             }
-        } else if (IS(cat, CharTypes::UW | CharTypes::OW)) {
-            _cases.push_back(ccase);
-            _respos.push_back(_respos_current++);
         } else {
             _v.pop_back();
             InvalidateAndPopBack(c);
@@ -362,9 +362,7 @@ TelexStates TelexEngine::PushChar(wchar_t corig) {
 
     } else if (IS(cat, CharTypes::W | CharTypes::WA | CharTypes::LeadingW)) {
         if (_c1.empty() && IS(cat, CharTypes::LeadingW)) {
-            _v.push_back(L'\x1b0');
-            _cases.push_back(ccase);
-            _respos.push_back(_respos_current++);
+            FeedNewResultChar(_v, L'\x1b0', ccase);
         } else if (!_v.empty()) {
             bool vw_transitioned = false;
             if (IS(cat, CharTypes::W)) {

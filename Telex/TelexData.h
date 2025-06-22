@@ -884,7 +884,8 @@ MAKE_MAP(
     P(L"\x1b0o", L"\x1b0\x1a1"),   // relaxed transformations
 );
 debug_ensure(std::all_of(transitions_telex.begin(), transitions_telex.end(), [](const auto& x) {
-    return x.second.length() <= x.first.length();
+    // the ends_with checks are for making sure [] won't trigger transitions
+    return !x.first.ends_with(L'\x1b0') && !x.first.ends_with(L'\x1a1') && x.second.length() <= x.first.length();
 }));
 
 MAKE_MAP(
