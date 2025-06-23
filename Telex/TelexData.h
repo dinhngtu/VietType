@@ -1442,9 +1442,9 @@ const std::array<const TypingStyle, static_cast<size_t>(TypingStyles::Max)> typi
                 CharTypes::Uncategorized,
                 CharTypes::Uncategorized,
                 CharTypes::Uncategorized,
-                CharTypes::UW,            // [
+                CharTypes::OW,            // [
                 CharTypes::Uncategorized, //
-                CharTypes::OW,            // ]
+                CharTypes::UW,            // ]
                 CharTypes::Uncategorized,
                 CharTypes::Uncategorized,
                 CharTypes::Uncategorized,
@@ -1474,9 +1474,9 @@ const std::array<const TypingStyle, static_cast<size_t>(TypingStyles::Max)> typi
                 CharTypes::ToneX | CharTypes::ConsoC1,                            // x
                 CharTypes::Vowel | CharTypes::Transition,                         // y
                 CharTypes::ToneZ,                                                 // z
-                CharTypes::UW,                                                    // {
+                CharTypes::OW,                                                    // {
                 CharTypes::Uncategorized,                                         //
-                CharTypes::OW,                                                    // }
+                CharTypes::UW,                                                    // }
                 CharTypes::Uncategorized,
                 CharTypes::Uncategorized,
             },

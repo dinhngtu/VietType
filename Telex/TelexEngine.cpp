@@ -306,10 +306,10 @@ TelexStates TelexEngine::PushChar(wchar_t corig) {
 
     } else if (IS(cat, CharTypes::UW | CharTypes::OW)) {
         if (IS(cat, CharTypes::UW)) {
-            ccase = c != L'[';
+            ccase = c != L']';
             c = L'\x1b0';
         } else if (IS(cat, CharTypes::OW)) {
-            ccase = c != L']';
+            ccase = c != L'[';
             c = L'\x1a1';
         }
         FeedNewResultChar(_v, c, ccase);

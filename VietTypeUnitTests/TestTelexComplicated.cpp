@@ -32,35 +32,35 @@ TEST_CLASS (TestTelexComplicated) {
 
 public:
     TEST_METHOD (TestTelexComplicatedUW_ng) {
-        TestValidWord(L"\x1b0ng", L"[ng");
+        TestValidWord(L"\x1b0ng", L"]ng");
     }
 
     TEST_METHOD (TestTelexComplicatedUW_ngs) {
-        TestValidWord(L"\x1ee9ng", L"[ngs");
+        TestValidWord(L"\x1ee9ng", L"]ngs");
     }
 
     TEST_METHOD (TestTelexComplicatedH_UW_ng) {
-        TestValidWord(L"h\x1b0ng", L"h[ng");
+        TestValidWord(L"h\x1b0ng", L"h]ng");
     }
 
     TEST_METHOD (TestTelexComplicatedH_UW_ngs) {
-        TestValidWord(L"h\x1ee9ng", L"h[ngs");
+        TestValidWord(L"h\x1ee9ng", L"h]ngs");
     }
 
     TEST_METHOD (TestTelexComplicatedOW_m) {
-        TestValidWord(L"\x1a1m", L"]m");
+        TestValidWord(L"\x1a1m", L"[m");
     }
 
     TEST_METHOD (TestTelexComplicatedOW_ms) {
-        TestValidWord(L"\x1edbm", L"]ms");
+        TestValidWord(L"\x1edbm", L"[ms");
     }
 
     TEST_METHOD (TestTelexComplicatedC_OW_m) {
-        TestValidWord(L"c\x1a1m", L"c]m");
+        TestValidWord(L"c\x1a1m", L"c[m");
     }
 
     TEST_METHOD (TestTelexComplicatedC_OW_ms) {
-        TestValidWord(L"c\x1edbm", L"c]ms");
+        TestValidWord(L"c\x1edbm", L"c[ms");
     }
 
     TEST_METHOD (TestTelexComplicatedWng) {
