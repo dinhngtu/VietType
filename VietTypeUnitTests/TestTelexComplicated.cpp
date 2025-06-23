@@ -70,6 +70,30 @@ public:
     TEST_METHOD (TestTelexComplicatedWngs) {
         TestValidWord(L"\x1ee9ng", L"wngs");
     }
+
+    TEST_METHOD (TestTelexComplicatedUwng) {
+        TestValidWord(L"\x1b0ng", L"uwng");
+    }
+
+    TEST_METHOD (TestTelexComplicatedHwng) {
+        TestValidWord(L"h\x1b0ng", L"hwng");
+    }
+
+    TEST_METHOD (TestTelexComplicatedHuwng) {
+        TestValidWord(L"h\x1b0ng", L"huwng");
+    }
+
+    TEST_METHOD (TestTelexComplicatedCowm) {
+        TestValidWord(L"\x1a1m", L"owm");
+    }
+
+    TEST_METHOD (TestTelexComplicatedHuwowng) {
+        TestValidWord(L"h\x1b0\x1a1ng", L"huwowng");
+    }
+
+    TEST_METHOD (TestTelexComplicatedHuowng) {
+        TestValidWord(L"h\x1b0\x1a1ng", L"huowng");
+    }
 };
 
 } // namespace UnitTests

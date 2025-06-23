@@ -361,7 +361,7 @@ TelexStates TelexEngine::PushChar(wchar_t corig) {
         }
 
     } else if (IS(cat, CharTypes::W | CharTypes::WA | CharTypes::LeadingW)) {
-        if (_c1.empty() && IS(cat, CharTypes::LeadingW)) {
+        if (_v.empty() && IS(cat, CharTypes::LeadingW)) {
             FeedNewResultChar(_v, L'\x1b0', ccase);
         } else if (!_v.empty()) {
             bool vw_transitioned = false;
