@@ -35,6 +35,10 @@ public:
         TestValidWord(L"\x1b0ng", L"]ng");
     }
 
+    TEST_METHOD (TestTelexComplicatedUWUW_ng) {
+        TestInvalidWord(L"]ng", L"]]ng");
+    }
+
     TEST_METHOD (TestTelexComplicatedUW_ngs) {
         TestValidWord(L"\x1ee9ng", L"]ngs");
     }
@@ -49,6 +53,10 @@ public:
 
     TEST_METHOD (TestTelexComplicatedOW_m) {
         TestValidWord(L"\x1a1m", L"[m");
+    }
+
+    TEST_METHOD (TestTelexComplicatedOWOW_m) {
+        TestInvalidWord(L"[m", L"[[m");
     }
 
     TEST_METHOD (TestTelexComplicatedOW_ms) {

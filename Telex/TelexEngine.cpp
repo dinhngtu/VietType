@@ -63,6 +63,12 @@ static wchar_t ToLower(_In_ wchar_t c) {
     if (c >= L'\xc0' && c <= L'\xde') {
         return lc;
     }
+    // []
+    if (c == L'[' || c == L'{') {
+        return L'[';
+    } else if (c == L']' || c == L'}') {
+        return L']';
+    }
     // "uw" exception
     if (c >= L'\x1af' && c <= L'\x1b0') {
         return L'\x1b0';
@@ -305,14 +311,18 @@ TelexStates TelexEngine::PushChar(wchar_t corig) {
         FeedNewResultChar(_c1, c, ccase);
 
     } else if (IS(cat, CharTypes::UW | CharTypes::OW)) {
-        if (IS(cat, CharTypes::UW)) {
-            ccase = c != L']';
-            c = L'\x1b0';
-        } else if (IS(cat, CharTypes::OW)) {
-            ccase = c != L'[';
-            c = L'\x1a1';
+        if (_keyBuffer.length() > 1 && c == ToLower(_keyBuffer.rbegin()[1])) {
+            InvalidateAndPopBack(c);
+        } else {
+            if (IS(cat, CharTypes::UW)) {
+                ccase = c != L']';
+                c = L'\x1b0';
+            } else if (IS(cat, CharTypes::OW)) {
+                ccase = c != L'[';
+                c = L'\x1a1';
+            }
+            FeedNewResultChar(_v, c, ccase);
         }
-        FeedNewResultChar(_v, c, ccase);
 
     } else if (IS(cat, CharTypes::Vowel | CharTypes::Transition)) {
         // relaxed vowel position constraint: _c2.empty()
