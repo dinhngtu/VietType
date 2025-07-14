@@ -37,6 +37,12 @@ static wchar_t ToUpper(_In_ wchar_t c) {
     if (c >= L'\xe0' && c <= L'\xfe') {
         return uc;
     }
+    // []
+    if (c == L'[' || c == L'{') {
+        return L'{';
+    } else if (c == L']' || c == L'}') {
+        return L'}';
+    }
     // "uw" exception
     if (c >= L'\x1af' && c <= L'\x1b0') {
         return L'\x1af';
@@ -315,10 +321,8 @@ TelexStates TelexEngine::PushChar(wchar_t corig) {
             InvalidateAndPopBack(c);
         } else {
             if (IS(cat, CharTypes::UW)) {
-                ccase = c != L']';
                 c = L'\x1b0';
             } else if (IS(cat, CharTypes::OW)) {
-                ccase = c != L'[';
                 c = L'\x1a1';
             }
             FeedNewResultChar(_v, c, ccase);

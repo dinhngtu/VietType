@@ -102,6 +102,10 @@ public:
     TEST_METHOD (TestTelexComplicatedHuowng) {
         TestValidWord(L"h\x1b0\x1a1ng", L"huowng");
     }
+
+    TEST_METHOD (TestTelexComplicatedH_UW_OW_ng_upper) {
+        TestValidWord(L"H\x1af\x1a0NG", L"H}{NG");
+    }
 };
 
 } // namespace UnitTests
