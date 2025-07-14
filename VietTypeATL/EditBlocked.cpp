@@ -99,6 +99,11 @@ HRESULT EditBlocked(
 
     BlockedKind scopeBlocked;
     InputScope* scopes = pscopes;
+#ifdef _DEBUG
+    for (UINT i = 0; i < scount; i++) {
+        DBG_DPRINT(L"scope: %u", scopes[i]);
+    }
+#endif
     for (UINT i = 0; i < scount; i++) {
         switch (scopes[i]) {
         case IS_EMAIL_USERNAME:
