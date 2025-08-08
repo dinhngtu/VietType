@@ -45,6 +45,15 @@ Chương trình VietType Settings cho phép cài đặt lựa chọn của VietT
 - Tại sao VietType ít tính năng vậy? Tại sao VietType không có các tính năng như gõ tắt, chuyển mã, v.v.? \
 Tôi thiết kế VietType để đáp ứng nhu cầu gõ tiếng Việt tối thiểu.
 
+- Tại sao có UniKey, EVKey, OpenKey... rồi lại sinh ra VietType nữa?
+  - VietType dựa trên TSF là nền tảng bộ gõ chính thống của Windows (không giống các bộ gõ trên dùng phương pháp backspace), rất giàu tính năng hỗ trợ cho cả bộ gõ và các ứng dụng khác (trình duyệt, trình soạn thảo...)
+  - Nhờ vậy VietType có thể tự tắt khi gặp textbox gõ password, số điện thoại, v.v.
+  - VietType không gặp phải bug Chrome/HTKK mà các bộ gõ khác từng gặp.
+  - VietType có thể đọc trực tiếp text buffer của ứng dụng, vì vậy tính năng sửa từ hoạt động ổn định hơn rất nhiều so với các bộ gõ khác.
+  - VietType không xung đột với các bộ gõ cho ngôn ngữ khác (Trung/Nhật/Hàn). Các bộ gõ tiếng Việt khác như OpenKey có thể đọc trực tiếp trạng thái của VietType bằng TSF API.
+  - VietType không cần cài đặt global hook, không cần chạy với quyền admin (chỉ cần lúc cài). Vì vậy tính bảo mật và cách ly dữ liệu giữa các app sẽ cao hơn.
+  - Mỗi nền tảng bộ gõ đều có ưu và nhược điểm riêng. VietType chỉ đơn giản cho người dùng thêm một lựa chọn.
+
 - Tôi có thể sao chép, sửa đổi hay bán lại phần mềm VietType hay không? \
 VietType là phần mềm tự do, bạn có thể cung cấp lại và/hoặc chỉnh sửa nó theo những điều khoản của Giấy phép Công cộng GNU phiên bản 3 do Tổ chức Phần mềm Tự do công bố. \
 Tóm tắt Giấy phép Công cộng GNU (tham khảo tập tin LICENSE đi kèm VietType để biết chính xác các điều khoản):
