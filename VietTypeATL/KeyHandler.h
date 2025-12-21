@@ -46,7 +46,7 @@ private:
     CComPtr<ITfContext> _context;
     WPARAM _wParam = 0;
     LPARAM _lParam = 0;
-    BYTE _keyState[256];
+    BYTE _keyState[256] = {0};
     CComPtr<EngineController> _controller;
 };
 

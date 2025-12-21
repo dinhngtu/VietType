@@ -45,7 +45,7 @@ EngineController::Initialize(_In_ Telex::ITelexEngine* engine, _In_ ITfThreadMgr
     HRESULT_CHECK_RETURN(hr, L"_enabled->Initialize failed");
 #ifdef _DEBUG
     long dbgEnabled = 0;
-    HRESULT dbgHr = _enabled->GetValueDirect(&dbgEnabled);
+    [[maybe_unused]] HRESULT dbgHr = _enabled->GetValueDirect(&dbgEnabled);
     DBG_DPRINT(L"dbgHr %ld dbgEnabled %ld", dbgHr, dbgEnabled);
 #endif // _DEBUG
 

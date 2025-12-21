@@ -257,7 +257,8 @@ HRESULT KeyEventSink::CallKeyEdit(
     HRESULT hr;
 
     CComPtr<KeyHandlerEditSession> keyHandlerEditSession;
-    hr = CreateInitialize(&keyHandlerEditSession, _compositionManager, context, wParam, lParam, _keyState, _controller);
+    hr = CreateInitialize(
+&keyHandlerEditSession, _compositionManager.p, context, wParam, lParam, keyState, _controller.p);
     HRESULT_CHECK_RETURN(hr, L"CreateInitialize(&keyHandlerEditSession) failed");
     hr = _compositionManager->RequestEditSession(keyHandlerEditSession, context);
     HRESULT_CHECK_RETURN(hr, L"_compositionManager->RequestEditSession failed");
