@@ -31,7 +31,12 @@ bool IsEditKey(_In_ WPARAM wParam, _In_ LPARAM lParam, _In_reads_(256) const BYT
     return false;
 }
 
-bool IsKeyAccepted(
+bool IsModifier(_In_reads_(256) const BYTE* keyState) {
+    return (keyState[VK_CONTROL] & 0x80) || (keyState[VK_MENU] & 0x80) || (keyState[VK_LWIN] & 0x80) ||
+           (keyState[VK_RWIN] & 0x80);
+}
+
+_Success_(return) bool IsKeyAccepted(
     _In_ Telex::ITelexEngine* engine,
     _In_ WPARAM wParam,
     _In_ LPARAM lParam,
@@ -46,8 +51,7 @@ bool IsKeyEaten(
     _In_ WPARAM wParam,
     _In_ LPARAM lParam,
     _In_reads_(256) const BYTE* keyState) {
-    if ((keyState[VK_CONTROL] & 0x80) || (keyState[VK_MENU] & 0x80) || (keyState[VK_LWIN] & 0x80) ||
-        (keyState[VK_RWIN] & 0x80)) {
+    if (IsModifier(keyState)) {
         // engine doesn't want modifiers
         return false;
     }

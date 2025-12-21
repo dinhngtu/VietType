@@ -10,7 +10,9 @@ namespace VietType {
 
 bool IsEditKey(_In_ WPARAM wParam, _In_ LPARAM lParam, _In_reads_(256) const BYTE* keyState);
 
-bool IsKeyAccepted(
+bool IsModifier(_In_reads_(256) const BYTE* keyState);
+
+_Success_(return) bool IsKeyAccepted(
     _In_ Telex::ITelexEngine* engine,
     _In_ WPARAM wParam,
     _In_ LPARAM lParam,

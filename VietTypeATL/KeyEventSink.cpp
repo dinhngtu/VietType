@@ -62,11 +62,6 @@ STDMETHODIMP KeyEventSink::OnSetFocus(_In_ BOOL fForeground) {
     return S_OK;
 }
 
-static bool IsModifier(const BYTE (&keyState)[256]) {
-    return (keyState[VK_CONTROL] & 0x80) || (keyState[VK_MENU] & 0x80) || (keyState[VK_LWIN] & 0x80) ||
-           (keyState[VK_RWIN] & 0x80);
-}
-
 DWORD KeyEventSink::OnBackconvertBackspace(
     _In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten, _In_ DWORD prevBackconvert) {
     Compartment<long> compBackconvert;
