@@ -6,6 +6,7 @@
 #include "KeyTranslator.h"
 #include "CompositionManager.h"
 #include "EngineController.h"
+#include "EditSessions.h"
 
 namespace VietType {
 
@@ -23,7 +24,7 @@ STDMETHODIMP KeyHandlerEditSession::DoEditSession(_In_ TfEditCookie ec) {
     }
 
     if (_wParam == 0) {
-        Commit(ec);
+        EditSessions::EditCommit(ec, _compositionManager, _context, _controller);
     } else if (IsEditKey(_wParam, _lParam, _keyState)) {
         DBG_DPRINT(L"%d edit key, not eating", _wParam);
         // uneaten, ends composition
@@ -39,12 +40,13 @@ STDMETHODIMP KeyHandlerEditSession::DoEditSession(_In_ TfEditCookie ec) {
         return _compositionManager->EndCompositionNow(ec);
     } else if (IsKeyEaten(&_controller->GetEngine(), _compositionManager->IsComposing(), _wParam, _lParam, _keyState)) {
         // eaten, updates composition
-        ComposeKey(ec);
+        auto state = PushKey(&_controller->GetEngine(), _wParam, _lParam, _keyState);
+        EditSessions::EditNextState(ec, _compositionManager, _context, _controller, state);
     } else if (_wParam == VK_SHIFT) {
         // drop shift
     } else {
         // uneaten, commits
-        Commit(ec);
+        EditSessions::EditCommit(ec, _compositionManager, _context, _controller);
     }
 
     return S_OK;
@@ -53,84 +55,23 @@ STDMETHODIMP KeyHandlerEditSession::DoEditSession(_In_ TfEditCookie ec) {
 HRESULT KeyHandlerEditSession::Initialize(
     _In_ CompositionManager* compositionManager,
     _In_ ITfContext* context,
+    _In_ EngineController* controller,
     _In_ WPARAM wParam,
     _In_ LPARAM lParam,
-    _In_reads_(256) const BYTE* keyState,
-    _In_ EngineController* controller) {
+    _In_reads_(256) const BYTE* keyState) {
 
     _compositionManager = compositionManager;
     _context = context;
+    _controller = controller;
     _wParam = wParam;
     _lParam = lParam;
     memcpy(_keyState, keyState, ARRAYSIZE(_keyState));
-    _controller = controller;
     return S_OK;
 }
 
 HRESULT KeyHandlerEditSession::Uninitialize() {
     // since edit sessions are asynchronous, we can't know when the reference to the edit session will die
     // therefore, we don't explicitly uninit the class, leaving it to the destructor when the refcount runs out
-    return S_OK;
-}
-
-HRESULT KeyHandlerEditSession::ComposeKey(_In_ TfEditCookie ec) {
-    HRESULT hr;
-
-    DBG_DPRINT(L"");
-
-    switch (PushKey(&_controller->GetEngine(), _wParam, _lParam, _keyState)) {
-    case Telex::TelexStates::Valid: {
-        if (_controller->GetEngine().Count()) {
-            auto str = _controller->GetEngine().Peek();
-            hr = _compositionManager->EnsureCompositionText(ec, _context, &str[0], static_cast<LONG>(str.length()));
-            DBG_HRESULT_CHECK(hr, L"_compositionManager->EnsureCompositionText failed");
-        } else {
-            // backspace returns Valid on an empty buffer
-            _controller->GetEngine().Reset();
-            // EndComposition* will not empty composition text so we have to do it manually
-            hr = _compositionManager->EmptyCompositionText(ec);
-            HRESULT_CHECK_RETURN(hr, L"_compositionManager->EmptyCompositionText failed");
-            hr = _compositionManager->EndCompositionNow(ec);
-            HRESULT_CHECK_RETURN(hr, L"_compositionManager->EndCompositionNow failed");
-        }
-        break;
-    }
-
-    case Telex::TelexStates::Invalid: {
-        assert(_controller->GetEngine().Count() > 0);
-        auto str = _controller->GetEngine().RetrieveRaw();
-        hr = _compositionManager->EnsureCompositionText(ec, _context, &str[0], static_cast<LONG>(str.length()));
-        DBG_HRESULT_CHECK(hr, L"_compositionManager->EnsureCompositionText failed");
-        break;
-    }
-
-    default:
-        DBG_DPRINT(L"PushKey returned unexpected value");
-        assert(0);
-        break;
-    }
-
-    return S_OK;
-}
-
-HRESULT KeyHandlerEditSession::Commit(_In_ TfEditCookie ec) {
-    HRESULT hr = S_OK;
-
-    if (_compositionManager->IsComposing()) {
-        auto txstate = _controller->GetEngine().Commit();
-        if (txstate == Telex::TelexStates::Committed || txstate == Telex::TelexStates::CommittedInvalid) {
-            auto str = _controller->GetEngine().Retrieve();
-            hr = _compositionManager->SetCompositionText(ec, &str[0], static_cast<LONG>(str.length()));
-            DBG_HRESULT_CHECK(hr, L"_compositionManager->EnsureCompositionText failed");
-        } else {
-            assert(txstate == Telex::TelexStates::Committed || txstate == Telex::TelexStates::CommittedInvalid);
-            hr = E_FAIL;
-        }
-    }
-
-    _controller->GetEngine().Reset();
-    _compositionManager->EndCompositionNow(ec);
-
     return S_OK;
 }
 

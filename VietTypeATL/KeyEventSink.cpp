@@ -62,29 +62,26 @@ STDMETHODIMP KeyEventSink::OnSetFocus(_In_ BOOL fForeground) {
     return S_OK;
 }
 
-HRESULT KeyEventSink::OnKeyDownCommon(
-    _In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten, _Out_ BOOL* isBackconvert) {
-    HRESULT hr;
-    *isBackconvert = FALSE;
+static bool IsModifier(const BYTE (&keyState)[256]) {
+    return (keyState[VK_CONTROL] & 0x80) || (keyState[VK_MENU] & 0x80) || (keyState[VK_LWIN] & 0x80) ||
+           (keyState[VK_RWIN] & 0x80);
+}
 
-    if (!_controller->IsEnabled()) {
-        *pfEaten = FALSE;
-        return S_OK;
-    }
-
-    if (!GetKeyboardState(_keyState)) {
-        WINERROR_GLE_RETURN_HRESULT(L"GetKeyboardState failed");
-    }
-
+DWORD KeyEventSink::OnBackconvertBackspace(
+    _In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten, _In_ DWORD prevBackconvert) {
     Compartment<long> compBackconvert;
+    HRESULT hr;
+    bool backconvert = false;
+
+    *pfEaten = FALSE;
+
     hr = compBackconvert.Initialize(pic, _compositionManager->GetClientId(), Globals::GUID_Compartment_Backconvert);
     if (FAILED(hr)) {
         DBG_HRESULT_CHECK(hr, L"compBackconvert.Initialize failed");
         goto finish;
     }
 
-    if (wParam == VK_BACK && !_compositionManager->IsComposing() && !(_keyState[VK_CONTROL] & 0x80) &&
-        !(_keyState[VK_MENU] & 0x80) && !(_keyState[VK_LWIN] & 0x80) && !(_keyState[VK_RWIN] & 0x80)) {
+    if (wParam == VK_BACK && !_compositionManager->IsComposing() && !IsModifier(_keyState)) {
         long backspacing;
         hr = compBackconvert.GetValue(&backspacing);
         if (FAILED(hr)) {
@@ -92,25 +89,137 @@ HRESULT KeyEventSink::OnKeyDownCommon(
             goto finish;
         }
 
-        *isBackconvert = _controller->IsBackconvertOnBackspace() && (backspacing != -1);
+        backconvert = backspacing != -1;
     }
 
 finish:
-    if (*isBackconvert) {
+    if (backconvert) {
         *pfEaten = TRUE;
+        return prevBackconvert;
     } else {
         hr = compBackconvert.SetValue(0);
         DBG_HRESULT_CHECK(hr, L"compBackconvert reset failed");
         *pfEaten = IsKeyEaten(&_controller->GetEngine(), _compositionManager->IsComposing(), wParam, lParam, _keyState);
+        return 0;
     }
+}
+
+DWORD KeyEventSink::OnBackconvertRetype(
+    _In_ ITfContext* pic,
+    _In_ WPARAM wParam,
+    _In_ LPARAM lParam,
+    _Out_ BOOL* pfEaten,
+    _In_ DWORD prevBackconvert,
+    _Out_ wchar_t* acceptedChar) {
+    if (!_compositionManager->IsComposing() && !IsModifier(_keyState) &&
+        IsKeyAccepted(&_controller->GetEngine(), wParam, lParam, _keyState, acceptedChar)) {
+        *pfEaten = TRUE;
+        return prevBackconvert;
+    } else {
+        *pfEaten = IsKeyEaten(&_controller->GetEngine(), _compositionManager->IsComposing(), wParam, lParam, _keyState);
+        *acceptedChar = 0;
+        return 0;
+    }
+}
+
+HRESULT KeyEventSink::OnKeyDownCommon(
+    _In_ ITfContext* pic,
+    _In_ WPARAM wParam,
+    _In_ LPARAM lParam,
+    _Out_ BOOL* pfEaten,
+    _Out_ DWORD* isBackconvert,
+    _Out_ wchar_t* acceptedChar) {
+    *pfEaten = FALSE;
+    *isBackconvert = 0;
+    *acceptedChar = 0;
+
+    if (!_controller->IsEnabled()) {
+        return S_OK;
+    }
+
+    if (!GetKeyboardState(_keyState)) {
+        WINERROR_GLE_RETURN_HRESULT(L"GetKeyboardState failed");
+    }
+
+    *isBackconvert = _controller->IsBackconvert();
+    switch (*isBackconvert) {
+    case 1:
+        *isBackconvert = OnBackconvertBackspace(pic, wParam, lParam, pfEaten, *isBackconvert);
+        break;
+    case 2:
+        *isBackconvert = OnBackconvertRetype(pic, wParam, lParam, pfEaten, *isBackconvert, acceptedChar);
+        break;
+    default:
+        *isBackconvert = 0;
+        break;
+    }
+
+    return S_OK;
+}
+
+HRESULT KeyEventSink::CallKeyEditBackspace(
+    _In_ ITfContext* context, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_reads_(256) const BYTE* keyState) {
+    HRESULT hrSession;
+    HRESULT hr;
+
+    hr = CompositionManager::RequestEditSessionEx(
+        EditSessions::EditSurroundingWord,
+        _compositionManager,
+        context,
+        TF_ES_SYNC | TF_ES_READWRITE,
+        &hrSession,
+        _controller.p,
+        1);
+
+    if (FAILED(hr) || FAILED(hrSession)) {
+        DBG_DPRINT(L"backspace SendInput fallback");
+
+        CComPtr<ITfCompartmentMgr> tcMgr;
+        hr = context->QueryInterface(&tcMgr);
+        HRESULT_CHECK_RETURN(hr, L"pic->QueryInterface failed");
+
+        INPUT inp[2];
+        ZeroMemory(inp, sizeof(inp));
+        inp[0].type = inp[1].type = INPUT_KEYBOARD;
+        inp[0].ki.wVk = inp[1].ki.wVk = VK_BACK;
+        inp[1].ki.dwFlags = KEYEVENTF_KEYUP;
+        if (!SendInput(ARRAYSIZE(inp), inp, sizeof(INPUT))) {
+            WINERROR_GLE_RETURN_HRESULT(L"SendInput failed");
+        }
+    }
+
+    return S_OK;
+}
+
+HRESULT KeyEventSink::CallKeyEditRetype(
+    _In_ ITfContext* context,
+    _In_ WPARAM wParam,
+    _In_ LPARAM lParam,
+    _In_reads_(256) const BYTE* keyState,
+    _In_ wchar_t push) {
+    HRESULT hrSession;
+    HRESULT hr;
+
+    hr = CompositionManager::RequestEditSessionEx(
+        EditSessions::EditSurroundingWordAndPush,
+        _compositionManager,
+        context,
+        TF_ES_ASYNCDONTCARE | TF_ES_READWRITE,
+        &hrSession,
+        _controller.p,
+        0,
+        push);
+    HRESULT_CHECK_RETURN(hr, L"RequestEditSession EditSurroundingWord failed");
+    HRESULT_CHECK_RETURN(hrSession, L"EditSurroundingWord hrSession failed");
 
     return S_OK;
 }
 
 STDMETHODIMP KeyEventSink::OnTestKeyDown(
     _In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten) {
-    BOOL isBackconvert;
-    HRESULT hr = OnKeyDownCommon(pic, wParam, lParam, pfEaten, &isBackconvert);
+    DWORD isBackconvert;
+    wchar_t c;
+    HRESULT hr = OnKeyDownCommon(pic, wParam, lParam, pfEaten, &isBackconvert, &c);
     HRESULT_CHECK_RETURN(hr, L"OnKeyDownCommon failed");
 
     // break off the composition early at OnTestKeyDown on an uneaten key
@@ -145,43 +254,29 @@ STDMETHODIMP KeyEventSink::OnTestKeyUp(
 
 STDMETHODIMP KeyEventSink::OnKeyDown(
     _In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten) {
-    BOOL isBackconvert;
-    HRESULT hr = OnKeyDownCommon(pic, wParam, lParam, pfEaten, &isBackconvert);
+    DWORD isBackconvert;
+    wchar_t c;
+    HRESULT hr = OnKeyDownCommon(pic, wParam, lParam, pfEaten, &isBackconvert, &c);
     HRESULT_CHECK_RETURN(hr, L"OnKeyDownCommon failed");
 
     DBG_DPRINT(L"OnKeyDown wParam = %lx %s", wParam, *pfEaten ? L"eaten" : L"not eaten");
 
     if (*pfEaten || _compositionManager->IsComposing()) {
-        if (isBackconvert) {
-            HRESULT hrSession;
-            hr = CompositionManager::RequestEditSessionEx(
-                EditSessions::EditSurroundingWord,
-                _compositionManager,
-                pic,
-                TF_ES_SYNC | TF_ES_READWRITE,
-                &hrSession,
-                _controller.p,
-                1);
-            if (FAILED(hr) || FAILED(hrSession)) {
-                DBG_DPRINT(L"backspace SendInput fallback");
-
-                CComPtr<ITfCompartmentMgr> tcMgr;
-                hr = pic->QueryInterface(&tcMgr);
-                HRESULT_CHECK_RETURN(hr, L"pic->QueryInterface failed");
-
-                INPUT inp[2];
-                ZeroMemory(inp, sizeof(inp));
-                inp[0].type = inp[1].type = INPUT_KEYBOARD;
-                inp[0].ki.wVk = inp[1].ki.wVk = VK_BACK;
-                inp[1].ki.dwFlags = KEYEVENTF_KEYUP;
-                if (!SendInput(ARRAYSIZE(inp), inp, sizeof(INPUT))) {
-                    WINERROR_GLE_RETURN_HRESULT(L"SendInput failed");
-                }
-            }
-        } else {
+        switch (isBackconvert) {
+        case 0:
             hr = CallKeyEdit(pic, wParam, lParam, _keyState);
-            HRESULT_CHECK_RETURN(hr, L"CallKeyEdit failed");
+            break;
+        case 1:
+            hr = CallKeyEditBackspace(pic, wParam, lParam, _keyState);
+            break;
+        case 2:
+            hr = CallKeyEditRetype(pic, wParam, lParam, _keyState, c);
+            break;
+        default:
+            hr = E_FAIL;
+            break;
         }
+        HRESULT_CHECK_RETURN(hr, L"CallKeyEdit failed");
     }
 
     return S_OK;
@@ -258,7 +353,7 @@ HRESULT KeyEventSink::CallKeyEdit(
 
     CComPtr<KeyHandlerEditSession> keyHandlerEditSession;
     hr = CreateInitialize(
-&keyHandlerEditSession, _compositionManager.p, context, wParam, lParam, keyState, _controller.p);
+        &keyHandlerEditSession, _compositionManager.p, context, _controller.p, wParam, lParam, keyState);
     HRESULT_CHECK_RETURN(hr, L"CreateInitialize(&keyHandlerEditSession) failed");
     hr = _compositionManager->RequestEditSession(keyHandlerEditSession, context);
     HRESULT_CHECK_RETURN(hr, L"_compositionManager->RequestEditSession failed");

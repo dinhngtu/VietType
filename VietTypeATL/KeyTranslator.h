@@ -10,8 +10,12 @@ namespace VietType {
 
 bool IsEditKey(_In_ WPARAM wParam, _In_ LPARAM lParam, _In_reads_(256) const BYTE* keyState);
 
-Telex::TelexStates PushKey(
-    _In_ Telex::ITelexEngine* engine, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_reads_(256) const BYTE* keyState);
+bool IsKeyAccepted(
+    _In_ Telex::ITelexEngine* engine,
+    _In_ WPARAM wParam,
+    _In_ LPARAM lParam,
+    _In_reads_(256) const BYTE* keyState,
+    _Out_ wchar_t* c);
 
 bool IsKeyEaten(
     _In_ Telex::ITelexEngine* engine,
@@ -19,5 +23,8 @@ bool IsKeyEaten(
     _In_ WPARAM wParam,
     _In_ LPARAM lParam,
     _In_reads_(256) const BYTE* keyState);
+
+Telex::TelexStates PushKey(
+    _In_ Telex::ITelexEngine* engine, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_reads_(256) const BYTE* keyState);
 
 } // namespace VietType

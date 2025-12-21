@@ -30,24 +30,20 @@ public:
     HRESULT Initialize(
         _In_ CompositionManager* compositionManager,
         _In_ ITfContext* context,
+        _In_ EngineController* controller,
         _In_ WPARAM wParam,
         _In_ LPARAM lParam,
-        _In_reads_(256) const BYTE* keyState,
-        _In_ EngineController* controller);
+        _In_reads_(256) const BYTE* keyState);
     // dummy method
     HRESULT Uninitialize();
 
 private:
-    HRESULT ComposeKey(_In_ TfEditCookie ec);
-    HRESULT Commit(_In_ TfEditCookie ec);
-
-private:
     CComPtr<CompositionManager> _compositionManager;
     CComPtr<ITfContext> _context;
+    CComPtr<EngineController> _controller;
     WPARAM _wParam = 0;
     LPARAM _lParam = 0;
     BYTE _keyState[256] = {0};
-    CComPtr<EngineController> _controller;
 };
 
 } // namespace VietType

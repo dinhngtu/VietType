@@ -5,7 +5,6 @@
 #include "CompositionManager.h"
 #include "EngineController.h"
 #include "VirtualDocument.h"
-#include "Telex.h"
 
 namespace VietType {
 namespace EditSessions {
@@ -217,6 +216,23 @@ HRESULT EditSurroundingWord(
     }
 
     return hr;
+}
+
+HRESULT EditSurroundingWordAndPush(
+    _In_ TfEditCookie ec,
+    _In_ CompositionManager* compositionManager,
+    _In_ ITfContext* context,
+    _In_ EngineController* controller,
+    _In_ int ignore,
+    _In_ wchar_t push) {
+    HRESULT hr = EditSurroundingWord(ec, compositionManager, context, controller, ignore);
+    HRESULT_CHECK(hr, "EditSurroundingWord failed");
+
+    if (!push) {
+        return hr;
+    }
+
+    return EditNextState(ec, compositionManager, context, controller, controller->GetEngine().PushChar(push));
 }
 
 } // namespace EditSessions

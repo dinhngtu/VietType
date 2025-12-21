@@ -477,6 +477,7 @@
       </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="EditBlocked.cpp" />
+    <ClCompile Include="EditSessions.cpp" />
     <ClCompile Include="EngineController.cpp" />
     <ClCompile Include="EngineSettingsController.cpp" />
     <ClCompile Include="EnumDisplayAttributeInfo.cpp" />

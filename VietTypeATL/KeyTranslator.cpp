@@ -31,16 +31,13 @@ bool IsEditKey(_In_ WPARAM wParam, _In_ LPARAM lParam, _In_reads_(256) const BYT
     return false;
 }
 
-Telex::TelexStates PushKey(
-    _In_ Telex::ITelexEngine* engine, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_reads_(256) const BYTE* keyState) {
-    wchar_t c;
-    if (IsTranslatableKey(wParam, lParam, keyState, &c) && engine->AcceptsChar(c)) {
-        return engine->PushChar(c);
-    } else if (wParam == VK_BACK) {
-        return engine->Backspace();
-    } else {
-        return Telex::TelexStates::TxError;
-    }
+bool IsKeyAccepted(
+    _In_ Telex::ITelexEngine* engine,
+    _In_ WPARAM wParam,
+    _In_ LPARAM lParam,
+    _In_reads_(256) const BYTE* keyState,
+    _Out_ wchar_t* c) {
+    return IsTranslatableKey(wParam, lParam, keyState, c) && engine->AcceptsChar(*c);
 }
 
 bool IsKeyEaten(
@@ -55,13 +52,25 @@ bool IsKeyEaten(
         return false;
     }
     wchar_t c;
-    if (IsTranslatableKey(wParam, lParam, keyState, &c) && engine->AcceptsChar(c)) {
+    if (IsKeyAccepted(engine, wParam, lParam, keyState, &c)) {
         return true;
     }
     if (isComposing && (wParam == VK_BACK || wParam == VK_ESCAPE)) {
         return true;
     }
     return false;
+}
+
+Telex::TelexStates PushKey(
+    _In_ Telex::ITelexEngine* engine, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_reads_(256) const BYTE* keyState) {
+    wchar_t c;
+    if (IsKeyAccepted(engine, wParam, lParam, keyState, &c)) {
+        return engine->PushChar(c);
+    } else if (wParam == VK_BACK) {
+        return engine->Backspace();
+    } else {
+        return Telex::TelexStates::TxError;
+    }
 }
 
 } // namespace VietType

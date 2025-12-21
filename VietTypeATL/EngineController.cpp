@@ -101,8 +101,8 @@ const Telex::ITelexEngine& EngineController::GetEngine() const {
     return *_engine;
 }
 
-DWORD EngineController::IsBackconvertOnBackspace() {
-    return _backconvertOnBackspace;
+DWORD EngineController::IsBackconvert() {
+    return _backconvert;
 }
 
 _Check_return_ HRESULT EngineController::IsUserEnabled(_Out_ long* penabled) const {
@@ -208,7 +208,7 @@ HRESULT EngineController::UpdateStates(bool foreground) {
         DBG_HRESULT_CHECK(hr, L"_openclose->SetValue failed");
 
         _settings->IsDefaultEnabled(&_defaultEnabled);
-        _settings->IsBackconvertOnBackspace(&_backconvertOnBackspace);
+        _settings->IsBackconvert(&_backconvert);
 
         Telex::TelexConfig cfg = GetEngine().GetConfig();
         hr = _settings->LoadTelexSettings(cfg);

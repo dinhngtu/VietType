@@ -45,7 +45,7 @@ public:
     Telex::ITelexEngine& GetEngine();
     const Telex::ITelexEngine& GetEngine() const;
 
-    DWORD IsBackconvertOnBackspace();
+    DWORD IsBackconvert();
 
     _Check_return_ HRESULT IsUserEnabled(_Out_ long* penabled) const;
     HRESULT ToggleUserEnabled();
@@ -82,7 +82,7 @@ private:
     CComPtr<EngineSettingsController> _settings;
     // cached settings
     DWORD _defaultEnabled = 0;
-    DWORD _backconvertOnBackspace = 0;
+    DWORD _backconvert = 0;
     CComPtr<CompartmentNotifier> _systemNotify;
 
     BlockedKind _blocked = BlockedKind::Free;

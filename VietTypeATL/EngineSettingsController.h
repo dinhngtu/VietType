@@ -32,7 +32,7 @@ public:
     HRESULT LoadTelexSettings(Telex::TelexConfig& cfg);
 
     void IsDefaultEnabled(_Out_ DWORD* pde);
-    void IsBackconvertOnBackspace(_Out_ DWORD* pde);
+    void IsBackconvert(_Out_ DWORD* pde);
     void GetPreservedKeyToggle(_Out_ TF_PRESERVEDKEY* pde);
     void IsShowingComposingAttr(_Out_ DWORD* pde);
 
