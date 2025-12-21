@@ -104,6 +104,10 @@ TfClientId CompositionManager::GetClientId() const {
 HRESULT CompositionManager::StartCompositionNow(_In_ TfEditCookie ec, _In_ ITfContext* context) {
     HRESULT hr;
 
+    if (_composition) {
+        return TF_E_LOCKED;
+    }
+
     CComPtr<ITfCompositionSink> compositionSink;
     hr = QueryInterface2(this, &compositionSink);
     HRESULT_CHECK_RETURN(hr, L"this->QueryInterface failed");
@@ -198,8 +202,8 @@ HRESULT CompositionManager::EndCompositionNow(_In_ TfEditCookie ec) {
         hr = _composition->EndComposition(ec);
         DBG_HRESULT_CHECK(hr, L"_composition->EndComposition failed");
 
-        _composition.Release();
         _context.Release();
+        _composition.Release();
     }
 
     return S_OK;

@@ -125,10 +125,12 @@ private:
 
 private:
     TfClientId _clientid = TF_CLIENTID_NULL;
-    CComPtr<ITfContext> _context;
-    CComPtr<ITfComposition> _composition;
-    CComPtr<ITfCategoryMgr> _categoryMgr;
     CComPtr<ITfDisplayAttributeInfo> _composingAttribute;
+    CComPtr<ITfCategoryMgr> _categoryMgr;
+
+    CComPtr<ITfComposition> _composition;
+    // only for use when composition is active
+    CComPtr<ITfContext> _context;
 };
 
 } // namespace VietType
