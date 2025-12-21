@@ -62,7 +62,7 @@ HRESULT KeyHandlerEditSession::Initialize(
     _context = context;
     _wParam = wParam;
     _lParam = lParam;
-    _keyState = keyState;
+    memcpy(_keyState, keyState, ARRAYSIZE(_keyState));
     _controller = controller;
     return S_OK;
 }
