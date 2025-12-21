@@ -1,0 +1,43 @@
+<Solution>
+  <Configurations>
+    <Platform Name="ARM64" />
+    <Platform Name="ARM64EC" />
+    <Platform Name="Win32" />
+    <Platform Name="x64" />
+  </Configurations>
+  <Folder Name="/Solution Items/">
+    <File Path=".clang-format" />
+    <File Path="LICENSE" />
+    <File Path="README.md" />
+    <File Path="UpdateVersion.ps1" />
+    <File Path="UpdateVersionCs.ps1" />
+    <File Path="UpdateVersionWix.ps1" />
+    <File Path="Version.ps1" />
+    <File Path="VietType.props" />
+  </Folder>
+  <Project Path="Telex/Telex.vcxproj" Id="4c4ce742-99a9-40e7-b03a-68a3cbe0ae77" />
+  <Project Path="TestLib/TestLib.vcxproj" Id="39086f5e-94a0-4de8-9fb0-3df69721a97c" />
+  <Project Path="TfDumper/TfDumper.vcxproj" Id="62f82c74-9fdc-4673-b392-06399e06ce45">
+    <Build Project="false" />
+  </Project>
+  <Project Path="VietTypeATL/VietTypeATL.vcxproj" Id="6ca483bd-b365-42dc-8ae6-7cfbd2014cbe" />
+  <Project Path="VietTypeConfig2/VietTypeConfig2.csproj" Id="1b708a01-724b-41c5-b177-93844708e24d">
+    <Platform Solution="*|ARM64" Project="ARM64" />
+    <Platform Solution="*|ARM64EC" Project="ARM64" />
+    <Platform Solution="*|Win32" Project="x86" />
+    <Platform Solution="*|x64" Project="x86" />
+    <Build Solution="*|ARM64" Project="false" />
+  </Project>
+  <Project Path="VietTypeSetup/VietTypeSetup.wixproj" Type="b7dd6f7e-def8-4e67-b5b7-07ef123db6f0">
+    <Platform Solution="*|ARM64EC" Project="ARM64" />
+    <Platform Solution="*|Win32" Project="x86" />
+    <Build Solution="*|ARM64" Project="false" />
+  </Project>
+  <Project Path="VietTypeUnitTests/VietTypeUnitTests.vcxproj" Id="3f698192-164b-4e9d-91fd-ddd623c1c98c">
+    <BuildDependency Project="TestLib/TestLib.vcxproj" />
+  </Project>
+  <Project Path="WordLister/WordLister.vcxproj" Id="99b31857-77b4-45e1-8969-90f5172a9999">
+    <BuildDependency Project="Telex/Telex.vcxproj" />
+    <BuildDependency Project="TestLib/TestLib.vcxproj" />
+  </Project>
+</Solution>

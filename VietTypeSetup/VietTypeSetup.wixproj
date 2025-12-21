@@ -1,5 +1,6 @@
 <Project>
-  <Import Project="Sdk.props" Sdk="WixToolset.Sdk" Version="5.0.1" />
+  <Import Project="Sdk.props" Sdk="WixToolset.Sdk" Version="6.0.2" />
+  <Import Project="Sdk.targets" Sdk="WixToolset.Sdk" Version="6.0.2" />
   <PropertyGroup>
     <OutputName>VietTypeSetup$(Platform)</OutputName>
   </PropertyGroup>
@@ -20,8 +21,8 @@
     <SuppressSpecificWarnings>1103</SuppressSpecificWarnings>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="WixToolset.Util.wixext" Version="5.0.2" />
-    <PackageReference Include="WixToolset.UI.wixext" Version="5.0.2" />
+    <PackageReference Include="WixToolset.Util.wixext" Version="6.0.2" />
+    <PackageReference Include="WixToolset.UI.wixext" Version="6.0.2" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="licembed.rtf" />
@@ -30,7 +31,6 @@
   <ItemGroup>
     <ProjectReference Include="..\VietTypeConfig2\VietTypeConfig2.csproj" />
   </ItemGroup>
-  <Import Project="Sdk.targets" Sdk="WixToolset.Sdk" Version="5.0.1" />
   <PropertyGroup>
     <PreBuildEvent>powershell.exe -noprofile -noninteractive -executionpolicy bypass $(SolutionDir)\UpdateVersionWix.ps1</PreBuildEvent>
   </PropertyGroup>
