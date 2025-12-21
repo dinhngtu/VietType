@@ -4,7 +4,6 @@
 using System;
 using System.ComponentModel;
 using System.Globalization;
-using System.Threading;
 using System.Windows.Input;
 
 namespace VietTypeConfig2 {
@@ -147,14 +146,14 @@ namespace VietTypeConfig2 {
             }
         }
 
-        public bool BackconvertOnBackspace {
+        public BackconvertModes Backconvert {
             get {
-                return _settings.BackconvertOnBackspace;
+                return (BackconvertModes)_settings.Backconvert;
             }
             set {
-                if (_settings.BackconvertOnBackspace != value) {
-                    _settings.BackconvertOnBackspace = value;
-                    OnPropertyChanged(nameof(BackconvertOnBackspace));
+                if (Backconvert != value && Enum.IsDefined(typeof(BackconvertModes), value)) {
+                    _settings.Backconvert = (int)value;
+                    OnPropertyChanged(nameof(Backconvert));
                 }
             }
         }

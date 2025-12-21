@@ -37,6 +37,11 @@
                 <x:Type TypeName="local:ComposingAttributes" />
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
+        <ObjectDataProvider x:Key="BackconvertDataSource" ObjectType="{x:Type sys:Enum}" MethodName="GetValues">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="local:BackconvertModes" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
         <ObjectDataProvider x:Key="ToggleModifiersDataSource" ObjectType="{x:Type sys:Enum}" MethodName="GetValues">
             <ObjectDataProvider.MethodParameters>
                 <x:Type TypeName="local:ToggleModifiers" />
@@ -140,10 +145,23 @@
                 <CheckBox
                     IsChecked="{Binding DefaultEnabled}"
                     Content="{local:Localized Key=MainWindow_CheckBox_DefaultEnabled_Content}" />
-                <CheckBox
-                    Margin="0,7,0,0"
-                    IsChecked="{Binding BackconvertOnBackspace}"
-                    Content="{local:Localized Key=MainWindow_CheckBox_BackconvertOnBackspace_Content}" />
+                <Grid Margin="0,7,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="160" />
+                    </Grid.ColumnDefinitions>
+                    <Label
+                        Grid.Column="0"
+                        Margin="-5,0,0,0"
+                        Target="{Binding ElementName=comboboxBackconvert}"
+                        Content="{local:Localized Key=MainWindow_Label_Backconvert_Content}" />
+                    <ComboBox
+                        Grid.Column="2"
+                        Name="comboboxBackconvert"
+                        ItemsSource="{Binding Source={StaticResource ResourceKey=BackconvertDataSource}}"
+                        SelectedValue="{Binding Backconvert}" />
+                </Grid>
                 <Grid Margin="0,7,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />

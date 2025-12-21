@@ -19,7 +19,7 @@ namespace VietTypeConfig2.LocalizedResources {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Localized {
@@ -117,15 +117,6 @@ namespace VietTypeConfig2.LocalizedResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to _Reconvert word on Backspace.
-        /// </summary>
-        public static string MainWindow_CheckBox_BackconvertOnBackspace_Content {
-            get {
-                return ResourceManager.GetString("MainWindow_CheckBox_BackconvertOnBackspace_Content", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Backspaced _invalid word stays invalid.
         /// </summary>
         public static string MainWindow_CheckBox_BackspaceInvalid_Content {
@@ -194,6 +185,15 @@ namespace VietTypeConfig2.LocalizedResources {
         public static string MainWindow_GroupBox_EngineSettings_Header {
             get {
                 return ResourceManager.GetString("MainWindow_GroupBox_EngineSettings_Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Word _reconversion mode.
+        /// </summary>
+        public static string MainWindow_Label_Backconvert_Content {
+            get {
+                return ResourceManager.GetString("MainWindow_Label_Backconvert_Content", resourceCulture);
             }
         }
         

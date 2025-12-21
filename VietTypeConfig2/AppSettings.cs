@@ -22,7 +22,8 @@ namespace VietTypeConfig2 {
         private static bool? ToBool(object v) {
             if (v is int) {
                 return (int)v != 0;
-            } else {
+            }
+            else {
                 return null;
             }
         }
@@ -30,12 +31,13 @@ namespace VietTypeConfig2 {
         private static int? ToInt(object v) {
             if (v is int) {
                 return (int)v;
-            } else {
+            }
+            else {
                 return null;
             }
         }
 
-        public int typing_style = 0;
+        int typing_style = 0;
         public int TypingStyle {
             get {
                 return typing_style;
@@ -100,15 +102,18 @@ namespace VietTypeConfig2 {
             }
         }
 
-        bool backconvert_on_backspace = false;
-        public bool BackconvertOnBackspace {
+        /// <summary>
+        /// Legacy name for backconvert setting
+        /// </summary>
+        int backconvert_on_backspace = 0;
+        public int Backconvert {
             get {
                 return backconvert_on_backspace;
             }
             set {
                 if (backconvert_on_backspace != value) {
                     backconvert_on_backspace = value;
-                    OnPropertyChanged(nameof(BackconvertOnBackspace));
+                    OnPropertyChanged(nameof(Backconvert));
                 }
             }
         }
@@ -187,7 +192,7 @@ namespace VietTypeConfig2 {
                 setting.OaUy = ToBool(regKey.GetValue(nameof(oa_uy_tone1))) ?? setting.OaUy;
                 setting.AcceptDd = ToBool(regKey.GetValue(nameof(accept_dd))) ?? setting.AcceptDd;
                 setting.BackspaceInvalid = ToBool(regKey.GetValue(nameof(backspace_invalid))) ?? setting.BackspaceInvalid;
-                setting.BackconvertOnBackspace = ToBool(regKey.GetValue(nameof(backconvert_on_backspace))) ?? setting.BackconvertOnBackspace;
+                setting.Backconvert = ToInt(regKey.GetValue(nameof(backconvert_on_backspace))) ?? setting.Backconvert;
                 setting.OptimizeMultilang = ToInt(regKey.GetValue(nameof(optimize_multilang))) ?? setting.OptimizeMultilang;
                 setting.Autocorrect = ToBool(regKey.GetValue(nameof(autocorrect))) ?? setting.Autocorrect;
                 setting.ShowComposingAttr = ToInt(regKey.GetValue(nameof(show_composing_attr))) ?? setting.ShowComposingAttr;
@@ -204,7 +209,7 @@ namespace VietTypeConfig2 {
                 regKey.SetValue(nameof(oa_uy_tone1), settings.OaUy ? 1 : 0);
                 regKey.SetValue(nameof(accept_dd), settings.AcceptDd ? 1 : 0);
                 regKey.SetValue(nameof(backspace_invalid), settings.BackspaceInvalid ? 1 : 0);
-                regKey.SetValue(nameof(backconvert_on_backspace), settings.BackconvertOnBackspace ? 1 : 0);
+                regKey.SetValue(nameof(backconvert_on_backspace), settings.Backconvert);
                 regKey.SetValue(nameof(optimize_multilang), settings.OptimizeMultilang);
                 regKey.SetValue(nameof(autocorrect), settings.Autocorrect ? 1 : 0);
                 regKey.SetValue(nameof(show_composing_attr), settings.ShowComposingAttr);
@@ -220,7 +225,8 @@ namespace VietTypeConfig2 {
                                 globalCompartment.SetValue(tid, unchecked((oldGlobal as int? ?? 0) + 1));
                             }
                         }
-                    } finally {
+                    }
+                    finally {
                         threadMgr.Deactivate();
                     }
                 }

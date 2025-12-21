@@ -123,8 +123,8 @@
   <data name="MainWindow_CheckBox_Autocorrect_Content" xml:space="preserve">
     <value>Enable _autocorrect</value>
   </data>
-  <data name="MainWindow_CheckBox_BackconvertOnBackspace_Content" xml:space="preserve">
-    <value>_Reconvert word on Backspace</value>
+  <data name="MainWindow_Label_Backconvert_Content" xml:space="preserve">
+    <value>Word _reconversion mode</value>
   </data>
   <data name="MainWindow_CheckBox_BackspaceInvalid_Content" xml:space="preserve">
     <value>Backspaced _invalid word stays invalid</value>

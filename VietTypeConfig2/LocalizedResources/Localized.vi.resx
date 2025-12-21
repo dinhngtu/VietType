@@ -123,8 +123,8 @@
   <data name="MainWindow_CheckBox_Autocorrect_Content" xml:space="preserve">
     <value>Tự động sửa từ (_A)</value>
   </data>
-  <data name="MainWindow_CheckBox_BackconvertOnBackspace_Content" xml:space="preserve">
-    <value>Chuyển ngược từ khi Backspace (_R)</value>
+  <data name="MainWindow_Label_Backconvert_Content" xml:space="preserve">
+    <value>Chế độ chuyển ngược từ (_R)</value>
   </data>
   <data name="MainWindow_CheckBox_BackspaceInvalid_Content" xml:space="preserve">
     <value>Giữ trạng thái sai khi xóa từ sai (_I)</value>

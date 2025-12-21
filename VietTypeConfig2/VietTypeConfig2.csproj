@@ -90,6 +90,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="BackconvertModes.cs" />
     <Compile Include="LocalizationManager.cs" />
     <Compile Include="LocalizedExtension.cs" />
     <Compile Include="LocalizedResources\Localized.vi.Designer.cs">
