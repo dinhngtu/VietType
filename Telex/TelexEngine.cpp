@@ -531,7 +531,7 @@ TelexStates TelexEngine::Backspace() {
             rp[i] = (rp[i] & ResposMask) | ResposExpunged;
         }
     }
-    if (foundTone) {
+    if (foundTone && _t != Tones::Z) {
         rp[lastTone] = (rp[lastTone] & ResposMask) | ResposTone;
     }
 

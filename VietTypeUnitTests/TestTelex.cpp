@@ -162,6 +162,16 @@ public:
         });
     }
 
+    TEST_METHOD (TestTelexBackspaceAfzea) {
+        MultiConfigTester(config).Invoke([](auto& e) {
+            e.Reset();
+            // must leave the class in a valid state
+            if (FeedWord(e, L"afzea") == TelexStates::Valid) {
+                AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+            }
+        });
+    }
+
     // commit
 
     TEST_METHOD (TestTelexEmptyCommit) {
