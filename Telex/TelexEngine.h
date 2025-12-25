@@ -208,9 +208,12 @@ private:
     std::vector<int> _cases;
     /// <summary>
     /// for each character in the _keyBuffer, record which output character it's responsible for,
-    /// e.g. 'đuống' (dduoongs) _respos = 00122342 (T = tone, C = transition _c1, V = transition _v)
+    /// e.g. 'đuống' (dduoongs) _respos = 00122340 (T = tone, C = transition _c1, V = transition _v)
     ///                                    C  V  T
-    /// note that respos position masks are only valid if state is Valid
+    /// notes:
+    /// - respos position masks are only valid if state is Valid
+    /// - 0 is a valid placeholder for respos position (backspacing the last character will reset the engine state anyway)
+    /// - tones use a respos value of 0 since they're committed in a separate phase
     /// </summary>
     std::vector<unsigned int> _respos;
     unsigned int _respos_current = 0;
