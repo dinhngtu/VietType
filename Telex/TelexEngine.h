@@ -239,7 +239,6 @@ private:
     void InvalidateAndPopBack(wchar_t c);
     std::optional<std::pair<std::wstring_view, VInfo>> FindTable() const;
     bool GetTonePos(_In_ bool predict, _Out_ VInfo* vinfo) const;
-    void ReapplyTone();
     bool HasValidRespos() const;
     void FeedNewResultChar(std::wstring& target, wchar_t c, bool ccase, unsigned int respos_flags = 0);
     TelexStates DoOptimizeAndAutocorrect();

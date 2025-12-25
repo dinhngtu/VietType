@@ -714,6 +714,17 @@ public:
         });
     }
 
+    TEST_METHOD (TestTelexBackspaceEefsch) {
+        MultiConfigTester(config).Invoke([](auto& e) {
+            if (FeedWord(e, L"eefsch") == TelexStates::Valid) {
+                AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+                Assert::AreEqual(L"\x1ebf\x63", e.Peek().c_str());
+                AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+                Assert::AreEqual(L"\x1ebf", e.Peek().c_str());
+            }
+        });
+    }
+
     // test backconversions
 
     TEST_METHOD (TestTelexBackconversionDdoongf) {

@@ -187,28 +187,6 @@ bool TelexEngine::GetTonePos(_In_ bool predict, _Out_ VInfo* vinfo) const {
     return found.has_value();
 }
 
-void TelexEngine::ReapplyTone() {
-    _toneCount++;
-    unsigned int pos = 0;
-    bool foundTone = false;
-    for (size_t i = _respos.size(); i > 0; i--) {
-        if (_respos[i - 1] & ResposTone) {
-            pos = static_cast<unsigned int>(i - 1);
-            foundTone = true;
-            break;
-        }
-    }
-    if (foundTone) {
-        _respos.push_back(pos | ResposTone);
-    } else {
-        VInfo vinfo;
-        if (GetTonePos(false, &vinfo))
-            _respos.push_back(static_cast<unsigned int>(_c1.size() + vinfo.tonepos) | ResposTone);
-        else
-            _respos.push_back(static_cast<unsigned int>(_c1.size() + _v.size() - 1) | ResposTone);
-    }
-}
-
 bool TelexEngine::HasValidRespos() const {
     return std::any_of(_respos.begin(), _respos.end(), [](auto rp) { return rp & ResposValidMask; });
 }
@@ -416,7 +394,8 @@ TelexStates TelexEngine::PushChar(wchar_t corig) {
                 Invalidate();
             } else {
                 _t = newtone;
-                ReapplyTone();
+                _toneCount++;
+                _respos.push_back(ResposTone);
             }
         } else {
             InvalidateAndPopBack(c);
