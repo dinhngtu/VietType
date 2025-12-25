@@ -95,13 +95,49 @@ constexpr CharTypes operator&(CharTypes lhs, CharTypes rhs) {
     return static_cast<CharTypes>(static_cast<unsigned int>(lhs) & static_cast<unsigned int>(rhs));
 }
 
+enum class TypingFlags : unsigned long long {
+    Zero = 0,
+    IsTelex = 0x1,
+    NoAutocorrectLeadingW = 0x2,
+    // legacy 1+
+    NoAutocorrectLeadingEmptyW = 0x10, // telex only
+    OptimizeEnDictionary = 0x20,
+    Level1 = OptimizeEnDictionary,
+    Level1Telex = Level1 | IsTelex | NoAutocorrectLeadingEmptyW,
+    // legacy 2+
+    OptimizeEnDictionary2 = 0x100,
+    NoAutocorrectTrailingHWithoutTone = 0x200,
+    NoAutocorrectTrailingG = 0x400,
+    Level2 = Level1 | OptimizeEnDictionary2 | NoAutocorrectTrailingHWithoutTone | NoAutocorrectTrailingG,
+    Level2Telex = Level2 | Level1Telex,
+    // legacy 3+
+    InvalidateOnVowelPostTone = 0x1000,
+    InvalidateDoubleTone = 0x2000,
+    Level3 = Level2 | InvalidateOnVowelPostTone | InvalidateDoubleTone,
+    Level3Telex = Level3 | Level2Telex,
+};
+
+constexpr TypingFlags operator|(TypingFlags lhs, TypingFlags rhs) {
+    return static_cast<TypingFlags>(static_cast<unsigned long long>(lhs) | static_cast<unsigned long long>(rhs));
+}
+
+constexpr TypingFlags operator&(TypingFlags lhs, TypingFlags rhs) {
+    return static_cast<TypingFlags>(static_cast<unsigned long long>(lhs) & static_cast<unsigned long long>(rhs));
+}
+
+constexpr TypingFlags operator~(TypingFlags val) {
+    return static_cast<TypingFlags>(~static_cast<unsigned long long>(val));
+}
+
+constexpr size_t NumOptimizationLevels = 8;
+
 struct TypingStyle {
     CharTypes chartypes[128];
     ArrayMap<std::wstring_view, std::wstring_view, true> transitions;
     ArrayMap<wchar_t, std::wstring_view, true> backconversions;
     const std::wstring_view charlist;
+    TypingFlags flags[NumOptimizationLevels];
     unsigned long max_optimize;
-    bool is_telex;
 };
 
 class TelexEngine : public ITelexEngine {
@@ -154,6 +190,7 @@ public:
 
 private:
     struct TelexConfig _config;
+    TypingFlags _cachedFlags;
 
     TelexStates _state = TelexStates::Valid;
 
@@ -196,8 +233,8 @@ private:
     }
 
     const TypingStyle* GetTypingStyle() const;
-    unsigned long GetOptimizeLevel() const {
-        return std::min(GetTypingStyle()->max_optimize, _config.optimize_multilang);
+    bool IsTypingStyle(TypingFlags flag) const {
+        return static_cast<unsigned long long>(_cachedFlags & flag);
     }
     CharTypes ClassifyCharacter(_In_ wchar_t lc) const;
     void Invalidate();

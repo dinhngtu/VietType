@@ -227,13 +227,13 @@ TelexEngine::TelexEngine(const TelexConfig& config) {
     if (config.typing_style >= TypingStyles::Max) {
         throw std::invalid_argument("invalid typing style");
     }
-    _config = config;
     _keyBuffer.reserve(MaxLength);
     _c1.reserve(MaxLength);
     _v.reserve(MaxLength);
     _c2.reserve(MaxLength);
     _cases.reserve(MaxLength);
     _respos.reserve(MaxLength);
+    SetConfig(config);
     Reset();
 }
 
@@ -247,6 +247,8 @@ void TelexEngine::SetConfig(const TelexConfig& config) {
     }
     auto last = _config.typing_style;
     _config = config;
+    auto optimizeLevel = std::min(GetTypingStyle()->max_optimize, _config.optimize_multilang);
+    _cachedFlags = GetTypingStyle()->flags[optimizeLevel];
     if (last != config.typing_style) {
         Reset();
     }
@@ -334,11 +336,11 @@ TelexStates TelexEngine::PushChar(wchar_t corig) {
         auto before = _v.size();
         // HACK: single special case for "khongoo"
         // note that _v here is post-append but pre-transition
-        if (!_c2.empty() && GetTypingStyle()->is_telex && c == L'o' && _v == L"\xf4o") {
+        if (!_c2.empty() && IsTypingStyle(TypingFlags::IsTelex) && c == L'o' && _v == L"\xf4o") {
             Invalidate();
         } else if (TransitionV(GetTypingStyle()->transitions)) {
             auto after = _v.size();
-            if (GetOptimizeLevel() >= 3 && _toneCount) {
+            if (IsTypingStyle(TypingFlags::InvalidateOnVowelPostTone) && _toneCount) {
                 Invalidate();
             } else if (
                 _keyBuffer.size() > 1 && _respos.back() & ResposTransitionV && c == ToLower(_keyBuffer.rbegin()[1])) {
@@ -396,8 +398,8 @@ TelexStates TelexEngine::PushChar(wchar_t corig) {
             }
             // 'w' always keeps V size constant, don't push case
         } else if (
-            GetTypingStyle()->is_telex && _config.autocorrect && !_toneCount &&
-            (!_c1.empty() || GetOptimizeLevel() == 0)) {
+            !IsTypingStyle(TypingFlags::NoAutocorrectLeadingW) && _config.autocorrect && !_toneCount &&
+            (!_c1.empty() || !IsTypingStyle(TypingFlags::NoAutocorrectLeadingEmptyW))) {
             // at >=1 optimization, autocorrecting "nwuocs" is desirable but "wuocs" not
             FeedNewResultChar(_v, c, ccase, ResposAutocorrect);
         } else {
@@ -408,7 +410,7 @@ TelexStates TelexEngine::PushChar(wchar_t corig) {
         // tones
         auto newtone = GetCharTone(cat);
         if (newtone != _t) {
-            if (GetOptimizeLevel() >= 3 && _toneCount) {
+            if (IsTypingStyle(TypingFlags::InvalidateDoubleTone) && _toneCount) {
                 Invalidate();
             } else {
                 _t = newtone;
@@ -554,7 +556,7 @@ TelexStates TelexEngine::DoOptimizeAndAutocorrect() {
     // precondition
     assert(_state == TelexStates::Valid);
 
-    if (GetOptimizeLevel() >= 1) {
+    if (IsTypingStyle(TypingFlags::OptimizeEnDictionary)) {
         std::wstring wordBuffer = _keyBuffer;
         for (auto& c : wordBuffer) {
             c = ToLower(c);
@@ -569,7 +571,7 @@ TelexStates TelexEngine::DoOptimizeAndAutocorrect() {
             assert(CheckInvariants());
             return _state;
         }
-        if (GetOptimizeLevel() >= 2 && wlist_en_2.find(wordBuffer) != wlist_en_2.end()) {
+        if (IsTypingStyle(TypingFlags::OptimizeEnDictionary2) && wlist_en_2.find(wordBuffer) != wlist_en_2.end()) {
             _state = TelexStates::CommittedInvalid;
             assert(CheckInvariants());
             return _state;
@@ -579,7 +581,7 @@ TelexStates TelexEngine::DoOptimizeAndAutocorrect() {
     if (_config.autocorrect && !_backconverted && _toneCount < 2) {
         // fixing respos might not be necessary here but fixing cases is
         // HACK
-        if (GetTypingStyle()->is_telex) {
+        if (IsTypingStyle(TypingFlags::IsTelex)) {
             if (_v == L"wu") {
                 _v = L"\x1b0u";
                 _autocorrected = true;
@@ -606,7 +608,7 @@ TelexStates TelexEngine::DoOptimizeAndAutocorrect() {
                 _c2 = L"ch";
                 _cases.push_back(_cases[_c1.length() + _v.length()]);
                 _autocorrected = true;
-            } else if (GetOptimizeLevel() <= 1 || HasValidRespos()) {
+            } else if (!IsTypingStyle(TypingFlags::NoAutocorrectTrailingHWithoutTone) || HasValidRespos()) {
                 _c2 = L"nh";
                 _cases.push_back(_cases[_c1.length() + _v.length()]);
                 _autocorrected = true;
@@ -616,7 +618,7 @@ TelexStates TelexEngine::DoOptimizeAndAutocorrect() {
             if (_c2 == L"gn") {
                 _c2 = L"ng";
                 _autocorrected = true;
-            } else if (GetOptimizeLevel() <= 1 && _c2 == L"g") {
+            } else if (!IsTypingStyle(TypingFlags::NoAutocorrectTrailingG) && _c2 == L"g") {
                 _c2 = L"ng";
                 _cases.push_back(_cases.back());
                 _autocorrected = true;
@@ -751,7 +753,7 @@ TelexStates TelexEngine::Backconvert(const std::wstring& s) {
     bool failed = false;
     for (auto c : s) {
         // for emulating double key outcomes ("xoong")
-        auto double_flag = GetTypingStyle()->is_telex && _c2.empty() && (_v == L"e" || _v == L"o");
+        auto double_flag = IsTypingStyle(TypingFlags::IsTelex) && _c2.empty() && (_v == L"e" || _v == L"o");
         auto clow = ToLower(c);
         auto cat = ClassifyCharacter(clow);
         if (cat != CharTypes::Uncategorized) {

@@ -1203,8 +1203,14 @@ const std::array<const TypingStyle, static_cast<size_t>(TypingStyles::Max)> typi
         .transitions = transitions_telex,
         .backconversions = backconversions_telex,
         .charlist = L"abcdefghijklmnopqrstuvwxyz",
+        .flags =
+            {
+                TypingFlags::IsTelex,     //
+                TypingFlags::Level1Telex, //
+                TypingFlags::Level2Telex, //
+                TypingFlags::Level3Telex, //
+            },
         .max_optimize = 3,
-        .is_telex = true,
     },
 
     // vni
@@ -1343,8 +1349,8 @@ const std::array<const TypingStyle, static_cast<size_t>(TypingStyles::Max)> typi
         .transitions = transitions_vni,
         .backconversions = backconversions_vni,
         .charlist = L"0123456789abcdefghijklmnopqrstuvwxyz",
+        .flags = {TypingFlags::NoAutocorrectLeadingW},
         .max_optimize = 0,
-        .is_telex = false,
     },
 
     // complicated telex
@@ -1483,13 +1489,25 @@ const std::array<const TypingStyle, static_cast<size_t>(TypingStyles::Max)> typi
         .transitions = transitions_telex,
         .backconversions = backconversions_telex,
         .charlist = L"[]abcdefghijklmnopqrstuvwxyz{}",
+        .flags =
+            {
+                TypingFlags::IsTelex,     //
+                TypingFlags::Level1Telex, //
+                TypingFlags::Level2Telex, //
+                TypingFlags::Level3Telex, //
+            },
         .max_optimize = 3,
-        .is_telex = true,
     },
 };
 debug_ensure(std::all_of(typing_styles.begin(), typing_styles.end(), [](const auto& x) {
-    for (int i = 0; i < std::size(x.chartypes); i++) {
+    for (unsigned int i = 0; i < std::size(x.chartypes); i++) {
         if (x.chartypes[i] != CharTypes::Uncategorized && x.charlist.find((wchar_t)i) == std::wstring_view::npos)
+            return false;
+    }
+    if (x.max_optimize >= NumOptimizationLevels)
+        return false;
+    for (unsigned long j = 0; j < x.max_optimize; j++) {
+        if (static_cast<unsigned long long>(x.flags[j] & ~x.flags[j + 1]))
             return false;
     }
     // charlist might be more liberal than chartypes so we don't test the converse
