@@ -625,6 +625,10 @@ public:
             Assert::AreEqual(L"g\xecg", e.Peek().c_str());
             e.Backspace();
             Assert::AreEqual(L"g\xec", e.Peek().c_str());
+            e.Backspace();
+            Assert::AreEqual(L"g", e.Peek().c_str());
+            e.PushChar(L'i');
+            Assert::AreEqual(L"gi", e.Peek().c_str());
         });
     }
 
@@ -656,6 +660,8 @@ public:
             Assert::AreEqual(L"tho\xf2n", e.Peek().c_str());
             AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
             Assert::AreEqual(L"tho\xf2", e.Peek().c_str());
+            AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+            Assert::AreEqual(L"tho", e.Peek().c_str());
         });
     }
 
@@ -675,10 +681,7 @@ public:
     TEST_METHOD (TestTelexBackspaceCuwsoc) {
         MultiConfigTester(config, 0, 2).Invoke([](auto& e) {
             AssertTelexStatesEqual(TelexStates::Valid, FeedWord(e, L"cuwsoc"));
-            Assert::AreEqual(
-                L"c\x1b0\x1edb"
-                "c",
-                e.Peek().c_str());
+            Assert::AreEqual(L"c\x1b0\x1edb\x63", e.Peek().c_str());
             AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
             Assert::AreEqual(L"c\x1b0\x1edb", e.Peek().c_str());
             AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
@@ -689,10 +692,7 @@ public:
     TEST_METHOD (TestTelexBackspaceCuwocs) {
         MultiConfigTester(config).Invoke([](auto& e) {
             AssertTelexStatesEqual(TelexStates::Valid, FeedWord(e, L"cuwocs"));
-            Assert::AreEqual(
-                L"c\x1b0\x1edb"
-                "c",
-                e.Peek().c_str());
+            Assert::AreEqual(L"c\x1b0\x1edb\x63", e.Peek().c_str());
             AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
             Assert::AreEqual(L"c\x1b0\x1edb", e.Peek().c_str());
             AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
@@ -703,13 +703,21 @@ public:
     TEST_METHOD (TestTelexBackspaceCuocws) {
         MultiConfigTester(config).Invoke([](auto& e) {
             AssertTelexStatesEqual(TelexStates::Valid, FeedWord(e, L"cuocws"));
-            Assert::AreEqual(
-                L"c\x1b0\x1edb"
-                "c",
-                e.Peek().c_str());
+            Assert::AreEqual(L"c\x1b0\x1edb\x63", e.Peek().c_str());
             AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
             Assert::AreEqual(L"cu\x1edb", e.Peek().c_str());
             AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+            Assert::AreEqual(L"cu", e.Peek().c_str());
+        });
+    }
+
+    TEST_METHOD (TestTelexBackspaceCows) {
+        MultiConfigTester(config).Invoke([](auto& e) {
+            AssertTelexStatesEqual(TelexStates::Valid, FeedWord(e, L"cows"));
+            Assert::AreEqual(L"c\x1edb", e.Peek().c_str());
+            AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+            Assert::AreEqual(L"c", e.Peek().c_str());
+            e.PushChar(L'u');
             Assert::AreEqual(L"cu", e.Peek().c_str());
         });
     }
@@ -721,6 +729,8 @@ public:
                 Assert::AreEqual(L"\x1ebf\x63", e.Peek().c_str());
                 AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
                 Assert::AreEqual(L"\x1ebf", e.Peek().c_str());
+                AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+                Assert::AreEqual(L"", e.Peek().c_str());
             }
         });
     }
