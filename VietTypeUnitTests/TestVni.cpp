@@ -103,14 +103,6 @@ public:
         });
     }
 
-    TEST_METHOD (TestVniEmptyForceCommit) {
-        MultiConfigTester(config).Invoke([](auto& e) {
-            e.Reset();
-            AssertTelexStatesEqual(TelexStates::Committed, e.ForceCommit());
-            Assert::AreEqual(L"", e.Retrieve().c_str());
-        });
-    }
-
     TEST_METHOD (TestVniEmptyCancel) {
         MultiConfigTester(config).Invoke([](auto& e) {
             e.Reset();

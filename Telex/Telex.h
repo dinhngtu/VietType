@@ -13,8 +13,8 @@ namespace Telex {
 // Valid (initial) -> Valid|Invalid (by pushing a character)
 // Invalid -> Invalid (by pushing a character)
 
-// Valid -> Committed|CommittedInvalid (by calling Commit/ForceCommit)
-// Invalid -> CommittedInvalid (by calling Commit/ForceCommit)
+// Valid -> Committed|CommittedInvalid (by calling Commit)
+// Invalid -> CommittedInvalid (by calling Commit)
 // Valid/Invalid -> CommittedInvalid (by calling Cancel)
 
 // Committed: can call Retrieve/RetrieveRaw, does not change state
@@ -64,7 +64,6 @@ public:
     virtual TelexStates PushChar(wchar_t c) = 0;
     virtual TelexStates Backspace() = 0;
     virtual TelexStates Commit() = 0;
-    virtual TelexStates ForceCommit() = 0;
     virtual TelexStates Cancel() = 0;
     virtual TelexStates Backconvert(const std::wstring& s) = 0;
 

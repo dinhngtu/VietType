@@ -157,7 +157,6 @@ public:
     TelexStates PushChar(wchar_t c) override;
     TelexStates Backspace() override;
     TelexStates Commit() override;
-    TelexStates ForceCommit() override;
     TelexStates Cancel() override;
     TelexStates Backconvert(const std::wstring& s) override;
 

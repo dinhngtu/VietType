@@ -707,36 +707,6 @@ TelexStates TelexEngine::Commit() {
     return _state;
 }
 
-TelexStates TelexEngine::ForceCommit() {
-    if (_state == TelexStates::Committed || _state == TelexStates::CommittedInvalid ||
-        _state == TelexStates::BackconvertFailed) {
-        return _state;
-    }
-
-    if (_state == TelexStates::Invalid) {
-        _state = TelexStates::CommittedInvalid;
-        return _state;
-    }
-
-    if (_keyBuffer.empty()) {
-        _state = TelexStates::Committed;
-        return _state;
-    }
-
-    VInfo vinfo;
-    auto found = GetTonePos(false, &vinfo);
-    if (!found) {
-        _state = TelexStates::CommittedInvalid;
-        assert(CheckInvariants());
-        return _state;
-    }
-    _v[vinfo.tonepos] = TranslateTone(_v[vinfo.tonepos], _t);
-
-    _state = TelexStates::Committed;
-    assert(CheckInvariants());
-    return _state;
-}
-
 TelexStates TelexEngine::Cancel() {
     if (_backconverted && _c1.size() + _v.size() + _c2.size() != _keyBuffer.size()) {
         auto s = Peek();
