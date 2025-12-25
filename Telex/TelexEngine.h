@@ -186,6 +186,7 @@ public:
     }
 
     bool CheckInvariants() const;
+    bool CheckInvariantsBackspace(TelexStates prevState) const;
 
 private:
     struct TelexConfig _config;
@@ -217,8 +218,6 @@ private:
     bool _autocorrected = false;
 
 private:
-    bool CheckInvariantsBackspace(TelexStates prevState) const;
-
     template <typename T>
     bool TransitionV(const T& source, bool w_mode = false) {
         auto it = source.find(_v);

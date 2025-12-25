@@ -59,22 +59,24 @@ static void DoFuzz(const FuzzWorkItem& wi) {
                         e.PushChar(wi.table[cur % table_size]);
                         cur /= table_size;
                     }
+                    auto keyBuffer = e.RetrieveRaw();
                     if (!e.CheckInvariants()) {
-                        wprintf(L"word failed: %s\n", e.RetrieveRaw().c_str());
+                        wprintf(L"word failed: %s\n", keyBuffer.c_str());
                     }
                     if (wi.mode == 0) {
                         if (e.Commit() == TelexStates::TxError) {
-                            wprintf(L"word failed commit: %s\n", e.RetrieveRaw().c_str());
+                            wprintf(L"word failed commit: %s\n", keyBuffer.c_str());
                         }
                         if (!e.CheckInvariants()) {
-                            wprintf(L"word failed commit invariant: %s\n", e.RetrieveRaw().c_str());
+                            wprintf(L"word failed commit invariant: %s\n", keyBuffer.c_str());
                         }
                     } else {
+                        auto prevState = e.GetState();
                         if (e.Backspace() == TelexStates::TxError) {
-                            wprintf(L"word failed backspace: %s\n", e.RetrieveRaw().c_str());
+                            wprintf(L"word failed backspace: %s\n", keyBuffer.c_str());
                         }
-                        if (!e.CheckInvariants()) {
-                            wprintf(L"word failed backspace invariant: %s\n", e.RetrieveRaw().c_str());
+                        if (!e.CheckInvariantsBackspace(prevState)) {
+                            wprintf(L"word failed backspace invariant: %s\n", keyBuffer.c_str());
                         }
                     }
                 }
@@ -113,59 +115,69 @@ bool fuzz() {
         std::mutex wq_lock;
         for (auto len = 1; len <= 5; len++) {
             for (auto mode = 0; mode <= 1; mode++) {
-                wq.emplace_back(FuzzWorkItem{
-                    .len = len,
-                    .style = TypingStyles::Telex,
-                    .table = table_telex,
-                    .start = 0,
-                    .end = (int)table_telex.size(),
-                    .mode = mode,
-                });
-                wq.emplace_back(FuzzWorkItem{
-                    .len = len,
-                    .style = TypingStyles::TelexComplicated,
-                    .table = table_telex_complicated,
-                    .start = 0,
-                    .end = (int)table_telex_complicated.size(),
-                    .mode = mode,
-                });
-                wq.emplace_back(FuzzWorkItem{
-                    .len = len,
-                    .style = TypingStyles::Vni,
-                    .table = table_vni,
-                    .start = 0,
-                    .end = (int)table_vni.size(),
-                    .mode = mode,
-                });
-            }
-        }
-        for (auto len = 6; len <= 8; len++) {
-            for (int i = 0; i < table_telex.size(); i += skip) {
-                for (auto mode = 0; mode <= 1; mode++) {
-                    wq.emplace_back(FuzzWorkItem{
+                wq.emplace_back(
+                    FuzzWorkItem{
                         .len = len,
                         .style = TypingStyles::Telex,
                         .table = table_telex,
-                        .start = i,
-                        .end = std::min(i + skip, (int)table_telex.size()),
+                        .start = 0,
+                        .end = (int)table_telex.size(),
                         .mode = mode,
                     });
-                    wq.emplace_back(FuzzWorkItem{
+                wq.emplace_back(
+                    FuzzWorkItem{
                         .len = len,
                         .style = TypingStyles::TelexComplicated,
                         .table = table_telex_complicated,
-                        .start = i,
-                        .end = std::min(i + skip, (int)table_telex_complicated.size()),
+                        .start = 0,
+                        .end = (int)table_telex_complicated.size(),
                         .mode = mode,
                     });
-                    wq.emplace_back(FuzzWorkItem{
+                wq.emplace_back(
+                    FuzzWorkItem{
                         .len = len,
                         .style = TypingStyles::Vni,
                         .table = table_vni,
-                        .start = i,
-                        .end = std::min(i + skip, (int)table_vni.size()),
+                        .start = 0,
+                        .end = (int)table_vni.size(),
                         .mode = mode,
                     });
+            }
+        }
+        for (auto len = 6; len <= 8; len++) {
+            for (auto mode = 0; mode <= 1; mode++) {
+                for (int i = 0; i < table_telex.size(); i += skip) {
+                    wq.emplace_back(
+                        FuzzWorkItem{
+                            .len = len,
+                            .style = TypingStyles::Telex,
+                            .table = table_telex,
+                            .start = i,
+                            .end = std::min(i + skip, (int)table_telex.size()),
+                            .mode = mode,
+                        });
+                }
+                for (int i = 0; i < table_telex_complicated.size(); i += skip) {
+                    wq.emplace_back(
+                        FuzzWorkItem{
+                            .len = len,
+                            .style = TypingStyles::TelexComplicated,
+                            .table = table_telex_complicated,
+                            .start = i,
+                            .end = std::min(i + skip, (int)table_telex_complicated.size()),
+                            .mode = mode,
+                        });
+                }
+                for (int i = 0; i < table_vni.size(); i += skip) {
+                    wq.emplace_back(
+                        FuzzWorkItem{
+                            .len = len,
+                            .style = TypingStyles::Vni,
+                            .table = table_vni,
+                            .start = i,
+                            .end = std::min(i + skip, (int)table_vni.size()),
+                            .mode = mode,
+                        });
                 }
             }
         }
