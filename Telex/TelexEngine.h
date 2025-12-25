@@ -38,11 +38,11 @@ enum ResposTransitions {
     // transitions to Invalid:
 
     // removed by backspace (e.g. excessive tones), valid within Backspace only
-    ResposExpunged = 0x40000000,
+    ResposExpunged = 0x80000000,
     // caused transition to Invalid through double key
-    ResposDoubleUndo = 0x20000000,
+    ResposDoubleUndo = 0x40000000,
     // caused transition to Invalid
-    ResposInvalidate = 0x10000000,
+    ResposInvalidate = 0x20000000,
 
     // transitions findable in valid words:
 
@@ -176,7 +176,7 @@ public:
     constexpr Tones GetTone() const {
         return _t;
     }
-    constexpr const std::vector<int>& GetRespos() const {
+    constexpr const std::vector<unsigned int>& GetRespos() const {
         return _respos;
     }
     constexpr bool IsBackconverted() const {
@@ -199,7 +199,7 @@ private:
     std::wstring _v;
     std::wstring _c2;
     Tones _t = Tones::Z;
-    int _toneCount = 0;
+    unsigned int _toneCount = 0;
     // don't use bool vector since that's special cased in the STL
     /// <summary>
     /// only use when valid;
@@ -212,8 +212,8 @@ private:
     ///                                    C  V  T
     /// note that respos position masks are only valid if state is Valid
     /// </summary>
-    std::vector<int> _respos;
-    int _respos_current = 0;
+    std::vector<unsigned int> _respos;
+    unsigned int _respos_current = 0;
     bool _backconverted = false;
     bool _autocorrected = false;
 
@@ -243,7 +243,7 @@ private:
     bool GetTonePos(_In_ bool predict, _Out_ VInfo* vinfo) const;
     void ReapplyTone();
     bool HasValidRespos() const;
-    void FeedNewResultChar(std::wstring& target, wchar_t c, bool ccase, int respos_flags = 0);
+    void FeedNewResultChar(std::wstring& target, wchar_t c, bool ccase, unsigned int respos_flags = 0);
     TelexStates DoOptimizeAndAutocorrect();
 };
 

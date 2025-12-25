@@ -189,21 +189,23 @@ bool TelexEngine::GetTonePos(_In_ bool predict, _Out_ VInfo* vinfo) const {
 
 void TelexEngine::ReapplyTone() {
     _toneCount++;
-    int found = -1;
-    for (int i = static_cast<int>(_respos.size() - 1); i >= 0; i--) {
-        if (_respos[i] & ResposTone) {
-            found = i;
+    unsigned int pos = 0;
+    bool foundTone = false;
+    for (size_t i = _respos.size(); i > 0; i--) {
+        if (_respos[i - 1] & ResposTone) {
+            pos = static_cast<unsigned int>(i - 1);
+            foundTone = true;
             break;
         }
     }
-    if (found >= 0) {
-        _respos.push_back(found | ResposTone);
+    if (foundTone) {
+        _respos.push_back(pos | ResposTone);
     } else {
         VInfo vinfo;
         if (GetTonePos(false, &vinfo))
-            _respos.push_back(static_cast<int>(_c1.size() + vinfo.tonepos) | ResposTone);
+            _respos.push_back(static_cast<unsigned int>(_c1.size() + vinfo.tonepos) | ResposTone);
         else
-            _respos.push_back(static_cast<int>(_c1.size() + _v.size() - 1) | ResposTone);
+            _respos.push_back(static_cast<unsigned int>(_c1.size() + _v.size() - 1) | ResposTone);
     }
 }
 
@@ -211,7 +213,7 @@ bool TelexEngine::HasValidRespos() const {
     return std::any_of(_respos.begin(), _respos.end(), [](auto rp) { return rp & ResposValidMask; });
 }
 
-void TelexEngine::FeedNewResultChar(std::wstring& target, wchar_t c, bool ccase, int respos_flags) {
+void TelexEngine::FeedNewResultChar(std::wstring& target, wchar_t c, bool ccase, unsigned int respos_flags) {
     target.push_back(c);
     _cases.push_back(ccase);
     _respos.push_back(_respos_current++ | respos_flags);
@@ -465,7 +467,7 @@ TelexStates TelexEngine::Backspace() {
 
     [[maybe_unused]] auto prevState = _state;
     std::wstring buf(_keyBuffer);
-    std::vector<int> rp(_respos);
+    std::vector<unsigned int> rp(_respos);
 
     if (_state == TelexStates::BackconvertFailed) {
         _keyBuffer.pop_back();
@@ -515,24 +517,26 @@ TelexStates TelexEngine::Backspace() {
     rp = _respos;
     bool oldBackconverted = _backconverted;
 
-    auto toDelete = static_cast<int>(_c1.size() + _v.size() + _c2.size()) - 1;
+    auto toDelete = static_cast<unsigned int>(_c1.size() + _v.size() + _c2.size()) - 1;
 
     Reset();
 
     // ensure only one key in the _keyBuffer is Tone
-    int lastTone = -1;
-    for (size_t i = 0; i < buf.size(); i++) {
+    unsigned int lastTone = 0;
+    bool foundTone = false;
+    for (unsigned int i = 0; i < buf.size(); i++) {
         if (rp[i] & ResposTone) {
-            lastTone = static_cast<int>(i);
+            lastTone = i;
+            foundTone = true;
             rp[i] = (rp[i] & ResposMask) | ResposExpunged;
         }
     }
-    if (lastTone >= 0) {
+    if (foundTone) {
         rp[lastTone] = (rp[lastTone] & ResposMask) | ResposTone;
     }
 
     // scan word for respos that should be expunged
-    for (size_t i = 0; i < buf.size(); i++) {
+    for (unsigned int i = 0; i < buf.size(); i++) {
         if (rp[i] & ResposDoubleUndo && (rp[i] & ResposMask) >= toDelete) {
             assert(i > 0);
             assert(rp[i - 1] & ~ResposMask);
@@ -540,7 +544,7 @@ TelexStates TelexEngine::Backspace() {
         }
     }
 
-    for (size_t i = 0; i < buf.size(); i++)
+    for (unsigned int i = 0; i < buf.size(); i++)
         if (!(rp[i] & ResposExpunged) && (rp[i] & ResposMask) < toDelete)
             PushChar(buf[i]);
 
