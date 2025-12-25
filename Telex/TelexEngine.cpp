@@ -518,24 +518,19 @@ TelexStates TelexEngine::Backspace() {
     bool oldBackconverted = _backconverted;
 
     auto toDelete = static_cast<unsigned int>(_c1.size() + _v.size() + _c2.size()) - 1;
+    auto toneWasReset = _c1.size() + vinfo.tonepos >= toDelete;
 
     Reset();
 
-    // ensure only one key in the _keyBuffer is Tone
-    unsigned int lastTone = 0;
-    bool foundTone = false;
-    for (size_t i = 0; i < buf.size(); i++) {
-        if (rp[i] & ResposTone) {
-            lastTone = static_cast<unsigned int>(i);
-            foundTone = true;
-            rp[i] = (rp[i] & ResposMask) | ResposExpunged;
-        }
-    }
-    if (foundTone && _t != Tones::Z) {
-        rp[lastTone] = (rp[lastTone] & ResposMask) | ResposTone;
+    // scan word for respos that should be expunged
+    // attention that Reset() is already called
+
+    if (toneWasReset) {
+        for (size_t i = 0; i < buf.size(); i++)
+            if (rp[i] & ResposTone)
+                rp[i] = (rp[i] & ResposMask) | ResposExpunged;
     }
 
-    // scan word for respos that should be expunged
     for (size_t i = 0; i < buf.size(); i++) {
         if (rp[i] & ResposDoubleUndo && (rp[i] & ResposMask) >= toDelete) {
             assert(i > 0);

@@ -165,9 +165,9 @@ public:
     TEST_METHOD (TestTelexBackspaceAfzea) {
         MultiConfigTester(config).Invoke([](auto& e) {
             e.Reset();
-            // must leave the class in a valid state
             if (FeedWord(e, L"afzea") == TelexStates::Valid) {
                 AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+                Assert::AreEqual(L"ae", e.Retrieve().c_str());
             }
         });
     }
@@ -628,6 +628,15 @@ public:
         });
     }
 
+    TEST_METHOD (TestTelexBackspaceHofazn) {
+        MultiConfigTester(config, 0, 0).Invoke([](auto& e) {
+            FeedWord(e, L"hofazn");
+            Assert::AreEqual(L"hoan", e.Peek().c_str());
+            e.Backspace();
+            Assert::AreEqual(L"hoa", e.Peek().c_str());
+        });
+    }
+
     TEST_METHOD (TestTelexBackspaceXooong) {
         MultiConfigTester(config).Invoke([](auto& e) {
             AssertTelexStatesEqual(TelexStates::Valid, FeedWord(e, L"xooong"));
@@ -673,8 +682,7 @@ public:
             AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
             Assert::AreEqual(L"c\x1b0\x1edb", e.Peek().c_str());
             AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-            // since the tone is entered with the "uw", it should stay there
-            Assert::AreEqual(L"c\x1ee9", e.Peek().c_str());
+            Assert::AreEqual(L"c\x1b0", e.Peek().c_str());
         });
     }
 

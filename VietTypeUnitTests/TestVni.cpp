@@ -517,8 +517,7 @@ public:
             AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
             Assert::AreEqual(L"c\x1b0\x1edb", e.Peek().c_str());
             AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-            // since the tone is entered with the "uw", it should stay there
-            Assert::AreEqual(L"c\x1ee9", e.Peek().c_str());
+            Assert::AreEqual(L"c\x1b0", e.Peek().c_str());
         });
     }
 

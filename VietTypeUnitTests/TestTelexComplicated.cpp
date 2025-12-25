@@ -106,6 +106,15 @@ public:
     TEST_METHOD (TestTelexComplicatedH_UW_OW_ng_upper) {
         TestValidWord(L"H\x1af\x1a0NG", L"H}{NG");
     }
+
+    TEST_METHOD (TestTelexComplicatedBackspaceBracket) {
+        MultiConfigTester(config).Invoke([=](auto& e) {
+            e.Reset();
+            if (FeedWord(e, L"[f[za") == TelexStates::Valid) {
+                AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+            }
+        });
+    }
 };
 
 } // namespace UnitTests
