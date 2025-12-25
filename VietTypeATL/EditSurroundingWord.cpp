@@ -146,18 +146,10 @@ static HRESULT DoEditSurroundingWord(
 
     // reinitialize engine with text
     controller->GetEngine().Reset();
-#pragma warning(push)
-#pragma warning(disable : 26451)
     controller->GetEngine().Backconvert(std::wstring(&buf[static_cast<size_t>(retrieved - wordlen - ignore)], wordlen));
-#pragma warning(pop)
 
     auto displayText = controller->GetEngine().Peek();
     compositionManager->SetCompositionText(ec, displayText.c_str(), static_cast<LONG>(displayText.length()));
-
-    if (controller->GetEngine().GetState() == Telex::TelexStates::TxError) {
-        controller->GetEngine().Reset();
-        return E_FAIL;
-    }
 
     return S_OK;
 }
