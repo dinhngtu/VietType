@@ -351,7 +351,7 @@ TelexStates TelexEngine::PushChar(wchar_t corig) {
             } else if (after < before) {
                 // make sure transitions will only consume the typed character in this case
                 assert(after == before - 1);
-                _respos.push_back(static_cast<int>(_c1.size() + _v.size() - 1) | ResposTransitionV);
+                _respos.push_back(static_cast<unsigned int>(_c1.size() + _v.size() - 1) | ResposTransitionV);
             } else if (after == before) {
                 // in case of 'uơi' -> 'ươi', the transition char itself is a normal character
                 // so it must be recorded as such rather than just a transition
@@ -394,7 +394,7 @@ TelexStates TelexEngine::PushChar(wchar_t corig) {
                 if (!_c2.empty()) {
                     TransitionV(_c1 == L"q" ? transitions_wv_c2_q : transitions_wv_c2);
                 }
-                _respos.push_back(static_cast<int>(_c1.size() + _v.size() - 1) | ResposTransitionW);
+                _respos.push_back(static_cast<unsigned int>(_c1.size() + _v.size() - 1) | ResposTransitionW);
             } else {
                 InvalidateAndPopBack(c);
             }
@@ -524,9 +524,9 @@ TelexStates TelexEngine::Backspace() {
     // ensure only one key in the _keyBuffer is Tone
     unsigned int lastTone = 0;
     bool foundTone = false;
-    for (unsigned int i = 0; i < buf.size(); i++) {
+    for (size_t i = 0; i < buf.size(); i++) {
         if (rp[i] & ResposTone) {
-            lastTone = i;
+            lastTone = static_cast<unsigned int>(i);
             foundTone = true;
             rp[i] = (rp[i] & ResposMask) | ResposExpunged;
         }
@@ -536,7 +536,7 @@ TelexStates TelexEngine::Backspace() {
     }
 
     // scan word for respos that should be expunged
-    for (unsigned int i = 0; i < buf.size(); i++) {
+    for (size_t i = 0; i < buf.size(); i++) {
         if (rp[i] & ResposDoubleUndo && (rp[i] & ResposMask) >= toDelete) {
             assert(i > 0);
             assert(rp[i - 1] & ~ResposMask);
@@ -544,7 +544,7 @@ TelexStates TelexEngine::Backspace() {
         }
     }
 
-    for (unsigned int i = 0; i < buf.size(); i++)
+    for (size_t i = 0; i < buf.size(); i++)
         if (!(rp[i] & ResposExpunged) && (rp[i] & ResposMask) < toDelete)
             PushChar(buf[i]);
 
