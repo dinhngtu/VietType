@@ -1,7 +1,6 @@
 // SPDX-FileCopyrightText: Copyright (c) 2024 Dinh Ngoc Tu
 // SPDX-License-Identifier: GPL-3.0-only
 
-#include "stdafx.h"
 #include "Util.h"
 #include "Telex.h"
 
@@ -23,9 +22,9 @@ void TestValidWord(ITelexEngine& e, const wchar_t* expected, const wchar_t* inpu
     for (auto c : std::wstring(input)) {
         AssertTelexStatesEqual(TelexStates::Valid, e.PushChar(c));
     }
-    Assert::AreEqual(expected, e.Peek().c_str());
+    CHECK(std::wstring(expected) == e.Peek());
     AssertTelexStatesEqual(TelexStates::Committed, e.Commit());
-    Assert::AreEqual(expected, e.Retrieve().c_str());
+    CHECK(std::wstring(expected) == e.Retrieve());
 }
 
 void TestInvalidWord(ITelexEngine& e, const wchar_t* expected, const wchar_t* input) {
@@ -34,12 +33,12 @@ void TestInvalidWord(ITelexEngine& e, const wchar_t* expected, const wchar_t* in
         e.PushChar(c);
     }
     AssertTelexStatesEqual(TelexStates::CommittedInvalid, e.Commit());
-    Assert::AreEqual(expected, e.RetrieveRaw().c_str());
+    CHECK(std::wstring(expected) == e.RetrieveRaw());
 }
 
 void TestPeekWord(ITelexEngine& e, const wchar_t* expected, const wchar_t* input) {
     FeedWord(e, input);
-    Assert::AreEqual(expected, e.Peek().c_str());
+    CHECK(std::wstring(expected) == e.Peek());
 }
 
 } // namespace UnitTests

@@ -3,17 +3,16 @@
 
 #pragma once
 
-#include "stdafx.h"
 #include <functional>
+#include <memory>
 #include "Telex.h"
-
-using namespace Microsoft::VisualStudio::CppUnitTestFramework;
+#include "catch_amalgamated.hpp"
 
 namespace VietType {
 namespace UnitTests {
 
 inline void AssertTelexStatesEqual(VietType::Telex::TelexStates expected, VietType::Telex::TelexStates actual) {
-    Assert::AreEqual(static_cast<int>(expected), static_cast<int>(actual));
+    CHECK(static_cast<int>(expected) == static_cast<int>(actual));
 }
 
 VietType::Telex::TelexStates FeedWord(VietType::Telex::ITelexEngine& e, const wchar_t* input);
@@ -36,7 +35,13 @@ public:
 
     void Invoke(std::function<void(VietType::Telex::ITelexEngine&)> f) const {
         for (int level = _omMin; level <= _omMax; level++) {
+#ifdef _DEBUG
+            UNSCOPED_INFO("level " << level);
+#endif
             for (int autocorrect = _ac ? 0 : 1; autocorrect <= 1; autocorrect++) {
+#ifdef _DEBUG
+                UNSCOPED_INFO("autocorrect " << autocorrect);
+#endif
                 auto config = _config;
                 config.optimize_multilang = level;
                 if (_ac)

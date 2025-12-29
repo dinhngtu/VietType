@@ -40,46 +40,45 @@
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>VietTypeUnitTests</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectSubType>NativeUnitTestProject</ProjectSubType>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v145</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v145</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v145</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v145</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64EC'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v145</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v145</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v145</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64EC'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v145</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -120,108 +119,109 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64EC'">
     <BuildAsX>true</BuildAsX>
   </PropertyGroup>
+  <PropertyGroup Label="Vcpkg" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)TestLib;$(SolutionDir)Telex;$(VCInstallDir)UnitTest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)TestLib;$(SolutionDir)Telex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;VIETTYPE_TEST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4251;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>$(OutDir);$(VCInstallDir)UnitTest\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>TestLib.lib;Telex.lib</AdditionalDependencies>
+      <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)TestLib;$(SolutionDir)Telex;$(VCInstallDir)UnitTest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)TestLib;$(SolutionDir)Telex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;VIETTYPE_TEST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4251;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>$(OutDir);$(VCInstallDir)UnitTest\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>TestLib.lib;Telex.lib</AdditionalDependencies>
+      <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64EC'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)TestLib;$(SolutionDir)Telex;$(VCInstallDir)UnitTest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)TestLib;$(SolutionDir)Telex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;VIETTYPE_TEST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4251;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>$(OutDir);$(VCInstallDir)UnitTest\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>TestLib.lib;Telex.lib</AdditionalDependencies>
+      <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)TestLib;$(SolutionDir)Telex;$(VCInstallDir)UnitTest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)TestLib;$(SolutionDir)Telex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;VIETTYPE_TEST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4251;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>$(OutDir);$(VCInstallDir)UnitTest\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>TestLib.lib;Telex.lib</AdditionalDependencies>
+      <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)TestLib;$(SolutionDir)Telex;$(VCInstallDir)UnitTest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)TestLib;$(SolutionDir)Telex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_ITERATOR_DEBUG_LEVEL=1;WIN32;NDEBUG;VIETTYPE_TEST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4251;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>$(OutDir);$(VCInstallDir)UnitTest\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>TestLib.lib;Telex.lib</AdditionalDependencies>
+      <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)TestLib;$(SolutionDir)Telex;$(VCInstallDir)UnitTest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)TestLib;$(SolutionDir)Telex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_ITERATOR_DEBUG_LEVEL=1;NDEBUG;VIETTYPE_TEST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4251;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>$(OutDir);$(VCInstallDir)UnitTest\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>TestLib.lib;Telex.lib</AdditionalDependencies>
+      <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)TestLib;$(SolutionDir)Telex;$(VCInstallDir)UnitTest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)TestLib;$(SolutionDir)Telex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_ITERATOR_DEBUG_LEVEL=1;NDEBUG;VIETTYPE_TEST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4251;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>$(OutDir);$(VCInstallDir)UnitTest\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>TestLib.lib;Telex.lib</AdditionalDependencies>
+      <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64EC'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)TestLib;$(SolutionDir)Telex;$(VCInstallDir)UnitTest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)TestLib;$(SolutionDir)Telex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_ITERATOR_DEBUG_LEVEL=1;NDEBUG;VIETTYPE_TEST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4251;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>$(OutDir);$(VCInstallDir)UnitTest\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>TestLib.lib;Telex.lib</AdditionalDependencies>
+      <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="stdafx.h" />
-    <ClInclude Include="targetver.h" />
+    <ClInclude Include="catch_amalgamated.hpp" />
     <ClInclude Include="Util.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="catch_amalgamated.cpp" />
     <ClCompile Include="TestTelex.cpp" />
     <ClCompile Include="TestTelexComplicated.cpp" />
     <ClCompile Include="TestVni.cpp" />
@@ -231,6 +231,9 @@
   <ItemGroup>
     <ProjectReference Include="..\Telex\Telex.vcxproj">
       <Project>{4c4ce742-99a9-40e7-b03a-68a3cbe0ae77}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\TestLib\TestLib.vcxproj">
+      <Project>{39086f5e-94a0-4de8-9fb0-3df69721a97c}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include <cstddef>
 #include <iterator>
+#include <cwchar>
 
 namespace VietType {
 namespace TestLib {
@@ -49,7 +49,7 @@ public:
     constexpr reference operator*() {
         return _words;
     }
-    constexpr value_type* operator->() {
+    constexpr const value_type* operator->() const {
         return &_words;
     }
     constexpr size_t wlen() const {
@@ -58,7 +58,16 @@ public:
 
 private:
     void UpdateWordLength() {
-        _wlen = wcsnlen_s(_words, _wend - _words);
+        if (_words >= _wend) {
+            _wlen = 0;
+            return;
+        }
+        auto found = std::wmemchr(_words, L'\0', _wend - _words);
+        if (found) {
+            _wlen = static_cast<const wchar_t*>(found) - _words;
+        } else {
+            _wlen = _wend - _words;
+        }
     }
 
     const wchar_t *_words, *_wend;

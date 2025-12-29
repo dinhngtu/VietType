@@ -1,58 +1,47 @@
 // SPDX-FileCopyrightText: Copyright (c) 2024 Dinh Ngoc Tu
 // SPDX-License-Identifier: GPL-3.0-only
 
-#include <cstdlib>
+#include <fstream>
 #include <stdexcept>
 #include <system_error>
+#include <cstdlib>
 #include "FileUtil.hpp"
 
 namespace VietType {
 namespace TestLib {
 
-static BOOL readall(HANDLE fd, PVOID buf, DWORD count) {
-    auto _buf = static_cast<char*>(buf);
-    DWORD rem = count;
-    while (rem) {
-        DWORD done;
-        if (!ReadFile(fd, _buf, static_cast<DWORD>(rem), &done, NULL))
-            return FALSE;
-        else if (done == 0)
-            break;
-        _buf += done;
-        rem -= done;
+void* ReadWholeFile(const std::filesystem::path& filename, int64_t* size) {
+    std::ifstream file(filename, std::ios::binary | std::ios::ate);
+    if (!file) {
+        throw std::system_error(errno, std::generic_category(), "std::ifstream");
     }
-    return TRUE;
-}
 
-PVOID ReadWholeFile(PCWSTR filename, _Out_ PLONGLONG size) {
-    auto f = CreateFileW(filename, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
-    if (f == INVALID_HANDLE_VALUE)
-        throw std::system_error(GetLastError(), std::system_category(), "CreateFileW");
-    LARGE_INTEGER fsize;
-    if (!GetFileSizeEx(f, &fsize)) {
-        CloseHandle(f);
-        throw std::system_error(GetLastError(), std::system_category(), "GetFileSizeEx");
+    auto fsize = file.tellg();
+    if (fsize == -1) {
+        throw std::runtime_error("failed to get file size");
     }
-    if (fsize.QuadPart > (10ll << 32)) {
-        CloseHandle(f);
+
+    if (fsize > (10LL << 32)) {
         throw std::runtime_error("file too large");
     }
-    auto bytes = malloc(fsize.QuadPart);
+
+    void* bytes = std::malloc(static_cast<std::size_t>(fsize));
     if (!bytes) {
-        CloseHandle(f);
         throw std::bad_alloc();
     }
-    if (!readall(f, bytes, static_cast<DWORD>(fsize.QuadPart))) {
-        free(bytes);
-        CloseHandle(f);
-        throw std::system_error(GetLastError(), std::system_category(), "ReadFile");
+
+    file.seekg(0, std::ios::beg);
+    if (!file.read(static_cast<char*>(bytes), fsize)) {
+        std::free(bytes);
+        throw std::runtime_error("failed to read file");
     }
-    *size = fsize.QuadPart;
+
+    *size = static_cast<int64_t>(fsize);
     return bytes;
 }
 
-VOID FreeFile(PVOID file) {
-    free(file);
+void FreeFile(void* file) {
+    std::free(file);
 }
 
 } // namespace TestLib
