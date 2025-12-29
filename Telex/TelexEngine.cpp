@@ -4,7 +4,7 @@
 #include <utility>
 #include <cassert>
 #include <stdexcept>
-#include <intrin.h>
+#include <bit>
 #include "TelexMaps.h"
 #include "TelexEngine.h"
 #include "TelexData.h"
@@ -113,9 +113,8 @@ static void ApplyCases(_In_ std::wstring& str, _In_ const std::vector<int>& case
 
 static inline Tones GetCharTone(_In_ CharTypes cat) {
     assert(IS(cat, CharTypes::Tone));
-    unsigned long bit;
-    [[maybe_unused]] auto flag = _BitScanForward(&bit, (static_cast<unsigned int>(cat) >> 16));
-    assert(flag && bit < 6);
+    auto bit = std::countr_zero(static_cast<unsigned int>(cat) >> 16);
+    assert(bit < 6);
     return static_cast<Tones>(bit);
 }
 
