@@ -11,7 +11,7 @@ using namespace VietType::Telex;
 using namespace VietType::TestLib;
 
 bool vietscan(const wchar_t* filename) {
-    LONGLONG fsize;
+    int64_t fsize;
     auto words = static_cast<wchar_t*>(ReadWholeFile(filename, &fsize));
     auto wend = words + fsize / sizeof(wchar_t);
 
@@ -27,7 +27,7 @@ bool vietscan(const wchar_t* filename) {
             break;
         case TelexStates::Invalid:
         case TelexStates::BackconvertFailed:
-            wprintf(L"%s %d\n", word.c_str(), state);
+            wprintf(L"%s %d\n", word.c_str(), static_cast<int>(state));
             break;
         default:
             throw std::runtime_error("unexpected state");

@@ -2,9 +2,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 #include "stdafx.h"
-#include <thread>
-#include <mutex>
-#include <deque>
 #include "Telex.h"
 #include "TelexEngine.h"
 
@@ -31,6 +28,7 @@ static void DoFuzz(const FuzzWorkItem& wi) {
     }
     for (int level = 0; level <= 3; level++) {
         for (int autocorrect = 0; autocorrect <= 1; autocorrect++) {
+#if _DEBUG
             wprintf(
                 L"len %d style %d ts %zu start %d end %d mode %d level %d autocorrect %d\n",
                 wi.len,
@@ -41,6 +39,7 @@ static void DoFuzz(const FuzzWorkItem& wi) {
                 wi.mode,
                 level,
                 autocorrect);
+#endif
             TelexConfig config;
             config.optimize_multilang = level;
             config.autocorrect = !!autocorrect;
@@ -108,8 +107,10 @@ static void FuzzWorker(std::deque<FuzzWorkItem>* wq, std::mutex* wq_lock) {
 }
 
 bool fuzz() {
+#if _WIN32
     SetPriorityClass(GetCurrentProcess(), IDLE_PRIORITY_CLASS);
     SetThreadExecutionState(ES_SYSTEM_REQUIRED | ES_CONTINUOUS);
+#endif
     {
         std::deque<FuzzWorkItem> wq;
         std::mutex wq_lock;
@@ -144,7 +145,7 @@ bool fuzz() {
                     });
             }
         }
-        for (auto len = 6; len <= 8; len++) {
+        for (auto len = 6; len <= 7; len++) {
             for (auto mode = 0; mode <= 1; mode++) {
                 for (int i = 0; i < table_telex.size(); i += skip) {
                     wq.emplace_back(

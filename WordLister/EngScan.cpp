@@ -19,7 +19,7 @@ static TelexStates TestWord(TelexEngine& e, const wchar_t* input) {
 }
 
 bool engscan(const wchar_t* filename) {
-    LONGLONG fsize;
+    int64_t fsize;
     auto words = static_cast<wchar_t*>(ReadWholeFile(filename, &fsize));
     auto wend = words + fsize / sizeof(wchar_t);
 
@@ -37,11 +37,11 @@ bool engscan(const wchar_t* filename) {
                 wordclass = L"DoubleTone";
             else if (!(*engine.GetRespos().rbegin() & ResposTone))
                 wordclass = L"ToneNotEnd";
-            wprintf(L"%s %s\n", word.c_str(), wordclass);
+            wprintf(L"%s %ls\n", word.c_str(), wordclass);
         } else if (std::any_of(engine.GetRespos().begin(), engine.GetRespos().end(), [](auto x) {
                        return x & ResposDoubleUndo;
                    })) {
-            wprintf(L"%s %s\n", word.c_str(), L"DoubleUndo");
+            wprintf(L"%s %ls\n", word.c_str(), L"DoubleUndo");
         }
     }
     FreeFile(words);

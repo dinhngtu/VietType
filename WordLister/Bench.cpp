@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 #include "stdafx.h"
-#include <chrono>
 #include "Telex.h"
 #include "TelexEngine.h"
 #include "WordListIterator.hpp"
@@ -21,8 +20,9 @@ using namespace VietType::TestLib;
 
 bool bench() {
     {
-        LONGLONG efsize;
-        auto ewords = static_cast<wchar_t*>(ReadWholeFile(L"..\\..\\data\\ewdsw.txt", &efsize));
+        int64_t efsize;
+        auto epath = std::filesystem::path("..") / ".." / "data" / "ewdsw.txt";
+        auto ewords = static_cast<wchar_t*>(ReadWholeFile(epath, &efsize));
         auto ewend = ewords + efsize / sizeof(wchar_t);
         TelexConfig config;
         TelexEngine engine(config);
@@ -46,13 +46,14 @@ bool bench() {
             L"ewords total iters: %d, count = %llu, time = %llu us\n",
             EITERATIONS,
             count,
-            std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count());
+            static_cast<unsigned long long>(std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count()));
         FreeFile(ewords);
     }
 
     {
-        LONGLONG vfsize;
-        auto vwords = static_cast<wchar_t*>(ReadWholeFile(L"..\\..\\data\\vw39kw.txt", &vfsize));
+        int64_t vfsize;
+        auto vpath = std::filesystem::path("../../data/vw39kw.txt");
+        auto vwords = static_cast<wchar_t*>(ReadWholeFile(vpath, &vfsize));
         auto vwend = vwords + vfsize / sizeof(wchar_t);
         TelexConfig config;
         TelexEngine engine(config);
@@ -71,7 +72,7 @@ bool bench() {
             L"vwords total iters: %d, count = %llu, time = %llu us\n",
             VITERATIONS,
             count,
-            std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count());
+            static_cast<unsigned long long>(std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count()));
         FreeFile(vwords);
     }
     return true;
