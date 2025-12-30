@@ -9,23 +9,28 @@ namespace VietType {
 namespace UnitTests {
 
 TEST_CASE("TestTelexComplicated", "[telex][complicated]") {
-    const TelexConfig config{.typing_style = TypingStyles::TelexComplicated};
+    auto level = GENERATE(0, 1, 2, 3);
+    auto autocorrect = GENERATE(true, false);
+
+    TelexConfig config{.typing_style = TypingStyles::TelexComplicated};
+    config.optimize_multilang = level;
+    config.autocorrect = autocorrect;
+
+    auto engine = std::unique_ptr<ITelexEngine>(TelexNew(config));
 
     auto TestValidWord = [&](const wchar_t* expected, const wchar_t* input) {
-        MultiConfigTester(config).Invoke([=](auto& e) { UnitTests::TestValidWord(e, expected, input); });
+        UnitTests::TestValidWord(*engine, expected, input);
     };
 
     auto TestInvalidWord = [&](const wchar_t* expected, const wchar_t* input) {
-        MultiConfigTester(config).Invoke([=](auto& e) { UnitTests::TestInvalidWord(e, expected, input); });
+        UnitTests::TestInvalidWord(*engine, expected, input);
     };
 
     auto TestPeekWord = [&](const wchar_t* expected, const wchar_t* input, TelexStates state = TelexStates::TxError) {
-        MultiConfigTester(config).Invoke([=](auto& e) {
-            UnitTests::TestPeekWord(e, expected, input);
-            if (state != TelexStates::TxError) {
-                AssertTelexStatesEqual(state, e.GetState());
-            }
-        });
+        UnitTests::TestPeekWord(*engine, expected, input);
+        if (state != TelexStates::TxError) {
+            AssertTelexStatesEqual(state, engine->GetState());
+        }
     };
 
     SECTION("UW_ng") {
@@ -87,12 +92,10 @@ TEST_CASE("TestTelexComplicated", "[telex][complicated]") {
     }
 
     SECTION("TestTelexComplicatedBackspaceBracket") {
-        MultiConfigTester(config).Invoke([=](auto& e) {
-            e.Reset();
-            if (FeedWord(e, L"[f[za") == TelexStates::Valid) {
-                AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-            }
-        });
+        engine->Reset();
+        if (FeedWord(*engine, L"[f[za") == TelexStates::Valid) {
+            AssertTelexStatesEqual(TelexStates::Valid, engine->Backspace());
+        }
     }
 }
 

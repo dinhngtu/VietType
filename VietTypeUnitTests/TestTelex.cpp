@@ -9,114 +9,99 @@ namespace VietType {
 namespace UnitTests {
 
 TEST_CASE("TestTelex", "[telex]") {
-    const TelexConfig config{};
+    auto level = GENERATE(0, 1, 2, 3);
+    auto autocorrect = GENERATE(true, false);
+
+    TelexConfig config{};
+    config.optimize_multilang = level;
+    config.autocorrect = autocorrect;
+
+    auto engine = std::unique_ptr<ITelexEngine>(TelexNew(config));
 
     auto TestValidWord = [&](const wchar_t* expected, const wchar_t* input) {
-        MultiConfigTester(config).Invoke([=](auto& e) { UnitTests::TestValidWord(e, expected, input); });
+        UnitTests::TestValidWord(*engine, expected, input);
     };
 
     auto TestInvalidWord = [&](const wchar_t* expected, const wchar_t* input) {
-        MultiConfigTester(config).Invoke([=](auto& e) { UnitTests::TestInvalidWord(e, expected, input); });
+        UnitTests::TestInvalidWord(*engine, expected, input);
     };
 
     auto TestPeekWord = [&](const wchar_t* expected, const wchar_t* input, TelexStates state = TelexStates::TxError) {
-        MultiConfigTester(config).Invoke([=](auto& e) {
-            UnitTests::TestPeekWord(e, expected, input);
-            if (state != TelexStates::TxError) {
-                AssertTelexStatesEqual(state, e.GetState());
-            }
-        });
+        UnitTests::TestPeekWord(*engine, expected, input);
+        if (state != TelexStates::TxError) {
+            AssertTelexStatesEqual(state, engine->GetState());
+        }
     };
 
     SECTION("reset") {
         SECTION("TestTelexEmpty") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                e.Reset();
-                CHECK(L"" == e.Retrieve());
-                CHECK(L"" == e.RetrieveRaw());
-                CHECK(L"" == e.Peek());
-                CHECK(std::size_t{0} == e.Count());
-            });
+            engine->Reset();
+            CHECK(L"" == engine->Retrieve());
+            CHECK(L"" == engine->RetrieveRaw());
+            CHECK(L"" == engine->Peek());
+            CHECK(std::size_t{0} == engine->Count());
         }
     }
 
     SECTION("push char") {
         SECTION("TestTelexEmptyPushCharC1_1") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                e.Reset();
-                AssertTelexStatesEqual(TelexStates::Valid, e.PushChar(L'b'));
-                CHECK(L"b" == e.Retrieve());
-            });
+            engine->Reset();
+            AssertTelexStatesEqual(TelexStates::Valid, engine->PushChar(L'b'));
+            CHECK(L"b" == engine->Retrieve());
         }
 
         SECTION("TestTelexEmptyPushCharC1_2") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                e.Reset();
-                AssertTelexStatesEqual(TelexStates::Valid, e.PushChar(L'c'));
-                CHECK(L"c" == e.Retrieve());
-            });
+            engine->Reset();
+            AssertTelexStatesEqual(TelexStates::Valid, engine->PushChar(L'c'));
+            CHECK(L"c" == engine->Retrieve());
         }
 
         SECTION("TestTelexEmptyPushCharC1_3") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                e.Reset();
-                AssertTelexStatesEqual(TelexStates::Valid, e.PushChar(L'd'));
-                CHECK(L"d" == e.Retrieve());
-            });
+            engine->Reset();
+            AssertTelexStatesEqual(TelexStates::Valid, engine->PushChar(L'd'));
+            CHECK(L"d" == engine->Retrieve());
         }
 
         SECTION("TestTelexEmptyPushCharC1_4") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                e.Reset();
-                AssertTelexStatesEqual(TelexStates::Valid, e.PushChar(L'r'));
-                CHECK(L"r" == e.Retrieve());
-            });
+            engine->Reset();
+            AssertTelexStatesEqual(TelexStates::Valid, engine->PushChar(L'r'));
+            CHECK(L"r" == engine->Retrieve());
         }
 
         SECTION("TestTelexEmptyPushCharC1_5") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                e.Reset();
-                AssertTelexStatesEqual(TelexStates::Valid, e.PushChar(L'x'));
-                CHECK(L"x" == e.Retrieve());
-            });
+            engine->Reset();
+            AssertTelexStatesEqual(TelexStates::Valid, engine->PushChar(L'x'));
+            CHECK(L"x" == engine->Retrieve());
         }
 
         SECTION("TestTelexEmptyPushCharV") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                e.Reset();
-                AssertTelexStatesEqual(TelexStates::Valid, e.PushChar(L'a'));
-                CHECK(L"a" == e.Retrieve());
-            });
+            engine->Reset();
+            AssertTelexStatesEqual(TelexStates::Valid, engine->PushChar(L'a'));
+            CHECK(L"a" == engine->Retrieve());
         }
 
         SECTION("TestTelexEmptyCommittedPushChar") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                e.Reset();
-                AssertTelexStatesEqual(TelexStates::Committed, e.Commit());
-                AssertTelexStatesEqual(TelexStates::Committed, e.PushChar('a'));
-                CHECK(L"" == e.Retrieve());
-                CHECK(L"" == e.RetrieveRaw());
-                CHECK(L"" == e.Peek());
-                CHECK(std::size_t{0} == e.Count());
-            });
+            engine->Reset();
+            AssertTelexStatesEqual(TelexStates::Committed, engine->Commit());
+            AssertTelexStatesEqual(TelexStates::Committed, engine->PushChar('a'));
+            CHECK(L"" == engine->Retrieve());
+            CHECK(L"" == engine->RetrieveRaw());
+            CHECK(L"" == engine->Peek());
+            CHECK(std::size_t{0} == engine->Count());
         }
     }
 
     SECTION("uppercase") {
         SECTION("TestTelexEmptyPushCharUpC1") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                e.Reset();
-                AssertTelexStatesEqual(TelexStates::Valid, e.PushChar(L'B'));
-                CHECK(L"B" == e.Retrieve());
-            });
+            engine->Reset();
+            AssertTelexStatesEqual(TelexStates::Valid, engine->PushChar(L'B'));
+            CHECK(L"B" == engine->Retrieve());
         }
 
         SECTION("TestTelexEmptyPushCharUpV") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                e.Reset();
-                AssertTelexStatesEqual(TelexStates::Valid, e.PushChar(L'A'));
-                CHECK(L"A" == e.Retrieve());
-            });
+            engine->Reset();
+            AssertTelexStatesEqual(TelexStates::Valid, engine->PushChar(L'A'));
+            CHECK(L"A" == engine->Retrieve());
         }
 
         SECTION("TestTelexTypingUpAai") {
@@ -152,47 +137,37 @@ TEST_CASE("TestTelex", "[telex]") {
 
     SECTION("backspace") {
         SECTION("TestTelexEmptyBackspace") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                e.Reset();
-                CHECK(L"" == e.Retrieve());
-                CHECK(L"" == e.RetrieveRaw());
-            });
+            engine->Reset();
+            CHECK(L"" == engine->Retrieve());
+            CHECK(L"" == engine->RetrieveRaw());
         }
 
         SECTION("TestTelexBackspaceAfzea") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                e.Reset();
-                if (FeedWord(e, L"afzea") == TelexStates::Valid) {
-                    AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-                    CHECK(L"ae" == e.Retrieve());
-                }
-            });
+            engine->Reset();
+            if (FeedWord(*engine, L"afzea") == TelexStates::Valid) {
+                AssertTelexStatesEqual(TelexStates::Valid, engine->Backspace());
+                CHECK(L"ae" == engine->Retrieve());
+            }
         }
     }
 
     SECTION("commit") {
         SECTION("TestTelexEmptyCommit") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                e.Reset();
-                AssertTelexStatesEqual(TelexStates::Committed, e.Commit());
-                CHECK(L"" == e.Retrieve());
-            });
+            engine->Reset();
+            AssertTelexStatesEqual(TelexStates::Committed, engine->Commit());
+            CHECK(L"" == engine->Retrieve());
         }
 
         SECTION("TestTelexEmptyCancel") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                e.Reset();
-                AssertTelexStatesEqual(TelexStates::CommittedInvalid, e.Cancel());
-                CHECK(L"" == e.RetrieveRaw());
-            });
+            engine->Reset();
+            AssertTelexStatesEqual(TelexStates::CommittedInvalid, engine->Cancel());
+            CHECK(L"" == engine->RetrieveRaw());
         }
 
         SECTION("TestTelexEmptyBackconversion") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                e.Reset();
-                AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(std::wstring()));
-                CHECK(L"" == e.RetrieveRaw());
-            });
+            engine->Reset();
+            AssertTelexStatesEqual(TelexStates::Valid, engine->Backconvert(std::wstring()));
+            CHECK(L"" == engine->RetrieveRaw());
         }
     }
 
@@ -354,10 +329,9 @@ TEST_CASE("TestTelex", "[telex]") {
         SECTION("TestTelexPeekDand") {
             auto config1 = config;
             config1.accept_separate_dd = true;
-            MultiConfigTester(config1).Invoke([](auto& e) {
-                FeedWord(e, L"dand");
-                CHECK(L"\x111\x61n" == e.Peek());
-            });
+            auto e = std::unique_ptr<ITelexEngine>(TelexNew(config1));
+            FeedWord(*e, L"dand");
+            CHECK(L"\x111\x61n" == e->Peek());
         }
     }
 
@@ -417,7 +391,9 @@ TEST_CASE("TestTelex", "[telex]") {
 
     SECTION("caps repeat") {
         SECTION("TestTelexCapsOSS") {
-            MultiConfigTester(config, 0, 1).Invoke([](auto& e) { UnitTests::TestPeekWord(e, L"OS", L"OSS"); });
+            if (level <= 1) {
+                UnitTests::TestPeekWord(*engine, L"OS", L"OSS");
+            }
         }
         SECTION("TestTelexCapsAAA") {
             TestInvalidWord(L"AA", L"AAA");
@@ -426,329 +402,274 @@ TEST_CASE("TestTelex", "[telex]") {
             TestInvalidWord(L"OW", L"OWW");
         }
         SECTION("TestTelexCapsGIFF") {
-            MultiConfigTester(config, 0, 1).Invoke([](auto& e) { UnitTests::TestPeekWord(e, L"GIF", L"GIFF"); });
+            if (level <= 1) {
+                UnitTests::TestPeekWord(*engine, L"GIF", L"GIFF");
+            }
         }
         SECTION("TestTelexCapsGISS") {
-            MultiConfigTester(config, 0, 1).Invoke([](auto& e) { UnitTests::TestPeekWord(e, L"GIS", L"GISS"); });
+            if (level <= 1) {
+                UnitTests::TestPeekWord(*engine, L"GIS", L"GISS");
+            }
         }
     }
 
     SECTION("backspace tests") {
         SECTION("TestTelexBackspaceDdoongf") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                FeedWord(e, L"ddoongf");
-                AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-                CHECK(L"\x111\x1ed3n" == e.Peek());
-                AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-                CHECK(L"\x111\x1ed3" == e.Peek());
-                AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-                CHECK(L"\x111" == e.Peek());
-                AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-                CHECK(L"" == e.Peek());
-            });
+            FeedWord(*engine, L"ddoongf");
+            AssertTelexStatesEqual(TelexStates::Valid, engine->Backspace());
+            CHECK(L"\x111\x1ed3n" == engine->Peek());
+            AssertTelexStatesEqual(TelexStates::Valid, engine->Backspace());
+            CHECK(L"\x111\x1ed3" == engine->Peek());
+            AssertTelexStatesEqual(TelexStates::Valid, engine->Backspace());
+            CHECK(L"\x111" == engine->Peek());
+            AssertTelexStatesEqual(TelexStates::Valid, engine->Backspace());
+            CHECK(L"" == engine->Peek());
         }
 
         SECTION("TestTelexBackspaceLeeen") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                FeedWord(e, L"leeen");
-                CHECK(L"leen" == e.Peek());
-                AssertTelexStatesEqual(TelexStates::Invalid, e.Backspace());
-                CHECK(L"lee" == e.Peek());
-            });
+            FeedWord(*engine, L"leeen");
+            CHECK(L"leen" == engine->Peek());
+            AssertTelexStatesEqual(TelexStates::Invalid, engine->Backspace());
+            CHECK(L"lee" == engine->Peek());
         }
 
         SECTION("TestTelexBackspaceHuowng") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                FeedWord(e, L"huowng");
-                CHECK(L"h\x1b0\x1a1ng" == e.Peek());
-                AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-                CHECK(L"h\x1b0\x1a1n" == e.Peek());
-                AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-                CHECK(L"hu\x1a1" == e.Peek());
-                AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-                CHECK(L"hu" == e.Peek());
-            });
+            FeedWord(*engine, L"huowng");
+            CHECK(L"h\x1b0\x1a1ng" == engine->Peek());
+            AssertTelexStatesEqual(TelexStates::Valid, engine->Backspace());
+            CHECK(L"h\x1b0\x1a1n" == engine->Peek());
+            AssertTelexStatesEqual(TelexStates::Valid, engine->Backspace());
+            CHECK(L"hu\x1a1" == engine->Peek());
+            AssertTelexStatesEqual(TelexStates::Valid, engine->Backspace());
+            CHECK(L"hu" == engine->Peek());
         }
 
         SECTION("TestTelexBackspaceAoas") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                FeedWord(e, L"aoas");
-                CHECK(L"aoas" == e.Peek());
-                e.Backspace();
-                CHECK(L"aoa" == e.Peek());
-            });
+            FeedWord(*engine, L"aoas");
+            CHECK(L"aoas" == engine->Peek());
+            engine->Backspace();
+            CHECK(L"aoa" == engine->Peek());
         }
 
         SECTION("TestTelexBackspaceHeei") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                FeedWord(e, L"heei");
-                CHECK(L"h\xeai" == e.Peek());
-                e.Backspace();
-                CHECK(L"h\xea" == e.Peek());
-            });
+            FeedWord(*engine, L"heei");
+            CHECK(L"h\xeai" == engine->Peek());
+            engine->Backspace();
+            CHECK(L"h\xea" == engine->Peek());
         }
 
         SECTION("TestTelexBackspaceOwa") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                FeedWord(e, L"owa");
-                CHECK(L"\x1a1\x61" == e.Peek());
-                e.Backspace();
-                CHECK(L"\x1a1" == e.Peek());
-            });
+            FeedWord(*engine, L"owa");
+            CHECK(L"\x1a1\x61" == engine->Peek());
+            engine->Backspace();
+            CHECK(L"\x1a1" == engine->Peek());
         }
 
         SECTION("TestTelexBackspaceRuowi") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                FeedWord(e, L"ruowi");
-                CHECK(L"r\x1b0\x1a1i" == e.Peek());
-                e.Backspace();
-                CHECK(L"ru\x1a1" == e.Peek());
-            });
+            FeedWord(*engine, L"ruowi");
+            CHECK(L"r\x1b0\x1a1i" == engine->Peek());
+            engine->Backspace();
+            CHECK(L"ru\x1a1" == engine->Peek());
         }
 
         SECTION("TestTelexBackspaceQuee") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                FeedWord(e, L"quee");
-                CHECK(L"qu\xea" == e.Peek());
-                e.Backspace();
-                CHECK(L"qu" == e.Peek());
-            });
+            FeedWord(*engine, L"quee");
+            CHECK(L"qu\xea" == engine->Peek());
+            engine->Backspace();
+            CHECK(L"qu" == engine->Peek());
         }
 
         SECTION("TestTelexBackspaceQuys") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                FeedWord(e, L"quys");
-                CHECK(L"qu\xfd" == e.Peek());
-                e.Backspace();
-                CHECK(L"qu" == e.Peek());
-            });
+            FeedWord(*engine, L"quys");
+            CHECK(L"qu\xfd" == engine->Peek());
+            engine->Backspace();
+            CHECK(L"qu" == engine->Peek());
         }
 
         SECTION("TestTelexBackspaceHieef") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                FeedWord(e, L"hieef");
-                CHECK(L"hi\x1ec1" == e.Peek());
-                e.Backspace();
-                CHECK(L"hi" == e.Peek());
-            });
+            FeedWord(*engine, L"hieef");
+            CHECK(L"hi\x1ec1" == engine->Peek());
+            engine->Backspace();
+            CHECK(L"hi" == engine->Peek());
         }
 
         SECTION("TestTelexBackspaceGifg") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                FeedWord(e, L"gifg");
-                CHECK(L"g\xecg" == e.Peek());
-                e.Backspace();
-                CHECK(L"g\xec" == e.Peek());
-                e.Backspace();
-                CHECK(L"g" == e.Peek());
-                e.PushChar(L'i');
-                CHECK(L"gi" == e.Peek());
-            });
+            FeedWord(*engine, L"gifg");
+            CHECK(L"g\xecg" == engine->Peek());
+            engine->Backspace();
+            CHECK(L"g\xec" == engine->Peek());
+            engine->Backspace();
+            CHECK(L"g" == engine->Peek());
+            engine->PushChar(L'i');
+            CHECK(L"gi" == engine->Peek());
         }
 
         SECTION("TestTelexBackspaceHofazn") {
-            MultiConfigTester(config, 0, 0).Invoke([](auto& e) {
-                FeedWord(e, L"hofazn");
-                CHECK(L"hoan" == e.Peek());
-                e.Backspace();
-                CHECK(L"hoa" == e.Peek());
-            });
+            if (level == 0) {
+                FeedWord(*engine, L"hofazn");
+                CHECK(L"hoan" == engine->Peek());
+                engine->Backspace();
+                CHECK(L"hoa" == engine->Peek());
+            }
         }
 
         SECTION("TestTelexBackspaceXooong") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                AssertTelexStatesEqual(TelexStates::Valid, FeedWord(e, L"xooong"));
-                CHECK(L"xoong" == e.Peek());
-                AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-                CHECK(L"xoon" == e.Peek());
-                AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-                CHECK(L"xoo" == e.Peek());
-            });
+            AssertTelexStatesEqual(TelexStates::Valid, FeedWord(*engine, L"xooong"));
+            CHECK(L"xoong" == engine->Peek());
+            AssertTelexStatesEqual(TelexStates::Valid, engine->Backspace());
+            CHECK(L"xoon" == engine->Peek());
+            AssertTelexStatesEqual(TelexStates::Valid, engine->Backspace());
+            CHECK(L"xoo" == engine->Peek());
         }
 
         SECTION("TestTelexBackspaceThooongf") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                AssertTelexStatesEqual(TelexStates::Valid, FeedWord(e, L"thooongf"));
-                CHECK(L"tho\xf2ng" == e.Peek());
-                AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-                CHECK(L"tho\xf2n" == e.Peek());
-                AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-                CHECK(L"tho\xf2" == e.Peek());
-                AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-                CHECK(L"tho" == e.Peek());
-            });
+            AssertTelexStatesEqual(TelexStates::Valid, FeedWord(*engine, L"thooongf"));
+            CHECK(L"tho\xf2ng" == engine->Peek());
+            AssertTelexStatesEqual(TelexStates::Valid, engine->Backspace());
+            CHECK(L"tho\xf2n" == engine->Peek());
+            AssertTelexStatesEqual(TelexStates::Valid, engine->Backspace());
+            CHECK(L"tho\xf2" == engine->Peek());
+            AssertTelexStatesEqual(TelexStates::Valid, engine->Backspace());
+            CHECK(L"tho" == engine->Peek());
         }
 
         SECTION("TestTelexBackspaceAssi") {
-            auto config1 = config;
-            config1.backspaced_word_stays_invalid = false;
-            MultiConfigTester(config1, 0, 1).Invoke([](auto& e) {
-                FeedWord(e, L"asssi");
-                CHECK(L"assi" == e.Peek());
-                e.Backspace();
-                CHECK(L"ass" == e.Peek());
-            });
+            if (level <= 1) {
+                auto config1 = config;
+                config1.backspaced_word_stays_invalid = false;
+                auto e = std::unique_ptr<ITelexEngine>(TelexNew(config1));
+                FeedWord(*e, L"asssi");
+                CHECK(L"assi" == e->Peek());
+                e->Backspace();
+                CHECK(L"ass" == e->Peek());
+            }
         }
     }
 
     SECTION("test tone and w movements") {
         SECTION("TestTelexBackspaceCuwsoc") {
-            MultiConfigTester(config, 0, 2).Invoke([](auto& e) {
-                AssertTelexStatesEqual(TelexStates::Valid, FeedWord(e, L"cuwsoc"));
-                CHECK(L"c\x1b0\x1edb\x63" == e.Peek());
-                AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-                CHECK(L"c\x1b0\x1edb" == e.Peek());
-                AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-                CHECK(L"c\x1b0" == e.Peek());
-            });
+            if (level <= 2) {
+                AssertTelexStatesEqual(TelexStates::Valid, FeedWord(*engine, L"cuwsoc"));
+                CHECK(L"c\x1b0\x1edb\x63" == engine->Peek());
+                AssertTelexStatesEqual(TelexStates::Valid, engine->Backspace());
+                CHECK(L"c\x1b0\x1edb" == engine->Peek());
+                AssertTelexStatesEqual(TelexStates::Valid, engine->Backspace());
+                CHECK(L"c\x1b0" == engine->Peek());
+            }
         }
         SECTION("TestTelexBackspaceCuwocs") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                AssertTelexStatesEqual(TelexStates::Valid, FeedWord(e, L"cuwocs"));
-                CHECK(L"c\x1b0\x1edb\x63" == e.Peek());
-                AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-                CHECK(L"c\x1b0\x1edb" == e.Peek());
-                AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-                CHECK(L"c\x1b0" == e.Peek());
-            });
+            AssertTelexStatesEqual(TelexStates::Valid, FeedWord(*engine, L"cuwocs"));
+            CHECK(L"c\x1b0\x1edb\x63" == engine->Peek());
+            AssertTelexStatesEqual(TelexStates::Valid, engine->Backspace());
+            CHECK(L"c\x1b0\x1edb" == engine->Peek());
+            AssertTelexStatesEqual(TelexStates::Valid, engine->Backspace());
+            CHECK(L"c\x1b0" == engine->Peek());
         }
         SECTION("TestTelexBackspaceCuocws") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                AssertTelexStatesEqual(TelexStates::Valid, FeedWord(e, L"cuocws"));
-                CHECK(L"c\x1b0\x1edb\x63" == e.Peek());
-                AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-                CHECK(L"cu\x1edb" == e.Peek());
-                AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-                CHECK(L"cu" == e.Peek());
-            });
+            AssertTelexStatesEqual(TelexStates::Valid, FeedWord(*engine, L"cuocws"));
+            CHECK(L"c\x1b0\x1edb\x63" == engine->Peek());
+            AssertTelexStatesEqual(TelexStates::Valid, engine->Backspace());
+            CHECK(L"cu\x1edb" == engine->Peek());
+            AssertTelexStatesEqual(TelexStates::Valid, engine->Backspace());
+            CHECK(L"cu" == engine->Peek());
         }
         SECTION("TestTelexBackspaceCows") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                AssertTelexStatesEqual(TelexStates::Valid, FeedWord(e, L"cows"));
-                CHECK(L"c\x1edb" == e.Peek());
-                AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-                CHECK(L"c" == e.Peek());
-                e.PushChar(L'u');
-                CHECK(L"cu" == e.Peek());
-            });
+            AssertTelexStatesEqual(TelexStates::Valid, FeedWord(*engine, L"cows"));
+            CHECK(L"c\x1edb" == engine->Peek());
+            AssertTelexStatesEqual(TelexStates::Valid, engine->Backspace());
+            CHECK(L"c" == engine->Peek());
+            engine->PushChar(L'u');
+            CHECK(L"cu" == engine->Peek());
         }
         SECTION("TestTelexBackspaceEefsch") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                if (FeedWord(e, L"eefsch") == TelexStates::Valid) {
-                    AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-                    CHECK(L"\x1ebf\x63" == e.Peek());
-                    AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-                    CHECK(L"\x1ebf" == e.Peek());
-                    AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-                    CHECK(L"" == e.Peek());
-                }
-            });
+            if (FeedWord(*engine, L"eefsch") == TelexStates::Valid) {
+                AssertTelexStatesEqual(TelexStates::Valid, engine->Backspace());
+                CHECK(L"\x1ebf\x63" == engine->Peek());
+                AssertTelexStatesEqual(TelexStates::Valid, engine->Backspace());
+                CHECK(L"\x1ebf" == engine->Peek());
+                AssertTelexStatesEqual(TelexStates::Valid, engine->Backspace());
+                CHECK(L"" == engine->Peek());
+            }
         }
     }
 
     SECTION("test backconversions") {
         SECTION("TestTelexBackconversionDdoongf") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(L"\x111\x1ed3ng"));
-                CHECK(L"\x111\x1ed3ng" == e.Peek());
-            });
+            AssertTelexStatesEqual(TelexStates::Valid, engine->Backconvert(L"\x111\x1ed3ng"));
+            CHECK(L"\x111\x1ed3ng" == engine->Peek());
         }
         SECTION("TestTelexBackconversionSystem") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                AssertTelexStatesEqual(TelexStates::Invalid, e.Backconvert(L"system"));
-                CHECK(L"system" == e.Peek());
-            });
+            AssertTelexStatesEqual(TelexStates::Invalid, engine->Backconvert(L"system"));
+            CHECK(L"system" == engine->Peek());
         }
         SECTION("TestTelexBackconversionThees") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(L"TH\x1ebe"));
-                CHECK(L"TH\x1ebe" == e.Peek());
-            });
+            AssertTelexStatesEqual(TelexStates::Valid, engine->Backconvert(L"TH\x1ebe"));
+            CHECK(L"TH\x1ebe" == engine->Peek());
         }
         SECTION("TestTelexBackconversionVirus") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                AssertTelexStatesEqual(TelexStates::Invalid, e.Backconvert(L"virus"));
-                CHECK(L"virus" == e.Peek());
-            });
+            AssertTelexStatesEqual(TelexStates::Invalid, engine->Backconvert(L"virus"));
+            CHECK(L"virus" == engine->Peek());
         }
         SECTION("TestTelexBackconversionDdoonfCtrlW") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                AssertTelexStatesEqual(TelexStates::BackconvertFailed, e.Backconvert(L"\x111\x1ed3nw"));
-                CHECK(L"\x111\x1ed3nw" == e.Peek());
-                AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-                CHECK(L"\x111\x1ed3n" == e.Peek());
-                e.Cancel();
-                CHECK(L"\x111\x1ed3n" == e.Peek());
-                CHECK(L"\x111\x1ed3n" == e.Retrieve());
-            });
+            AssertTelexStatesEqual(TelexStates::BackconvertFailed, engine->Backconvert(L"\x111\x1ed3nw"));
+            CHECK(L"\x111\x1ed3nw" == engine->Peek());
+            AssertTelexStatesEqual(TelexStates::Valid, engine->Backspace());
+            CHECK(L"\x111\x1ed3n" == engine->Peek());
+            engine->Cancel();
+            CHECK(L"\x111\x1ed3n" == engine->Peek());
+            CHECK(L"\x111\x1ed3n" == engine->Retrieve());
         }
         SECTION("TestTelexBackconversionDdCtrlW") {
-            MultiConfigTester(config, 0, 3, false).Invoke([](auto& e) {
-                AssertTelexStatesEqual(TelexStates::BackconvertFailed, e.Backconvert(L"\x111w"));
-                e.Backspace();
-                AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-                AssertTelexStatesEqual(TelexStates::CommittedInvalid, e.Cancel());
-            });
+            if (!autocorrect) {
+                AssertTelexStatesEqual(TelexStates::BackconvertFailed, engine->Backconvert(L"\x111w"));
+                engine->Backspace();
+                AssertTelexStatesEqual(TelexStates::Valid, engine->Backspace());
+                AssertTelexStatesEqual(TelexStates::CommittedInvalid, engine->Cancel());
+            }
         }
         SECTION("TestTelexBackconversionXooong") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(L"xoong"));
-                CHECK(L"xoong" == e.Peek());
-                AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-                CHECK(L"xoon" == e.Peek());
-            });
+            AssertTelexStatesEqual(TelexStates::Valid, engine->Backconvert(L"xoong"));
+            CHECK(L"xoong" == engine->Peek());
+            AssertTelexStatesEqual(TelexStates::Valid, engine->Backspace());
+            CHECK(L"xoon" == engine->Peek());
         }
         SECTION("TestTelexBackconversionXooongUpper") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(L"XOONG"));
-                CHECK(L"XOONG" == e.Peek());
-            });
+            AssertTelexStatesEqual(TelexStates::Valid, engine->Backconvert(L"XOONG"));
+            CHECK(L"XOONG" == engine->Peek());
         }
         SECTION("TestTelexBackconversionThooongf") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(L"tho\xf2ng"));
-                CHECK(L"tho\xf2ng" == e.Peek());
-                AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-                CHECK(L"tho\xf2n" == e.Peek());
-            });
+            AssertTelexStatesEqual(TelexStates::Valid, engine->Backconvert(L"tho\xf2ng"));
+            CHECK(L"tho\xf2ng" == engine->Peek());
+            AssertTelexStatesEqual(TelexStates::Valid, engine->Backspace());
+            CHECK(L"tho\xf2n" == engine->Peek());
         }
         SECTION("TestTelexBackconversionThooongfUpper") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(L"THO\xd2NG"));
-                CHECK(L"THO\xd2NG" == e.Peek());
-            });
+            AssertTelexStatesEqual(TelexStates::Valid, engine->Backconvert(L"THO\xd2NG"));
+            CHECK(L"THO\xd2NG" == engine->Peek());
         }
         SECTION("TestTelexBackconversionXoooong") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                AssertTelexStatesEqual(TelexStates::BackconvertFailed, e.Backconvert(L"x\xf4\xf4ng"));
-                CHECK(L"x\xf4\xf4ng" == e.Peek());
-            });
+            AssertTelexStatesEqual(TelexStates::BackconvertFailed, engine->Backconvert(L"x\xf4\xf4ng"));
+            CHECK(L"x\xf4\xf4ng" == engine->Peek());
         }
         SECTION("TestTelexBackconversionXo_oong") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                AssertTelexStatesEqual(TelexStates::BackconvertFailed, e.Backconvert(L"xo\xf4ng"));
-                CHECK(L"xo\xf4ng" == e.Peek());
-                AssertTelexStatesEqual(TelexStates::BackconvertFailed, e.Backspace());
-                CHECK(L"xo\xf4n" == e.Peek());
-                AssertTelexStatesEqual(TelexStates::BackconvertFailed, e.Backspace());
-                CHECK(L"xo\xf4" == e.Peek());
-                AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-                CHECK(L"xo" == e.Peek());
-            });
+            AssertTelexStatesEqual(TelexStates::BackconvertFailed, engine->Backconvert(L"xo\xf4ng"));
+            CHECK(L"xo\xf4ng" == engine->Peek());
+            AssertTelexStatesEqual(TelexStates::BackconvertFailed, engine->Backspace());
+            CHECK(L"xo\xf4n" == engine->Peek());
+            AssertTelexStatesEqual(TelexStates::BackconvertFailed, engine->Backspace());
+            CHECK(L"xo\xf4" == engine->Peek());
+            AssertTelexStatesEqual(TelexStates::Valid, engine->Backspace());
+            CHECK(L"xo" == engine->Peek());
         }
         SECTION("TestTelexBackconversionCaays") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(L"c\x1ea5y"));
-                e.Commit();
-                CHECK(L"c\x1ea5y" == e.Retrieve());
-            });
+            AssertTelexStatesEqual(TelexStates::Valid, engine->Backconvert(L"c\x1ea5y"));
+            engine->Commit();
+            CHECK(L"c\x1ea5y" == engine->Retrieve());
         }
         SECTION("TestTelexBackconversionQuaays") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                AssertTelexStatesEqual(TelexStates::Valid, e.Backconvert(L"qu\x1ea5y"));
-                e.Commit();
-                CHECK(L"qu\x1ea5y" == e.Retrieve());
-            });
+            AssertTelexStatesEqual(TelexStates::Valid, engine->Backconvert(L"qu\x1ea5y"));
+            engine->Commit();
+            CHECK(L"qu\x1ea5y" == engine->Retrieve());
         }
     }
 
@@ -761,11 +682,10 @@ TEST_CASE("TestTelex", "[telex]") {
         SECTION("TestTelexTypingOaUyOff") {
             auto config1 = config;
             config1.oa_uy_tone1 = false;
-            MultiConfigTester(config1).Invoke([](auto& e) {
-                UnitTests::TestValidWord(e, L"h\xf2\x61", L"hoaf");
-                UnitTests::TestValidWord(e, L"h\xf2\x65", L"hoef");
-                UnitTests::TestValidWord(e, L"l\x1ee5y", L"luyj");
-            });
+            auto e = std::unique_ptr<ITelexEngine>(TelexNew(config1));
+            UnitTests::TestValidWord(*e, L"h\xf2\x61", L"hoaf");
+            UnitTests::TestValidWord(*e, L"h\xf2\x65", L"hoef");
+            UnitTests::TestValidWord(*e, L"l\x1ee5y", L"luyj");
         }
     }
 
@@ -776,14 +696,16 @@ TEST_CASE("TestTelex", "[telex]") {
         SECTION("TestTelexInvalidDodongf") {
             auto config1 = config;
             config1.accept_separate_dd = false;
-            MultiConfigTester(config1).Invoke([](auto& e) { UnitTests::TestInvalidWord(e, L"dodongf", L"dodongf"); });
+            auto e = std::unique_ptr<ITelexEngine>(TelexNew(config1));
+            UnitTests::TestInvalidWord(*e, L"dodongf", L"dodongf");
         }
     }
 
     SECTION("test config oa/uy") {
         auto config1 = config;
         config1.oa_uy_tone1 = false;
-        MultiConfigTester(config1).Invoke([](auto& e) { UnitTests::TestValidWord(e, L"to\xe0n", L"toanf"); });
+        auto e = std::unique_ptr<ITelexEngine>(TelexNew(config1));
+        UnitTests::TestValidWord(*e, L"to\xe0n", L"toanf");
     }
 
     SECTION("test multilang optimizations") {
@@ -821,48 +743,35 @@ TEST_CASE("TestTelex", "[telex]") {
 
     SECTION("test doublekey backspace") {
         SECTION("TestTelexBackspaceMooo") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                FeedWord(e, L"mooo");
-                AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-                CHECK(L"mo" == e.Peek());
-            });
+            FeedWord(*engine, L"mooo");
+            AssertTelexStatesEqual(TelexStates::Valid, engine->Backspace());
+            CHECK(L"mo" == engine->Peek());
         }
         SECTION("TestTelexBackspaceMooof") {
-            MultiConfigTester(config).Invoke([](auto& e) {
-                FeedWord(e, L"mooof");
-                AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
-                CHECK(L"mo" == e.Peek());
-            });
+            auto& e = *engine;
+            FeedWord(e, L"mooof");
+            AssertTelexStatesEqual(TelexStates::Valid, e.Backspace());
+            CHECK(L"mo" == e.Peek());
         }
     }
 
     SECTION("autocorrect") {
-        SECTION("TestTelexAutocorrectHwuogn") {
-            auto config1 = config;
-            config1.autocorrect = true;
-            MultiConfigTester(config1, 0, 3, false).Invoke([](auto& e) {
-                FeedWord(e, L"hwuogn");
-                AssertTelexStatesEqual(TelexStates::Committed, e.Commit());
-                CHECK(L"h\x1b0\x1a1ng" == e.Retrieve());
-            });
-        }
-        SECTION("TestTelexAutocorrectViets") {
-            auto config1 = config;
-            config1.autocorrect = true;
-            MultiConfigTester(config1, 0, 3, false).Invoke([](auto& e) {
-                FeedWord(e, L"viets");
-                AssertTelexStatesEqual(TelexStates::Committed, e.Commit());
-                CHECK(L"vi\x1ebft" == e.Retrieve());
-            });
-        }
-        SECTION("TestTelexTypingThuowgnf") {
-            auto config1 = config;
-            config1.autocorrect = true;
-            MultiConfigTester(config1, 0, 3, false).Invoke([](auto& e) {
-                FeedWord(e, L"thuowgnf");
-                AssertTelexStatesEqual(TelexStates::Committed, e.Commit());
-                CHECK(L"th\x1b0\x1eddng" == e.Retrieve());
-            });
+        if (autocorrect) {
+            SECTION("TestTelexAutocorrectHwuogn") {
+                FeedWord(*engine, L"hwuogn");
+                AssertTelexStatesEqual(TelexStates::Committed, engine->Commit());
+                CHECK(L"h\x1b0\x1a1ng" == engine->Retrieve());
+            }
+            SECTION("TestTelexAutocorrectViets") {
+                FeedWord(*engine, L"viets");
+                AssertTelexStatesEqual(TelexStates::Committed, engine->Commit());
+                CHECK(L"vi\x1ebft" == engine->Retrieve());
+            }
+            SECTION("TestTelexTypingThuowgnf") {
+                FeedWord(*engine, L"thuowgnf");
+                AssertTelexStatesEqual(TelexStates::Committed, engine->Commit());
+                CHECK(L"th\x1b0\x1eddng" == engine->Retrieve());
+            }
         }
     }
 }
