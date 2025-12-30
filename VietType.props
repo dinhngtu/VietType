@@ -1,78 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <!-- build config -->
-  <ItemDefinitionGroup>
-    <ClCompile>
-      <LanguageStandard>stdcpp20</LanguageStandard>
-      <ConformanceMode>true</ConformanceMode>
-      <RuntimeTypeInfo>false</RuntimeTypeInfo>
-      <WarningLevel>Level4</WarningLevel>
-      <UseFullPaths>true</UseFullPaths>
-    </ClCompile>
-    <Link>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
-    <ClCompile>
-      <Optimization>Disabled</Optimization>
-    </ClCompile>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
-    <ClCompile>
-      <Optimization>MaxSpeed</Optimization>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <WholeProgramOptimization>true</WholeProgramOptimization>
-    </ClCompile>
-    <Link>
-      <OptimizeReferences>true</OptimizeReferences>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <LinkTimeCodeGeneration>UseFastLinkTimeCodeGeneration</LinkTimeCodeGeneration>
-    </Link>
-  </ItemDefinitionGroup>
-  <PropertyGroup>
-    <IntDir>$(Platform)\$(Configuration)\</IntDir>
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
-    <UseDebugLibraries>true</UseDebugLibraries>
-    <LinkIncremental>true</LinkIncremental>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)'=='Release'">
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <LinkIncremental>false</LinkIncremental>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-  </PropertyGroup>
-  <!-- hybrid CRT -->
-  <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
-    <ClCompile>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-    </ClCompile>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
-    <ClCompile>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-    </ClCompile>
-    <Link>
-      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries);libucrt.lib</IgnoreSpecificDefaultLibraries>
-      <AdditionalOptions>%(AdditionalOptions) /defaultlib:ucrt.lib</AdditionalOptions>
-    </Link>
-  </ItemDefinitionGroup>
-  <!-- security checks -->
-  <ItemDefinitionGroup>
-    <ClCompile>
-      <SDLCheck>true</SDLCheck>
-    </ClCompile>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
-    <ClCompile>
-      <ControlFlowGuard>Guard</ControlFlowGuard>
-      <GuardEHContMetadata Condition="'$(Platform)' == 'ARM64' Or '$(Platform)' == 'ARM64EC' Or '$(Platform)' == 'x64'">true</GuardEHContMetadata>
-      <GuardSignedReturns Condition="'$(Platform)' == 'ARM64' Or '$(Platform)' == 'ARM64EC'">true</GuardSignedReturns>
-    </ClCompile>
-    <Link>
-      <CETCompat Condition="'$(Platform)' == 'Win32' Or '$(Platform)' == 'x64'">true</CETCompat>
-    </Link>
-  </ItemDefinitionGroup>
+	<!-- build config -->
+	<ItemDefinitionGroup>
+		<ClCompile>
+			<LanguageStandard>stdcpp20</LanguageStandard>
+			<ConformanceMode>true</ConformanceMode>
+			<RuntimeTypeInfo>false</RuntimeTypeInfo>
+			<WarningLevel>Level4</WarningLevel>
+			<UseFullPaths>true</UseFullPaths>
+			<MultiProcessorCompilation>true</MultiProcessorCompilation>
+		</ClCompile>
+		<Link>
+			<GenerateDebugInformation>true</GenerateDebugInformation>
+		</Link>
+	</ItemDefinitionGroup>
+	<ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
+		<ClCompile>
+			<Optimization>Disabled</Optimization>
+		</ClCompile>
+	</ItemDefinitionGroup>
+	<ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
+		<ClCompile>
+			<Optimization>MaxSpeed</Optimization>
+			<FunctionLevelLinking>true</FunctionLevelLinking>
+			<IntrinsicFunctions>true</IntrinsicFunctions>
+			<WholeProgramOptimization>true</WholeProgramOptimization>
+		</ClCompile>
+		<Link>
+			<OptimizeReferences>true</OptimizeReferences>
+			<EnableCOMDATFolding>true</EnableCOMDATFolding>
+			<LinkTimeCodeGeneration>UseFastLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+		</Link>
+	</ItemDefinitionGroup>
+	<PropertyGroup>
+		<IntDir>$(Platform)\$(Configuration)\</IntDir>
+		<OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+		<UseDebugLibraries>true</UseDebugLibraries>
+		<LinkIncremental>true</LinkIncremental>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)'=='Release'">
+		<UseDebugLibraries>false</UseDebugLibraries>
+		<LinkIncremental>false</LinkIncremental>
+		<WholeProgramOptimization>true</WholeProgramOptimization>
+	</PropertyGroup>
+	<!-- hybrid CRT -->
+	<ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
+		<ClCompile>
+			<RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+		</ClCompile>
+	</ItemDefinitionGroup>
+	<ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
+		<ClCompile>
+			<RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+		</ClCompile>
+		<Link>
+			<IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries);libucrt.lib</IgnoreSpecificDefaultLibraries>
+			<AdditionalOptions>%(AdditionalOptions) /defaultlib:ucrt.lib</AdditionalOptions>
+		</Link>
+	</ItemDefinitionGroup>
+	<!-- security checks -->
+	<ItemDefinitionGroup>
+		<ClCompile>
+			<SDLCheck>true</SDLCheck>
+		</ClCompile>
+	</ItemDefinitionGroup>
+	<ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
+		<ClCompile>
+			<ControlFlowGuard>Guard</ControlFlowGuard>
+			<GuardEHContMetadata Condition="'$(Platform)' == 'ARM64' Or '$(Platform)' == 'ARM64EC' Or '$(Platform)' == 'x64'">true</GuardEHContMetadata>
+			<GuardSignedReturns Condition="'$(Platform)' == 'ARM64' Or '$(Platform)' == 'ARM64EC'">true</GuardSignedReturns>
+		</ClCompile>
+		<Link>
+			<CETCompat Condition="'$(Platform)' == 'Win32' Or '$(Platform)' == 'x64'">true</CETCompat>
+		</Link>
+	</ItemDefinitionGroup>
 </Project>
