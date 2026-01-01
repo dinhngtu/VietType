@@ -145,6 +145,7 @@ HRESULT KeyEventSink::OnKeyDownCommon(
         *isBackconvert = OnBackconvertRetype(pic, wParam, lParam, pfEaten, *isBackconvert, acceptedChar);
         break;
     default:
+        *pfEaten = IsKeyEaten(&_controller->GetEngine(), _compositionManager->IsComposing(), wParam, lParam, _keyState);
         *isBackconvert = BackconvertDisabled;
         break;
     }
