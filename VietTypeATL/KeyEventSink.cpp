@@ -95,7 +95,7 @@ finish:
         hr = compBackconvert.SetValue(0);
         DBG_HRESULT_CHECK(hr, L"compBackconvert reset failed");
         *pfEaten = IsKeyEaten(&_controller->GetEngine(), _compositionManager->IsComposing(), wParam, lParam, _keyState);
-        return 0;
+        return BackconvertDisabled;
     }
 }
 
@@ -125,7 +125,7 @@ HRESULT KeyEventSink::OnKeyDownCommon(
     _Out_ DWORD* isBackconvert,
     _Out_ wchar_t* acceptedChar) {
     *pfEaten = FALSE;
-    *isBackconvert = 0;
+    *isBackconvert = BackconvertDisabled;
     *acceptedChar = 0;
 
     if (!_controller->IsEnabled()) {
@@ -138,14 +138,14 @@ HRESULT KeyEventSink::OnKeyDownCommon(
 
     *isBackconvert = _controller->IsBackconvert();
     switch (*isBackconvert) {
-    case 1:
+    case BackconvertOnBackspace:
         *isBackconvert = OnBackconvertBackspace(pic, wParam, lParam, pfEaten, *isBackconvert);
         break;
-    case 2:
+    case BackconvertOnType:
         *isBackconvert = OnBackconvertRetype(pic, wParam, lParam, pfEaten, *isBackconvert, acceptedChar);
         break;
     default:
-        *isBackconvert = 0;
+        *isBackconvert = BackconvertDisabled;
         break;
     }
 
@@ -258,17 +258,14 @@ STDMETHODIMP KeyEventSink::OnKeyDown(
 
     if (*pfEaten || _compositionManager->IsComposing()) {
         switch (isBackconvert) {
-        case 0:
-            hr = CallKeyEdit(pic, wParam, lParam, _keyState);
-            break;
-        case 1:
+        case BackconvertOnBackspace:
             hr = CallKeyEditBackspace(pic, wParam, lParam, _keyState);
             break;
-        case 2:
+        case BackconvertOnType:
             hr = CallKeyEditRetype(pic, wParam, lParam, _keyState, c);
             break;
         default:
-            hr = E_FAIL;
+            hr = CallKeyEdit(pic, wParam, lParam, _keyState);
             break;
         }
         HRESULT_CHECK_RETURN(hr, L"CallKeyEdit failed");

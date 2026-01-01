@@ -11,6 +11,12 @@ namespace VietType {
 class CompositionManager;
 class EngineController;
 
+enum BackconvertModes : DWORD {
+    BackconvertDisabled = 0,
+    BackconvertOnBackspace = 1,
+    BackconvertOnType = 2,
+};
+
 class KeyEventSink : public CComObjectRootEx<CComSingleThreadModel>, public ITfKeyEventSink {
 public:
     KeyEventSink() = default;
