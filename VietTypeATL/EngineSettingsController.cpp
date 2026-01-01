@@ -47,15 +47,23 @@ HRESULT EngineSettingsController::LoadTelexSettings(Telex::TelexConfig& cfg) {
         static_cast<DWORD>(_ec->GetEngine().GetConfig().backspaced_word_stays_invalid));
     cfg.backspaced_word_stays_invalid = !!backspace_invalid;
 
+    DWORD autocorrect;
+    SettingsStore::GetValueOrDefault(
+        _settingsKey, L"autocorrect", &autocorrect, static_cast<DWORD>(_ec->GetEngine().GetConfig().autocorrect));
+    cfg.autocorrect = !!autocorrect;
+
     DWORD optimize_multilang;
     SettingsStore::GetValueOrDefault(
         _settingsKey, L"optimize_multilang", &optimize_multilang, _ec->GetEngine().GetConfig().optimize_multilang);
     cfg.optimize_multilang = optimize_multilang;
 
-    DWORD autocorrect;
+    DWORD allow_abbreviations;
     SettingsStore::GetValueOrDefault(
-        _settingsKey, L"autocorrect", &autocorrect, static_cast<DWORD>(_ec->GetEngine().GetConfig().autocorrect));
-    cfg.autocorrect = !!autocorrect;
+        _settingsKey,
+        L"allow_abbreviations",
+        &allow_abbreviations,
+        static_cast<DWORD>(_ec->GetEngine().GetConfig().allow_abbreviations));
+    cfg.allow_abbreviations = !!allow_abbreviations;
 
     return S_OK;
 }
