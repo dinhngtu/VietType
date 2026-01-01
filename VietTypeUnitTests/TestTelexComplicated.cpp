@@ -36,61 +36,25 @@ TEST_CASE("TestTelexComplicated", "[telex][complicated]") {
         }
     };
 
-    SECTION("UW_ng") {
+    SECTION("w") {
         TestValidWord(L"\x1b0ng", L"]ng");
-    }
-    SECTION("UWUW_ng") {
         TestInvalidWord(L"]ng", L"]]ng");
-    }
-    SECTION("UW_ngs") {
         TestValidWord(L"\x1ee9ng", L"]ngs");
-    }
-    SECTION("H_UW_ng") {
         TestValidWord(L"h\x1b0ng", L"h]ng");
-    }
-    SECTION("H_UW_ngs") {
         TestValidWord(L"h\x1ee9ng", L"h]ngs");
-    }
-    SECTION("OW_m") {
         TestValidWord(L"\x1a1m", L"[m");
-    }
-    SECTION("OWOW_m") {
         TestInvalidWord(L"[m", L"[[m");
-    }
-    SECTION("OW_ms") {
         TestValidWord(L"\x1edbm", L"[ms");
-    }
-    SECTION("C_OW_m") {
         TestValidWord(L"c\x1a1m", L"c[m");
-    }
-    SECTION("C_OW_ms") {
         TestValidWord(L"c\x1edbm", L"c[ms");
-    }
-    SECTION("Wng") {
         TestValidWord(L"\x1b0ng", L"wng");
-    }
-    SECTION("Wngs") {
         TestValidWord(L"\x1ee9ng", L"wngs");
-    }
-    SECTION("Uwng") {
         TestValidWord(L"\x1b0ng", L"uwng");
-    }
-    SECTION("Hwng") {
         TestValidWord(L"h\x1b0ng", L"hwng");
-    }
-    SECTION("Huwng") {
         TestValidWord(L"h\x1b0ng", L"huwng");
-    }
-    SECTION("Cowm") {
         TestValidWord(L"\x1a1m", L"owm");
-    }
-    SECTION("Huwowng") {
         TestValidWord(L"h\x1b0\x1a1ng", L"huwowng");
-    }
-    SECTION("Huowng") {
         TestValidWord(L"h\x1b0\x1a1ng", L"huowng");
-    }
-    SECTION("H_UW_OW_ng_upper") {
         TestValidWord(L"H\x1af\x1a0NG", L"H}{NG");
     }
 
