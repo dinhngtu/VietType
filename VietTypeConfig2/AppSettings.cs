@@ -92,7 +92,7 @@ namespace VietTypeConfig2 {
             }
         }
 
-        bool allow_abbreviations = false;
+        bool allow_abbreviations = true;
         public bool AllowAbbreviations {
             get {
                 return allow_abbreviations;
@@ -175,7 +175,7 @@ namespace VietTypeConfig2 {
             }
         }
 
-        int pk_toggle = 0x100c0; // alt+~
+        int pk_toggle = 0x100c0; // alt+`
         public int PkToggle {
             get {
                 return pk_toggle;

@@ -192,6 +192,6 @@ VietType là phần mềm tự do, bạn có thể cung cấp lại và/hoặc c
     <value>Cài đặt giao diện</value>
   </data>
   <data name="MainWindow_CheckBox_AllowAbbreviations_Content" xml:space="preserve">
-    <value>Cho phép viết tắt (_V)</value>
+    <value>Viết tắt chữ "đ" ("đc", "QĐ", "SĐT") (_V)</value>
   </data>
 </root>

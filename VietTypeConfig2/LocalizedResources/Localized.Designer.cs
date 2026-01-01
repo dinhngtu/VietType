@@ -108,7 +108,7 @@ namespace VietTypeConfig2.LocalizedResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Allow abbre_viations.
+        ///   Looks up a localized string similar to Allow &quot;đ&quot; abbre_viations.
         /// </summary>
         public static string MainWindow_CheckBox_AllowAbbreviations_Content {
             get {
