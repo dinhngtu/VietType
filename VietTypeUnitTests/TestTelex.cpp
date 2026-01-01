@@ -9,12 +9,15 @@ namespace VietType {
 namespace UnitTests {
 
 TEST_CASE("TestTelex", "[telex]") {
-    auto level = GENERATE(0, 1, 2, 3);
-    auto autocorrect = GENERATE(true, false);
-
-    TelexConfig config{};
-    config.optimize_multilang = level;
-    config.autocorrect = autocorrect;
+    TelexConfig config{
+        .typing_style = TypingStyles::Telex,
+        .oa_uy_tone1 = GENERATE(true, false),
+        .accept_separate_dd = GENERATE(true, false),
+        .backspaced_word_stays_invalid = GENERATE(true, false),
+        .autocorrect = GENERATE(true, false),
+        .optimize_multilang = static_cast<unsigned long>(GENERATE(0, 1, 2, 3)),
+        .allow_abbreviations = GENERATE(true, false),
+    };
 
     SECTION("engine") {
         auto engine = std::unique_ptr<ITelexEngine>(TelexNew(config));
@@ -385,7 +388,7 @@ TEST_CASE("TestTelex", "[telex]") {
 
         SECTION("caps repeat") {
             SECTION("TestTelexCapsOSS") {
-                if (level <= 1) {
+                if (config.optimize_multilang <= 1) {
                     UnitTests::TestPeekWord(*engine, L"OS", L"OSS");
                 }
             }
@@ -396,12 +399,12 @@ TEST_CASE("TestTelex", "[telex]") {
                 TestInvalidWord(L"OW", L"OWW");
             }
             SECTION("TestTelexCapsGIFF") {
-                if (level <= 1) {
+                if (config.optimize_multilang <= 1) {
                     UnitTests::TestPeekWord(*engine, L"GIF", L"GIFF");
                 }
             }
             SECTION("TestTelexCapsGISS") {
-                if (level <= 1) {
+                if (config.optimize_multilang <= 1) {
                     UnitTests::TestPeekWord(*engine, L"GIS", L"GISS");
                 }
             }
@@ -499,7 +502,7 @@ TEST_CASE("TestTelex", "[telex]") {
             }
 
             SECTION("TestTelexBackspaceHofazn") {
-                if (level == 0) {
+                if (config.optimize_multilang == 0) {
                     FeedWord(*engine, L"hofazn");
                     CHECK(L"hoan" == engine->Peek());
                     engine->Backspace();
@@ -528,7 +531,7 @@ TEST_CASE("TestTelex", "[telex]") {
             }
 
             SECTION("TestTelexBackspaceAssi") {
-                if (level <= 1) {
+                if (config.optimize_multilang <= 1) {
                     auto config1 = config;
                     config1.backspaced_word_stays_invalid = false;
                     auto e = std::unique_ptr<ITelexEngine>(TelexNew(config1));
@@ -542,7 +545,7 @@ TEST_CASE("TestTelex", "[telex]") {
 
         SECTION("test tone and w movements") {
             SECTION("TestTelexBackspaceCuwsoc") {
-                if (level <= 2) {
+                if (config.optimize_multilang <= 2) {
                     AssertTelexStatesEqual(TelexStates::Valid, FeedWord(*engine, L"cuwsoc"));
                     CHECK(L"c\x1b0\x1edb\x63" == engine->Peek());
                     AssertTelexStatesEqual(TelexStates::Valid, engine->Backspace());
@@ -614,7 +617,7 @@ TEST_CASE("TestTelex", "[telex]") {
                 CHECK(L"\x111\x1ed3n" == engine->Retrieve());
             }
             SECTION("TestTelexBackconversionDdCtrlW") {
-                if (!autocorrect) {
+                if (!config.autocorrect) {
                     AssertTelexStatesEqual(TelexStates::BackconvertFailed, engine->Backconvert(L"\x111w"));
                     engine->Backspace();
                     AssertTelexStatesEqual(TelexStates::Valid, engine->Backspace());
@@ -668,10 +671,15 @@ TEST_CASE("TestTelex", "[telex]") {
         }
 
         SECTION("test oa/oe/uy") {
-            SECTION("TestTelexTypingOaUy") {
+            if (config.oa_uy_tone1) {
                 TestValidWord(L"ho\xe0", L"hoaf");
                 TestValidWord(L"ho\xe8", L"hoef");
                 TestValidWord(L"lu\x1ef5", L"luyj");
+            } else {
+                TestValidWord(L"to\xe0n", L"toanf");
+                TestValidWord(L"h\xf2\x61", L"hoaf");
+                TestValidWord(L"h\xf2\x65", L"hoef");
+                TestValidWord(L"l\x1ee5y", L"luyj");
             }
         }
 
@@ -689,7 +697,7 @@ TEST_CASE("TestTelex", "[telex]") {
         }
 
         SECTION("autocorrect") {
-            if (autocorrect) {
+            if (config.autocorrect) {
                 SECTION("TestTelexAutocorrectHwuogn") {
                     FeedWord(*engine, L"hwuogn");
                     AssertTelexStatesEqual(TelexStates::Committed, engine->Commit());
@@ -707,97 +715,78 @@ TEST_CASE("TestTelex", "[telex]") {
                 }
             }
         }
-    }
 
-    SECTION("test dd accept") {
-        auto config1 = config;
-        config1.accept_separate_dd = true;
-        auto e = std::unique_ptr<ITelexEngine>(TelexNew(config1));
+        SECTION("test dd accept") {
+            if (config.accept_separate_dd) {
+                SECTION("TestTelexPeekDand") {
+                    FeedWord(*engine, L"dand");
+                    CHECK(L"\x111\x61n" == engine->Peek());
+                }
+                SECTION("TestTelexValidDodongf") {
+                    TestValidWord(L"\x111\x1ed3ng", L"dodongf");
+                }
+            } else {
+                TestInvalidWord(L"dodongf", L"dodongf");
+            }
+        }
 
-        SECTION("TestTelexPeekDand") {
-            FeedWord(*e, L"dand");
-            CHECK(L"\x111\x61n" == e->Peek());
+        SECTION("test abbreviations") {
+            if (config.allow_abbreviations) {
+                SECTION("ddc") {
+                    TestValidWord(L"\x111\x63", L"ddc");
+                }
+                SECTION("ddca") {
+                    TestInvalidWord(L"ddca", L"ddca");
+                }
+                SECTION("qdd") {
+                    TestValidWord(L"q\x111", L"qdd");
+                }
+                SECTION("qdda") {
+                    TestInvalidWord(L"qdda", L"qdda");
+                }
+            }
         }
-        SECTION("TestTelexValidDodongf") {
-            UnitTests::TestValidWord(*e, L"\x111\x1ed3ng", L"dodongf");
-        }
-    }
 
-    SECTION("test abbreviations") {
-        auto config1 = config;
-        config1.allow_abbreviations = true;
-        auto e = std::unique_ptr<ITelexEngine>(TelexNew(config1));
+        SECTION("test no abbreviations") {
+            if (!config.allow_abbreviations) {
+                SECTION("ddc") {
+                    TestInvalidWord(L"ddc", L"ddc");
+                }
+                SECTION("qdd") {
+                    TestInvalidWord(L"qdd", L"qdd");
+                }
+                SECTION("qdda") {
+                    TestInvalidWord(L"qdda", L"qdda");
+                }
+            }
+        }
 
-        SECTION("ddc") {
-            UnitTests::TestValidWord(*e, L"\x111\x63", L"ddc");
-        }
-        SECTION("ddca") {
-            UnitTests::TestInvalidWord(*e, L"ddca", L"ddca");
-        }
-        SECTION("qdd") {
-            UnitTests::TestValidWord(*e, L"q\x111", L"qdd");
-        }
-        SECTION("qdda") {
-            UnitTests::TestInvalidWord(*e, L"qdda", L"qdda");
-        }
-    }
-
-    SECTION("test no abbreviations") {
-        auto config1 = config;
-        config1.allow_abbreviations = false;
-        auto e = std::unique_ptr<ITelexEngine>(TelexNew(config1));
-
-        SECTION("ddc") {
-            UnitTests::TestInvalidWord(*e, L"ddc", L"ddc");
-        }
-        SECTION("qdd") {
-            UnitTests::TestInvalidWord(*e, L"qdd", L"qdd");
-        }
-        SECTION("qdda") {
-            UnitTests::TestInvalidWord(*e, L"qdda", L"qdda");
-        }
-    }
-
-    SECTION("TestTelexTypingOaUyOff") {
-        auto config1 = config;
-        config1.oa_uy_tone1 = false;
-        auto e = std::unique_ptr<ITelexEngine>(TelexNew(config1));
-        UnitTests::TestValidWord(*e, L"to\xe0n", L"toanf");
-        UnitTests::TestValidWord(*e, L"h\xf2\x61", L"hoaf");
-        UnitTests::TestValidWord(*e, L"h\xf2\x65", L"hoef");
-        UnitTests::TestValidWord(*e, L"l\x1ee5y", L"luyj");
-    }
-
-    SECTION("test multilang optimizations") {
-        SECTION("TestTelexMultilangVirus") {
-            auto config1 = config;
-            config1.optimize_multilang = 1;
-            std::unique_ptr<ITelexEngine> e(TelexNew(config1));
-            UnitTests::TestInvalidWord(*e, L"virus", L"virus");
-        }
-        SECTION("TestTelexMultilangDense") {
-            auto config1 = config;
-            config1.optimize_multilang = 2;
-            std::unique_ptr<ITelexEngine> e(TelexNew(config1));
-            UnitTests::TestInvalidWord(*e, L"dense", L"dense");
-        }
-        SECTION("TestTelexMultilangDefe") {
-            auto config1 = config;
-            config1.optimize_multilang = 3;
-            std::unique_ptr<ITelexEngine> e(TelexNew(config1));
-            AssertTelexStatesEqual(TelexStates::Invalid, FeedWord(*e, L"defe"));
-        }
-        SECTION("TestTelexMultilangVirusUpper") {
-            auto config1 = config;
-            config1.optimize_multilang = 1;
-            std::unique_ptr<ITelexEngine> e(TelexNew(config1));
-            UnitTests::TestInvalidWord(*e, L"VIRUS", L"VIRUS");
-        }
-        SECTION("TestTelexMultilangDenseUpper") {
-            auto config1 = config;
-            config1.optimize_multilang = 2;
-            std::unique_ptr<ITelexEngine> e(TelexNew(config1));
-            UnitTests::TestInvalidWord(*e, L"DENSE", L"DENSE");
+        SECTION("test multilang optimizations") {
+            SECTION("TestTelexMultilangVirus") {
+                if (config.optimize_multilang == 1) {
+                    TestInvalidWord(L"virus", L"virus");
+                }
+            }
+            SECTION("TestTelexMultilangDense") {
+                if (config.optimize_multilang == 2) {
+                    TestInvalidWord(L"dense", L"dense");
+                }
+            }
+            SECTION("TestTelexMultilangDefe") {
+                if (config.optimize_multilang == 3) {
+                    AssertTelexStatesEqual(TelexStates::Invalid, FeedWord(*engine, L"defe"));
+                }
+            }
+            SECTION("TestTelexMultilangVirusUpper") {
+                if (config.optimize_multilang == 1) {
+                    TestInvalidWord(L"VIRUS", L"VIRUS");
+                }
+            }
+            SECTION("TestTelexMultilangDenseUpper") {
+                if (config.optimize_multilang == 2) {
+                    TestInvalidWord(L"DENSE", L"DENSE");
+                }
+            }
         }
     }
 }

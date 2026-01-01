@@ -9,12 +9,15 @@ namespace VietType {
 namespace UnitTests {
 
 TEST_CASE("TestTelexComplicated", "[telex][complicated]") {
-    auto level = GENERATE(0, 1, 2, 3);
-    auto autocorrect = GENERATE(true, false);
-
-    TelexConfig config{.typing_style = TypingStyles::TelexComplicated};
-    config.optimize_multilang = level;
-    config.autocorrect = autocorrect;
+    TelexConfig config{
+        .typing_style = TypingStyles::TelexComplicated,
+        .oa_uy_tone1 = GENERATE(true, false),
+        .accept_separate_dd = GENERATE(true, false),
+        .backspaced_word_stays_invalid = GENERATE(true, false),
+        .autocorrect = GENERATE(true, false),
+        .optimize_multilang = static_cast<unsigned long>(GENERATE(0, 1, 2, 3)),
+        .allow_abbreviations = GENERATE(true, false),
+    };
 
     auto engine = std::unique_ptr<ITelexEngine>(TelexNew(config));
 

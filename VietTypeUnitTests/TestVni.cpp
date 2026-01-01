@@ -9,12 +9,15 @@ namespace VietType {
 namespace UnitTests {
 
 TEST_CASE("TestVni", "[vni]") {
-    auto level = GENERATE(0, 1, 2, 3);
-    auto autocorrect = GENERATE(true, false);
-
-    TelexConfig config{.typing_style = TypingStyles::Vni};
-    config.optimize_multilang = level;
-    config.autocorrect = autocorrect;
+    TelexConfig config{
+        .typing_style = TypingStyles::Vni,
+        .oa_uy_tone1 = GENERATE(true, false),
+        .accept_separate_dd = GENERATE(true, false),
+        .backspaced_word_stays_invalid = GENERATE(true, false),
+        .autocorrect = GENERATE(true, false),
+        .optimize_multilang = static_cast<unsigned long>(GENERATE(0, 1, 2, 3)),
+        .allow_abbreviations = GENERATE(true, false),
+    };
 
     auto engine = std::unique_ptr<ITelexEngine>(TelexNew(config));
 
@@ -400,7 +403,7 @@ TEST_CASE("TestVni", "[vni]") {
 
         SECTION("test tone and w movements") {
             SECTION("TestVniBackspaceCuwsoc") {
-                if (level <= 2) {
+                if (config.optimize_multilang <= 2) {
                     AssertTelexStatesEqual(TelexStates::Valid, FeedWord(*engine, L"cu71oc"));
                     CHECK(L"c\x1b0\x1edb\x63" == engine->Peek());
                     AssertTelexStatesEqual(TelexStates::Valid, engine->Backspace());
@@ -446,7 +449,7 @@ TEST_CASE("TestVni", "[vni]") {
                 CHECK(L"\x111\x1ed3n" == engine->Retrieve());
             }
             SECTION("TestVniBackconversionDdCtrlW") {
-                if (!autocorrect) {
+                if (!config.autocorrect) {
                     AssertTelexStatesEqual(
                         TelexStates::BackconvertFailed,
                         engine->Backconvert(
@@ -499,45 +502,34 @@ TEST_CASE("TestVni", "[vni]") {
         }
 
         SECTION("test oa/oe/uy") {
-            SECTION("TestVniTypingOaUy") {
+            if (config.oa_uy_tone1) {
                 TestValidWord(L"ho\xe0", L"hoa2");
                 TestValidWord(L"ho\xe8", L"hoe2");
                 TestValidWord(L"lu\x1ef5", L"luy5");
-            }
-            SECTION("TestVniTypingOaUyOff") {
-                auto config1 = config;
-                config1.oa_uy_tone1 = false;
-                auto e = std::unique_ptr<ITelexEngine>(TelexNew(config1));
-                UnitTests::TestValidWord(*e, L"h\xf2\x61", L"hoa2");
-                UnitTests::TestValidWord(*e, L"h\xf2\x65", L"hoe2");
-                UnitTests::TestValidWord(*e, L"l\x1ee5y", L"luy5");
+            } else {
+                TestValidWord(L"to\xe0n", L"toan2");
+                TestValidWord(L"h\xf2\x61", L"hoa2");
+                TestValidWord(L"h\xf2\x65", L"hoe2");
+                TestValidWord(L"l\x1ee5y", L"luy5");
             }
         }
 
         SECTION("test dd accept") {
-            SECTION("TestVniValidDodongf") {
+            if (config.accept_separate_dd) {
                 TestValidWord(L"\x111\x1ed3ng", L"do96ng2");
+            } else {
+                TestInvalidWord(L"do96ng2", L"do96ng2");
             }
-            SECTION("TestVniInvalidDodongf") {
-                auto config1 = config;
-                config1.accept_separate_dd = false;
-                auto e = std::unique_ptr<ITelexEngine>(TelexNew(config1));
-                UnitTests::TestInvalidWord(*e, L"dodongf", L"dodongf");
-            }
-        }
-
-        SECTION("test config oa/uy") {
-            auto config1 = config;
-            config1.oa_uy_tone1 = false;
-            auto e = std::unique_ptr<ITelexEngine>(TelexNew(config1));
-            UnitTests::TestValidWord(*e, L"to\xe0n", L"toan2");
         }
 
         SECTION("test doublekey backspace") {
             SECTION("TestVniBackspaceMooo") {
                 FeedWord(*engine, L"mo66");
                 CHECK(L"mo6" == engine->Peek());
-                AssertTelexStatesEqual(TelexStates::Invalid, engine->Backspace());
+                if (config.backspaced_word_stays_invalid)
+                    AssertTelexStatesEqual(TelexStates::Invalid, engine->Backspace());
+                else
+                    AssertTelexStatesEqual(TelexStates::Valid, engine->Backspace());
                 CHECK(L"mo" == engine->Peek());
             }
             SECTION("TestVniBackspaceMooof") {
@@ -549,7 +541,7 @@ TEST_CASE("TestVni", "[vni]") {
         }
 
         SECTION("autocorrect") {
-            if (autocorrect) {
+            if (config.autocorrect) {
                 SECTION("TestVniAutocorrectViet1") {
                     FeedWord(*engine, L"viet1");
                     AssertTelexStatesEqual(TelexStates::Committed, engine->Commit());
