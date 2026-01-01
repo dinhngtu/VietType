@@ -37,6 +37,22 @@ namespace VietTypeConfig2 {
             }
         }
 
+        #region Global settings
+        bool vietnamese_interface = true;
+        public bool VietnameseInterface {
+            get {
+                return vietnamese_interface;
+            }
+            set {
+                if (vietnamese_interface != value) {
+                    vietnamese_interface = value;
+                    OnPropertyChanged(nameof(VietnameseInterface));
+                }
+            }
+        }
+        #endregion
+
+        #region Engine settings
         int typing_style = 0;
         public int TypingStyle {
             get {
@@ -46,19 +62,6 @@ namespace VietTypeConfig2 {
                 if (typing_style != value) {
                     typing_style = value;
                     OnPropertyChanged(nameof(typing_style));
-                }
-            }
-        }
-
-        bool default_enabled = false;
-        public bool DefaultEnabled {
-            get {
-                return default_enabled;
-            }
-            set {
-                if (default_enabled != value) {
-                    default_enabled = value;
-                    OnPropertyChanged(nameof(DefaultEnabled));
                 }
             }
         }
@@ -115,22 +118,6 @@ namespace VietTypeConfig2 {
             }
         }
 
-        /// <summary>
-        /// Legacy name for backconvert setting
-        /// </summary>
-        int backconvert_on_backspace = 0;
-        public int Backconvert {
-            get {
-                return backconvert_on_backspace;
-            }
-            set {
-                if (backconvert_on_backspace != value) {
-                    backconvert_on_backspace = value;
-                    OnPropertyChanged(nameof(Backconvert));
-                }
-            }
-        }
-
         int optimize_multilang = 1;
         public int OptimizeMultilang {
             get {
@@ -156,17 +143,34 @@ namespace VietTypeConfig2 {
                 }
             }
         }
+        #endregion
 
-
-        int show_composing_attr = 0;
-        public int ShowComposingAttr {
+        #region Control settings
+        bool default_enabled = false;
+        public bool DefaultEnabled {
             get {
-                return show_composing_attr;
+                return default_enabled;
             }
             set {
-                if (show_composing_attr != value) {
-                    show_composing_attr = value;
-                    OnPropertyChanged(nameof(ShowComposingAttr));
+                if (default_enabled != value) {
+                    default_enabled = value;
+                    OnPropertyChanged(nameof(DefaultEnabled));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Legacy name for backconvert setting
+        /// </summary>
+        int backconvert_on_backspace = 0;
+        public int Backconvert {
+            get {
+                return backconvert_on_backspace;
+            }
+            set {
+                if (backconvert_on_backspace != value) {
+                    backconvert_on_backspace = value;
+                    OnPropertyChanged(nameof(Backconvert));
                 }
             }
         }
@@ -184,52 +188,57 @@ namespace VietTypeConfig2 {
             }
         }
 
-        bool vietnamese_interface = true;
-        public bool VietnameseInterface {
+        int show_composing_attr = 0;
+        public int ShowComposingAttr {
             get {
-                return vietnamese_interface;
+                return show_composing_attr;
             }
             set {
-                if (vietnamese_interface != value) {
-                    vietnamese_interface = value;
-                    OnPropertyChanged(nameof(VietnameseInterface));
+                if (show_composing_attr != value) {
+                    show_composing_attr = value;
+                    OnPropertyChanged(nameof(ShowComposingAttr));
                 }
             }
         }
+        #endregion
 
         public static AppSettings LoadSettings() {
             using (var regKey = Registry.CurrentUser.CreateSubKey(Subkey)) {
                 var setting = new AppSettings();
+                setting.VietnameseInterface = "en" != (string)regKey.GetValue("ui_language");
+
                 setting.TypingStyle = ToInt(regKey.GetValue(nameof(typing_style))) ?? setting.TypingStyle;
-                setting.DefaultEnabled = ToBool(regKey.GetValue(nameof(default_enabled))) ?? setting.DefaultEnabled;
                 setting.OaUy = ToBool(regKey.GetValue(nameof(oa_uy_tone1))) ?? setting.OaUy;
                 setting.AcceptDd = ToBool(regKey.GetValue(nameof(accept_dd))) ?? setting.AcceptDd;
                 setting.AllowAbbreviations = ToBool(regKey.GetValue(nameof(allow_abbreviations))) ?? setting.AllowAbbreviations;
                 setting.BackspaceInvalid = ToBool(regKey.GetValue(nameof(backspace_invalid))) ?? setting.BackspaceInvalid;
-                setting.Backconvert = ToInt(regKey.GetValue(nameof(backconvert_on_backspace))) ?? setting.Backconvert;
                 setting.OptimizeMultilang = ToInt(regKey.GetValue(nameof(optimize_multilang))) ?? setting.OptimizeMultilang;
                 setting.Autocorrect = ToBool(regKey.GetValue(nameof(autocorrect))) ?? setting.Autocorrect;
-                setting.ShowComposingAttr = ToInt(regKey.GetValue(nameof(show_composing_attr))) ?? setting.ShowComposingAttr;
+
+                setting.DefaultEnabled = ToBool(regKey.GetValue(nameof(default_enabled))) ?? setting.DefaultEnabled;
+                setting.Backconvert = ToInt(regKey.GetValue(nameof(backconvert_on_backspace))) ?? setting.Backconvert;
                 setting.PkToggle = ToInt(regKey.GetValue(nameof(pk_toggle))) ?? setting.PkToggle;
-                setting.VietnameseInterface = "en" != (string)regKey.GetValue("ui_language");
+                setting.ShowComposingAttr = ToInt(regKey.GetValue(nameof(show_composing_attr))) ?? setting.ShowComposingAttr;
                 return setting;
             }
         }
 
         public static void SaveSettings(AppSettings settings) {
             using (var regKey = Registry.CurrentUser.CreateSubKey(Subkey)) {
+                regKey.SetValue("ui_language", settings.VietnameseInterface ? "vi" : "en");
+
                 regKey.SetValue(nameof(typing_style), settings.typing_style);
-                regKey.SetValue(nameof(default_enabled), settings.DefaultEnabled ? 1 : 0);
                 regKey.SetValue(nameof(oa_uy_tone1), settings.OaUy ? 1 : 0);
                 regKey.SetValue(nameof(accept_dd), settings.AcceptDd ? 1 : 0);
                 regKey.SetValue(nameof(allow_abbreviations), settings.AllowAbbreviations ? 1 : 0);
                 regKey.SetValue(nameof(backspace_invalid), settings.BackspaceInvalid ? 1 : 0);
-                regKey.SetValue(nameof(backconvert_on_backspace), settings.Backconvert);
                 regKey.SetValue(nameof(optimize_multilang), settings.OptimizeMultilang);
                 regKey.SetValue(nameof(autocorrect), settings.Autocorrect ? 1 : 0);
-                regKey.SetValue(nameof(show_composing_attr), settings.ShowComposingAttr);
+
+                regKey.SetValue(nameof(default_enabled), settings.DefaultEnabled ? 1 : 0);
+                regKey.SetValue(nameof(backconvert_on_backspace), settings.Backconvert);
                 regKey.SetValue(nameof(pk_toggle), settings.PkToggle);
-                regKey.SetValue("ui_language", settings.VietnameseInterface ? "vi" : "en");
+                regKey.SetValue(nameof(show_composing_attr), settings.ShowComposingAttr);
 
                 var threadMgr = Activator.CreateInstance(Type.GetTypeFromCLSID(CLSID_TF_ThreadMgr, true)) as ITfThreadMgr;
                 if (threadMgr.Activate(out uint tid) >= 0) {
