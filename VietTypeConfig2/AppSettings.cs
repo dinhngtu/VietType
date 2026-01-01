@@ -89,6 +89,19 @@ namespace VietTypeConfig2 {
             }
         }
 
+        bool allow_abbreviations = false;
+        public bool AllowAbbreviations {
+            get {
+                return allow_abbreviations;
+            }
+            set {
+                if (allow_abbreviations != value) {
+                    allow_abbreviations = value;
+                    OnPropertyChanged(nameof(AllowAbbreviations));
+                }
+            }
+        }
+
         bool backspace_invalid = true;
         public bool BackspaceInvalid {
             get {
@@ -191,6 +204,7 @@ namespace VietTypeConfig2 {
                 setting.DefaultEnabled = ToBool(regKey.GetValue(nameof(default_enabled))) ?? setting.DefaultEnabled;
                 setting.OaUy = ToBool(regKey.GetValue(nameof(oa_uy_tone1))) ?? setting.OaUy;
                 setting.AcceptDd = ToBool(regKey.GetValue(nameof(accept_dd))) ?? setting.AcceptDd;
+                setting.AllowAbbreviations = ToBool(regKey.GetValue(nameof(allow_abbreviations))) ?? setting.AllowAbbreviations;
                 setting.BackspaceInvalid = ToBool(regKey.GetValue(nameof(backspace_invalid))) ?? setting.BackspaceInvalid;
                 setting.Backconvert = ToInt(regKey.GetValue(nameof(backconvert_on_backspace))) ?? setting.Backconvert;
                 setting.OptimizeMultilang = ToInt(regKey.GetValue(nameof(optimize_multilang))) ?? setting.OptimizeMultilang;
@@ -208,6 +222,7 @@ namespace VietTypeConfig2 {
                 regKey.SetValue(nameof(default_enabled), settings.DefaultEnabled ? 1 : 0);
                 regKey.SetValue(nameof(oa_uy_tone1), settings.OaUy ? 1 : 0);
                 regKey.SetValue(nameof(accept_dd), settings.AcceptDd ? 1 : 0);
+                regKey.SetValue(nameof(allow_abbreviations), settings.AllowAbbreviations ? 1 : 0);
                 regKey.SetValue(nameof(backspace_invalid), settings.BackspaceInvalid ? 1 : 0);
                 regKey.SetValue(nameof(backconvert_on_backspace), settings.Backconvert);
                 regKey.SetValue(nameof(optimize_multilang), settings.OptimizeMultilang);

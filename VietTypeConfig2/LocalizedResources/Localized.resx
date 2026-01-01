@@ -191,4 +191,7 @@ VietType is free software, licensed under the GNU General Public License. VietTy
   <data name="MainWindow_GroupBox_ControlSettings_Header" xml:space="preserve">
     <value>Control settings</value>
   </data>
+  <data name="MainWindow_CheckBox_AllowAbbreviations_Content" xml:space="preserve">
+    <value>Allow abbre_viations</value>
+  </data>
 </root>

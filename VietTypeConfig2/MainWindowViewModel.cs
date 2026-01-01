@@ -96,6 +96,18 @@ namespace VietTypeConfig2 {
             }
         }
 
+        public bool AllowAbbreviations {
+            get {
+                return _settings.AllowAbbreviations;
+            }
+            set {
+                if (_settings.AllowAbbreviations != value) {
+                    _settings.AllowAbbreviations = value;
+                    OnPropertyChanged(nameof(AllowAbbreviations));
+                }
+            }
+        }
+
         public bool BackspaceInvalid {
             get {
                 return _settings.BackspaceInvalid;

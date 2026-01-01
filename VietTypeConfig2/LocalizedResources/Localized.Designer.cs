@@ -108,6 +108,15 @@ namespace VietTypeConfig2.LocalizedResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Allow abbre_viations.
+        /// </summary>
+        public static string MainWindow_CheckBox_AllowAbbreviations_Content {
+            get {
+                return ResourceManager.GetString("MainWindow_CheckBox_AllowAbbreviations_Content", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Enable _autocorrect.
         /// </summary>
         public static string MainWindow_CheckBox_Autocorrect_Content {

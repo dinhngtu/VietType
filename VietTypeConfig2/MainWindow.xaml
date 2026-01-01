@@ -106,6 +106,10 @@
                     Content="{local:Localized Key=MainWindow_CheckBox_AcceptDd_Content}" />
                 <CheckBox
                     Margin="0,7,0,0"
+                    IsChecked="{Binding AllowAbbreviations}"
+                    Content="{local:Localized Key=MainWindow_CheckBox_AllowAbbreviations_Content}" />
+                <CheckBox
+                    Margin="0,7,0,0"
                     IsChecked="{Binding BackspaceInvalid}"
                     Content="{local:Localized Key=MainWindow_CheckBox_BackspaceInvalid_Content}" />
                 <Grid Margin="0,7,0,0">
