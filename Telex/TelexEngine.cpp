@@ -296,12 +296,12 @@ TelexStates TelexEngine::PushChar(wchar_t corig) {
         _c1.back() = L'\x111';
         _respos.push_back(static_cast<unsigned int>(_c1.size() - 1) | ResposTransitionC1);
 
-    } else if (_config.allow_abbreviations && _v.empty() && IS(cat, CharTypes::ConsoC1)) {
-        FeedNewResultChar(_c1, c, ccase);
-
     } else if (!_c1.empty() && _c1.back() == L'\x111' && IS(cat, CharTypes::Dd)) {
         // relaxed constraint: _v.empty()
         InvalidateAndPopBack(c);
+
+    } else if (_config.allow_abbreviations && _c1 != L"gi" && _v.empty() && IS(cat, CharTypes::ConsoC1)) {
+        FeedNewResultChar(_c1, c, ccase);
 
     } else if (_v.empty() && _c2.empty() && _c1 != L"gi" && IS(cat, CharTypes::ConsoContinue)) {
         FeedNewResultChar(_c1, c, ccase);
