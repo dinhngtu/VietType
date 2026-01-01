@@ -289,8 +289,17 @@ TelexStates TelexEngine::PushChar(wchar_t corig) {
         _c1 = L"\x111";
         _respos.push_back(0 | ResposTransitionC1);
 
-    } else if (_c1 == L"\x111" && IS(cat, CharTypes::Dd)) {
-        // only used for 'dd'
+    } else if (
+        _config.allow_abbreviations && !_c1.empty() && _c1.back() == L'd' && IS(cat, CharTypes::Dd) && _v.empty() &&
+        _c2.empty()) {
+        // special exception for "QĐ" and the like
+        _c1.back() = L'\x111';
+        _respos.push_back(static_cast<unsigned int>(_c1.size() - 1) | ResposTransitionC1);
+
+    } else if (_config.allow_abbreviations && _v.empty() && IS(cat, CharTypes::ConsoC1)) {
+        FeedNewResultChar(_c1, c, ccase);
+
+    } else if (!_c1.empty() && _c1.back() == L'\x111' && IS(cat, CharTypes::Dd)) {
         // relaxed constraint: _v.empty()
         InvalidateAndPopBack(c);
 
@@ -618,6 +627,12 @@ TelexStates TelexEngine::Commit() {
     }
 
     if (_keyBuffer.empty()) {
+        _state = TelexStates::Committed;
+        return _state;
+    }
+
+    if (_state == TelexStates::Valid && _v.empty() && _c2.empty() && _config.allow_abbreviations &&
+        std::any_of(_respos.begin(), _respos.end(), [](auto x) { return x & ResposTransitionC1; })) {
         _state = TelexStates::Committed;
         return _state;
     }

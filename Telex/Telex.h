@@ -50,6 +50,7 @@ struct TelexConfig {
     bool autocorrect = false;
     // optimize key engine for foreign language typing
     unsigned long optimize_multilang = 1;
+    bool allow_abbreviations = false;
 };
 
 class ITelexEngine {
