@@ -6,7 +6,7 @@ param([switch] $Force)
 . "$PSScriptRoot\Version.ps1"
 
 # compile happens in bin\Configuration folder
-$vcsRev = git describe --tags --long --dirty --always
+$vcsRev = git describe --long --dirty --always --abbrev=12
 $wixFile = "$pwd\..\..\..\Version.wxi"
 $wixOld = Get-Content -ErrorAction Ignore -Raw $wixFile
 $wixNew = `
