@@ -5,14 +5,14 @@ on:
     branches:
       - master
     paths-ignore:
-      - 'VietTypeConfig2/**'
-      - 'VietTypeATL/**'
-      - 'VietTypeSetup/**'
+      - "VietTypeConfig2/**"
+      - "VietTypeATL/**"
+      - "VietTypeSetup/**"
       # unconditional
-      - 'TfDumper/**'
-      - 'WordLister/**'
-      - 'data/**'
-      - 'docs/**'
+      - "TfDumper/**"
+      - "WordLister/**"
+      - "data/**"
+      - "docs/**"
   pull_request:
     branches:
       - master
@@ -51,4 +51,6 @@ jobs:
         run: msbuild.exe -m -target:VietTypeUnitTests:Rebuild -p:Configuration=${{matrix.configuration}} -p:Platform=${{matrix.platform}} .
 
       - name: Run tests
-        run: ${{matrix.platform}}/${{matrix.configuration}}/VietTypeUnitTests.exe
+        run: |
+          cd VietTypeUnitTests
+          ../${{matrix.platform}}/${{matrix.configuration}}/VietTypeUnitTests.exe
