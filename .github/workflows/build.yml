@@ -5,18 +5,16 @@ on:
     branches:
       - master
     paths-ignore:
-      - 'TestLib/**'
-      - 'VietTypeUnitTests/**'
+      - "TestLib/**"
+      - "VietTypeUnitTests/**"
       # unconditional
-      - 'TfDumper/**'
-      - 'WordLister/**'
-      - 'data/**'
-      - 'docs/**'
+      - "TfDumper/**"
+      - "WordLister/**"
+      - "data/**"
+      - "docs/**"
   pull_request:
     branches:
       - master
-  release:
-    types: [published]
   workflow_dispatch:
 
 env:
@@ -68,7 +66,7 @@ jobs:
       subject-digest: sha256:${{ steps.upload.outputs.artifact-digest }}
 
   attest:
-    if: ${{ github.event_name == 'release' && github.event.action == 'published' }}
+    if: ${{ github.event_name == 'workflow_dispatch' }}
     needs: [build]
     uses: dinhngtu/github-workflows/.github/workflows/attest.yml@af4b127febded0600cafa4f5935f99a24e267a8c
     permissions:
