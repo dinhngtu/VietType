@@ -3,7 +3,7 @@
 ## VietType là gì?
 VietType là bộ gõ tiếng Việt nguồn mở dành cho Windows 10.
 
-![viettype](/viettype.png)
+![settings](/settings.png)
 
 ## Tại sao sử dụng VietType?
 - VietType là phần mềm nguồn mở. Bất cứ ai có thể sử dụng, sửa đổi và lưu hành VietType theo Giấy phép Công cộng GNU phiên bản 3 (GNU GPL v3).
