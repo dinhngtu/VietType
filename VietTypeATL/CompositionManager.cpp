@@ -24,7 +24,7 @@ static HRESULT IsContextEmpty(_In_ ITfContext* context, _In_ TfClientId clientid
 }
 
 HRESULT CompositionManager::OnNewContext(_In_opt_ ITfContext* context) {
-    HRESULT hr;
+    HRESULT hr, hrSession;
 
     _context = context;
 
@@ -74,8 +74,9 @@ HRESULT CompositionManager::OnNewContext(_In_opt_ ITfContext* context) {
         DBG_HRESULT_CHECK(hr, L"compBackconvert.Initialize failed");
     }
 
-    hr = RequestEditSession(EditSessions::EditBlocked, _controller.p);
-    if (FAILED(hr)) {
+    hr = RequestEditSessionEx(
+        EditSessions::EditBlocked, TF_ES_ASYNCDONTCARE | TF_ES_READWRITE, &hrSession, _controller.p);
+    if (FAILED(hr) || FAILED(hrSession)) {
         DBG_HRESULT_CHECK(hr, L"CompositionManager::RequestEditSession failed");
         _controller->SetBlocked(EngineController::BlockedKind::Free);
     }
@@ -222,11 +223,18 @@ HRESULT CompositionManager::Uninitialize() {
 }
 
 HRESULT CompositionManager::StartComposition(_In_ ITfContext* pContext) {
+    HRESULT hr, hrSession;
+
     if (_clientid == TF_CLIENTID_NULL || _composition) {
         DBG_DPRINT(L"bad composition request");
         return E_FAIL;
     }
-    return RequestEditSession(&_StartComposition);
+
+    hr = RequestEditSessionEx(&_StartComposition, TF_ES_ASYNCDONTCARE | TF_ES_READWRITE, &hrSession);
+    HRESULT_CHECK_RETURN(hr, "RequestEditSessionEx failed");
+    HRESULT_CHECK_RETURN(hrSession, "_StartComposition failed");
+
+    return S_OK;
 }
 
 HRESULT CompositionManager::EndComposition() {
@@ -234,11 +242,16 @@ HRESULT CompositionManager::EndComposition() {
         DBG_DPRINT(L"bad end composition request");
         return E_FAIL;
     }
+
     if (_composition) {
-        return RequestEditSession(&_EndComposition);
-    } else {
-        return S_OK;
+        HRESULT hr, hrSession;
+
+        hr = RequestEditSessionEx(&_EndComposition, TF_ES_ASYNCDONTCARE | TF_ES_READWRITE, &hrSession);
+        HRESULT_CHECK_RETURN(hr, "RequestEditSessionEx failed");
+        HRESULT_CHECK_RETURN(hrSession, "_EndComposition failed");
     }
+
+    return S_OK;
 }
 
 bool CompositionManager::IsComposing() const {

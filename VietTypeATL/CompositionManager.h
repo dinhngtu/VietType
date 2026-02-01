@@ -114,21 +114,6 @@ public:
         return hr;
     }
 
-    template <typename... Args>
-    HRESULT RequestEditSession(
-        _In_ HRESULT (*callback)(
-            TfEditCookie ec, CompositionManager* compositionManager, ITfContext* context, Args... args),
-        Args... args) {
-
-        HRESULT hr;
-        HRESULT hrSession;
-
-        hr = RequestEditSessionEx(callback, TF_ES_ASYNCDONTCARE | TF_ES_READWRITE, &hrSession, args...);
-        HRESULT_CHECK_RETURN(hr, L"context->RequestEditSession failed");
-
-        return hr;
-    }
-
 private:
     static HRESULT _StartComposition(
         /* EditSession */ _In_ TfEditCookie ec,
