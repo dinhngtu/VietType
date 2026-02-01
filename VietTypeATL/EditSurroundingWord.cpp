@@ -203,7 +203,7 @@ HRESULT EditSurroundingWord(
         compBackconvert.SetValue(0);
     } else {
         DBG_HRESULT_CHECK(hr, L"DoEditSurroundingWord failed");
-        compositionManager->EndCompositionNow(ec);
+        hr = compositionManager->EndCompositionNow(ec);
         DBG_HRESULT_CHECK(hr, L"compositionManager->EndCompositionNow failed");
     }
 
