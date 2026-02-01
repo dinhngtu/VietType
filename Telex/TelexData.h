@@ -91,55 +91,57 @@ MAKE_MAP(
     transitions_w,
     false,
     std::wstring_view,
-    std::wstring_view,
-    P(L"o", L"\x1a1"),           //
-    P(L"oi", L"\x1a1i"),         //
-    P(L"u", L"\x1b0"),           //
-    P(L"ua", L"\x1b0\x61"),      //
-    P(L"ui", L"\x1b0i"),         //
-    P(L"uo", L"u\x1a1"),         //
-    P(L"uoi", L"\x1b0\x1a1i"),   //
-    P(L"uou", L"\x1b0\x1a1u"),   //
-    P(L"uu", L"\x1b0u"),         //
-    P(L"\x1b0o", L"\x1b0\x1a1"), //
+    TransitionV,
+    P1(L"o", P1(L"\x1a1", 0)),      //
+    P1(L"oi", P1(L"\x1a1i", 0)),    //
+    P1(L"u", P1(L"\x1b0", 0)),      //
+    P1(L"ua", P1(L"\x1b0\x61", 0)), //
+    P1(L"ui", P1(L"\x1b0i", 0)),    //
+    P1(L"uo", P1(L"u\x1a1", 1)),    //
+    // respos is recorded as 1 here to delete it asap (to revisit)
+    P1(L"uoi", P1(L"\x1b0\x1a1i", 1)),   //
+    P1(L"uou", P1(L"\x1b0\x1a1u", 1)),   //
+    P1(L"uu", P1(L"\x1b0u", 0)),         //
+    P1(L"\x1b0o", P1(L"\x1b0\x1a1", 1)), //
     // identical transitions are ignored if the last "w" is typed immediately after V without repeating (e.g.
     // "uwow")
-    P(L"\x1b0\x1a1", L"\x1b0\x1a1"), //
+    // same as above, respos is recorded as 1 here to delete it asap (to revisit)
+    P1(L"\x1b0\x1a1", P1(L"\x1b0\x1a1", 1)), //
 );
 debug_ensure(std::all_of(transitions_w.begin(), transitions_w.end(), [](const auto& x) {
-    return x.second.length() == x.first.length();
+    return x.second.second < x.second.first.length() && x.second.first.length() == x.first.length();
 }));
 
 MAKE_MAP(
     transitions_w_q,
     false,
     std::wstring_view,
-    std::wstring_view,
-    P(L"u", L"\x1b0"),
-    P(L"uo", L"u\x1a1"),
-    P(L"uoi", L"u\x1a1i"),
-    P(L"\x1b0\x1a1", L"\x1b0\x1a1"), //
+    TransitionV,
+    P1(L"u", P1(L"\x1b0", 0)),
+    P1(L"uo", P1(L"u\x1a1", 1)),
+    P1(L"uoi", P1(L"u\x1a1i", 1)),
+    P1(L"\x1b0\x1a1", P1(L"\x1b0\x1a1", 1)), //
 );
 debug_ensure(std::all_of(transitions_w_q.begin(), transitions_w_q.end(), [](const auto& x) {
-    return x.second.length() == x.first.length();
+    return x.second.second < x.second.first.length() && x.second.first.length() == x.first.length();
 }));
 
 MAKE_MAP(
     transitions_wa,
     false,
     std::wstring_view,
-    std::wstring_view,
-    P(L"a", L"\x103"),   //
-    P(L"oa", L"o\x103"), //
-    P(L"ua", L"u\x103"), //
+    TransitionV,
+    P1(L"a", P1(L"\x103", 0)),   //
+    P1(L"oa", P1(L"o\x103", 1)), //
+    P1(L"ua", P1(L"u\x103", 1)), //
 );
 debug_ensure(std::all_of(transitions_wa.begin(), transitions_wa.end(), [](const auto& x) {
-    return x.second.length() == x.first.length();
+    return x.second.second < x.second.first.length() && x.second.first.length() == x.first.length();
 }));
 
-MAKE_MAP(transitions_wa_q, false, std::wstring_view, std::wstring_view, P(L"ua", L"u\x103"));
+MAKE_MAP(transitions_wa_q, false, std::wstring_view, TransitionV, P1(L"ua", P1(L"u\x103", 1)));
 debug_ensure(std::all_of(transitions_wa.begin(), transitions_wa.end(), [](const auto& x) {
-    return x.second.length() == x.first.length();
+    return x.second.second < x.second.first.length() && x.second.first.length() == x.first.length();
 }));
 
 MAKE_MAP(
@@ -166,20 +168,18 @@ MAKE_MAP(
     transitions_wv_c2,
     false,
     std::wstring_view,
-    std::wstring_view,
-    P(L"u\x1a1", L"\x1b0\x1a1"), //
-    P(L"\x1b0"
-      "a",
-      L"u\x103"),                //
-    P(L"\x1b0o", L"\x1b0\x1a1"), //
+    TransitionV,
+    P1(L"u\x1a1", P1(L"\x1b0\x1a1", 0)), //
+    P1(L"\x1b0\x61", P1(L"u\x103", 1)),  //
+    P1(L"\x1b0o", P1(L"\x1b0\x1a1", 1)), //
 );
 debug_ensure(std::all_of(transitions_wv_c2.begin(), transitions_wv_c2.end(), [](const auto& x) {
-    return x.second.length() == x.first.length();
+    return x.second.second < x.second.first.length() && x.second.first.length() == x.first.length();
 }));
 
-MAKE_MAP(transitions_wv_c2_q, false, std::wstring_view, std::wstring_view, P(L"\x1b0o", L"\x1b0\x1a1"));
+MAKE_MAP(transitions_wv_c2_q, false, std::wstring_view, TransitionV, P1(L"\x1b0o", P1(L"\x1b0\x1a1", 1)));
 debug_ensure(std::all_of(transitions_wv_c2_q.begin(), transitions_wv_c2_q.end(), [](const auto& x) {
-    return x.second.length() == x.first.length();
+    return x.second.second < x.second.first.length() && x.second.first.length() == x.first.length();
 }));
 
 MAKE_MAP(
@@ -859,63 +859,64 @@ MAKE_MAP(
     transitions_telex,
     true,
     std::wstring_view,
-    std::wstring_view,
-    P(L"aa", L"\xe2"),     //
-    P(L"aua", L"\xe2u"),   // relaxed transformations
-    P(L"aya", L"\xe2y"),   // relaxed transformations
-    P(L"ee", L"\xea"),     //
-    P(L"eue", L"\xeau"),   // relaxed transformations
-    P(L"iee", L"i\xea"),   //
-    P(L"ieue", L"i\xeau"), // relaxed transformations
-    P(L"oio", L"\xf4i"),   // relaxed transformations
-    P(L"oo", L"\xf4"),     //
-    P(L"uaa", L"u\xe2"),   //
-    P(L"uaya", L"u\xe2y"), // relaxed transformations
-    P(L"uee", L"u\xea"),   //
-    P(L"uoio", L"u\xf4i"), // relaxed transformations
-    P(L"uoo", L"u\xf4"),   //
-    P(L"uyee", L"uy\xea"), //
-    //{ L"u\x1a1" , L"\x1b0\x1a1" }, // transition in v_c2 only
-    P(L"u\x1a1i", L"\x1b0\x1a1i"), //
-    P(L"u\x1a1u", L"\x1b0\x1a1u"), //
-    P(L"yee", L"y\xea"),           //
-    P(L"yeue", L"y\xeau"),         // relaxed transformations
-    P(L"\xf4o", L"oo"),            // only for 'xoong', etc.
-    P(L"\x1b0o", L"\x1b0\x1a1"),   // relaxed transformations
+    TransitionV,
+    P1(L"aa", P1(L"\xe2", 0)),     //
+    P1(L"aua", P1(L"\xe2u", 0)),   // relaxed transformations
+    P1(L"aya", P1(L"\xe2y", 0)),   // relaxed transformations
+    P1(L"ee", P1(L"\xea", 0)),     //
+    P1(L"eue", P1(L"\xeau", 0)),   // relaxed transformations
+    P1(L"iee", P1(L"i\xea", 1)),   //
+    P1(L"ieue", P1(L"i\xeau", 1)), // relaxed transformations
+    P1(L"oio", P1(L"\xf4i", 0)),   // relaxed transformations
+    P1(L"oo", P1(L"\xf4", 0)),     //
+    P1(L"uaa", P1(L"u\xe2", 1)),   //
+    P1(L"uaya", P1(L"u\xe2y", 1)), // relaxed transformations
+    P1(L"uee", P1(L"u\xea", 1)),   //
+    P1(L"uoio", P1(L"u\xf4i", 1)), // relaxed transformations
+    P1(L"uoo", P1(L"u\xf4", 1)),   //
+    P1(L"uyee", P1(L"uy\xea", 2)), //
+    //{ L"u\x1a1" , P1(L"\x1b0\x1a1" }, // transition in v_c2 only
+    P1(L"u\x1a1i", P1(L"\x1b0\x1a1i", 0)), //
+    P1(L"u\x1a1u", P1(L"\x1b0\x1a1u", 0)), //
+    P1(L"yee", P1(L"y\xea", 1)),           //
+    P1(L"yeue", P1(L"y\xeau", 1)),         // relaxed transformations
+    P1(L"\xf4o", P1(L"oo", 0)),            // only for 'xoong', etc.
+    P1(L"\x1b0o", P1(L"\x1b0\x1a1", 1)),   // relaxed transformations
 );
 debug_ensure(std::all_of(transitions_telex.begin(), transitions_telex.end(), [](const auto& x) {
     // the ends_with checks are for making sure [] won't trigger transitions
-    return !x.first.ends_with(L'\x1b0') && !x.first.ends_with(L'\x1a1') && x.second.length() <= x.first.length();
+    return !x.first.ends_with(L'\x1b0') && !x.first.ends_with(L'\x1a1') && x.second.second < x.second.first.length() &&
+           x.second.first.length() <= x.first.length();
 }));
 
 MAKE_MAP(
     transitions_vni,
     true,
     std::wstring_view,
-    std::wstring_view,
-    P(L"a6", L"\xe2"),             //
-    P(L"au6", L"\xe2u"),           //
-    P(L"ay6", L"\xe2y"),           //
-    P(L"e6", L"\xea"),             //
-    P(L"eu6", L"\xeau"),           //
-    P(L"ie6", L"i\xea"),           //
-    P(L"ieu6", L"i\xeau"),         //
-    P(L"o6", L"\xf4"),             //
-    P(L"oi6", L"\xf4i"),           //
-    P(L"ua6", L"u\xe2"),           //
-    P(L"uay6", L"u\xe2y"),         //
-    P(L"ue6", L"u\xea"),           //
-    P(L"uo6", L"u\xf4"),           //
-    P(L"uoi6", L"u\xf4i"),         //
-    P(L"uye6", L"uy\xea"),         //
-    P(L"u\x1a1i", L"\x1b0\x1a1i"), //
-    P(L"u\x1a1u", L"\x1b0\x1a1u"), //
-    P(L"ye6", L"y\xea"),           //
-    P(L"yeu6", L"y\xeau"),         //
-    P(L"\x1b0o", L"\x1b0\x1a1"),   //
+    TransitionV,
+    P1(L"a6", P1(L"\xe2", 0)),             //
+    P1(L"au6", P1(L"\xe2u", 0)),           //
+    P1(L"ay6", P1(L"\xe2y", 0)),           //
+    P1(L"e6", P1(L"\xea", 0)),             //
+    P1(L"eu6", P1(L"\xeau", 0)),           //
+    P1(L"ie6", P1(L"i\xea", 1)),           //
+    P1(L"ieu6", P1(L"i\xeau", 1)),         //
+    P1(L"o6", P1(L"\xf4", 0)),             //
+    P1(L"oi6", P1(L"\xf4i", 0)),           //
+    P1(L"ua6", P1(L"u\xe2", 1)),           //
+    P1(L"uay6", P1(L"u\xe2y", 1)),         //
+    P1(L"ue6", P1(L"u\xea", 1)),           //
+    P1(L"uo6", P1(L"u\xf4", 1)),           //
+    P1(L"uoi6", P1(L"u\xf4i", 1)),         //
+    P1(L"uye6", P1(L"uy\xea", 2)),         //
+    P1(L"u\x1a1i", P1(L"\x1b0\x1a1i", 0)), //
+    P1(L"u\x1a1u", P1(L"\x1b0\x1a1u", 0)), //
+    P1(L"ye6", P1(L"y\xea", 1)),           //
+    P1(L"yeu6", P1(L"y\xeau", 1)),         //
+    P1(L"\x1b0o", P1(L"\x1b0\x1a1", 1)),   //
 );
 debug_ensure(std::all_of(transitions_vni.begin(), transitions_vni.end(), [](const auto& x) {
-    return x.second.length() <= x.first.length();
+    return x.second.second < x.second.first.length() && x.second.first.length() <= x.first.length();
 }));
 
 MAKE_MAP(

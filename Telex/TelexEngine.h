@@ -131,9 +131,11 @@ constexpr TypingFlags operator~(TypingFlags val) {
 
 constexpr size_t NumOptimizationLevels = 8;
 
+using TransitionV = std::pair<std::wstring_view, int>;
+
 struct TypingStyle {
     CharTypes chartypes[128];
-    ArrayMap<std::wstring_view, std::wstring_view, true> transitions;
+    ArrayMap<std::wstring_view, TransitionV, true> transitions;
     ArrayMap<wchar_t, std::wstring_view, true> backconversions;
     const std::wstring_view charlist;
     TypingFlags flags[NumOptimizationLevels];
@@ -212,7 +214,8 @@ private:
     ///                                    C  V  T
     /// notes:
     /// - respos position masks are only valid if state is Valid
-    /// - 0 is a valid placeholder for respos position (backspacing the last character will reset the engine state anyway)
+    /// - 0 is a valid placeholder for respos position (backspacing the last character will reset the engine state
+    /// anyway)
     /// - tones use a respos value of 0 since they're committed in a separate phase
     /// </summary>
     std::vector<unsigned int> _respos;
@@ -221,12 +224,14 @@ private:
     bool _autocorrected = false;
 
 private:
-    template <typename T>
-    bool TransitionV(const T& source, bool w_mode = false) {
+    template <bool sorted>
+    _Success_(return) bool TransitionV(
+        const ArrayMap<std::wstring_view, TransitionV, sorted>& source, _Out_ int& offset, bool w_mode = false) {
         auto it = source.find(_v);
         if (it != source.end() &&
-            (!w_mode || ((_v != it->second || _c2.empty()) && !(_respos.back() & ResposTransitionW)))) {
-            _v = it->second;
+            (!w_mode || ((_v != it->second.first || _c2.empty()) && !(_respos.back() & ResposTransitionW)))) {
+            _v = it->second.first;
+            offset = it->second.second;
             return true;
         } else {
             return false;

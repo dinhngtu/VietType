@@ -322,11 +322,12 @@ TelexStates TelexEngine::PushChar(wchar_t corig) {
         // relaxed vowel position constraint: _c2.empty()
         _v.push_back(c);
         auto before = _v.size();
+        int offset = 0;
         // HACK: single special case for "khongoo"
         // note that _v here is post-append but pre-transition
         if (!_c2.empty() && IsTypingStyle(TypingFlags::IsTelex) && c == L'o' && _v == L"\xf4o") {
             Invalidate();
-        } else if (TransitionV(GetTypingStyle()->transitions)) {
+        } else if (TransitionV(GetTypingStyle()->transitions, offset)) {
             auto after = _v.size();
             if (IsTypingStyle(TypingFlags::InvalidateOnVowelPostTone) && _toneCount) {
                 Invalidate();
@@ -337,7 +338,7 @@ TelexStates TelexEngine::PushChar(wchar_t corig) {
             } else if (after < before) {
                 // make sure transitions will only consume the typed character in this case
                 assert(after == before - 1);
-                _respos.push_back(static_cast<unsigned int>(_c1.size() + _v.size() - 1) | ResposTransitionV);
+                _respos.push_back(static_cast<unsigned int>(_c1.size() + offset) | ResposTransitionV);
             } else if (after == before) {
                 // in case of 'uơi' -> 'ươi', the transition char itself is a normal character
                 // so it must be recorded as such rather than just a transition
@@ -369,18 +370,19 @@ TelexStates TelexEngine::PushChar(wchar_t corig) {
             FeedNewResultChar(_v, L'\x1b0', ccase);
         } else if (!_v.empty()) {
             bool vw_transitioned = false;
+            int offset = 0;
             if (IS(cat, CharTypes::W)) {
-                vw_transitioned = TransitionV(_c1 == L"q" ? transitions_w_q : transitions_w, true);
+                vw_transitioned = TransitionV(_c1 == L"q" ? transitions_w_q : transitions_w, offset, true);
             }
             if (!vw_transitioned && IS(cat, CharTypes::WA)) {
                 // with the dual-action "w" in telex, CharTypes::W takes priority
-                vw_transitioned = TransitionV(_c1 == L"q" ? transitions_wa_q : transitions_wa, true);
+                vw_transitioned = TransitionV(_c1 == L"q" ? transitions_wa_q : transitions_wa, offset, true);
             }
             if (vw_transitioned) {
                 if (!_c2.empty()) {
-                    TransitionV(_c1 == L"q" ? transitions_wv_c2_q : transitions_wv_c2);
+                    TransitionV(_c1 == L"q" ? transitions_wv_c2_q : transitions_wv_c2, offset);
                 }
-                _respos.push_back(static_cast<unsigned int>(_c1.size() + _v.size() - 1) | ResposTransitionW);
+                _respos.push_back(static_cast<unsigned int>(_c1.size() + offset) | ResposTransitionW);
             } else {
                 InvalidateAndPopBack(c);
             }
@@ -412,6 +414,7 @@ TelexStates TelexEngine::PushChar(wchar_t corig) {
     } else if ((_c1 == L"gi" || !_v.empty()) && _c2.empty() && IS(cat, CharTypes::ConsoC2)) {
         // word-ending consonants (cnpt)
         bool success = true;
+        int offset = 0;
         // special teencode exception
         if (_c1 != L"\x111" && _t != Tones::Z && _t != Tones::S && _t != Tones::J) {
             wchar_t tmpc2[2] = {c, 0};
@@ -422,7 +425,7 @@ TelexStates TelexEngine::PushChar(wchar_t corig) {
                 success = false;
         }
         if (success) {
-            TransitionV(_c1 == L"q" ? transitions_wv_c2_q : transitions_wv_c2);
+            TransitionV(_c1 == L"q" ? transitions_wv_c2_q : transitions_wv_c2, offset);
             FeedNewResultChar(_c2, c, ccase);
         } else {
             Invalidate();
@@ -434,8 +437,9 @@ TelexStates TelexEngine::PushChar(wchar_t corig) {
 
     } else if ((_c1 == L"gi" || !_v.empty()) && IS(cat, CharTypes::Conso)) {
         // special case for delaying the invalidation of invalid c2 until commit
+        int offset = 0;
         if (_c2.empty()) {
-            TransitionV(_c1 == L"q" ? transitions_wv_c2_q : transitions_wv_c2);
+            TransitionV(_c1 == L"q" ? transitions_wv_c2_q : transitions_wv_c2, offset);
         }
         FeedNewResultChar(_c2, c, ccase);
 

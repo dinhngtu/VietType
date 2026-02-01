@@ -343,6 +343,26 @@ TEST_CASE("TestTelex", "[telex]") {
             CHECK(L"gi" == engine->Peek());
         }
 
+        SECTION("TestTelexBackspaceDdayas") {
+            FeedWord(*engine, L"ddayas");
+            CHECK(L"\x111\x1ea5y" == engine->Peek());
+            engine->Backspace();
+            CHECK(L"\x111\x1ea5" == engine->Peek());
+            engine->Backspace();
+            CHECK(L"\x111" == engine->Peek());
+        }
+
+        SECTION("TestTelexBackspaceDdaysa") {
+            if (config.optimize_multilang <= 2) {
+                FeedWord(*engine, L"ddaysa");
+                CHECK(L"\x111\x1ea5y" == engine->Peek());
+                engine->Backspace();
+                CHECK(L"\x111\x1ea5" == engine->Peek());
+                engine->Backspace();
+                CHECK(L"\x111" == engine->Peek());
+            }
+        }
+
         SECTION("TestTelexBackspaceHofazn") {
             if (config.optimize_multilang == 0) {
                 FeedWord(*engine, L"hofazn");
