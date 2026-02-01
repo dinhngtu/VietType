@@ -34,9 +34,6 @@
     <ClCompile Include="Globals.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ThreadMgrEventSink.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="TextEditSink.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -68,9 +65,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Compartment.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ContextUtilities.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="EditBlocked.cpp">
@@ -114,16 +108,10 @@
     <ClInclude Include="SinkAdvisor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ThreadMgrEventSink.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="TextEditSink.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Common.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="KeyEventSink.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CompositionManager.h">
@@ -154,9 +142,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Compartment.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ContextUtilities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ComUtils.h">

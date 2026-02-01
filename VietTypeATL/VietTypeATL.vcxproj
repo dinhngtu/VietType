@@ -501,8 +501,6 @@
     <ClCompile Include="EditSurroundingWord.cpp" />
     <ClCompile Include="TextEditSink.cpp" />
     <ClCompile Include="TextService.cpp" />
-    <ClCompile Include="ThreadMgrEventSink.cpp" />
-    <ClCompile Include="ContextUtilities.cpp" />
     <ClCompile Include="VietTypeATL.cpp" />
     <ClCompile Include="VirtualDocument.cpp" />
   </ItemGroup>
@@ -520,7 +518,6 @@
     <ClInclude Include="EngineSettingsController.h" />
     <ClInclude Include="EnumDisplayAttributeInfo.h" />
     <ClInclude Include="Globals.h" />
-    <ClInclude Include="KeyEventSink.h" />
     <ClInclude Include="KeyHandler.h" />
     <ClInclude Include="KeyTranslator.h" />
     <ClInclude Include="LanguageBarButton.h" />
@@ -531,8 +528,6 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TextEditSink.h" />
     <ClInclude Include="TextService.h" />
-    <ClInclude Include="ThreadMgrEventSink.h" />
-    <ClInclude Include="ContextUtilities.h" />
     <ClInclude Include="Version.h" />
     <ClInclude Include="VirtualDocument.h" />
   </ItemGroup>

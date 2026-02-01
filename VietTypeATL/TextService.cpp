@@ -1,24 +1,12 @@
 // SPDX-FileCopyrightText: Copyright (c) 2018 Dinh Ngoc Tu
 // SPDX-License-Identifier: GPL-3.0-only
 
-// Derived from Microsoft's SampleIME source code included in the Windows classic samples,
-// whose original copyright and permission notice is included below:
-//
-//     THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF
-//     ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO
-//     THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
-//     PARTICULAR PURPOSE.
-//
-//     Copyright (c) Microsoft Corporation. All rights reserved
-
 // TextService.cpp : Implementation of TextService
 
 #include "stdafx.h"
 #include "TextService.h"
 #include "EnumDisplayAttributeInfo.h"
 #include "DisplayAttributes.h"
-#include "ThreadMgrEventSink.h"
-#include "KeyEventSink.h"
 #include "CompositionManager.h"
 #include "Telex.h"
 #include "EngineController.h"
@@ -59,10 +47,6 @@ STDMETHODIMP TextService::ActivateEx(_In_ ITfThreadMgr* ptim, _In_ TfClientId ti
 
     HRESULT hr;
 
-    _threadMgr = ptim;
-    _clientId = tid;
-    _activateFlags = dwFlags;
-
     _engine = std::unique_ptr<Telex::ITelexEngine>(Telex::TelexNew(Telex::TelexConfig{}));
 
     hr = CreateInitialize(&_engineController, _engine.get(), ptim, tid);
@@ -81,40 +65,28 @@ STDMETHODIMP TextService::ActivateEx(_In_ ITfThreadMgr* ptim, _In_ TfClientId ti
     HRESULT_CHECK_RETURN(hr, L"CreateInstance2(&attr1) failed");
     _attributeStore->AddAttribute(composingAttrib);
 
-    hr = CreateInitialize(
-        &_compositionManager,
-        tid,
-        static_cast<ITfDisplayAttributeInfo*>(composingAttrib),
-        static_cast<bool>(dwFlags & TF_TMAE_COMLESS));
-    HRESULT_CHECK_RETURN(hr, L"CreateInitialize(&_compositionManager) failed");
-
     long enabled;
     // this already sets enabled state if the compartment is empty
     hr = _engineController->IsUserEnabled(&enabled);
     HRESULT_CHECK_RETURN(hr, L"_engineController->IsUserEnabled failed");
     DBG_DPRINT(L"init hr = %ld, enabled = %ld", hr, enabled);
 
-    hr = CreateInitialize(&_keyEventSink, ptim, tid, _compositionManager, _engineController);
-    HRESULT_CHECK_RETURN(hr, L"CreateInitialize(&_keyEventSink) failed");
-
-    hr = CreateInitialize(&_threadMgrEventSink, ptim, tid, _compositionManager, _engineController);
-    HRESULT_CHECK_RETURN(hr, L"CreateInitialize(&_threadMgrEventSink) failed");
+    hr = CreateInitialize(
+        &_compositionManager,
+        ptim,
+        tid,
+        _engineController,
+        static_cast<ITfDisplayAttributeInfo*>(composingAttrib),
+        static_cast<bool>(dwFlags & TF_TMAE_COMLESS));
+    HRESULT_CHECK_RETURN(hr, L"CreateInitialize(&_compositionManager) failed");
 
     return S_OK;
 }
 
 STDMETHODIMP TextService::Deactivate(void) {
-    DBG_DPRINT(L"h = %p, threadno = %ld, tid = %ld", Globals::DllInstance, GetCurrentThreadId(), _clientId);
+    DBG_DPRINT(L"h = %p, threadno = %ld", Globals::DllInstance, GetCurrentThreadId());
 
     HRESULT hr;
-
-    hr = _threadMgrEventSink->Uninitialize();
-    DBG_HRESULT_CHECK(hr, L"_threadMgrEventSink->Uninitialize failed");
-    _threadMgrEventSink.Release();
-
-    hr = _keyEventSink->Uninitialize();
-    DBG_HRESULT_CHECK(hr, L"_keyEventSink->Uninitialize failed");
-    _keyEventSink.Release();
 
     _compositionManager->Uninitialize();
     _compositionManager.Release();

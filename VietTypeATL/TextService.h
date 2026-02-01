@@ -57,10 +57,6 @@ public:
         __RPC__in REFGUID guid, __RPC__deref_out_opt ITfDisplayAttributeInfo** ppInfo) override;
 
 private:
-    CComPtr<ITfThreadMgr> _threadMgr;
-    TfClientId _clientId = TF_CLIENTID_NULL;
-    DWORD _activateFlags = 0;
-
     std::unique_ptr<Telex::ITelexEngine> _engine;
 
     CComPtr<EngineController> _engineController;
@@ -68,9 +64,6 @@ private:
     CComPtr<VietType::EnumDisplayAttributeInfo> _attributeStore;
 
     CComPtr<CompositionManager> _compositionManager;
-
-    CComPtr<KeyEventSink> _keyEventSink;
-    CComPtr<ThreadMgrEventSink> _threadMgrEventSink;
 };
 OBJECT_ENTRY_AUTO(VietType::Globals::CLSID_TextService, TextService)
 

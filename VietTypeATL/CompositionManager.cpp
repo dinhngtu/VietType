@@ -1,19 +1,142 @@
 // SPDX-FileCopyrightText: Copyright (c) 2018 Dinh Ngoc Tu
 // SPDX-License-Identifier: GPL-3.0-only
 
-// Derived from Microsoft's SampleIME source code included in the Windows classic samples,
-// whose original copyright and permission notice is included below:
-//
-//     THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF
-//     ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO
-//     THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
-//     PARTICULAR PURPOSE.
-//
-//     Copyright (c) Microsoft Corporation. All rights reserved
-
 #include "CompositionManager.h"
+#include "EngineController.h"
+#include "EngineSettingsController.h"
+#include "EditSessions.h"
 
 namespace VietType {
+
+static HRESULT IsContextEmpty(_In_ ITfContext* context, _In_ TfClientId clientid, _Out_ bool* isempty) {
+    HRESULT hr;
+
+    Compartment<long> compEmpty;
+    hr = compEmpty.Initialize(context, clientid, GUID_COMPARTMENT_EMPTYCONTEXT);
+    HRESULT_CHECK_RETURN(hr, L"compEmpty->Initialize failed");
+
+    long contextEmpty;
+    hr = compEmpty.GetValue(&contextEmpty);
+    HRESULT_CHECK_RETURN(hr, L"compDisabled->GetValue failed");
+
+    *isempty = hr == S_OK && contextEmpty;
+    return hr;
+}
+
+HRESULT CompositionManager::OnNewContext(_In_opt_ ITfContext* context) {
+    HRESULT hr;
+
+    _context = context;
+
+    if (!context) {
+        _controller->SetBlocked(EngineController::BlockedKind::Blocked);
+        return S_OK;
+    }
+
+    bool isempty;
+    hr = IsContextEmpty(context, _clientid, &isempty);
+    HRESULT_CHECK_RETURN(hr, L"IsContextEmpty failed");
+    if (isempty) {
+        _controller->SetBlocked(EngineController::BlockedKind::Blocked);
+        return S_OK;
+    }
+
+#ifdef _DEBUG
+    TF_STATUS st;
+    hr = context->GetStatus(&st);
+    DBG_HRESULT_CHECK(hr, L"context->GetStatus failed") else {
+        DBG_DPRINT(
+            L"d=%c%c%c%c%c%c%c%c%c s=%c%c%c%c%c%c%c",
+            (st.dwDynamicFlags & TS_SD_READONLY) ? L'R' : L'_',
+            (st.dwDynamicFlags & TS_SD_LOADING) ? L'L' : L'_',
+            (st.dwDynamicFlags & TS_SD_RESERVED) ? L'?' : L'_',
+            (st.dwDynamicFlags & TS_SD_TKBAUTOCORRECTENABLE) ? L'A' : L'_',
+            (st.dwDynamicFlags & TS_SD_TKBPREDICTIONENABLE) ? L'P' : L'_',
+            (st.dwDynamicFlags & TS_SD_UIINTEGRATIONENABLE) ? L'I' : L'_',
+            (st.dwDynamicFlags & TS_SD_INPUTPANEMANUALDISPLAYENABLE) ? L'M' : L'_',
+            (st.dwDynamicFlags & TS_SD_EMBEDDEDHANDWRITINGVIEW_ENABLED) ? L'H' : L'_',
+            (st.dwDynamicFlags & TS_SD_EMBEDDEDHANDWRITINGVIEW_VISIBLE) ? L'V' : L'_',
+            (st.dwStaticFlags & TS_SS_DISJOINTSEL) ? L'D' : L'_',
+            (st.dwStaticFlags & TS_SS_REGIONS) ? L'R' : L'_',
+            (st.dwStaticFlags & TS_SS_TRANSITORY) ? L'T' : L'_',
+            (st.dwStaticFlags & TS_SS_NOHIDDENTEXT) ? L'H' : L'_',
+            (st.dwStaticFlags & TS_SS_TKBAUTOCORRECTENABLE) ? L'A' : L'_',
+            (st.dwStaticFlags & TS_SS_TKBPREDICTIONENABLE) ? L'P' : L'_',
+            (st.dwStaticFlags & TS_SS_UWPCONTROL) ? L'U' : L'_');
+    }
+#endif
+
+    Compartment<long> compBackconvert;
+    hr = compBackconvert.Initialize(context, _clientid, Globals::GUID_Compartment_Backconvert);
+    if (SUCCEEDED(hr)) {
+        compBackconvert.SetValue(0);
+    } else {
+        DBG_HRESULT_CHECK(hr, L"compBackconvert.Initialize failed");
+    }
+
+    hr = RequestEditSession(EditSessions::EditBlocked, _controller.p);
+    if (FAILED(hr)) {
+        DBG_HRESULT_CHECK(hr, L"CompositionManager::RequestEditSession failed");
+        _controller->SetBlocked(EngineController::BlockedKind::Free);
+    }
+
+    return S_OK;
+}
+
+STDMETHODIMP CompositionManager::OnInitDocumentMgr(__RPC__in_opt ITfDocumentMgr* pdim) {
+    DBG_DPRINT(L"pdim = %p", pdim);
+
+    return E_NOTIMPL;
+}
+
+STDMETHODIMP CompositionManager::OnUninitDocumentMgr(__RPC__in_opt ITfDocumentMgr* pdim) {
+    DBG_DPRINT(L"pdim = %p", pdim);
+
+    return E_NOTIMPL;
+}
+
+STDMETHODIMP CompositionManager::OnSetFocus(
+    __RPC__in_opt ITfDocumentMgr* pdimFocus, __RPC__in_opt ITfDocumentMgr* pdimPrevFocus) {
+    HRESULT hr;
+
+    DBG_DPRINT(L"pdimFocus = %p", pdimFocus);
+
+    _composition.Release();
+    _context.Release();
+
+    if (!pdimFocus) {
+        _controller->SetBlocked(EngineController::BlockedKind::Blocked);
+        return S_OK;
+    }
+
+    CComPtr<ITfContext> context;
+    hr = pdimFocus->GetTop(&context);
+    if (FAILED(hr)) {
+        _controller->SetBlocked(EngineController::BlockedKind::Blocked);
+        return S_OK;
+    }
+
+    hr = OnNewContext(context);
+    HRESULT_CHECK_RETURN(hr, L"OnNewContext failed");
+
+    return S_OK;
+}
+
+STDMETHODIMP CompositionManager::OnPushContext(__RPC__in_opt ITfContext* pic) {
+    DBG_DPRINT(L"context = %p", pic);
+
+    _composition.Release();
+
+    return S_OK;
+}
+
+STDMETHODIMP CompositionManager::OnPopContext(__RPC__in_opt ITfContext* pic) {
+    DBG_DPRINT(L"context = %p", pic);
+
+    _composition.Release();
+
+    return S_OK;
+}
 
 STDMETHODIMP CompositionManager::OnCompositionTerminated(
     _In_ TfEditCookie ecWrite, __RPC__in_opt ITfComposition* pComposition) {
@@ -21,18 +144,44 @@ STDMETHODIMP CompositionManager::OnCompositionTerminated(
 
     DBG_DPRINT(L"ecWrite = %ld", ecWrite);
 
-    hr = EndCompositionNow(ecWrite);
-    DBG_HRESULT_CHECK(hr, L"EndCompositionNow failed");
+    if (_composition == pComposition) {
+        _controller->GetEngine().Reset();
+        hr = EndCompositionNow(ecWrite);
+        DBG_HRESULT_CHECK(hr, L"EndCompositionNow failed");
+    }
 
     return S_OK;
 }
 
 _Check_return_ HRESULT CompositionManager::Initialize(
-    _In_ TfClientId clientid, _In_opt_ ITfDisplayAttributeInfo* composingAttribute, _In_ bool comless) {
+    _In_ ITfThreadMgr* threadMgr,
+    _In_ TfClientId clientid,
+    _In_ EngineController* controller,
+    _In_opt_ ITfDisplayAttributeInfo* composingAttribute,
+    _In_ bool comless) {
     HRESULT hr;
 
     _clientid = clientid;
+    _controller = controller;
     _composingAttribute = composingAttribute;
+    _threadMgr = threadMgr;
+
+    hr = _threadMgrEventSinkAdvisor.Advise(threadMgr, this);
+    HRESULT_CHECK_RETURN(hr, L"_threadMgrEventSinkAdvisor.Advise failed");
+
+    CComPtr<ITfKeystrokeMgr> keystrokeMgr;
+    hr = _threadMgr->QueryInterface(&keystrokeMgr);
+    if (SUCCEEDED(hr)) {
+        hr = keystrokeMgr->AdviseKeyEventSink(_clientid, this, TRUE);
+        HRESULT_CHECK_RETURN(hr, L"_keystrokeMgr->AdviseKeyEventSink failed");
+
+        _controller->GetSettings()->GetPreservedKeyToggle(&_pk_toggle);
+        hr = keystrokeMgr->PreserveKey(_clientid, GUID_KeyEventSink_PreservedKey_Toggle, &_pk_toggle, NULL, 0);
+        // probably not fatal
+        DBG_HRESULT_CHECK(hr, L"_keystrokeMgr->PreserveKey failed");
+    } else {
+        DBG_HRESULT_CHECK(hr, L"_threadMgr->QueryInterface failed");
+    }
 
     if (!comless) {
         hr = _categoryMgr.CoCreateInstance(CLSID_TF_CategoryMgr, NULL, CLSCTX_INPROC_SERVER);
@@ -43,19 +192,33 @@ _Check_return_ HRESULT CompositionManager::Initialize(
 }
 
 HRESULT CompositionManager::Uninitialize() {
-    _categoryMgr.Release();
-    _composingAttribute.Release();
-    return S_OK;
-}
+    HRESULT hr;
 
-HRESULT CompositionManager::RequestEditSession(
-    _In_ ITfEditSession* session, _In_ ITfContext* context, _In_ DWORD flags) {
-    if (_clientid == TF_CLIENTID_NULL || !context) {
-        DBG_DPRINT(L"bad edit session request");
-        return E_FAIL;
+    _composition.Release();
+    _context.Release();
+
+    _categoryMgr.Release();
+
+    CComPtr<ITfKeystrokeMgr> keystrokeMgr;
+    hr = _threadMgr->QueryInterface(&keystrokeMgr);
+    if (SUCCEEDED(hr)) {
+        hr = keystrokeMgr->UnpreserveKey(GUID_KeyEventSink_PreservedKey_Toggle, &_pk_toggle);
+        DBG_HRESULT_CHECK(hr, L"_keystrokeMgr->UnpreserveKey failed");
+
+        hr = keystrokeMgr->UnadviseKeyEventSink(_clientid);
+        DBG_HRESULT_CHECK(hr, L"_keystrokeMgr->UnadviseKeyEventSink failed");
+    } else {
+        DBG_HRESULT_CHECK(hr, L"_threadMgr->QueryInterface failed");
     }
-    HRESULT hrSession;
-    return context->RequestEditSession(_clientid, session, flags, &hrSession);
+
+    _threadMgrEventSinkAdvisor.Unadvise();
+    _threadMgr.Release();
+
+    _composingAttribute.Release();
+    _controller.Release();
+    _clientid = TF_CLIENTID_NULL;
+
+    return S_OK;
 }
 
 HRESULT CompositionManager::StartComposition(_In_ ITfContext* pContext) {
@@ -63,7 +226,7 @@ HRESULT CompositionManager::StartComposition(_In_ ITfContext* pContext) {
         DBG_DPRINT(L"bad composition request");
         return E_FAIL;
     }
-    return RequestEditSession(&_StartComposition, this, pContext);
+    return RequestEditSession(&_StartComposition);
 }
 
 HRESULT CompositionManager::EndComposition() {
@@ -72,7 +235,7 @@ HRESULT CompositionManager::EndComposition() {
         return E_FAIL;
     }
     if (_composition) {
-        return RequestEditSession(&_EndComposition, this, _context);
+        return RequestEditSession(&_EndComposition);
     } else {
         return S_OK;
     }
@@ -204,7 +367,6 @@ HRESULT CompositionManager::EndCompositionNow(_In_ TfEditCookie ec) {
             HRESULT_CHECK(hr, L"_composition->GetRange failed");
         }
 
-        _context.Release();
         _composition.Release();
     }
 
@@ -222,10 +384,8 @@ HRESULT CompositionManager::SetCompositionText(_In_ TfEditCookie ec, _In_z_ LPCW
         hr = range->SetText(ec, TF_ST_CORRECTION, str, length);
         HRESULT_CHECK_RETURN(hr, L"range->SetText failed");
 
-        if (_composingAttribute) {
-            hr = SetRangeDisplayAttribute(ec, _context, range, _composingAttribute);
-            HRESULT_CHECK_RETURN(hr, L"SetRangeDisplayAttribute failed");
-        }
+        hr = SetRangeDisplayAttribute(ec, _context, range);
+        HRESULT_CHECK_RETURN(hr, L"SetRangeDisplayAttribute failed");
 
         hr = MoveCaretToEnd(ec);
         DBG_HRESULT_CHECK(hr, L"MoveCaretToEnd failed");
@@ -247,15 +407,15 @@ HRESULT CompositionManager::EnsureCompositionText(
 }
 
 HRESULT CompositionManager::SetRangeDisplayAttribute(
-    _In_ TfEditCookie ec, _In_ ITfContext* context, _In_ ITfRange* range, _In_ ITfDisplayAttributeInfo* attr) {
+    _In_ TfEditCookie ec, _In_ ITfContext* context, _In_ ITfRange* range) {
     HRESULT hr;
 
-    if (!_categoryMgr) {
+    if (!_categoryMgr || !_composingAttribute) {
         return S_OK;
     }
 
     GUID guid;
-    hr = attr->GetGUID(&guid);
+    hr = _composingAttribute->GetGUID(&guid);
     HRESULT_CHECK_RETURN(hr, L"attr->GetGUID failed");
 
     TfGuidAtom atom = TF_INVALID_GUIDATOM;
