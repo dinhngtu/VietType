@@ -189,18 +189,20 @@ HRESULT CompositionManager::EndCompositionNow(_In_ TfEditCookie ec) {
     if (_composition) {
         CComPtr<ITfRange> range;
         hr = _composition->GetRange(&range);
-        HRESULT_CHECK_RETURN(hr, L"_composition->GetRange failed");
+        if (SUCCEEDED(hr)) {
+            if (_composingAttribute) {
+                hr = ClearRangeDisplayAttribute(ec, _context, range);
+                DBG_HRESULT_CHECK(hr, L"ClearRangeDisplayAttribute failed");
+            }
 
-        if (_composingAttribute) {
-            hr = ClearRangeDisplayAttribute(ec, _context, range);
-            HRESULT_CHECK_RETURN(hr, L"ClearRangeDisplayAttribute failed");
+            hr = MoveCaretToEnd(ec);
+            DBG_HRESULT_CHECK(hr, L"MoveCaretToEnd failed");
+
+            hr = _composition->EndComposition(ec);
+            DBG_HRESULT_CHECK(hr, L"_composition->EndComposition failed");
+        } else {
+            HRESULT_CHECK(hr, L"_composition->GetRange failed");
         }
-
-        hr = MoveCaretToEnd(ec);
-        DBG_HRESULT_CHECK(hr, L"MoveCaretToEnd failed");
-
-        hr = _composition->EndComposition(ec);
-        DBG_HRESULT_CHECK(hr, L"_composition->EndComposition failed");
 
         _context.Release();
         _composition.Release();
