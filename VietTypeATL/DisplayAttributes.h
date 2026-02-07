@@ -7,7 +7,8 @@
 
 namespace VietType {
 
-class DisplayAttributeInfo : public CComObjectRootEx<CComSingleThreadModel>, public ITfDisplayAttributeInfo {
+class ATL_NO_VTABLE DisplayAttributeInfo : public CComObjectRootEx<CComSingleThreadModel>,
+                                           public ITfDisplayAttributeInfo {
 public:
     DisplayAttributeInfo() = default;
     DisplayAttributeInfo(const DisplayAttributeInfo&) = delete;

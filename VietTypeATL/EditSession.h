@@ -8,7 +8,7 @@
 namespace VietType {
 
 template <typename... Args>
-class EditSession : public CComObjectRootEx<CComSingleThreadModel>, public ITfEditSession {
+class ATL_NO_VTABLE EditSession : public CComObjectRootEx<CComSingleThreadModel>, public ITfEditSession {
 public:
     using callback_type = HRESULT (*)(TfEditCookie ec, Args... args);
 
