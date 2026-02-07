@@ -11,6 +11,7 @@
 //
 //     Copyright (c) Microsoft Corporation. All rights reserved
 
+#include "stdafx.h"
 #include "Compartment.h"
 
 namespace VietType {
