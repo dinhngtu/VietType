@@ -1,45 +1,38 @@
 // SPDX-FileCopyrightText: Copyright (c) 2025 Dinh Ngoc Tu
 // SPDX-License-Identifier: GPL-3.0-only
 
-#include "EditSessions.h"
-#include "CompositionManager.h"
-#include "EngineController.h"
+#include "stdafx.h"
+#include "Context.h"
 
 namespace VietType {
-namespace EditSessions {
 
-HRESULT EditNextState(
-    _In_ TfEditCookie ec,
-    _In_ VietType::CompositionManager* compositionManager,
-    _In_ ITfContext* context,
-    _In_ VietType::EngineController* controller,
-    _In_ Telex::TelexStates state) {
+HRESULT Context::EditNextState(_In_ TfEditCookie ec, _In_ Telex::TelexStates state) {
     HRESULT hr;
 
     DBG_DPRINT(L"");
 
     switch (state) {
     case Telex::TelexStates::Valid: {
-        if (controller->GetEngine().Count()) {
-            auto str = controller->GetEngine().Peek();
-            hr = compositionManager->EnsureCompositionText(ec, context, &str[0], static_cast<LONG>(str.length()));
+        if (GetEngine()->Count()) {
+            auto str = GetEngine()->Peek();
+            hr = EnsureCompositionText(ec, &str[0], static_cast<LONG>(str.length()));
             DBG_HRESULT_CHECK(hr, L"_compositionManager->EnsureCompositionText failed");
         } else {
             // backspace returns Valid on an empty buffer
-            controller->GetEngine().Reset();
+            GetEngine()->Reset();
             // EndComposition* will not empty composition text so we have to do it manually
-            hr = compositionManager->EmptyCompositionText(ec);
+            hr = EmptyCompositionText(ec);
             HRESULT_CHECK_RETURN(hr, L"_compositionManager->EmptyCompositionText failed");
-            hr = compositionManager->EndCompositionNow(ec);
+            hr = EndCompositionNow(ec);
             HRESULT_CHECK_RETURN(hr, L"_compositionManager->EndCompositionNow failed");
         }
         break;
     }
 
     case Telex::TelexStates::Invalid: {
-        assert(controller->GetEngine().Count() > 0);
-        auto str = controller->GetEngine().RetrieveRaw();
-        hr = compositionManager->EnsureCompositionText(ec, context, &str[0], static_cast<LONG>(str.length()));
+        assert(GetEngine()->Count() > 0);
+        auto str = GetEngine()->RetrieveRaw();
+        hr = EnsureCompositionText(ec, &str[0], static_cast<LONG>(str.length()));
         DBG_HRESULT_CHECK(hr, L"_compositionManager->EnsureCompositionText failed");
         break;
     }
@@ -53,18 +46,14 @@ HRESULT EditNextState(
     return S_OK;
 }
 
-HRESULT EditCommit(
-    _In_ TfEditCookie ec,
-    _In_ VietType::CompositionManager* compositionManager,
-    _In_ ITfContext* context,
-    _In_ VietType::EngineController* controller) {
+HRESULT Context::EditCommit(_In_ TfEditCookie ec) {
     HRESULT hr = S_OK;
 
-    if (compositionManager->IsComposing()) {
-        auto txstate = controller->GetEngine().Commit();
+    if (GetComposition()) {
+        auto txstate = GetEngine()->Commit();
         if (txstate == Telex::TelexStates::Committed || txstate == Telex::TelexStates::CommittedInvalid) {
-            auto str = controller->GetEngine().Retrieve();
-            hr = compositionManager->SetCompositionText(ec, &str[0], static_cast<LONG>(str.length()));
+            auto str = GetEngine()->Retrieve();
+            hr = SetCompositionText(ec, &str[0], static_cast<LONG>(str.length()));
             DBG_HRESULT_CHECK(hr, L"_compositionManager->EnsureCompositionText failed");
         } else {
             assert(txstate == Telex::TelexStates::Committed || txstate == Telex::TelexStates::CommittedInvalid);
@@ -72,11 +61,10 @@ HRESULT EditCommit(
         }
     }
 
-    controller->GetEngine().Reset();
-    compositionManager->EndCompositionNow(ec);
+    GetEngine()->Reset();
+    EndCompositionNow(ec);
 
     return S_OK;
 }
 
-} // namespace EditSessions
 } // namespace VietType

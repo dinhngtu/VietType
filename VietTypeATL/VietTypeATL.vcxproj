@@ -449,6 +449,7 @@
   <ItemGroup>
     <ClCompile Include="Compartment.cpp" />
     <ClCompile Include="CompositionManager.cpp" />
+    <ClCompile Include="Context.cpp" />
     <ClCompile Include="DisplayAttributes.cpp" />
     <ClCompile Include="dllmain.cpp">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
@@ -478,7 +479,7 @@
     </ClCompile>
     <ClCompile Include="EditBlocked.cpp" />
     <ClCompile Include="EditSessions.cpp" />
-    <ClCompile Include="EngineController.cpp" />
+    <ClCompile Include="StatusController.cpp" />
     <ClCompile Include="EngineSettingsController.cpp" />
     <ClCompile Include="EnumDisplayAttributeInfo.cpp" />
     <ClCompile Include="Globals.cpp" />
@@ -499,7 +500,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|ARM64EC'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="EditSurroundingWord.cpp" />
-    <ClCompile Include="TextEditSink.cpp" />
     <ClCompile Include="TextService.cpp" />
     <ClCompile Include="VietTypeATL.cpp" />
     <ClCompile Include="VirtualDocument.cpp" />
@@ -509,16 +509,15 @@
     <ClInclude Include="Compartment.h" />
     <ClInclude Include="CompositionManager.h" />
     <ClInclude Include="ComUtils.h" />
+    <ClInclude Include="Context.h" />
     <ClInclude Include="Define.h" />
     <ClInclude Include="DisplayAttributes.h" />
     <ClInclude Include="dllmain.h" />
     <ClInclude Include="EditSession.h" />
-    <ClInclude Include="EditSessions.h" />
-    <ClInclude Include="EngineController.h" />
+    <ClInclude Include="StatusController.h" />
     <ClInclude Include="EngineSettingsController.h" />
     <ClInclude Include="EnumDisplayAttributeInfo.h" />
     <ClInclude Include="Globals.h" />
-    <ClInclude Include="KeyHandler.h" />
     <ClInclude Include="KeyTranslator.h" />
     <ClInclude Include="LanguageBarButton.h" />
     <ClInclude Include="SettingsStore.h" />
@@ -526,7 +525,6 @@
     <ClInclude Include="SinkAdvisor.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="TextEditSink.h" />
     <ClInclude Include="TextService.h" />
     <ClInclude Include="Version.h" />
     <ClInclude Include="VirtualDocument.h" />

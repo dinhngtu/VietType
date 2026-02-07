@@ -38,6 +38,7 @@
 #include <iterator>
 #include <optional>
 #include <string>
+#include <map>
 
 #include <strsafe.h>
 #include <msctf.h>

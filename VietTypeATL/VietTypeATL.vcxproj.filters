@@ -34,9 +34,6 @@
     <ClCompile Include="Globals.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TextEditSink.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="KeyEventSink.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -49,7 +46,7 @@
     <ClCompile Include="Register.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="EngineController.cpp">
+    <ClCompile Include="StatusController.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="LanguageBarButton.cpp">
@@ -85,6 +82,9 @@
     <ClCompile Include="EditSessions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Context.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -108,9 +108,6 @@
     <ClInclude Include="SinkAdvisor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TextEditSink.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -120,19 +117,13 @@
     <ClInclude Include="EditSession.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="KeyHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EngineController.h">
+    <ClInclude Include="StatusController.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="LanguageBarButton.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VirtualDocument.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EditSessions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DisplayAttributes.h">
@@ -160,6 +151,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="KeyTranslator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Context.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

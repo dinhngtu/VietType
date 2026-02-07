@@ -1,13 +1,12 @@
 // SPDX-FileCopyrightText: Copyright (c) 2018 Dinh Ngoc Tu
 // SPDX-License-Identifier: GPL-3.0-only
 
-#include "EditSessions.h"
-#include "CompositionManager.h"
-#include "EngineController.h"
+#include "stdafx.h"
+#include "Context.h"
 #include "VirtualDocument.h"
+#include "Compartment.h"
 
 namespace VietType {
-namespace EditSessions {
 
 static const long SWF_MAXCHARS = 9; // "nghiêng" + 1 for the padding + 1 for max ignore
 
@@ -52,24 +51,21 @@ static bool IsSeparatorCharacter(WCHAR c) {
     return false;
 }
 
-static HRESULT DoEditSurroundingWord(
-    _In_ TfEditCookie ec,
-    _In_ CompositionManager* compositionManager,
-    _In_ ITfContext* context,
-    _In_ EngineController* controller,
-    _In_ int ignore) {
+HRESULT Context::DoEditSurroundingWord(_In_ TfEditCookie ec, _In_ int ignore) {
     HRESULT hr;
 
     CComPtr<ITfContext> ppic;
-    hr = VirtualDocument::GetVirtualDocumentContext(context, &ppic);
+    hr = VirtualDocument::GetVirtualDocumentContext(GetContext(), &ppic);
     DBG_HRESULT_CHECK(hr, L"ThreadMgrEventSink::GetTransitoryParentContext failed");
 
     if (!ppic) {
-        ppic = context;
+        ppic = GetContext();
     }
 
+    auto composition = GetComposition();
+
     CComPtr<ITfRange> range;
-    hr = compositionManager->GetRange(&range);
+    hr = composition->GetRange(&range);
     HRESULT_CHECK_RETURN(hr, L"_composition->GetRange failed");
 
     // shift current range backwards
@@ -79,9 +75,10 @@ static HRESULT DoEditSurroundingWord(
     HRESULT_CHECK_RETURN(hr, L"range->Clone failed");
 
     TF_HALTCOND haltcond{
-        NULL,
+        nullptr,
         TF_ANCHOR_START, // ignored
-        TF_HF_OBJECT};
+        TF_HF_OBJECT,
+    };
 
     LONG shifted;
     hr = rangeTest->ShiftStart(ec, -SWF_MAXCHARS, &shifted, &haltcond);
@@ -127,8 +124,6 @@ static HRESULT DoEditSurroundingWord(
         return E_FAIL;
     }
 
-    CComPtr<ITfComposition> composition(compositionManager->GetComposition());
-
     // move composition to the word we found
     hr = range->ShiftStart(ec, -wordlen - ignore, &shifted, &haltcond);
     HRESULT_CHECK_RETURN(hr, L"range->ShiftStart failed");
@@ -145,39 +140,34 @@ static HRESULT DoEditSurroundingWord(
     */
 
     // reinitialize engine with text
-    controller->GetEngine().Reset();
-    controller->GetEngine().Backconvert(std::wstring(&buf[static_cast<size_t>(retrieved - wordlen - ignore)], wordlen));
+    auto engine = GetEngine();
+    engine->Reset();
+    engine->Backconvert(std::wstring(&buf[static_cast<size_t>(retrieved - wordlen - ignore)], wordlen));
 
-    auto displayText = controller->GetEngine().Peek();
-    compositionManager->SetCompositionText(ec, displayText.c_str(), static_cast<LONG>(displayText.length()));
+    auto displayText = engine->Peek();
+    SetCompositionText(ec, displayText.c_str(), static_cast<LONG>(displayText.length()));
 
     return S_OK;
 }
 
-HRESULT EditSurroundingWord(
-    _In_ TfEditCookie ec,
-    _In_ CompositionManager* compositionManager,
-    _In_ ITfContext* context,
-    _In_ EngineController* controller,
-    _In_ int ignore) {
-
+HRESULT Context::EditSurroundingWord(_In_ TfEditCookie ec, _In_ Context* context, _In_ int ignore) {
     HRESULT hr;
 
     DBG_DPRINT(L"backconvert ec = %ld", ec);
 
     Compartment<long> compBackconvert;
-    hr = compBackconvert.Initialize(context, compositionManager->GetClientId(), Globals::GUID_Compartment_Backconvert);
+    hr = compBackconvert.Initialize(context->GetContext(), context->GetClientId(), Globals::GUID_Compartment_Backconvert);
     HRESULT_CHECK_RETURN(hr, L"compBackconvert.Initialize failed");
     hr = compBackconvert.SetValue(-1);
     HRESULT_CHECK_RETURN(hr, L"compBackconvert.SetValue failed");
 
-    if (compositionManager->IsComposing()) {
+    if (context->GetComposition()) {
         return E_PENDING;
     }
 
     std::array<TF_SELECTION, 2> sel{};
     ULONG fetched;
-    hr = context->GetSelection(ec, 0, static_cast<ULONG>(sel.size()), sel.data(), &fetched);
+    hr = context->GetContext()->GetSelection(ec, 0, static_cast<ULONG>(sel.size()), sel.data(), &fetched);
     HRESULT_CHECK_RETURN(hr, L"context->GetSelection failed");
 
     if (fetched > 1) {
@@ -195,37 +185,31 @@ HRESULT EditSurroundingWord(
         }
     }
 
-    hr = compositionManager->StartCompositionNow(ec, context);
+    hr = context->StartCompositionNow(ec);
     HRESULT_CHECK_RETURN(hr, L"_compositionManager->StartComposition failed");
 
-    hr = DoEditSurroundingWord(ec, compositionManager, context, controller, ignore);
+    hr = context->DoEditSurroundingWord(ec, ignore);
     if (SUCCEEDED(hr)) {
         compBackconvert.SetValue(0);
     } else {
         DBG_HRESULT_CHECK(hr, L"DoEditSurroundingWord failed");
-        hr = compositionManager->EndCompositionNow(ec);
+        hr = context->EndCompositionNow(ec);
         DBG_HRESULT_CHECK(hr, L"compositionManager->EndCompositionNow failed");
     }
 
     return hr;
 }
 
-HRESULT EditSurroundingWordAndPush(
-    _In_ TfEditCookie ec,
-    _In_ CompositionManager* compositionManager,
-    _In_ ITfContext* context,
-    _In_ EngineController* controller,
-    _In_ int ignore,
-    _In_ wchar_t push) {
-    HRESULT hr = EditSurroundingWord(ec, compositionManager, context, controller, ignore);
+HRESULT Context::EditSurroundingWordAndPush(
+    _In_ TfEditCookie ec, _In_ Context* context, _In_ int ignore, _In_ wchar_t push) {
+    HRESULT hr = EditSurroundingWord(ec, context, ignore);
     HRESULT_CHECK(hr, "EditSurroundingWord failed");
 
     if (!push) {
         return hr;
     }
 
-    return EditNextState(ec, compositionManager, context, controller, controller->GetEngine().PushChar(push));
+    return context->EditNextState(ec, context->GetEngine()->PushChar(push));
 }
 
-} // namespace EditSessions
 } // namespace VietType

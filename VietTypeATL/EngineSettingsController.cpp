@@ -1,16 +1,16 @@
 // SPDX-FileCopyrightText: Copyright (c) 2018 Dinh Ngoc Tu
 // SPDX-License-Identifier: GPL-3.0-only
 
+#include "stdafx.h"
 #include "EngineSettingsController.h"
-#include "EngineController.h"
+#include "SettingsStore.h"
+#include "Telex.h"
 
 namespace VietType {
 
 static constexpr TF_PRESERVEDKEY PK_Toggle = {VK_OEM_3, TF_MOD_ALT}; // Alt-`
 
-_Check_return_ HRESULT EngineSettingsController::Initialize(
-    _In_ EngineController* ec, _In_ ITfThreadMgr* threadMgr, _In_ TfClientId clientid) {
-    _ec = ec;
+_Check_return_ HRESULT EngineSettingsController::Initialize(_In_ ITfThreadMgr* threadMgr, _In_ TfClientId clientid) {
     _settingsKey.Open(HKEY_CURRENT_USER, Globals::ConfigKeyName, KEY_QUERY_VALUE);
 
     return S_OK;
@@ -21,48 +21,39 @@ HRESULT EngineSettingsController::Uninitialize() {
     return S_OK;
 }
 
-HRESULT EngineSettingsController::LoadTelexSettings(Telex::TelexConfig& cfg) {
+HRESULT EngineSettingsController::LoadTelexSettings(_Inout_ Telex::TelexConfig& cfg) {
     DWORD typing_style;
     SettingsStore::GetValueOrDefault(
-        _settingsKey, L"typing_style", &typing_style, static_cast<DWORD>(_ec->GetEngine().GetConfig().typing_style));
+        _settingsKey, L"typing_style", &typing_style, static_cast<DWORD>(cfg.typing_style));
     if (typing_style >= static_cast<DWORD>(Telex::TypingStyles::Max))
         typing_style = static_cast<DWORD>(Telex::TypingStyles::Telex);
     cfg.typing_style = static_cast<Telex::TypingStyles>(typing_style);
 
     DWORD oa_uy_tone1;
-    SettingsStore::GetValueOrDefault(
-        _settingsKey, L"oa_uy_tone1", &oa_uy_tone1, static_cast<DWORD>(_ec->GetEngine().GetConfig().oa_uy_tone1));
+    SettingsStore::GetValueOrDefault(_settingsKey, L"oa_uy_tone1", &oa_uy_tone1, static_cast<DWORD>(cfg.oa_uy_tone1));
     cfg.oa_uy_tone1 = !!oa_uy_tone1;
 
     DWORD accept_dd;
     SettingsStore::GetValueOrDefault(
-        _settingsKey, L"accept_dd", &accept_dd, static_cast<DWORD>(_ec->GetEngine().GetConfig().accept_separate_dd));
+        _settingsKey, L"accept_dd", &accept_dd, static_cast<DWORD>(cfg.accept_separate_dd));
     cfg.accept_separate_dd = !!accept_dd;
 
     DWORD backspace_invalid;
     SettingsStore::GetValueOrDefault(
-        _settingsKey,
-        L"backspace_invalid",
-        &backspace_invalid,
-        static_cast<DWORD>(_ec->GetEngine().GetConfig().backspaced_word_stays_invalid));
+        _settingsKey, L"backspace_invalid", &backspace_invalid, static_cast<DWORD>(cfg.backspaced_word_stays_invalid));
     cfg.backspaced_word_stays_invalid = !!backspace_invalid;
 
     DWORD autocorrect;
-    SettingsStore::GetValueOrDefault(
-        _settingsKey, L"autocorrect", &autocorrect, static_cast<DWORD>(_ec->GetEngine().GetConfig().autocorrect));
+    SettingsStore::GetValueOrDefault(_settingsKey, L"autocorrect", &autocorrect, static_cast<DWORD>(cfg.autocorrect));
     cfg.autocorrect = !!autocorrect;
 
     DWORD optimize_multilang;
-    SettingsStore::GetValueOrDefault(
-        _settingsKey, L"optimize_multilang", &optimize_multilang, _ec->GetEngine().GetConfig().optimize_multilang);
+    SettingsStore::GetValueOrDefault(_settingsKey, L"optimize_multilang", &optimize_multilang, cfg.optimize_multilang);
     cfg.optimize_multilang = optimize_multilang;
 
     DWORD allow_abbreviations;
     SettingsStore::GetValueOrDefault(
-        _settingsKey,
-        L"allow_abbreviations",
-        &allow_abbreviations,
-        static_cast<DWORD>(_ec->GetEngine().GetConfig().allow_abbreviations));
+        _settingsKey, L"allow_abbreviations", &allow_abbreviations, static_cast<DWORD>(cfg.allow_abbreviations));
     cfg.allow_abbreviations = !!allow_abbreviations;
 
     return S_OK;
@@ -78,7 +69,7 @@ void EngineSettingsController::IsBackconvert(_Out_ DWORD* pde) {
 
 void EngineSettingsController::GetPreservedKeyToggle(_Out_ TF_PRESERVEDKEY* pde) {
     DWORD val;
-    if (_settingsKey.m_hKey != NULL && _settingsKey.QueryDWORDValue(L"pk_toggle", val) == ERROR_SUCCESS) {
+    if (_settingsKey.m_hKey != nullptr && _settingsKey.QueryDWORDValue(L"pk_toggle", val) == ERROR_SUCCESS) {
         *pde = TF_PRESERVEDKEY{static_cast<UINT>(val & 0xffff), static_cast<UINT>((val >> 16) & 0xffff)};
     } else {
         *pde = PK_Toggle;

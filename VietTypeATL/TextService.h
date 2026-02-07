@@ -20,10 +20,7 @@ namespace Telex {
 class ITelexEngine;
 }
 
-class ThreadMgrEventSink;
-class KeyEventSink;
 class CompositionManager;
-class EngineController;
 class EnumDisplayAttributeInfo;
 
 class ATL_NO_VTABLE TextService : public CComObjectRootEx<CComSingleThreadModel>,
@@ -57,12 +54,7 @@ public:
         __RPC__in REFGUID guid, __RPC__deref_out_opt ITfDisplayAttributeInfo** ppInfo) override;
 
 private:
-    std::unique_ptr<Telex::ITelexEngine> _engine;
-
-    CComPtr<EngineController> _engineController;
-
     CComPtr<VietType::EnumDisplayAttributeInfo> _attributeStore;
-
     CComPtr<CompositionManager> _compositionManager;
 };
 OBJECT_ENTRY_AUTO(VietType::Globals::CLSID_TextService, TextService)

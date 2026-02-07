@@ -1,8 +1,9 @@
 // SPDX-FileCopyrightText: Copyright (c) 2018 Dinh Ngoc Tu
 // SPDX-License-Identifier: GPL-3.0-only
 
+#include "stdafx.h"
 #include "LanguageBarButton.h"
-#include "EngineController.h"
+#include "StatusController.h"
 
 namespace VietType {
 
@@ -44,7 +45,7 @@ static int PopMenu(POINT pt, const RECT* area) {
     if (GetSystemMetrics(SM_MENUDROPALIGNMENT)) {
         flags |= TPM_RIGHTALIGN;
     }
-    int itemId = TrackPopupMenuEx(trayMenu, flags, pt.x, pt.y, /* doesn't matter */ GetFocus(), NULL);
+    int itemId = TrackPopupMenuEx(trayMenu, flags, pt.x, pt.y, /* doesn't matter */ GetFocus(), nullptr);
     return itemId;
 }
 
@@ -91,7 +92,7 @@ static HRESULT CopyTfMenu(_In_ ITfMenu* menu) {
         }
 
 #pragma warning(suppress : 6387)
-        hr = menu->AddMenuItem(mii.wID, tfFlags, NULL, NULL, &buf[0], static_cast<ULONG>(buf.size()), NULL);
+        hr = menu->AddMenuItem(mii.wID, tfFlags, nullptr, nullptr, &buf[0], static_cast<ULONG>(buf.size()), nullptr);
         DBG_HRESULT_CHECK(hr, L"menu->AddMenuItem failed");
     }
 
@@ -100,13 +101,13 @@ static HRESULT CopyTfMenu(_In_ ITfMenu* menu) {
 
 static HRESULT GetSettingsProgPath(std::wstring& path) {
     PWSTR pathStr;
-    HRESULT_CHECK_RETURN(SHGetKnownFolderPath(FOLDERID_ProgramFilesX86, 0, NULL, &pathStr), L"SHGetKnownFolderPath");
+    HRESULT_CHECK_RETURN(SHGetKnownFolderPath(FOLDERID_ProgramFilesX86, 0, nullptr, &pathStr), L"SHGetKnownFolderPath");
     path = std::wstring(pathStr) + Globals::SettingsProgSubpath;
     LocalFree(pathStr);
     return S_OK;
 }
 
-static HRESULT OnMenuSelectAll(_In_ UINT id, _In_ EngineController* controller) {
+static HRESULT OnMenuSelectAll(_In_ UINT id, _In_ StatusController* controller) {
     HRESULT hr;
 
     switch (id) {
@@ -115,7 +116,7 @@ static HRESULT OnMenuSelectAll(_In_ UINT id, _In_ EngineController* controller) 
         hr = GetSettingsProgPath(path);
         HRESULT_CHECK_RETURN(hr, L"GetSettingsProgPath");
 
-        ShellExecute(NULL, L"open", path.c_str(), NULL, NULL, SW_SHOW);
+        ShellExecute(nullptr, L"open", path.c_str(), nullptr, nullptr, SW_SHOW);
         WINERROR_GLE_RETURN_HRESULT(L"ShellExecute %s", path.c_str());
         return S_OK;
     }
@@ -201,10 +202,10 @@ STDMETHODIMP LanguageBarButton::Show(_In_ BOOL fShow) {
 
 STDMETHODIMP LanguageBarButton::OnClick(_In_ TfLBIClick click, _In_ POINT pt, __RPC__in const RECT* prcArea) {
     if (click == TF_LBI_CLK_LEFT) {
-        return _controller->ToggleUserEnabled();
+        _status->ToggleUserEnabled();
     } else if (click == TF_LBI_CLK_RIGHT) {
         int itemId = PopMenu(pt, prcArea);
-        return OnMenuSelectAll(itemId, _controller);
+        return OnMenuSelectAll(itemId, _status);
     }
     return S_OK;
 }
@@ -218,7 +219,7 @@ STDMETHODIMP LanguageBarButton::InitMenu(__RPC__in_opt ITfMenu* pMenu) {
 }
 
 STDMETHODIMP LanguageBarButton::OnMenuSelect(_In_ UINT wID) {
-    return OnMenuSelectAll(wID, _controller);
+    return OnMenuSelectAll(wID, _status);
 }
 
 STDMETHODIMP LanguageBarButton::GetIcon(__RPC__deref_out_opt HICON* phIcon) {
@@ -234,10 +235,10 @@ STDMETHODIMP LanguageBarButton::GetIcon(__RPC__deref_out_opt HICON* phIcon) {
     int iconx = GetSystemMetricsForDpi(SM_CXSMICON, dpi);
     int icony = GetSystemMetricsForDpi(SM_CYSMICON, dpi);
     SetThreadDpiAwarenessContext(old);
-    if (_controller->GetBlocked() == EngineController::BlockedKind::Blocked) {
+    if (_status->IsBlocked()) {
         *phIcon = static_cast<HICON>(LoadImage(
             Globals::DllInstance, MAKEINTRESOURCE(light ? IDI_ICONXL : IDI_ICONXD), IMAGE_ICON, iconx, icony, 0));
-    } else if (_controller->IsEnabled()) {
+    } else if (_status->IsEnabled()) {
         *phIcon = static_cast<HICON>(LoadImage(
             Globals::DllInstance, MAKEINTRESOURCE(light ? IDI_ICONVL : IDI_ICONVD), IMAGE_ICON, iconx, icony, 0));
     } else {
@@ -251,7 +252,7 @@ STDMETHODIMP LanguageBarButton::GetText(__RPC__deref_out_opt BSTR* pbstrText) {
     if (!pbstrText) {
         return E_INVALIDARG;
     }
-    *pbstrText = SysAllocString(_controller->IsEnabled() ? L"VIE" : L"ENG");
+    *pbstrText = SysAllocString(_status->IsEnabled() ? L"VIE" : L"ENG");
     return *pbstrText ? S_OK : E_OUTOFMEMORY;
 }
 
@@ -260,15 +261,15 @@ STDMETHODIMP LanguageBarButton::GetTooltipString(__RPC__deref_out_opt BSTR* pbst
         return E_INVALIDARG;
     }
     const wchar_t* status = Globals::TextServiceDescription;
-    if (_controller->GetBlocked() != EngineController::BlockedKind::Blocked) {
-        status = _controller->IsEnabled() ? L"Ti\x1ebfng Vi\x1ec7t" : L"English";
+    if (!_status->IsBlocked()) {
+        status = _status->IsEnabled() ? L"Ti\x1ebfng Vi\x1ec7t" : L"English";
     }
     *pbstrText = SysAllocString(status);
     return *pbstrText ? S_OK : E_OUTOFMEMORY;
 }
 
 _Check_return_ HRESULT LanguageBarButton::Initialize(
-    _In_ EngineController* ec,
+    _In_ StatusController* status,
     _In_ ITfLangBarItemMgr* langBarItemMgr,
     _In_ const GUID& guidItem,
     _In_ DWORD style,
@@ -276,7 +277,7 @@ _Check_return_ HRESULT LanguageBarButton::Initialize(
     _In_z_ const wchar_t* description) {
     HRESULT hr;
 
-    _controller = ec;
+    _status = status;
     _langBarItemMgr = langBarItemMgr;
     _guidItem = guidItem;
     _style = style;
@@ -291,8 +292,11 @@ _Check_return_ HRESULT LanguageBarButton::Initialize(
 
 HRESULT LanguageBarButton::Uninitialize() {
     HRESULT hr;
-    hr = _langBarItemMgr->RemoveItem(this);
-    DBG_HRESULT_CHECK(hr, L"langBarItemMgr->RemoveItem failed");
+
+    if (_langBarItemMgr) {
+        hr = _langBarItemMgr->RemoveItem(this);
+        DBG_HRESULT_CHECK(hr, L"langBarItemMgr->RemoveItem failed");
+    }
     _langBarItemMgr.Release();
     return S_OK;
 }

@@ -4,13 +4,12 @@
 #pragma once
 
 #include "Common.h"
-#include "SettingsStore.h"
-#include "Telex.h"
 
 namespace VietType {
 
-class EngineController;
-class SettingsDialog;
+namespace Telex {
+struct TelexConfig;
+}
 
 class EngineSettingsController : public CComObjectRootEx<CComSingleThreadModel> {
 public:
@@ -25,11 +24,13 @@ public:
     END_COM_MAP()
     DECLARE_PROTECT_FINAL_CONSTRUCT()
 
-    _Check_return_ HRESULT
-    Initialize(_In_ EngineController* ec, _In_ ITfThreadMgr* threadMgr, _In_ TfClientId clientid);
+    _Check_return_ HRESULT Initialize(_In_ ITfThreadMgr* threadMgr, _In_ TfClientId clientid);
     HRESULT Uninitialize();
+    void FinalRelease() {
+        Uninitialize();
+    }
 
-    HRESULT LoadTelexSettings(Telex::TelexConfig& cfg);
+    HRESULT LoadTelexSettings(_Inout_ Telex::TelexConfig& cfg);
 
     void IsDefaultEnabled(_Out_ DWORD* pde);
     void IsBackconvert(_Out_ DWORD* pde);
@@ -37,7 +38,6 @@ public:
     void IsShowingComposingAttr(_Out_ DWORD* pde);
 
 private:
-    EngineController* _ec = nullptr;
     CRegKey _settingsKey;
 };
 

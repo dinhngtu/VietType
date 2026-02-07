@@ -23,12 +23,12 @@ void _errorprint(_In_ LPCWSTR func, _In_ int line, _In_ DWORD err, _In_ LPCWSTR 
     std::array<WCHAR, 256> errmessage;
     auto chars = FormatMessage(
         FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-        NULL,
+        nullptr,
         err,
         0,
         &errmessage[0],
         static_cast<DWORD>(errmessage.size()),
-        NULL);
+        nullptr);
     assert(chars >= 0 && chars < 256);
     errmessage[chars] = 0;
     for (auto c = static_cast<long>(chars) - 1; c >= 0; c--) {

@@ -1,12 +1,48 @@
 // SPDX-FileCopyrightText: Copyright (c) 2018 Dinh Ngoc Tu
 // SPDX-License-Identifier: GPL-3.0-only
 
+#include "stdafx.h"
 #include "CompositionManager.h"
-#include "EngineController.h"
+#include "StatusController.h"
 #include "EngineSettingsController.h"
-#include "EditSessions.h"
+#include "Context.h"
+#include "LanguageBarButton.h"
+#include "DisplayAttributes.h"
+#include "EnumDisplayAttributeInfo.h"
 
 namespace VietType {
+
+// {B31B741B-63CE-413A-9B5A-D2B69C695A78}
+static const GUID GUID_SettingsCompartment_Toggle = {
+    0xb31b741b, 0x63ce, 0x413a, {0x9b, 0x5a, 0xd2, 0xb6, 0x9c, 0x69, 0x5a, 0x78}};
+// {CCA3D390-EF1A-4DE4-B2FF-B6BC76D68C3B}
+static const GUID GUID_LanguageBarButton_Item = {
+    0xcca3d390, 0xef1a, 0x4de4, {0xb2, 0xff, 0xb6, 0xbc, 0x76, 0xd6, 0x8c, 0x3b}};
+// {B2FBD2E7-922F-4996-BE77-21085B91A8F0}
+static const GUID GUID_SystemNotifyCompartment = {
+    0xb2fbd2e7, 0x922f, 0x4996, {0xbe, 0x77, 0x21, 0x8, 0x5b, 0x91, 0xa8, 0xf0}};
+
+// {7AB7384D-F5C6-43F9-B13C-80DCC788EE1D}
+static const GUID ComposingAttributeGuid = {
+    0x7ab7384d, 0xf5c6, 0x43f9, {0xb1, 0x3c, 0x80, 0xdc, 0xc7, 0x88, 0xee, 0x1d}};
+static const std::array<TF_DISPLAYATTRIBUTE, 2> ComposingAttributes = {
+    TF_DISPLAYATTRIBUTE{
+        {TF_CT_NONE, 0}, // text foreground
+        {TF_CT_NONE, 0}, // text background
+        TF_LS_NONE,      // underline style
+        FALSE,           // bold underline
+        {TF_CT_NONE, 0}, // underline color
+        TF_ATTR_INPUT    // attribute info
+    },
+    TF_DISPLAYATTRIBUTE{
+        {TF_CT_NONE, 0}, // text foreground
+        {TF_CT_NONE, 0}, // text background
+        TF_LS_DOT,       // underline style
+        FALSE,           // bold underline
+        {TF_CT_NONE, 0}, // underline color
+        TF_ATTR_INPUT    // attribute info
+    },
+};
 
 static HRESULT IsContextEmpty(_In_ ITfContext* context, _In_ TfClientId clientid, _Out_ bool* isempty) {
     HRESULT hr;
@@ -23,21 +59,27 @@ static HRESULT IsContextEmpty(_In_ ITfContext* context, _In_ TfClientId clientid
     return hr;
 }
 
-HRESULT CompositionManager::OnNewContext(_In_opt_ ITfContext* context) {
+HRESULT CompositionManager::OnFocusContext(_In_opt_ ITfContext* context) {
     HRESULT hr, hrSession;
 
-    _context = context;
-
     if (!context) {
-        _controller->SetBlocked(EngineController::BlockedKind::Blocked);
+        _focus.Release();
         return S_OK;
     }
+
+    if (_focus && _focus->GetContext() == context) {
+        return S_OK;
+    }
+
+    hr = OnPushContext(context);
+    HRESULT_CHECK_RETURN(hr, L"creating context with OnPushContext failed");
+    _focus = _map.at(context);
 
     bool isempty;
     hr = IsContextEmpty(context, _clientid, &isempty);
     HRESULT_CHECK_RETURN(hr, L"IsContextEmpty failed");
     if (isempty) {
-        _controller->SetBlocked(EngineController::BlockedKind::Blocked);
+        _focus.Release();
         return S_OK;
     }
 
@@ -74,12 +116,115 @@ HRESULT CompositionManager::OnNewContext(_In_opt_ ITfContext* context) {
         DBG_HRESULT_CHECK(hr, L"compBackconvert.Initialize failed");
     }
 
-    hr = RequestEditSessionEx(
-        EditSessions::EditBlocked, TF_ES_ASYNCDONTCARE | TF_ES_READWRITE, &hrSession, _controller.p);
+    _focus->GetEngine()->SetConfig(_config);
+    hr = _focus->RequestEditBlocked(&hrSession);
     if (FAILED(hr) || FAILED(hrSession)) {
         DBG_HRESULT_CHECK(hr, L"CompositionManager::RequestEditSession failed");
-        _controller->SetBlocked(EngineController::BlockedKind::Free);
     }
+
+    return S_OK;
+}
+
+HRESULT CompositionManager::OnOpenClose() {
+    HRESULT hr;
+
+    if (!this->_initialized) {
+        return S_FALSE;
+    }
+
+    long enabled;
+    hr = this->IsUserEnabled(&enabled);
+    DBG_HRESULT_CHECK(hr, L"this->IsUserEnabled failed");
+
+    long openclose;
+    hr = _openclose->GetValue(&openclose);
+    HRESULT_CHECK_RETURN(hr, L"_openclose->GetValue failed");
+
+    if (!!enabled != !!openclose) {
+        hr = _enabled->SetValue(openclose ? 0 : -1);
+        HRESULT_CHECK_RETURN(hr, L"_enabled->SetValue failed");
+
+        hr = UpdateStates(false);
+        DBG_HRESULT_CHECK(hr, L"UpdateStates failed");
+    }
+
+    return S_OK;
+}
+
+_Check_return_ HRESULT CompositionManager::IsUserEnabled(_Out_ long* penabled) const {
+    HRESULT hr;
+
+    hr = _enabled->GetValueOrWriteback(penabled, static_cast<LONG>(IsDefaultEnabled()));
+    if (*penabled != 0 && *penabled != -1) {
+        DBG_DPRINT(L"resetting enabled from %ld to %ld", *penabled, IsDefaultEnabled());
+        // _enabled may contain garbage value, reset if it's the case
+        *penabled = IsDefaultEnabled() == 0 ? 0 : -1;
+        DBG_HRESULT_CHECK(_enabled->SetValue(*penabled), L"_enabled reset failed");
+    }
+    return hr;
+}
+
+HRESULT CompositionManager::ToggleUserEnabled() {
+    HRESULT hr;
+
+    if (!_focus || _focus->IsBlocked()) {
+        DBG_DPRINT("write enabled skipped since engine is blocked");
+        return S_OK;
+    }
+
+    long enabled;
+    hr = IsUserEnabled(&enabled);
+    HRESULT_CHECK(hr, L"this->IsUserEnabled failed");
+    if (FAILED(hr)) {
+        enabled = false;
+    }
+
+    DBG_DPRINT(L"toggling enabled from %ld", enabled);
+    hr = _enabled->SetValue(enabled == 0 ? -1 : 0);
+    HRESULT_CHECK_RETURN(hr, L"_enabled->SetValue failed");
+    hr = UpdateStates(true);
+    DBG_HRESULT_CHECK(hr, L"UpdateEnabled failed");
+
+    return S_OK;
+}
+
+long CompositionManager::IsEnabled(Context* context) const {
+    if (!context)
+        return false;
+    long enabled;
+    HRESULT hr = IsUserEnabled(&enabled);
+    HRESULT_CHECK(hr, L"this->IsUserEnabled failed");
+    return !!enabled && !context->IsBlocked();
+}
+
+HRESULT CompositionManager::UpdateStates(bool foreground) {
+    HRESULT hr;
+
+    if (!this->_initialized) {
+        return S_FALSE;
+    }
+
+    long enabled;
+    hr = this->IsUserEnabled(&enabled);
+    DBG_HRESULT_CHECK(hr, L"this->IsUserEnabled failed");
+
+    DBG_DPRINT(L"enabled = %ld", enabled);
+
+    if (foreground) {
+        hr = _openclose->SetValue(!!enabled);
+        DBG_HRESULT_CHECK(hr, L"_openclose->SetValue failed");
+
+        _settings->IsDefaultEnabled(&_defaultEnabled);
+        _settings->IsBackconvert(&_backconvert);
+
+        hr = _settings->LoadTelexSettings(_config);
+        if (_focus) {
+            _focus->GetEngine()->SetConfig(_config);
+        }
+    }
+
+    hr = _status->UpdateStatus(IsEnabled(_focus), _focus ? _focus->IsBlocked() : true);
+    DBG_HRESULT_CHECK(hr, L"_langBarButton->Refresh failed");
 
     return S_OK;
 }
@@ -87,13 +232,14 @@ HRESULT CompositionManager::OnNewContext(_In_opt_ ITfContext* context) {
 STDMETHODIMP CompositionManager::OnInitDocumentMgr(__RPC__in_opt ITfDocumentMgr* pdim) {
     DBG_DPRINT(L"pdim = %p", pdim);
 
-    return E_NOTIMPL;
+    return S_OK;
 }
 
 STDMETHODIMP CompositionManager::OnUninitDocumentMgr(__RPC__in_opt ITfDocumentMgr* pdim) {
     DBG_DPRINT(L"pdim = %p", pdim);
 
-    return E_NOTIMPL;
+    _map.clear();
+    return S_OK;
 }
 
 STDMETHODIMP CompositionManager::OnSetFocus(
@@ -102,31 +248,36 @@ STDMETHODIMP CompositionManager::OnSetFocus(
 
     DBG_DPRINT(L"pdimFocus = %p", pdimFocus);
 
-    _composition.Release();
-    _context.Release();
+    _focus.Release();
 
     if (!pdimFocus) {
-        _controller->SetBlocked(EngineController::BlockedKind::Blocked);
         return S_OK;
     }
 
     CComPtr<ITfContext> context;
     hr = pdimFocus->GetTop(&context);
     if (FAILED(hr)) {
-        _controller->SetBlocked(EngineController::BlockedKind::Blocked);
         return S_OK;
     }
 
-    hr = OnNewContext(context);
+    hr = OnFocusContext(context);
     HRESULT_CHECK_RETURN(hr, L"OnNewContext failed");
 
     return S_OK;
 }
 
 STDMETHODIMP CompositionManager::OnPushContext(__RPC__in_opt ITfContext* pic) {
+    HRESULT hr;
+
     DBG_DPRINT(L"context = %p", pic);
 
-    _composition.Release();
+    if (!_map.contains(pic)) {
+        CComPtr<Context> context;
+        hr = CreateInitialize(
+            &context, _clientid, pic, static_cast<const Telex::TelexConfig&>(_config), TF_INVALID_GUIDATOM);
+        HRESULT_CHECK_RETURN(hr, "Create Context failed");
+        _map[pic] = std::move(context);
+    }
 
     return S_OK;
 }
@@ -134,22 +285,7 @@ STDMETHODIMP CompositionManager::OnPushContext(__RPC__in_opt ITfContext* pic) {
 STDMETHODIMP CompositionManager::OnPopContext(__RPC__in_opt ITfContext* pic) {
     DBG_DPRINT(L"context = %p", pic);
 
-    _composition.Release();
-
-    return S_OK;
-}
-
-STDMETHODIMP CompositionManager::OnCompositionTerminated(
-    _In_ TfEditCookie ecWrite, __RPC__in_opt ITfComposition* pComposition) {
-    HRESULT hr;
-
-    DBG_DPRINT(L"ecWrite = %ld", ecWrite);
-
-    if (_composition == pComposition) {
-        _controller->GetEngine().Reset();
-        hr = EndCompositionNow(ecWrite);
-        DBG_HRESULT_CHECK(hr, L"EndCompositionNow failed");
-    }
+    _map.erase(pic);
 
     return S_OK;
 }
@@ -157,15 +293,50 @@ STDMETHODIMP CompositionManager::OnCompositionTerminated(
 _Check_return_ HRESULT CompositionManager::Initialize(
     _In_ ITfThreadMgr* threadMgr,
     _In_ TfClientId clientid,
-    _In_ EngineController* controller,
-    _In_opt_ ITfDisplayAttributeInfo* composingAttribute,
+    _In_ EnumDisplayAttributeInfo* attributeStore,
     _In_ bool comless) {
     HRESULT hr;
 
     _clientid = clientid;
-    _controller = controller;
-    _composingAttribute = composingAttribute;
     _threadMgr = threadMgr;
+
+    hr = CreateInitialize(&_status, this, _threadMgr);
+    HRESULT_CHECK_RETURN(hr, L"CreateInitialize(&_status) failed");
+
+    // GUID_SettingsCompartment_Toggle is global
+    hr = CreateInitialize(&_enabled, threadMgr, clientid, GUID_SettingsCompartment_Toggle, true, [this] {
+        HRESULT hr = UpdateStates(false);
+        DBG_HRESULT_CHECK(hr, L"UpdateStates failed");
+        return S_OK;
+    });
+    HRESULT_CHECK_RETURN(hr, L"_enabled->Initialize failed");
+#ifdef _DEBUG
+    long dbgEnabled = 0;
+    [[maybe_unused]] HRESULT dbgHr = _enabled->GetValueDirect(&dbgEnabled);
+    DBG_DPRINT(L"dbgHr %ld dbgEnabled %ld", dbgHr, dbgEnabled);
+#endif // _DEBUG
+
+    hr = CreateInitialize(
+        &_openclose, threadMgr, clientid, GUID_COMPARTMENT_KEYBOARD_OPENCLOSE, false, [this] { return OnOpenClose(); });
+    HRESULT_CHECK_RETURN(hr, L"_openclose->Initialize failed");
+
+    // init settings compartment & listener
+    hr = CreateInitialize(&_settings, threadMgr, clientid);
+    HRESULT_CHECK_RETURN(hr, L"CreateInitialize(_settings) failed");
+    hr = CreateInitialize(&_systemNotify, threadMgr, clientid, GUID_SystemNotifyCompartment, true, [this] {
+        HRESULT hr = UpdateStates(true);
+        DBG_HRESULT_CHECK(hr, L"UpdateStates failed");
+        return S_OK;
+    });
+    DBG_HRESULT_CHECK(hr, L"_systemNotify->Initialize failed");
+    // must cache defaultEnabled early since it's used right away
+    _settings->IsDefaultEnabled(&_defaultEnabled);
+
+    long enabled;
+    // this already sets enabled state if the compartment is empty
+    hr = IsUserEnabled(&enabled);
+    HRESULT_CHECK_RETURN(hr, L"_status->IsUserEnabled failed");
+    DBG_DPRINT(L"init hr = %ld, enabled = %ld", hr, enabled);
 
     hr = _threadMgrEventSinkAdvisor.Advise(threadMgr, this);
     HRESULT_CHECK_RETURN(hr, L"_threadMgrEventSinkAdvisor.Advise failed");
@@ -176,7 +347,7 @@ _Check_return_ HRESULT CompositionManager::Initialize(
         hr = keystrokeMgr->AdviseKeyEventSink(_clientid, this, TRUE);
         HRESULT_CHECK_RETURN(hr, L"_keystrokeMgr->AdviseKeyEventSink failed");
 
-        _controller->GetSettings()->GetPreservedKeyToggle(&_pk_toggle);
+        _settings->GetPreservedKeyToggle(&_pk_toggle);
         hr = keystrokeMgr->PreserveKey(_clientid, GUID_KeyEventSink_PreservedKey_Toggle, &_pk_toggle, NULL, 0);
         // probably not fatal
         DBG_HRESULT_CHECK(hr, L"_keystrokeMgr->PreserveKey failed");
@@ -184,10 +355,29 @@ _Check_return_ HRESULT CompositionManager::Initialize(
         DBG_HRESULT_CHECK(hr, L"_threadMgr->QueryInterface failed");
     }
 
+    CComPtr<DisplayAttributeInfo> composingAttrib;
+    DWORD showComposingAttr;
+    _settings->IsShowingComposingAttr(&showComposingAttr);
+    if (showComposingAttr >= ComposingAttributes.size())
+        showComposingAttr = 0;
+    hr = CreateInitialize(
+        &composingAttrib, ComposingAttributeGuid, L"Composing", ComposingAttributes[showComposingAttr]);
+    HRESULT_CHECK_RETURN(hr, L"CreateInstance2(&attr1) failed");
+    attributeStore->AddAttribute(composingAttrib);
+
     if (!comless) {
         hr = _categoryMgr.CoCreateInstance(CLSID_TF_CategoryMgr, NULL, CLSCTX_INPROC_SERVER);
         HRESULT_CHECK_RETURN(hr, L"_categoryMgr.CoCreateInstance failed");
+
+        GUID guid;
+        hr = composingAttrib->GetGUID(&guid);
+        HRESULT_CHECK_RETURN(hr, L"attr->GetGUID failed");
+
+        hr = _categoryMgr->RegisterGUID(guid, &_displayAtom);
+        HRESULT_CHECK_RETURN(hr, L"_categoryMgr->RegisterGUID failed");
     }
+
+    _initialized = true;
 
     return S_OK;
 }
@@ -195,283 +385,51 @@ _Check_return_ HRESULT CompositionManager::Initialize(
 HRESULT CompositionManager::Uninitialize() {
     HRESULT hr;
 
-    _composition.Release();
-    _context.Release();
+    _initialized = false;
+
+    _map.clear();
 
     _categoryMgr.Release();
 
-    CComPtr<ITfKeystrokeMgr> keystrokeMgr;
-    hr = _threadMgr->QueryInterface(&keystrokeMgr);
-    if (SUCCEEDED(hr)) {
-        hr = keystrokeMgr->UnpreserveKey(GUID_KeyEventSink_PreservedKey_Toggle, &_pk_toggle);
-        DBG_HRESULT_CHECK(hr, L"_keystrokeMgr->UnpreserveKey failed");
+    if (_threadMgr) {
+        CComPtr<ITfKeystrokeMgr> keystrokeMgr;
+        hr = _threadMgr->QueryInterface(&keystrokeMgr);
+        if (SUCCEEDED(hr)) {
+            hr = keystrokeMgr->UnpreserveKey(GUID_KeyEventSink_PreservedKey_Toggle, &_pk_toggle);
+            DBG_HRESULT_CHECK(hr, L"_keystrokeMgr->UnpreserveKey failed");
 
-        hr = keystrokeMgr->UnadviseKeyEventSink(_clientid);
-        DBG_HRESULT_CHECK(hr, L"_keystrokeMgr->UnadviseKeyEventSink failed");
-    } else {
-        DBG_HRESULT_CHECK(hr, L"_threadMgr->QueryInterface failed");
+            hr = keystrokeMgr->UnadviseKeyEventSink(_clientid);
+            DBG_HRESULT_CHECK(hr, L"_keystrokeMgr->UnadviseKeyEventSink failed");
+        } else {
+            DBG_HRESULT_CHECK(hr, L"_threadMgr->QueryInterface failed");
+        }
     }
 
     _threadMgrEventSinkAdvisor.Unadvise();
+
+    if (_systemNotify)
+        _systemNotify->Uninitialize();
+    _systemNotify.Release();
+
+    if (_settings)
+        _settings->Uninitialize();
+    _settings.Release();
+    if (_openclose)
+        _openclose->Uninitialize();
+    _openclose.Release();
+    if (_enabled)
+        _enabled->Uninitialize();
+    _enabled.Release();
+
+    if (_status)
+        _status->Uninitialize();
+    _status.Release();
+
     _threadMgr.Release();
 
-    _composingAttribute.Release();
-    _controller.Release();
     _clientid = TF_CLIENTID_NULL;
 
     return S_OK;
-}
-
-HRESULT CompositionManager::StartComposition(_In_ ITfContext* pContext) {
-    HRESULT hr, hrSession;
-
-    if (_clientid == TF_CLIENTID_NULL || _composition) {
-        DBG_DPRINT(L"bad composition request");
-        return E_FAIL;
-    }
-
-    hr = RequestEditSessionEx(&_StartComposition, TF_ES_ASYNCDONTCARE | TF_ES_READWRITE, &hrSession);
-    HRESULT_CHECK_RETURN(hr, "RequestEditSessionEx failed");
-    HRESULT_CHECK_RETURN(hrSession, "_StartComposition failed");
-
-    return S_OK;
-}
-
-HRESULT CompositionManager::EndComposition() {
-    if (_clientid == TF_CLIENTID_NULL) {
-        DBG_DPRINT(L"bad end composition request");
-        return E_FAIL;
-    }
-
-    if (_composition) {
-        HRESULT hr, hrSession;
-
-        hr = RequestEditSessionEx(&_EndComposition, TF_ES_ASYNCDONTCARE | TF_ES_READWRITE, &hrSession);
-        HRESULT_CHECK_RETURN(hr, "RequestEditSessionEx failed");
-        HRESULT_CHECK_RETURN(hrSession, "_EndComposition failed");
-    }
-
-    return S_OK;
-}
-
-bool CompositionManager::IsComposing() const {
-    return (bool)_composition;
-}
-
-_Ret_maybenull_ ITfComposition* CompositionManager::GetComposition() const {
-    return _composition;
-}
-
-_Check_return_ HRESULT CompositionManager::GetRange(_COM_Outptr_ ITfRange** range) {
-    if (!IsComposing()) {
-        *range = nullptr;
-        return E_FAIL;
-    }
-    HRESULT hr = _composition->GetRange(range);
-    HRESULT_CHECK_RETURN_OUTPTR(hr, range, L"_composition->GetRange failed");
-
-    return S_OK;
-}
-
-TfClientId CompositionManager::GetClientId() const {
-    return _clientid;
-}
-
-HRESULT CompositionManager::StartCompositionNow(_In_ TfEditCookie ec, _In_ ITfContext* context) {
-    HRESULT hr;
-
-    if (_composition) {
-        return TF_E_LOCKED;
-    }
-
-    CComPtr<ITfCompositionSink> compositionSink;
-    hr = QueryInterface2(this, &compositionSink);
-    HRESULT_CHECK_RETURN(hr, L"this->QueryInterface failed");
-
-    CComPtr<ITfInsertAtSelection> insertAtSelection;
-    hr = context->QueryInterface(&insertAtSelection);
-    HRESULT_CHECK_RETURN(hr, L"context->QueryInterface failed");
-
-    CComPtr<ITfRange> insertRange;
-    hr = insertAtSelection->InsertTextAtSelection(ec, TF_IAS_QUERYONLY, NULL, 0, &insertRange);
-    HRESULT_CHECK_RETURN(hr, L"insertAtSelection->InsertTextAtSelection failed");
-
-    CComPtr<ITfContextComposition> contextComposition;
-    hr = context->QueryInterface(&contextComposition);
-    HRESULT_CHECK_RETURN(hr, L"context->QueryInterface failed");
-
-    ITfComposition* composition;
-    hr = contextComposition->StartComposition(ec, insertRange, compositionSink, &composition);
-    HRESULT_CHECK_RETURN(hr, L"contextComposition->StartComposition failed") else {
-        _composition = composition;
-
-        TF_SELECTION sel;
-        sel.range = insertRange;
-        sel.style.ase = TF_AE_NONE;
-        sel.style.fInterimChar = FALSE;
-        hr = context->SetSelection(ec, 1, &sel);
-        DBG_HRESULT_CHECK(hr, L"context->SetSelection failed");
-
-        _context = context;
-    }
-
-    return S_OK;
-}
-
-HRESULT CompositionManager::EmptyCompositionText(_In_ TfEditCookie ec) {
-    HRESULT hr;
-
-    CComPtr<ITfRange> range;
-    hr = _composition->GetRange(&range);
-    HRESULT_CHECK_RETURN(hr, L"composition->GetRange failed");
-
-    hr = range->SetText(ec, 0, NULL, 0);
-    HRESULT_CHECK_RETURN(hr, L"range->SetText failed");
-
-    return S_OK;
-}
-
-HRESULT CompositionManager::MoveCaretToEnd(_In_ TfEditCookie ec) {
-    HRESULT hr;
-
-    if (_composition) {
-        CComPtr<ITfRange> range;
-        hr = _composition->GetRange(&range);
-        HRESULT_CHECK_RETURN(hr, L"_composition->GetRange failed");
-
-        CComPtr<ITfRange> rangeClone;
-        hr = range->Clone(&rangeClone);
-        HRESULT_CHECK_RETURN(hr, L"range->Clone failed");
-
-        hr = rangeClone->Collapse(ec, TF_ANCHOR_END);
-        HRESULT_CHECK_RETURN(hr, L"rangeClone->Collapse failed");
-
-        TF_SELECTION sel;
-        sel.range = rangeClone;
-        sel.style.ase = TF_AE_NONE;
-        sel.style.fInterimChar = FALSE;
-        hr = _context->SetSelection(ec, 1, &sel);
-        HRESULT_CHECK_RETURN(hr, L"_context->SetSelection failed");
-    }
-
-    return S_OK;
-}
-
-HRESULT CompositionManager::EndCompositionNow(_In_ TfEditCookie ec) {
-    HRESULT hr;
-
-    DBG_DPRINT(L"ending composition");
-
-    if (_composition) {
-        CComPtr<ITfRange> range;
-        hr = _composition->GetRange(&range);
-        if (SUCCEEDED(hr)) {
-            if (_composingAttribute) {
-                hr = ClearRangeDisplayAttribute(ec, _context, range);
-                DBG_HRESULT_CHECK(hr, L"ClearRangeDisplayAttribute failed");
-            }
-
-            hr = MoveCaretToEnd(ec);
-            DBG_HRESULT_CHECK(hr, L"MoveCaretToEnd failed");
-
-            hr = _composition->EndComposition(ec);
-            DBG_HRESULT_CHECK(hr, L"_composition->EndComposition failed");
-        } else {
-            HRESULT_CHECK(hr, L"_composition->GetRange failed");
-        }
-
-        _composition.Release();
-    }
-
-    return S_OK;
-}
-
-HRESULT CompositionManager::SetCompositionText(_In_ TfEditCookie ec, _In_z_ LPCWSTR str, _In_ LONG length) {
-    HRESULT hr;
-
-    if (_composition) {
-        CComPtr<ITfRange> range;
-        hr = _composition->GetRange(&range);
-        HRESULT_CHECK_RETURN(hr, L"_composition->GetRange failed");
-
-        hr = range->SetText(ec, TF_ST_CORRECTION, str, length);
-        HRESULT_CHECK_RETURN(hr, L"range->SetText failed");
-
-        hr = SetRangeDisplayAttribute(ec, _context, range);
-        HRESULT_CHECK_RETURN(hr, L"SetRangeDisplayAttribute failed");
-
-        hr = MoveCaretToEnd(ec);
-        DBG_HRESULT_CHECK(hr, L"MoveCaretToEnd failed");
-    }
-
-    return S_OK;
-}
-
-HRESULT CompositionManager::EnsureCompositionText(
-    _In_ TfEditCookie ec, _In_ ITfContext* context, _In_z_ LPCWSTR str, _In_ LONG length) {
-    HRESULT hr;
-
-    if (!_composition) {
-        hr = StartComposition(context);
-        HRESULT_CHECK_RETURN(hr, L"StartComposition failed");
-    }
-
-    return SetCompositionText(ec, str, length);
-}
-
-HRESULT CompositionManager::SetRangeDisplayAttribute(
-    _In_ TfEditCookie ec, _In_ ITfContext* context, _In_ ITfRange* range) {
-    HRESULT hr;
-
-    if (!_categoryMgr || !_composingAttribute) {
-        return S_OK;
-    }
-
-    GUID guid;
-    hr = _composingAttribute->GetGUID(&guid);
-    HRESULT_CHECK_RETURN(hr, L"attr->GetGUID failed");
-
-    TfGuidAtom atom = TF_INVALID_GUIDATOM;
-    hr = _categoryMgr->RegisterGUID(guid, &atom);
-    HRESULT_CHECK_RETURN(hr, L"_categoryMgr->RegisterGUID failed");
-
-    if (atom == TF_INVALID_GUIDATOM) {
-        return E_FAIL;
-    }
-
-    CComPtr<ITfProperty> prop;
-    hr = context->GetProperty(GUID_PROP_ATTRIBUTE, &prop);
-    HRESULT_CHECK_RETURN(hr, L"context->GetProperty failed");
-
-    CComVariant v = static_cast<int>(atom);
-    hr = prop->SetValue(ec, range, &v);
-    HRESULT_CHECK_RETURN(hr, L"prop->SetValue failed");
-
-    return S_OK;
-}
-
-HRESULT CompositionManager::ClearRangeDisplayAttribute(
-    _In_ TfEditCookie ec, _In_ ITfContext* context, _In_ ITfRange* range) {
-    HRESULT hr;
-
-    CComPtr<ITfProperty> prop;
-    hr = context->GetProperty(GUID_PROP_ATTRIBUTE, &prop);
-    HRESULT_CHECK_RETURN(hr, L"context->GetProperty failed");
-
-    hr = prop->Clear(ec, range);
-    HRESULT_CHECK_RETURN(hr, L"prop->Clear failed");
-
-    return S_OK;
-}
-
-HRESULT CompositionManager::_StartComposition(
-    _In_ TfEditCookie ec, _In_ CompositionManager* instance, _In_ ITfContext* context) {
-    return instance->StartCompositionNow(ec, context);
-}
-
-HRESULT CompositionManager::_EndComposition(
-    _In_ TfEditCookie ec, _In_ CompositionManager* instance, _In_ ITfContext* context) {
-    return instance->EndCompositionNow(ec);
 }
 
 } // namespace VietType

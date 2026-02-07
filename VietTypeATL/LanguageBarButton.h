@@ -7,7 +7,7 @@
 
 namespace VietType {
 
-class EngineController;
+class StatusController;
 
 class LanguageBarButton : public CComObjectRootEx<CComSingleThreadModel>,
                           public ITfSource,
@@ -44,13 +44,16 @@ public:
     virtual STDMETHODIMP GetText(__RPC__deref_out_opt BSTR* pbstrText) override;
 
     _Check_return_ HRESULT Initialize(
-        _In_ EngineController* ec,
+        _In_ StatusController* status,
         _In_ ITfLangBarItemMgr* langBarItemMgr,
         _In_ const GUID& guidItem,
         _In_ DWORD style,
         _In_ ULONG sort,
         _In_z_ const wchar_t* description);
     HRESULT Uninitialize();
+    void FinalRelease() {
+        Uninitialize();
+    }
 
     HRESULT NotifyUpdate(_In_ DWORD flags);
     HRESULT Refresh();
@@ -61,7 +64,7 @@ private:
     ULONG _sort = 0;
     std::wstring _description;
 
-    EngineController* _controller = nullptr;
+    StatusController* _status = nullptr;
     CComPtr<ITfLangBarItemMgr> _langBarItemMgr;
     CComPtr<ITfLangBarItemSink> _itemSink;
 };
