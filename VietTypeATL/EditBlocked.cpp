@@ -115,7 +115,7 @@ HRESULT Context::EditBlocked(_In_ TfEditCookie ec, _In_ Context* context) {
     hr = S_OK;
 
 commit:
-    DBG_DPRINT(L"setting scope to %s", scopeBlocked ? "blocked" : "free");
+    DBG_DPRINT(L"setting scope to %s", scopeBlocked ? L"blocked" : L"free");
     context->_blocked = scopeBlocked;
     return hr;
 }

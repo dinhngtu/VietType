@@ -160,8 +160,10 @@ HRESULT TextService::UpdateDisplayAttributes(__RPC__deref_out_opt ITfDisplayAttr
         _attributeStore->AddAttribute(composingAttrib);
     }
 
-    *ppInfo = composingAttrib;
-    (*ppInfo)->AddRef();
+    if (ppInfo) {
+        *ppInfo = composingAttrib;
+        (*ppInfo)->AddRef();
+    }
     return S_OK;
 }
 
