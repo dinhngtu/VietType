@@ -7,42 +7,12 @@
 #include "EngineSettingsController.h"
 #include "Context.h"
 #include "LanguageBarButton.h"
-#include "DisplayAttributes.h"
-#include "EnumDisplayAttributeInfo.h"
 
 namespace VietType {
 
 // {B31B741B-63CE-413A-9B5A-D2B69C695A78}
-static const GUID GUID_SettingsCompartment_Toggle = {
+static const GUID GUID_Compartment_EnabledToggle = {
     0xb31b741b, 0x63ce, 0x413a, {0x9b, 0x5a, 0xd2, 0xb6, 0x9c, 0x69, 0x5a, 0x78}};
-// {CCA3D390-EF1A-4DE4-B2FF-B6BC76D68C3B}
-static const GUID GUID_LanguageBarButton_Item = {
-    0xcca3d390, 0xef1a, 0x4de4, {0xb2, 0xff, 0xb6, 0xbc, 0x76, 0xd6, 0x8c, 0x3b}};
-// {B2FBD2E7-922F-4996-BE77-21085B91A8F0}
-static const GUID GUID_SystemNotifyCompartment = {
-    0xb2fbd2e7, 0x922f, 0x4996, {0xbe, 0x77, 0x21, 0x8, 0x5b, 0x91, 0xa8, 0xf0}};
-
-// {7AB7384D-F5C6-43F9-B13C-80DCC788EE1D}
-static const GUID ComposingAttributeGuid = {
-    0x7ab7384d, 0xf5c6, 0x43f9, {0xb1, 0x3c, 0x80, 0xdc, 0xc7, 0x88, 0xee, 0x1d}};
-static const std::array<TF_DISPLAYATTRIBUTE, 2> ComposingAttributes = {
-    TF_DISPLAYATTRIBUTE{
-        {TF_CT_NONE, 0}, // text foreground
-        {TF_CT_NONE, 0}, // text background
-        TF_LS_NONE,      // underline style
-        FALSE,           // bold underline
-        {TF_CT_NONE, 0}, // underline color
-        TF_ATTR_INPUT    // attribute info
-    },
-    TF_DISPLAYATTRIBUTE{
-        {TF_CT_NONE, 0}, // text foreground
-        {TF_CT_NONE, 0}, // text background
-        TF_LS_DOT,       // underline style
-        FALSE,           // bold underline
-        {TF_CT_NONE, 0}, // underline color
-        TF_ATTR_INPUT    // attribute info
-    },
-};
 
 static HRESULT IsContextEmpty(_In_ ITfContext* context, _In_ TfClientId clientid, _Out_ bool* isempty) {
     HRESULT hr;
@@ -271,12 +241,12 @@ STDMETHODIMP CompositionManager::OnPushContext(__RPC__in_opt ITfContext* pic) {
 
     DBG_DPRINT(L"context = %p", pic);
 
-    if (!_map.contains(pic)) {
+    auto it = _map.lower_bound(pic);
+    if (it == _map.end() || _map.key_comp()(pic, it->first) != 0) {
         CComPtr<Context> context;
-        hr = CreateInitialize(
-            &context, _clientid, pic, static_cast<const Telex::TelexConfig&>(_config), TF_INVALID_GUIDATOM);
+        hr = CreateInitialize(&context, _clientid, pic, static_cast<const Telex::TelexConfig&>(_config), _displayAtom);
         HRESULT_CHECK_RETURN(hr, "Create Context failed");
-        _map[pic] = std::move(context);
+        _map.insert(it, {pic, std::move(context)});
     }
 
     return S_OK;
@@ -293,18 +263,20 @@ STDMETHODIMP CompositionManager::OnPopContext(__RPC__in_opt ITfContext* pic) {
 _Check_return_ HRESULT CompositionManager::Initialize(
     _In_ ITfThreadMgr* threadMgr,
     _In_ TfClientId clientid,
-    _In_ EnumDisplayAttributeInfo* attributeStore,
-    _In_ bool comless) {
+    _In_ EngineSettingsController* settings,
+    _In_ TfGuidAtom displayAtom) {
     HRESULT hr;
 
     _clientid = clientid;
     _threadMgr = threadMgr;
+    _settings = settings;
+    _displayAtom = displayAtom;
 
     hr = CreateInitialize(&_status, this, _threadMgr);
     HRESULT_CHECK_RETURN(hr, L"CreateInitialize(&_status) failed");
 
-    // GUID_SettingsCompartment_Toggle is global
-    hr = CreateInitialize(&_enabled, threadMgr, clientid, GUID_SettingsCompartment_Toggle, true, [this] {
+    // GUID_Compartment_EnabledToggle is global
+    hr = CreateInitialize(&_enabled, threadMgr, clientid, GUID_Compartment_EnabledToggle, true, [this] {
         HRESULT hr = UpdateStates(false);
         DBG_HRESULT_CHECK(hr, L"UpdateStates failed");
         return S_OK;
@@ -318,12 +290,10 @@ _Check_return_ HRESULT CompositionManager::Initialize(
 
     hr = CreateInitialize(
         &_openclose, threadMgr, clientid, GUID_COMPARTMENT_KEYBOARD_OPENCLOSE, false, [this] { return OnOpenClose(); });
-    HRESULT_CHECK_RETURN(hr, L"_openclose->Initialize failed");
+    DBG_HRESULT_CHECK(hr, L"_openclose->Initialize failed");
 
     // init settings compartment & listener
-    hr = CreateInitialize(&_settings, threadMgr, clientid);
-    HRESULT_CHECK_RETURN(hr, L"CreateInitialize(_settings) failed");
-    hr = CreateInitialize(&_systemNotify, threadMgr, clientid, GUID_SystemNotifyCompartment, true, [this] {
+    hr = CreateInitialize(&_systemNotify, threadMgr, clientid, Globals::GUID_Compartment_SystemNotify, true, [this] {
         HRESULT hr = UpdateStates(true);
         DBG_HRESULT_CHECK(hr, L"UpdateStates failed");
         return S_OK;
@@ -355,28 +325,6 @@ _Check_return_ HRESULT CompositionManager::Initialize(
         DBG_HRESULT_CHECK(hr, L"_threadMgr->QueryInterface failed");
     }
 
-    CComPtr<DisplayAttributeInfo> composingAttrib;
-    DWORD showComposingAttr;
-    _settings->IsShowingComposingAttr(&showComposingAttr);
-    if (showComposingAttr >= ComposingAttributes.size())
-        showComposingAttr = 0;
-    hr = CreateInitialize(
-        &composingAttrib, ComposingAttributeGuid, L"Composing", ComposingAttributes[showComposingAttr]);
-    HRESULT_CHECK_RETURN(hr, L"CreateInstance2(&attr1) failed");
-    attributeStore->AddAttribute(composingAttrib);
-
-    if (!comless) {
-        hr = _categoryMgr.CoCreateInstance(CLSID_TF_CategoryMgr, NULL, CLSCTX_INPROC_SERVER);
-        HRESULT_CHECK_RETURN(hr, L"_categoryMgr.CoCreateInstance failed");
-
-        GUID guid;
-        hr = composingAttrib->GetGUID(&guid);
-        HRESULT_CHECK_RETURN(hr, L"attr->GetGUID failed");
-
-        hr = _categoryMgr->RegisterGUID(guid, &_displayAtom);
-        HRESULT_CHECK_RETURN(hr, L"_categoryMgr->RegisterGUID failed");
-    }
-
     _initialized = true;
 
     return S_OK;
@@ -388,8 +336,6 @@ HRESULT CompositionManager::Uninitialize() {
     _initialized = false;
 
     _map.clear();
-
-    _categoryMgr.Release();
 
     if (_threadMgr) {
         CComPtr<ITfKeystrokeMgr> keystrokeMgr;
@@ -425,8 +371,8 @@ HRESULT CompositionManager::Uninitialize() {
         _status->Uninitialize();
     _status.Release();
 
+    _displayAtom = TF_INVALID_GUIDATOM;
     _threadMgr.Release();
-
     _clientid = TF_CLIENTID_NULL;
 
     return S_OK;

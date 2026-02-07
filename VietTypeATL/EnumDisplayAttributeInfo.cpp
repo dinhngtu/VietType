@@ -72,11 +72,14 @@ HRESULT EnumDisplayAttributeInfo::Uninitialize() {
 }
 
 void EnumDisplayAttributeInfo::AddAttribute(_In_ ITfDisplayAttributeInfo* item) {
-    _items.push_back(CComPtr<ITfDisplayAttributeInfo>(item));
+    _items.emplace_back(item);
 }
 
 _Ret_valid_ ITfDisplayAttributeInfo* EnumDisplayAttributeInfo::GetAttribute(_In_ info_vector_type::size_type index) {
-    return _items.at(index);
+    if (index < _items.size())
+        return _items.at(index);
+    else
+        return nullptr;
 }
 
 _Check_return_ HRESULT
@@ -97,7 +100,7 @@ EnumDisplayAttributeInfo::FindAttributeByGuid(_In_ const GUID& guid, _COM_Outptr
 
     // the docs for GetDisplayAttributeInfo doesn't say which error to use when no attribute is found so we just use
     // this one
-    return E_INVALIDARG;
+    return E_FAIL;
 }
 
 } // namespace VietType

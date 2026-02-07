@@ -13,7 +13,6 @@ namespace VietType {
 class StatusController;
 class EngineSettingsController;
 class Context;
-class EnumDisplayAttributeInfo;
 
 enum BackconvertModes : DWORD {
     BackconvertDisabled = 0,
@@ -65,8 +64,8 @@ public:
     _Check_return_ HRESULT Initialize(
         _In_ ITfThreadMgr* threadMgr,
         _In_ TfClientId clientid,
-        _In_ EnumDisplayAttributeInfo* composingAttribute,
-        _In_ bool comless);
+        _In_ EngineSettingsController* settings,
+        _In_ TfGuidAtom displayAtom);
     HRESULT Uninitialize();
     void FinalRelease() {
         Uninitialize();
@@ -129,6 +128,8 @@ private:
     // from parent
     TfClientId _clientid = TF_CLIENTID_NULL;
     CComPtr<ITfThreadMgr> _threadMgr;
+    TfGuidAtom _displayAtom = TF_INVALID_GUIDATOM;
+    CComPtr<EngineSettingsController> _settings;
 
     // state
     CComPtr<StatusController> _status;
@@ -136,7 +137,6 @@ private:
     Telex::TelexConfig _config{};
     CComPtr<CachedCompartmentSetting<long>> _enabled;
     CComPtr<CachedCompartmentSetting<long>> _openclose;
-    CComPtr<EngineSettingsController> _settings;
 
     // cached settings
     DWORD _defaultEnabled = 0;
@@ -144,12 +144,10 @@ private:
 
     CComPtr<CompartmentNotifier> _systemNotify;
 
-    bool _initialized = false;
-
     SinkAdvisor<ITfThreadMgrEventSink> _threadMgrEventSinkAdvisor;
     TF_PRESERVEDKEY _pk_toggle;
-    CComPtr<ITfCategoryMgr> _categoryMgr;
-    TfGuidAtom _displayAtom = TF_INVALID_GUIDATOM;
+
+    bool _initialized = false;
 
     ContextMap _map;
     CComPtr<Context> _focus;

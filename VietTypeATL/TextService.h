@@ -20,8 +20,10 @@ namespace Telex {
 class ITelexEngine;
 }
 
-class CompositionManager;
 class EnumDisplayAttributeInfo;
+class EngineSettingsController;
+class CompartmentNotifier;
+class CompositionManager;
 
 class ATL_NO_VTABLE TextService : public CComObjectRootEx<CComSingleThreadModel>,
                                   public CComCoClass<TextService, &VietType::Globals::CLSID_TextService>,
@@ -53,8 +55,15 @@ public:
     virtual STDMETHODIMP GetDisplayAttributeInfo(
         __RPC__in REFGUID guid, __RPC__deref_out_opt ITfDisplayAttributeInfo** ppInfo) override;
 
+    HRESULT InitializeDisplayAttributes(_In_ ITfThreadMgr* ptim, _In_ TfClientId tid);
+    HRESULT UpdateDisplayAttributes(__RPC__deref_out_opt ITfDisplayAttributeInfo** ppInfo);
+
 private:
+    CComPtr<ITfThreadMgr> _threadMgr;
     CComPtr<VietType::EnumDisplayAttributeInfo> _attributeStore;
+    CComPtr<EngineSettingsController> _settings;
+    CComPtr<CompartmentNotifier> _systemNotify;
+    TfGuidAtom _displayAtom = TF_INVALID_GUIDATOM;
     CComPtr<CompositionManager> _compositionManager;
 };
 OBJECT_ENTRY_AUTO(VietType::Globals::CLSID_TextService, TextService)
