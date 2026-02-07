@@ -12,7 +12,9 @@ public:
     CompartmentBase() = default;
     CompartmentBase(const CompartmentBase&) = delete;
     CompartmentBase& operator=(const CompartmentBase&) = delete;
-    ~CompartmentBase() = default;
+    virtual ~CompartmentBase() {
+        Uninitialize();
+    }
 
 public:
     _Ret_maybenull_ ITfCompartment* GetCompartment();

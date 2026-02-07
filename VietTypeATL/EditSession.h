@@ -35,10 +35,11 @@ public:
         _args = std::make_tuple(args...);
         return S_OK;
     }
-
-    // dummy method
     HRESULT Uninitialize() {
         return S_OK;
+    }
+    void FinalRelease() {
+        Uninitialize();
     }
 
 private:

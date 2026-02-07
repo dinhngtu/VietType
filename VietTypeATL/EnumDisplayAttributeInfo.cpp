@@ -65,6 +65,8 @@ HRESULT EnumDisplayAttributeInfo::Initialize(
 }
 
 HRESULT EnumDisplayAttributeInfo::Uninitialize() {
+    _index = 0;
+    _items.clear();
     return S_OK;
 }
 

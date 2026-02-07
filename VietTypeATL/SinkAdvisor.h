@@ -61,7 +61,7 @@ public:
 
     HRESULT Unadvise() {
         if (!IsAdvised())
-            return E_UNEXPECTED;
+            return S_OK;
 
         HRESULT hr = source_->UnadviseSink(cookie_);
         cookie_ = TF_INVALID_COOKIE;

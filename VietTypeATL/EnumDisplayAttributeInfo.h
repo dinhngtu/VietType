@@ -35,8 +35,10 @@ public:
 public:
     // only call when copying from another EnumDisplayAttributeInfo
     HRESULT Initialize(_In_ const info_vector_type& items, _In_ info_vector_type::size_type index);
-    // dummy method
     HRESULT Uninitialize();
+    void FinalRelease() {
+        Uninitialize();
+    }
 
     void AddAttribute(_In_ ITfDisplayAttributeInfo* item);
     _Ret_valid_ ITfDisplayAttributeInfo* GetAttribute(_In_ info_vector_type::size_type index);

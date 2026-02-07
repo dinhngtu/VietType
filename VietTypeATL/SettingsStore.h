@@ -202,9 +202,11 @@ public:
         return SettingsStore::InitializeSink(
             punk, clientid, guidDataCompartment, _dataCompartment, _dataCompartmentEventSink, this, global);
     }
-
     HRESULT Uninitialize() {
         return SettingsStore::UninitializeSink(_dataCompartment, _dataCompartmentEventSink);
+    }
+    void FinalRelease() {
+        Uninitialize();
     }
 
 private:
