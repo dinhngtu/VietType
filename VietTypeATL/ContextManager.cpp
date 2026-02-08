@@ -323,6 +323,9 @@ _Check_return_ HRESULT ContextManager::Initialize(
     HRESULT_CHECK_RETURN(hr, L"_status->IsUserEnabled failed");
     DBG_DPRINT(L"init hr = %ld, enabled = %ld", hr, enabled);
 
+    // must enable self before we get focus events from the threadmgr event sink
+    _initialized = true;
+
     hr = _threadMgrEventSinkAdvisor.Advise(threadMgr, this);
     HRESULT_CHECK_RETURN(hr, L"_threadMgrEventSinkAdvisor.Advise failed");
 
@@ -339,8 +342,6 @@ _Check_return_ HRESULT ContextManager::Initialize(
     } else {
         DBG_HRESULT_CHECK(hr, L"_threadMgr->QueryInterface failed");
     }
-
-    _initialized = true;
 
     return S_OK;
 }
