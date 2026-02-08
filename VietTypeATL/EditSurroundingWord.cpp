@@ -237,6 +237,7 @@ HRESULT Context::RequestEditLastWord(_In_ int ignore, _In_ wchar_t push) {
         hr = RequestEditSessionEx(EditLastWord, TF_ES_SYNC | TF_ES_READWRITE, &hrSession, ignore, push);
         HRESULT_CHECK_RETURN(hr, L"RequestEditSessionEx(EditLastWord) failed");
         HRESULT_CHECK_RETURN(hrSession, L"EditLastWord failed");
+        break;
     case VirtualDocument::FullContextType::Transitory: {
         do {
             CComPtr<EditSession<ITfContext*, int, std::wstring*>> session;
@@ -266,6 +267,7 @@ HRESULT Context::RequestEditLastWord(_In_ int ignore, _In_ wchar_t push) {
             push);
         HRESULT_CHECK_RETURN(hr, L"RequestEditSessionEx(EditLastWord) failed");
         HRESULT_CHECK_RETURN(hrSession, L"EditLastWord failed");
+        break;
     }
     }
     return S_OK;
