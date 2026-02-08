@@ -36,36 +36,17 @@ STDMETHODIMP ContextManager::OnSetFocus(_In_ BOOL fForeground) {
 
 DWORD ContextManager::OnBackconvertBackspace(
     _In_ Context* context, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten, _In_ DWORD prevBackconvert) {
-    Compartment<long> compBackconvert;
-    HRESULT hr;
     bool backconvert = false;
 
     *pfEaten = FALSE;
 
-    hr = compBackconvert.Initialize(context->GetContext(), _clientid, Globals::GUID_Compartment_Backconvert);
-    if (FAILED(hr)) {
-        DBG_HRESULT_CHECK(hr, L"compBackconvert.Initialize failed");
-        goto finish;
-    }
+    if (wParam == VK_BACK && !context->GetComposition() && !IsModifier(_keyState))
+        backconvert = true;
 
-    if (wParam == VK_BACK && !context->GetComposition() && !IsModifier(_keyState)) {
-        long backspacing;
-        hr = compBackconvert.GetValue(&backspacing);
-        if (FAILED(hr)) {
-            DBG_HRESULT_CHECK(hr, L"compBackconvert.GetValue failed");
-            goto finish;
-        }
-
-        backconvert = backspacing != -1;
-    }
-
-finish:
     if (backconvert) {
         *pfEaten = TRUE;
         return prevBackconvert;
     } else {
-        hr = compBackconvert.SetValue(0);
-        DBG_HRESULT_CHECK(hr, L"compBackconvert reset failed");
         *pfEaten = IsKeyEaten(context->GetEngine(), context->GetComposition(), wParam, lParam, _keyState);
         return BackconvertDisabled;
     }
@@ -127,11 +108,10 @@ HRESULT ContextManager::OnKeyDownCommon(
 
 HRESULT ContextManager::CallKeyEditBackspace(
     _In_ Context* context, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_reads_(256) const BYTE* keyState) {
-    HRESULT hrSession;
     HRESULT hr;
 
-    hr = context->RequestEditSurroundingWord(&hrSession, 1);
-    if (FAILED(hr) || FAILED(hrSession)) {
+    hr = context->RequestEditLastWord(1, L'\0');
+    if (FAILED(hr)) {
         DBG_DPRINT(L"backspace SendInput fallback");
 
         if (context != _focus)
@@ -156,12 +136,10 @@ HRESULT ContextManager::CallKeyEditRetype(
     _In_ LPARAM lParam,
     _In_reads_(256) const BYTE* keyState,
     _In_ wchar_t push) {
-    HRESULT hrSession;
     HRESULT hr;
 
-    hr = context->RequestEditSurroundingWordAndPush(&hrSession, 0, push);
-    HRESULT_CHECK_RETURN(hr, L"RequestEditSession EditSurroundingWord failed");
-    HRESULT_CHECK_RETURN(hrSession, L"EditSurroundingWord hrSession failed");
+    hr = context->RequestEditLastWord(0, push);
+    HRESULT_CHECK_RETURN(hr, L"RequestEditSession EditLastWord failed");
 
     return S_OK;
 }
@@ -265,6 +243,8 @@ STDMETHODIMP ContextManager::OnKeyUp(
 STDMETHODIMP ContextManager::OnPreservedKey(_In_ ITfContext* pic, _In_ REFGUID rguid, _Out_ BOOL* pfEaten) {
     HRESULT hr;
 
+    *pfEaten = FALSE;
+
     auto it = _map.find(pic);
     if (it == _map.end()) {
         return S_OK;
@@ -278,8 +258,6 @@ STDMETHODIMP ContextManager::OnPreservedKey(_In_ ITfContext* pic, _In_ REFGUID r
         DBG_HRESULT_CHECK(hr, L"_compositionManager->EndComposition failed");
         hr = ToggleUserEnabled();
         DBG_HRESULT_CHECK(hr, L"_engine->ToggleEnabled failed");
-    } else {
-        *pfEaten = FALSE;
     }
 
     return S_OK;

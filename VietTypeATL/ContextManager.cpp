@@ -78,14 +78,6 @@ HRESULT ContextManager::OnFocusContext(_In_opt_ ITfContext* context) {
     }
 #endif
 
-    Compartment<long> compBackconvert;
-    hr = compBackconvert.Initialize(context, _clientid, Globals::GUID_Compartment_Backconvert);
-    if (SUCCEEDED(hr)) {
-        compBackconvert.SetValue(0);
-    } else {
-        DBG_HRESULT_CHECK(hr, L"compBackconvert.Initialize failed");
-    }
-
     _focus->GetEngine()->SetConfig(_config);
     hr = _focus->RequestEditBlocked(&hrSession);
     if (FAILED(hr) || FAILED(hrSession)) {

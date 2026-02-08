@@ -62,18 +62,12 @@ public:
     HRESULT RequestEditBlocked(_Out_ HRESULT* hrSession) {
         return RequestEditSessionEx(EditBlockedAndUpdate, TF_ES_ASYNCDONTCARE | TF_ES_READWRITE, hrSession);
     }
-    HRESULT RequestEditSurroundingWord(_Out_ HRESULT* hrSession, _In_ int ignore) {
-        return RequestEditSessionEx(EditSurroundingWord, TF_ES_ASYNCDONTCARE | TF_ES_READWRITE, hrSession, ignore);
-    }
-    HRESULT RequestEditSurroundingWordAndPush(_Out_ HRESULT* hrSession, _In_ int ignore, _In_ wchar_t push) {
-        return RequestEditSessionEx(
-            EditSurroundingWordAndPush, TF_ES_ASYNCDONTCARE | TF_ES_READWRITE, hrSession, ignore, push);
-    }
     HRESULT RequestEditKey(
         _Out_ HRESULT* hrSession, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_reads_(256) const BYTE* keyState) {
         return RequestEditSessionEx(
             EditKey, TF_ES_ASYNCDONTCARE | TF_ES_READWRITE, hrSession, wParam, lParam, keyState);
     }
+    HRESULT RequestEditLastWord(_In_ int ignore, _In_ wchar_t push);
 
 private:
     template <typename... Args>
@@ -107,7 +101,6 @@ private:
     HRESULT SetRangeDisplayAttribute(_In_ TfEditCookie ec, _In_ ITfRange* range);
     HRESULT ClearRangeDisplayAttribute(_In_ TfEditCookie ec, _In_ ITfRange* range);
 
-    HRESULT DoEditSurroundingWord(_In_ TfEditCookie ec, _In_ int ignore);
     HRESULT EditNextState(_In_ TfEditCookie ec, _In_ Telex::TelexStates state);
     HRESULT EditCommit(_In_ TfEditCookie ec);
 
@@ -120,15 +113,28 @@ private:
     }
     static HRESULT EditBlocked(_In_ TfEditCookie ec, _In_ Context* context);
     static HRESULT EditBlockedAndUpdate(_In_ TfEditCookie ec, _In_ Context* context);
-    static HRESULT EditSurroundingWord(_In_ TfEditCookie ec, _In_ Context* context, _In_ int ignore);
-    static HRESULT EditSurroundingWordAndPush(
-        _In_ TfEditCookie ec, _In_ Context* context, _In_ int ignore, _In_ wchar_t push);
     static HRESULT EditKey(
         _In_ TfEditCookie ec,
         _In_ Context* context,
         _In_ WPARAM wParam,
         _In_ LPARAM lParam,
         _In_reads_(256) const BYTE* keyState);
+
+    static HRESULT SelectLastWord(
+        _In_ TfEditCookie ec,
+        _In_ ITfContext* context,
+        _In_ int ignore,
+        _COM_Outptr_ ITfRange** outRange,
+        _Out_ std::wstring* word);
+    static HRESULT EditLastWord(_In_ TfEditCookie ec, _In_ Context* context, _In_ int ignore, _In_ wchar_t push);
+    static HRESULT KillLastWordInFullContext(
+        _In_ TfEditCookie ec, _In_ ITfContext* fullContext, _In_ int ignore, _Out_ std::wstring* word);
+    static HRESULT BackconvertWord(
+        _In_ TfEditCookie ec,
+        _In_ Context* context,
+        _In_opt_ ITfRange* range,
+        _In_ const std::wstring* word,
+        _In_ wchar_t push);
 
 private:
     ContextManager* _parent;

@@ -51,24 +51,38 @@ static bool IsSeparatorCharacter(WCHAR c) {
     return false;
 }
 
-HRESULT Context::DoEditSurroundingWord(_In_ TfEditCookie ec, _In_ int ignore) {
+HRESULT Context::SelectLastWord(
+    _In_ TfEditCookie ec,
+    _In_ ITfContext* context,
+    _In_ int ignore,
+    _COM_Outptr_ ITfRange** outRange,
+    _Out_ std::wstring* word) {
     HRESULT hr;
 
-    CComPtr<ITfContext> ppic;
-    hr = VirtualDocument::GetVirtualDocumentContext(GetContext(), &ppic);
-    DBG_HRESULT_CHECK(hr, L"ThreadMgrEventSink::GetTransitoryParentContext failed");
+    *outRange = nullptr;
 
-    if (!ppic) {
-        ppic = GetContext();
-    }
-
-    auto composition = GetComposition();
+    std::array<TF_SELECTION, 2> sel{};
+    ULONG fetched;
+    hr = context->GetSelection(ec, 0, static_cast<ULONG>(sel.size()), sel.data(), &fetched);
+    HRESULT_CHECK_RETURN(hr, L"context->GetSelection failed");
+    DPRINT(L"fetched %lu selections", fetched);
 
     CComPtr<ITfRange> range;
-    hr = composition->GetRange(&range);
-    HRESULT_CHECK_RETURN(hr, L"_composition->GetRange failed");
-
-    // shift current range backwards
+    if (fetched > 1) {
+        for (ULONG i = 0; i < fetched; i++) {
+            sel[i].range->Release();
+        }
+        return E_FAIL;
+    } else if (fetched == 1) {
+        range.Attach(sel[0].range);
+        BOOL selEmpty;
+        hr = range->IsEmpty(ec, &selEmpty);
+        if (FAILED(hr) || !selEmpty) {
+            return E_FAIL;
+        }
+    } else {
+        return E_FAIL;
+    }
 
     CComPtr<ITfRange> rangeTest;
     hr = range->Clone(&rangeTest);
@@ -83,10 +97,10 @@ HRESULT Context::DoEditSurroundingWord(_In_ TfEditCookie ec, _In_ int ignore) {
     LONG shifted;
     hr = rangeTest->ShiftStart(ec, -SWF_MAXCHARS, &shifted, &haltcond);
     HRESULT_CHECK_RETURN(hr, L"rangeTest->ShiftStart failed");
+    DPRINT(L"shifted %ld", shifted);
 
-    if (shifted >= 0) {
+    if (shifted >= 0)
         return E_NOTIMPL;
-    }
     shifted = -shifted;
 
     // find word boundary
@@ -95,10 +109,10 @@ HRESULT Context::DoEditSurroundingWord(_In_ TfEditCookie ec, _In_ int ignore) {
     ULONG retrieved;
     hr = rangeTest->GetText(ec, 0, &buf[0], std::min(shifted, SWF_MAXCHARS), &retrieved);
     HRESULT_CHECK_RETURN(hr, L"rangeTest->GetText failed");
+    DPRINT(L"retrieved %lu", retrieved);
 
-    if (!retrieved) {
+    if (!retrieved)
         return E_NOTIMPL;
-    }
 
     LONG wordlen = 0;
     for (int i = retrieved - 1 - ignore; i >= 0; i--) {
@@ -124,93 +138,137 @@ HRESULT Context::DoEditSurroundingWord(_In_ TfEditCookie ec, _In_ int ignore) {
         return E_FAIL;
     }
 
-    // move composition to the word we found
+    // move range to the word we found
     hr = range->ShiftStart(ec, -wordlen - ignore, &shifted, &haltcond);
     HRESULT_CHECK_RETURN(hr, L"range->ShiftStart failed");
-    hr = composition->ShiftStart(ec, range);
-    HRESULT_CHECK_RETURN(hr, L"composition->ShiftStart failed");
 
-    /*
-    if (ignore) {
-        hr = range->ShiftEnd(ec, -ignore, &shifted, &haltcond);
-        HRESULT_CHECK_RETURN(hr, L"range->ShiftEnd failed");
-        hr = composition->ShiftEnd(ec, range);
-        HRESULT_CHECK_RETURN(hr, L"composition->ShiftEnd failed");
-    }
-    */
+    // now we got the selection containing the text
 
-    // reinitialize engine with text
-    auto engine = GetEngine();
-    engine->Reset();
-    engine->Backconvert(std::wstring(&buf[static_cast<size_t>(retrieved - wordlen - ignore)], wordlen));
+    *outRange = range;
+    (*outRange)->AddRef();
+    *word = std::wstring(&buf[static_cast<size_t>(retrieved - wordlen - ignore)], wordlen);
+    DPRINT(L"word = %s", word->c_str());
+    return S_OK;
+}
 
-    auto displayText = engine->Peek();
-    SetCompositionText(ec, displayText.c_str(), static_cast<LONG>(displayText.length()));
+HRESULT Context::EditLastWord(_In_ TfEditCookie ec, _In_ Context* context, _In_ int ignore, _In_ wchar_t push) {
+    CComPtr<ITfRange> range;
+    std::wstring word;
+    HRESULT hr = SelectLastWord(ec, context->GetContext(), ignore, &range, &word);
+    HRESULT_CHECK(hr, "SelectLastWord failed");
+
+    hr = BackconvertWord(ec, context, range, &word, push);
+    HRESULT_CHECK_RETURN(hr, "BackconvertWord failed");
+    return S_OK;
+}
+
+HRESULT Context::KillLastWordInFullContext(
+    _In_ TfEditCookie ec, _In_ ITfContext* fullContext, _In_ int ignore, _Out_ std::wstring* word) {
+    CComPtr<ITfRange> range;
+    HRESULT hr = SelectLastWord(ec, fullContext, ignore, &range, word);
+    HRESULT_CHECK_RETURN(hr, "SelectLastWord failed");
+
+    hr = range->SetText(ec, 0, L"", 0);
+    HRESULT_CHECK_RETURN(hr, L"range->SetText failed");
 
     return S_OK;
 }
 
-HRESULT Context::EditSurroundingWord(_In_ TfEditCookie ec, _In_ Context* context, _In_ int ignore) {
+HRESULT Context::BackconvertWord(
+    _In_ TfEditCookie ec,
+    _In_ Context* context,
+    _In_opt_ ITfRange* range,
+    _In_ const std::wstring* word,
+    _In_ wchar_t push) {
     HRESULT hr;
 
-    DBG_DPRINT(L"backconvert ec = %ld", ec);
-
-    Compartment<long> compBackconvert;
-    hr = compBackconvert.Initialize(
-        context->GetContext(), context->GetClientId(), Globals::GUID_Compartment_Backconvert);
-    HRESULT_CHECK_RETURN(hr, L"compBackconvert.Initialize failed");
-    hr = compBackconvert.SetValue(-1);
-    HRESULT_CHECK_RETURN(hr, L"compBackconvert.SetValue failed");
-
-    if (context->GetComposition()) {
-        return E_PENDING;
-    }
-
-    std::array<TF_SELECTION, 2> sel{};
-    ULONG fetched;
-    hr = context->GetContext()->GetSelection(ec, 0, static_cast<ULONG>(sel.size()), sel.data(), &fetched);
-    HRESULT_CHECK_RETURN(hr, L"context->GetSelection failed");
-
-    if (fetched > 1) {
-        for (ULONG i = 0; i < fetched; i++) {
-            sel[i].range->Release();
-        }
-        return E_FAIL;
-    } else if (fetched == 1) {
-        CComPtr<ITfRange> selRange;
-        selRange.Attach(sel[0].range);
-        BOOL selEmpty;
-        hr = selRange->IsEmpty(ec, &selEmpty);
-        if (FAILED(hr) || !selEmpty) {
-            return E_FAIL;
-        }
-    }
-
     hr = context->StartCompositionNow(ec);
-    HRESULT_CHECK_RETURN(hr, L"_compositionManager->StartComposition failed");
+    HRESULT_CHECK_RETURN(hr, L"context->StartCompositionNow failed");
 
-    hr = context->DoEditSurroundingWord(ec, ignore);
-    if (SUCCEEDED(hr)) {
-        compBackconvert.SetValue(0);
-    } else {
-        DBG_HRESULT_CHECK(hr, L"DoEditSurroundingWord failed");
-        hr = context->EndCompositionNow(ec);
-        DBG_HRESULT_CHECK(hr, L"compositionManager->EndCompositionNow failed");
+    if (range) {
+        hr = context->GetComposition()->ShiftStart(ec, range);
+        HRESULT_CHECK_RETURN(hr, L"context->GetComposition()->ShiftStart failed");
     }
 
-    return hr;
-}
+    auto engine = context->GetEngine();
+    engine->Reset();
+    engine->Backconvert(*word);
 
-HRESULT Context::EditSurroundingWordAndPush(
-    _In_ TfEditCookie ec, _In_ Context* context, _In_ int ignore, _In_ wchar_t push) {
-    HRESULT hr = EditSurroundingWord(ec, context, ignore);
-    HRESULT_CHECK(hr, "EditSurroundingWord failed");
+    auto displayText = engine->Peek();
+    context->SetCompositionText(ec, displayText.c_str(), static_cast<LONG>(displayText.length()));
 
-    if (!push) {
-        return hr;
-    }
+    if (!push)
+        return S_OK;
 
     return context->EditNextState(ec, context->GetEngine()->PushChar(push));
+}
+
+HRESULT Context::RequestEditLastWord(_In_ int ignore, _In_ wchar_t push) {
+    HRESULT hr, hrSession;
+    std::wstring word;
+
+    if (GetComposition())
+        return E_PENDING;
+
+    // get the full context
+
+    CComPtr<ITfContext> fullContext;
+    VirtualDocument::FullContextType contextType;
+    hr = VirtualDocument::GetFullContext(_context, GetClientId(), &fullContext, &contextType);
+    HRESULT_CHECK(hr, L"VirtualDocument::GetFullContext failed");
+    if (FAILED(hr)) {
+        // just open a new composition
+        hr = RequestEditSessionEx(
+            BackconvertWord,
+            TF_ES_SYNC | TF_ES_READWRITE,
+            &hrSession,
+            static_cast<ITfRange*>(nullptr),
+            static_cast<const std::wstring*>(&word),
+            push);
+        HRESULT_CHECK_RETURN(hr, L"RequestEditSessionEx(EditLastWord) failed");
+        HRESULT_CHECK_RETURN(hrSession, L"EditLastWord failed");
+        return S_OK;
+    }
+
+    switch (contextType) {
+    case VirtualDocument::FullContextType::Original:
+    case VirtualDocument::FullContextType::Chromium:
+        // oneshot edit is possible
+        hr = RequestEditSessionEx(EditLastWord, TF_ES_SYNC | TF_ES_READWRITE, &hrSession, ignore, push);
+        HRESULT_CHECK_RETURN(hr, L"RequestEditSessionEx(EditLastWord) failed");
+        HRESULT_CHECK_RETURN(hrSession, L"EditLastWord failed");
+    case VirtualDocument::FullContextType::Transitory: {
+        do {
+            CComPtr<EditSession<ITfContext*, int, std::wstring*>> session;
+            hr = CreateInitialize(&session, KillLastWordInFullContext, fullContext.p, ignore, &word);
+            if (FAILED(hr)) {
+                HRESULT_CHECK(hr, L"CreateInitialize(&session) failed");
+                break;
+            }
+
+            hr = fullContext->RequestEditSession(GetClientId(), session, TF_ES_SYNC | TF_ES_READWRITE, &hrSession);
+            if (FAILED(hr)) {
+                HRESULT_CHECK(hr, L"RequestEditSession(KillLastWordInFullContext) failed");
+                break;
+            }
+            if (FAILED(hrSession)) {
+                HRESULT_CHECK(hrSession, L"KillLastWordInFullContext failed");
+                break;
+            }
+        } while (0);
+
+        hr = RequestEditSessionEx(
+            BackconvertWord,
+            TF_ES_SYNC | TF_ES_READWRITE,
+            &hrSession,
+            static_cast<ITfRange*>(nullptr),
+            static_cast<const std::wstring*>(&word),
+            push);
+        HRESULT_CHECK_RETURN(hr, L"RequestEditSessionEx(EditLastWord) failed");
+        HRESULT_CHECK_RETURN(hrSession, L"EditLastWord failed");
+    }
+    }
+    return S_OK;
 }
 
 } // namespace VietType
