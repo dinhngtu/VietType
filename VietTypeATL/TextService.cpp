@@ -56,8 +56,8 @@ STDMETHODIMP TextService::ActivateEx(_In_ ITfThreadMgr* ptim, _In_ TfClientId ti
     hr = InitializeDisplayAttributes(ptim, tid);
     DBG_HRESULT_CHECK(hr, L"InitializeDisplayAttributes failed");
 
-    hr = CreateInitialize(&_compositionManager, ptim, tid, _settings, _displayAtom);
-    HRESULT_CHECK_RETURN(hr, L"CreateInitialize(&_compositionManager) failed");
+    hr = CreateInitialize(&_contextManager, ptim, tid, _settings, _displayAtom);
+    HRESULT_CHECK_RETURN(hr, L"CreateInitialize(&_contextManager) failed");
 
     return S_OK;
 }
@@ -65,9 +65,9 @@ STDMETHODIMP TextService::ActivateEx(_In_ ITfThreadMgr* ptim, _In_ TfClientId ti
 STDMETHODIMP TextService::Deactivate(void) {
     DBG_DPRINT(L"h = %p, threadno = %ld", Globals::DllInstance, GetCurrentThreadId());
 
-    if (_compositionManager)
-        _compositionManager->Uninitialize();
-    _compositionManager.Release();
+    if (_contextManager)
+        _contextManager->Uninitialize();
+    _contextManager.Release();
 
     _displayAtom = TF_INVALID_GUIDATOM;
 

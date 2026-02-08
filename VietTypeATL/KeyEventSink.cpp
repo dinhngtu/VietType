@@ -255,7 +255,7 @@ STDMETHODIMP ContextManager::OnPreservedKey(_In_ ITfContext* pic, _In_ REFGUID r
         *pfEaten = TRUE;
         context->GetEngine()->Reset();
         hr = context->EndComposition();
-        DBG_HRESULT_CHECK(hr, L"_compositionManager->EndComposition failed");
+        DBG_HRESULT_CHECK(hr, L"_contextManager->EndComposition failed");
         hr = ToggleUserEnabled();
         DBG_HRESULT_CHECK(hr, L"_engine->ToggleEnabled failed");
     }
@@ -267,7 +267,7 @@ HRESULT ContextManager::CallKeyEdit(
     _In_ Context* context, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_reads_(256) const BYTE* keyState) {
     HRESULT hr, hrSession;
     hr = context->RequestEditKey(&hrSession, wParam, lParam, keyState);
-    HRESULT_CHECK_RETURN(hr, L"_compositionManager->RequestEditSession failed");
+    HRESULT_CHECK_RETURN(hr, L"_contextManager->RequestEditSession failed");
     HRESULT_CHECK_RETURN(hrSession, L"KeyHandlerEditSession failed");
 
     return S_OK;

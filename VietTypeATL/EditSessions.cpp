@@ -16,15 +16,15 @@ HRESULT Context::EditNextState(_In_ TfEditCookie ec, _In_ Telex::TelexStates sta
         if (GetEngine()->Count()) {
             auto str = GetEngine()->Peek();
             hr = EnsureCompositionText(ec, &str[0], static_cast<LONG>(str.length()));
-            DBG_HRESULT_CHECK(hr, L"_compositionManager->EnsureCompositionText failed");
+            DBG_HRESULT_CHECK(hr, L"_contextManager->EnsureCompositionText failed");
         } else {
             // backspace returns Valid on an empty buffer
             GetEngine()->Reset();
             // EndComposition* will not empty composition text so we have to do it manually
             hr = EmptyCompositionText(ec);
-            HRESULT_CHECK_RETURN(hr, L"_compositionManager->EmptyCompositionText failed");
+            HRESULT_CHECK_RETURN(hr, L"_contextManager->EmptyCompositionText failed");
             hr = EndCompositionNow(ec);
-            HRESULT_CHECK_RETURN(hr, L"_compositionManager->EndCompositionNow failed");
+            HRESULT_CHECK_RETURN(hr, L"_contextManager->EndCompositionNow failed");
         }
         break;
     }
@@ -33,7 +33,7 @@ HRESULT Context::EditNextState(_In_ TfEditCookie ec, _In_ Telex::TelexStates sta
         assert(GetEngine()->Count() > 0);
         auto str = GetEngine()->RetrieveRaw();
         hr = EnsureCompositionText(ec, &str[0], static_cast<LONG>(str.length()));
-        DBG_HRESULT_CHECK(hr, L"_compositionManager->EnsureCompositionText failed");
+        DBG_HRESULT_CHECK(hr, L"_contextManager->EnsureCompositionText failed");
         break;
     }
 
@@ -54,7 +54,7 @@ HRESULT Context::EditCommit(_In_ TfEditCookie ec) {
         if (txstate == Telex::TelexStates::Committed || txstate == Telex::TelexStates::CommittedInvalid) {
             auto str = GetEngine()->Retrieve();
             hr = SetCompositionText(ec, &str[0], static_cast<LONG>(str.length()));
-            DBG_HRESULT_CHECK(hr, L"_compositionManager->EnsureCompositionText failed");
+            DBG_HRESULT_CHECK(hr, L"_contextManager->EnsureCompositionText failed");
         } else {
             assert(txstate == Telex::TelexStates::Committed || txstate == Telex::TelexStates::CommittedInvalid);
             hr = E_FAIL;

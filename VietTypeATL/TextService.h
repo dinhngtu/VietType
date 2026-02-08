@@ -64,7 +64,7 @@ private:
     CComPtr<EngineSettingsController> _settings;
     CComPtr<CompartmentNotifier> _systemNotify;
     TfGuidAtom _displayAtom = TF_INVALID_GUIDATOM;
-    CComPtr<ContextManager> _compositionManager;
+    CComPtr<ContextManager> _contextManager;
 };
 OBJECT_ENTRY_AUTO(VietType::Globals::CLSID_TextService, TextService)
 
