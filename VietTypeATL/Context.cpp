@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "Context.h"
 #include "Telex.h"
+#include "CompositionManager.h"
 
 namespace VietType {
 
@@ -22,15 +23,15 @@ STDMETHODIMP Context::OnCompositionTerminated(_In_ TfEditCookie ecWrite, __RPC__
 }
 
 HRESULT Context::Initialize(
-    _In_ TfClientId clientId,
+    _In_ CompositionManager* parent,
     _In_ ITfContext* context,
     _In_ const Telex::TelexConfig& config,
     _In_ TfGuidAtom displayAttrAtom) {
-    if (clientId == TF_CLIENTID_NULL || !context) {
+    if (!context) {
         return E_INVALIDARG;
     }
 
-    _clientId = clientId;
+    _parent = parent;
     _context = context;
     _displayAtom = displayAttrAtom;
 
@@ -46,10 +47,19 @@ HRESULT Context::Uninitialize() {
     return S_OK;
 }
 
+TfClientId Context::GetClientId() const {
+    return _parent->GetClientId();
+}
+
+void Context::UpdateStates() {
+    HRESULT hr = _parent->UpdateStates(this);
+    DBG_HRESULT_CHECK(hr, "_parent->UpdateStates failed");
+}
+
 HRESULT Context::StartComposition() {
     HRESULT hr, hrSession;
 
-    if (_clientId == TF_CLIENTID_NULL || _composition) {
+    if (GetClientId() == TF_CLIENTID_NULL || _composition) {
         DBG_DPRINT(L"bad composition request");
         return E_FAIL;
     }
@@ -62,7 +72,7 @@ HRESULT Context::StartComposition() {
 }
 
 HRESULT Context::EndComposition() {
-    if (_clientId == TF_CLIENTID_NULL) {
+    if (GetClientId() == TF_CLIENTID_NULL) {
         DBG_DPRINT(L"bad end composition request");
         return E_FAIL;
     }

@@ -17,10 +17,9 @@ namespace VietType {
     } while (0);
 
 HRESULT Context::EditBlocked(_In_ TfEditCookie ec, _In_ Context* context) {
-
     HRESULT hr;
 
-    DBG_DPRINT(L"EditBlocked ec = %ld", ec);
+    DBG_DPRINT(L"EditBlocked ec = %ld context = %p", ec, context->GetContext());
 
     // check GUID_COMPARTMENT_KEYBOARD_DISABLED
 
@@ -117,6 +116,14 @@ HRESULT Context::EditBlocked(_In_ TfEditCookie ec, _In_ Context* context) {
 commit:
     DBG_DPRINT(L"setting scope to %s", scopeBlocked ? L"blocked" : L"free");
     context->_blocked = scopeBlocked;
+    return hr;
+}
+
+HRESULT Context::EditBlockedAndUpdate(_In_ TfEditCookie ec, _In_ Context* context) {
+    HRESULT hr;
+
+    hr = EditBlocked(ec, context);
+    context->UpdateStates();
     return hr;
 }
 

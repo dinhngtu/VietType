@@ -92,8 +92,10 @@ public:
     _Check_return_ HRESULT IsUserEnabled(_Out_ long* penabled) const;
     HRESULT ToggleUserEnabled();
 
+    HRESULT UpdateStates(_In_ Context* context);
+
 private:
-    long IsEnabled(Context* context) const;
+    long IsEnabled(_In_ Context* context) const;
     HRESULT UpdateStates(bool foreground);
 
     DWORD OnBackconvertBackspace(

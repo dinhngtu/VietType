@@ -158,7 +158,7 @@ HRESULT CompositionManager::ToggleUserEnabled() {
     return S_OK;
 }
 
-long CompositionManager::IsEnabled(Context* context) const {
+long CompositionManager::IsEnabled(_In_ Context* context) const {
     if (!context)
         return false;
     long enabled;
@@ -197,6 +197,10 @@ HRESULT CompositionManager::UpdateStates(bool foreground) {
     DBG_HRESULT_CHECK(hr, L"_langBarButton->Refresh failed");
 
     return S_OK;
+}
+
+HRESULT CompositionManager::UpdateStates(_In_ Context* context) {
+    return UpdateStates(context == _focus);
 }
 
 STDMETHODIMP CompositionManager::OnInitDocumentMgr(__RPC__in_opt ITfDocumentMgr* pdim) {
@@ -244,7 +248,7 @@ STDMETHODIMP CompositionManager::OnPushContext(__RPC__in_opt ITfContext* pic) {
     auto it = _map.lower_bound(pic);
     if (it == _map.end() || _map.key_comp()(pic, it->first) != 0) {
         CComPtr<Context> context;
-        hr = CreateInitialize(&context, _clientid, pic, static_cast<const Telex::TelexConfig&>(_config), _displayAtom);
+        hr = CreateInitialize(&context, this, pic, static_cast<const Telex::TelexConfig&>(_config), _displayAtom);
         HRESULT_CHECK_RETURN(hr, "Create Context failed");
         _map.insert(it, {pic, std::move(context)});
     }

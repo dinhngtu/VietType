@@ -30,7 +30,7 @@ public:
         _In_ TfEditCookie ecWrite, __RPC__in_opt ITfComposition* pComposition) override;
 
     HRESULT Initialize(
-        _In_ TfClientId clientId,
+        _In_ CompositionManager* parent,
         _In_ ITfContext* context,
         _In_ const Telex::TelexConfig& config,
         _In_ TfGuidAtom displayAtom);
@@ -39,9 +39,7 @@ public:
         Uninitialize();
     }
 
-    constexpr TfClientId GetClientId() const {
-        return _clientId;
-    }
+    TfClientId GetClientId() const;
     ITfContext* GetContext() const {
         return _context;
     }
@@ -52,6 +50,7 @@ public:
     constexpr bool IsBlocked() const {
         return _blocked;
     }
+    void UpdateStates();
 
     HRESULT StartComposition();
     HRESULT EndComposition();
@@ -61,7 +60,7 @@ public:
 
     // edit session initiators
     HRESULT RequestEditBlocked(_Out_ HRESULT* hrSession) {
-        return RequestEditSessionEx(EditBlocked, TF_ES_ASYNCDONTCARE | TF_ES_READWRITE, hrSession);
+        return RequestEditSessionEx(EditBlockedAndUpdate, TF_ES_ASYNCDONTCARE | TF_ES_READWRITE, hrSession);
     }
     HRESULT RequestEditSurroundingWord(_Out_ HRESULT* hrSession, _In_ int ignore) {
         return RequestEditSessionEx(EditSurroundingWord, TF_ES_ASYNCDONTCARE | TF_ES_READWRITE, hrSession, ignore);
@@ -84,7 +83,7 @@ private:
         _Out_ HRESULT* hrSession,
         Args... args) {
 
-        if (_clientId == TF_CLIENTID_NULL || !_context) {
+        if (GetClientId() == TF_CLIENTID_NULL || !_context) {
             return E_FAIL;
         }
 
@@ -92,7 +91,7 @@ private:
         HRESULT hr = CreateInitialize(&session, callback, this, args...);
         HRESULT_CHECK_RETURN(hr, L"CreateInitialize(&session) failed");
 
-        hr = _context->RequestEditSession(_clientId, session, flags, hrSession);
+        hr = _context->RequestEditSession(GetClientId(), session, flags, hrSession);
         HRESULT_CHECK_RETURN(hr, L"context->RequestEditSession failed");
 
         return hr;
@@ -120,6 +119,7 @@ private:
         return context->EndCompositionNow(ec);
     }
     static HRESULT EditBlocked(_In_ TfEditCookie ec, _In_ Context* context);
+    static HRESULT EditBlockedAndUpdate(_In_ TfEditCookie ec, _In_ Context* context);
     static HRESULT EditSurroundingWord(_In_ TfEditCookie ec, _In_ Context* context, _In_ int ignore);
     static HRESULT EditSurroundingWordAndPush(
         _In_ TfEditCookie ec, _In_ Context* context, _In_ int ignore, _In_ wchar_t push);
@@ -131,7 +131,7 @@ private:
         _In_reads_(256) const BYTE* keyState);
 
 private:
-    TfClientId _clientId = TF_CLIENTID_NULL;
+    CompositionManager* _parent;
     CComPtr<ITfContext> _context;
     TfGuidAtom _displayAtom = TF_INVALID_GUIDATOM;
     bool _blocked = false;
