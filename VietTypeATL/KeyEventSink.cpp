@@ -42,13 +42,13 @@ DWORD CompositionManager::OnBackconvertBackspace(
 
     *pfEaten = FALSE;
 
-    hr = compBackconvert.Initialize(_focus->GetContext(), _clientid, Globals::GUID_Compartment_Backconvert);
+    hr = compBackconvert.Initialize(context->GetContext(), _clientid, Globals::GUID_Compartment_Backconvert);
     if (FAILED(hr)) {
         DBG_HRESULT_CHECK(hr, L"compBackconvert.Initialize failed");
         goto finish;
     }
 
-    if (wParam == VK_BACK && !_focus->GetComposition() && !IsModifier(_keyState)) {
+    if (wParam == VK_BACK && !context->GetComposition() && !IsModifier(_keyState)) {
         long backspacing;
         hr = compBackconvert.GetValue(&backspacing);
         if (FAILED(hr)) {
@@ -66,7 +66,7 @@ finish:
     } else {
         hr = compBackconvert.SetValue(0);
         DBG_HRESULT_CHECK(hr, L"compBackconvert reset failed");
-        *pfEaten = IsKeyEaten(context->GetEngine(), _focus->GetComposition(), wParam, lParam, _keyState);
+        *pfEaten = IsKeyEaten(context->GetEngine(), context->GetComposition(), wParam, lParam, _keyState);
         return BackconvertDisabled;
     }
 }
@@ -78,12 +78,12 @@ DWORD CompositionManager::OnBackconvertRetype(
     _Out_ BOOL* pfEaten,
     _In_ DWORD prevBackconvert,
     _Out_ wchar_t* acceptedChar) {
-    if (!_focus->GetComposition() && !IsModifier(_keyState) &&
+    if (!context->GetComposition() && !IsModifier(_keyState) &&
         IsKeyAccepted(context->GetEngine(), wParam, lParam, _keyState, acceptedChar)) {
         *pfEaten = TRUE;
         return prevBackconvert;
     } else {
-        *pfEaten = IsKeyEaten(context->GetEngine(), _focus->GetComposition(), wParam, lParam, _keyState);
+        *pfEaten = IsKeyEaten(context->GetEngine(), context->GetComposition(), wParam, lParam, _keyState);
         *acceptedChar = 0;
         return 0;
     }
@@ -117,7 +117,7 @@ HRESULT CompositionManager::OnKeyDownCommon(
         *isBackconvert = OnBackconvertRetype(context, wParam, lParam, pfEaten, *isBackconvert, acceptedChar);
         break;
     default:
-        *pfEaten = IsKeyEaten(context->GetEngine(), _focus->GetComposition(), wParam, lParam, _keyState);
+        *pfEaten = IsKeyEaten(context->GetEngine(), context->GetComposition(), wParam, lParam, _keyState);
         *isBackconvert = BackconvertDisabled;
         break;
     }
@@ -134,9 +134,8 @@ HRESULT CompositionManager::CallKeyEditBackspace(
     if (FAILED(hr) || FAILED(hrSession)) {
         DBG_DPRINT(L"backspace SendInput fallback");
 
-        CComPtr<ITfCompartmentMgr> tcMgr;
-        hr = _focus->GetContext()->QueryInterface(&tcMgr);
-        HRESULT_CHECK_RETURN(hr, L"pic->QueryInterface failed");
+        if (context != _focus)
+            return E_FAIL;
 
         INPUT inp[2];
         ZeroMemory(inp, sizeof(inp));
@@ -208,7 +207,7 @@ STDMETHODIMP CompositionManager::OnTestKeyUp(
     }
 
     // essentially we eat the KeyUp event if a composition is active; is this the correct behavior?
-    if (_focus->GetComposition()) {
+    if (context->GetComposition()) {
         if (!GetKeyboardState(_keyState)) {
             WINERROR_GLE_RETURN_HRESULT(L"GetKeyboardState failed");
         }
