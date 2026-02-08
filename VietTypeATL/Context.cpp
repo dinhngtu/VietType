@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "Context.h"
 #include "Telex.h"
-#include "CompositionManager.h"
+#include "ContextManager.h"
 
 namespace VietType {
 
@@ -23,7 +23,7 @@ STDMETHODIMP Context::OnCompositionTerminated(_In_ TfEditCookie ecWrite, __RPC__
 }
 
 HRESULT Context::Initialize(
-    _In_ CompositionManager* parent,
+    _In_ ContextManager* parent,
     _In_ ITfContext* context,
     _In_ const Telex::TelexConfig& config,
     _In_ TfGuidAtom displayAttrAtom) {
@@ -51,9 +51,9 @@ TfClientId Context::GetClientId() const {
     return _parent->GetClientId();
 }
 
-void Context::UpdateStates() {
-    HRESULT hr = _parent->UpdateStates(this);
-    DBG_HRESULT_CHECK(hr, "_parent->UpdateStates failed");
+void Context::UpdateStatus() {
+    HRESULT hr = _parent->UpdateStatus(this);
+    DBG_HRESULT_CHECK(hr, "_parent->UpdateStatus failed");
 }
 
 HRESULT Context::StartComposition() {

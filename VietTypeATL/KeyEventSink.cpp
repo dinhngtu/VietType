@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "Telex.h"
 #include "KeyTranslator.h"
-#include "CompositionManager.h"
+#include "ContextManager.h"
 #include "Context.h"
 
 namespace VietType {
@@ -13,7 +13,7 @@ namespace VietType {
 const GUID GUID_KeyEventSink_PreservedKey_Toggle = {
     0x8cc27cf8, 0x93d2, 0x416c, {0xb1, 0xa3, 0x66, 0x82, 0x7f, 0x54, 0x24, 0x4a}};
 
-STDMETHODIMP CompositionManager::OnSetFocus(_In_ BOOL fForeground) {
+STDMETHODIMP ContextManager::OnSetFocus(_In_ BOOL fForeground) {
     HRESULT hr;
 
     DBG_DPRINT(L"foreground %d", fForeground);
@@ -34,7 +34,7 @@ STDMETHODIMP CompositionManager::OnSetFocus(_In_ BOOL fForeground) {
     return OnSetFocus(docMgr, nullptr);
 }
 
-DWORD CompositionManager::OnBackconvertBackspace(
+DWORD ContextManager::OnBackconvertBackspace(
     _In_ Context* context, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten, _In_ DWORD prevBackconvert) {
     Compartment<long> compBackconvert;
     HRESULT hr;
@@ -71,7 +71,7 @@ finish:
     }
 }
 
-DWORD CompositionManager::OnBackconvertRetype(
+DWORD ContextManager::OnBackconvertRetype(
     _In_ Context* context,
     _In_ WPARAM wParam,
     _In_ LPARAM lParam,
@@ -89,7 +89,7 @@ DWORD CompositionManager::OnBackconvertRetype(
     }
 }
 
-HRESULT CompositionManager::OnKeyDownCommon(
+HRESULT ContextManager::OnKeyDownCommon(
     _In_ Context* context,
     _In_ WPARAM wParam,
     _In_ LPARAM lParam,
@@ -125,7 +125,7 @@ HRESULT CompositionManager::OnKeyDownCommon(
     return S_OK;
 }
 
-HRESULT CompositionManager::CallKeyEditBackspace(
+HRESULT ContextManager::CallKeyEditBackspace(
     _In_ Context* context, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_reads_(256) const BYTE* keyState) {
     HRESULT hrSession;
     HRESULT hr;
@@ -150,7 +150,7 @@ HRESULT CompositionManager::CallKeyEditBackspace(
     return S_OK;
 }
 
-HRESULT CompositionManager::CallKeyEditRetype(
+HRESULT ContextManager::CallKeyEditRetype(
     _In_ Context* context,
     _In_ WPARAM wParam,
     _In_ LPARAM lParam,
@@ -166,7 +166,7 @@ HRESULT CompositionManager::CallKeyEditRetype(
     return S_OK;
 }
 
-STDMETHODIMP CompositionManager::OnTestKeyDown(
+STDMETHODIMP ContextManager::OnTestKeyDown(
     _In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten) {
     DWORD isBackconvert;
     wchar_t c;
@@ -192,7 +192,7 @@ STDMETHODIMP CompositionManager::OnTestKeyDown(
     return S_OK;
 }
 
-STDMETHODIMP CompositionManager::OnTestKeyUp(
+STDMETHODIMP ContextManager::OnTestKeyUp(
     _In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten) {
     *pfEaten = FALSE;
 
@@ -220,7 +220,7 @@ STDMETHODIMP CompositionManager::OnTestKeyUp(
     return S_OK;
 }
 
-STDMETHODIMP CompositionManager::OnKeyDown(
+STDMETHODIMP ContextManager::OnKeyDown(
     _In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten) {
     DWORD isBackconvert;
     wchar_t c;
@@ -257,12 +257,12 @@ STDMETHODIMP CompositionManager::OnKeyDown(
     return S_OK;
 }
 
-STDMETHODIMP CompositionManager::OnKeyUp(
+STDMETHODIMP ContextManager::OnKeyUp(
     _In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten) {
     return OnTestKeyUp(pic, wParam, lParam, pfEaten);
 }
 
-STDMETHODIMP CompositionManager::OnPreservedKey(_In_ ITfContext* pic, _In_ REFGUID rguid, _Out_ BOOL* pfEaten) {
+STDMETHODIMP ContextManager::OnPreservedKey(_In_ ITfContext* pic, _In_ REFGUID rguid, _Out_ BOOL* pfEaten) {
     HRESULT hr;
 
     auto it = _map.find(pic);
@@ -285,7 +285,7 @@ STDMETHODIMP CompositionManager::OnPreservedKey(_In_ ITfContext* pic, _In_ REFGU
     return S_OK;
 }
 
-HRESULT CompositionManager::CallKeyEdit(
+HRESULT ContextManager::CallKeyEdit(
     _In_ Context* context, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_reads_(256) const BYTE* keyState) {
     HRESULT hr, hrSession;
     hr = context->RequestEditKey(&hrSession, wParam, lParam, keyState);

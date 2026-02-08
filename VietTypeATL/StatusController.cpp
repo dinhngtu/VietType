@@ -3,7 +3,7 @@
 
 #include "stdafx.h"
 #include "StatusController.h"
-#include "CompositionManager.h"
+#include "ContextManager.h"
 #include "LanguageBarButton.h"
 
 namespace VietType {
@@ -12,7 +12,7 @@ namespace VietType {
 static const GUID GUID_LanguageBarButton_Item = {
     0xcca3d390, 0xef1a, 0x4de4, {0xb2, 0xff, 0xb6, 0xbc, 0x76, 0xd6, 0x8c, 0x3b}};
 
-_Check_return_ HRESULT StatusController::Initialize(_In_ CompositionManager* parent, _In_ ITfThreadMgr* threadMgr) {
+_Check_return_ HRESULT StatusController::Initialize(_In_ ContextManager* parent, _In_ ITfThreadMgr* threadMgr) {
     HRESULT hr;
 
     _parent = parent;

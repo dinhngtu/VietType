@@ -9,7 +9,7 @@
 
 namespace VietType {
 
-class CompositionManager;
+class ContextManager;
 
 class Context : public CComObjectRootEx<CComSingleThreadModel>, public ITfCompositionSink {
 public:
@@ -30,7 +30,7 @@ public:
         _In_ TfEditCookie ecWrite, __RPC__in_opt ITfComposition* pComposition) override;
 
     HRESULT Initialize(
-        _In_ CompositionManager* parent,
+        _In_ ContextManager* parent,
         _In_ ITfContext* context,
         _In_ const Telex::TelexConfig& config,
         _In_ TfGuidAtom displayAtom);
@@ -50,7 +50,7 @@ public:
     constexpr bool IsBlocked() const {
         return _blocked;
     }
-    void UpdateStates();
+    void UpdateStatus();
 
     HRESULT StartComposition();
     HRESULT EndComposition();
@@ -131,7 +131,7 @@ private:
         _In_reads_(256) const BYTE* keyState);
 
 private:
-    CompositionManager* _parent;
+    ContextManager* _parent;
     CComPtr<ITfContext> _context;
     TfGuidAtom _displayAtom = TF_INVALID_GUIDATOM;
     bool _blocked = false;

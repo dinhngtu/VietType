@@ -123,7 +123,7 @@ HRESULT Context::EditBlockedAndUpdate(_In_ TfEditCookie ec, _In_ Context* contex
     HRESULT hr;
 
     hr = EditBlocked(ec, context);
-    context->UpdateStates();
+    context->UpdateStatus();
     return hr;
 }
 

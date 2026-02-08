@@ -5,7 +5,7 @@
 
 #include "stdafx.h"
 #include "TextService.h"
-#include "CompositionManager.h"
+#include "ContextManager.h"
 #include "Context.h"
 #include "EngineSettingsController.h"
 #include "StatusController.h"

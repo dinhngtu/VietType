@@ -156,7 +156,8 @@ HRESULT Context::EditSurroundingWord(_In_ TfEditCookie ec, _In_ Context* context
     DBG_DPRINT(L"backconvert ec = %ld", ec);
 
     Compartment<long> compBackconvert;
-    hr = compBackconvert.Initialize(context->GetContext(), context->GetClientId(), Globals::GUID_Compartment_Backconvert);
+    hr = compBackconvert.Initialize(
+        context->GetContext(), context->GetClientId(), Globals::GUID_Compartment_Backconvert);
     HRESULT_CHECK_RETURN(hr, L"compBackconvert.Initialize failed");
     hr = compBackconvert.SetValue(-1);
     HRESULT_CHECK_RETURN(hr, L"compBackconvert.SetValue failed");

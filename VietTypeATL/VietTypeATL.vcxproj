@@ -448,7 +448,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Compartment.cpp" />
-    <ClCompile Include="CompositionManager.cpp" />
+    <ClCompile Include="ContextManager.cpp" />
     <ClCompile Include="Context.cpp" />
     <ClCompile Include="DisplayAttributes.cpp" />
     <ClCompile Include="dllmain.cpp">
@@ -507,7 +507,7 @@
   <ItemGroup>
     <ClInclude Include="Common.h" />
     <ClInclude Include="Compartment.h" />
-    <ClInclude Include="CompositionManager.h" />
+    <ClInclude Include="ContextManager.h" />
     <ClInclude Include="ComUtils.h" />
     <ClInclude Include="Context.h" />
     <ClInclude Include="Define.h" />

@@ -11,4 +11,4 @@ namespace VirtualDocument {
 _Check_return_ HRESULT GetVirtualDocumentContext(_In_ ITfContext* context, _COM_Outptr_ ITfContext** pContext);
 
 }
-}
+} // namespace VietType

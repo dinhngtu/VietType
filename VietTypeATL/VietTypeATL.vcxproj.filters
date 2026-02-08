@@ -37,7 +37,7 @@
     <ClCompile Include="KeyEventSink.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CompositionManager.cpp">
+    <ClCompile Include="ContextManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="KeyHandler.cpp">
@@ -111,7 +111,7 @@
     <ClInclude Include="Common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CompositionManager.h">
+    <ClInclude Include="ContextManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EditSession.h">

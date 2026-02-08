@@ -7,7 +7,7 @@
 
 namespace VietType {
 
-class CompositionManager;
+class ContextManager;
 class LanguageBarButton;
 
 class ATL_NO_VTABLE StatusController : public CComObjectRootEx<CComSingleThreadModel> {
@@ -23,7 +23,7 @@ public:
     END_COM_MAP()
     DECLARE_PROTECT_FINAL_CONSTRUCT()
 
-    _Check_return_ HRESULT Initialize(_In_ CompositionManager* parent, _In_ ITfThreadMgr* threadMgr);
+    _Check_return_ HRESULT Initialize(_In_ ContextManager* parent, _In_ ITfThreadMgr* threadMgr);
     HRESULT Uninitialize();
     void FinalRelease() {
         Uninitialize();
@@ -45,7 +45,7 @@ private:
     HRESULT UninitLanguageBar();
 
 private:
-    CompositionManager* _parent = nullptr;
+    ContextManager* _parent = nullptr;
 
     CComPtr<ITfLangBarItemMgr> _langBarItemMgr;
     CComPtr<LanguageBarButton> _indicatorButton;

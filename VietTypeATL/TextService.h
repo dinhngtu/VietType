@@ -23,7 +23,7 @@ class ITelexEngine;
 class EnumDisplayAttributeInfo;
 class EngineSettingsController;
 class CompartmentNotifier;
-class CompositionManager;
+class ContextManager;
 
 class ATL_NO_VTABLE TextService : public CComObjectRootEx<CComSingleThreadModel>,
                                   public CComCoClass<TextService, &VietType::Globals::CLSID_TextService>,
@@ -64,7 +64,7 @@ private:
     CComPtr<EngineSettingsController> _settings;
     CComPtr<CompartmentNotifier> _systemNotify;
     TfGuidAtom _displayAtom = TF_INVALID_GUIDATOM;
-    CComPtr<CompositionManager> _compositionManager;
+    CComPtr<ContextManager> _compositionManager;
 };
 OBJECT_ENTRY_AUTO(VietType::Globals::CLSID_TextService, TextService)
 
