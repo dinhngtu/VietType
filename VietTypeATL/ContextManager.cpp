@@ -210,9 +210,28 @@ STDMETHODIMP ContextManager::OnInitDocumentMgr(__RPC__in_opt ITfDocumentMgr* pdi
 }
 
 STDMETHODIMP ContextManager::OnUninitDocumentMgr(__RPC__in_opt ITfDocumentMgr* pdim) {
+    HRESULT hr;
+
     DBG_DPRINT(L"pdim = %p", pdim);
 
-    _map.clear();
+    CComPtr<IEnumTfContexts> contexts;
+    hr = pdim->EnumContexts(&contexts);
+    if (FAILED(hr)) {
+        _map.clear();
+        return hr;
+    }
+
+    CComPtr<ITfContext> context;
+    while (1) {
+        ULONG fetched;
+        hr = contexts->Next(1, &context, &fetched);
+        if (SUCCEEDED(hr) && fetched) {
+            _map.erase(context.p);
+        } else {
+            break;
+        }
+        context.Release();
+    }
     return S_OK;
 }
 
