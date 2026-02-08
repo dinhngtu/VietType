@@ -56,7 +56,7 @@ public:
         __RPC__in REFGUID guid, __RPC__deref_out_opt ITfDisplayAttributeInfo** ppInfo) override;
 
     HRESULT InitializeDisplayAttributes(_In_ ITfThreadMgr* ptim, _In_ TfClientId tid);
-    HRESULT UpdateDisplayAttributes(__RPC__deref_out_opt ITfDisplayAttributeInfo** ppInfo);
+    HRESULT UpdateDisplayAttributes(_COM_Outptr_opt_ ITfDisplayAttributeInfo** ppInfo);
 
 private:
     CComPtr<ITfThreadMgr> _threadMgr;

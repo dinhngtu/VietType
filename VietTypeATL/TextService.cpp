@@ -137,7 +137,7 @@ HRESULT TextService::InitializeDisplayAttributes(_In_ ITfThreadMgr* ptim, _In_ T
     return S_OK;
 }
 
-HRESULT TextService::UpdateDisplayAttributes(__RPC__deref_out_opt ITfDisplayAttributeInfo** ppInfo) {
+HRESULT TextService::UpdateDisplayAttributes(_COM_Outptr_opt_ ITfDisplayAttributeInfo** ppInfo) {
     HRESULT hr;
 
     if (ppInfo)
