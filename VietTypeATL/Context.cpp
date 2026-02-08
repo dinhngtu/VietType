@@ -42,7 +42,11 @@ HRESULT Context::Initialize(
 
 HRESULT Context::Uninitialize() {
     _composition.Release();
+    _engine.release();
+    _blocked = true;
+    _displayAtom = TF_INVALID_GUIDATOM;
     _context.Release();
+    _parent = nullptr;
 
     return S_OK;
 }
