@@ -109,7 +109,7 @@ MAKE_MAP(
     P1(L"\x1b0\x1a1", P1(L"\x1b0\x1a1", 1)), //
 );
 debug_ensure(std::all_of(transitions_w.begin(), transitions_w.end(), [](const auto& x) {
-    return x.second.second < x.second.first.length() && x.second.first.length() == x.first.length();
+    return std::cmp_less(x.second.second, x.second.first.length()) && x.second.first.length() == x.first.length();
 }));
 
 MAKE_MAP(
@@ -123,7 +123,7 @@ MAKE_MAP(
     P1(L"\x1b0\x1a1", P1(L"\x1b0\x1a1", 1)), //
 );
 debug_ensure(std::all_of(transitions_w_q.begin(), transitions_w_q.end(), [](const auto& x) {
-    return x.second.second < x.second.first.length() && x.second.first.length() == x.first.length();
+    return std::cmp_less(x.second.second, x.second.first.length()) && x.second.first.length() == x.first.length();
 }));
 
 MAKE_MAP(
@@ -136,12 +136,12 @@ MAKE_MAP(
     P1(L"ua", P1(L"u\x103", 1)), //
 );
 debug_ensure(std::all_of(transitions_wa.begin(), transitions_wa.end(), [](const auto& x) {
-    return x.second.second < x.second.first.length() && x.second.first.length() == x.first.length();
+    return std::cmp_less(x.second.second, x.second.first.length()) && x.second.first.length() == x.first.length();
 }));
 
 MAKE_MAP(transitions_wa_q, false, std::wstring_view, TransitionV, P1(L"ua", P1(L"u\x103", 1)));
 debug_ensure(std::all_of(transitions_wa.begin(), transitions_wa.end(), [](const auto& x) {
-    return x.second.second < x.second.first.length() && x.second.first.length() == x.first.length();
+    return std::cmp_less(x.second.second, x.second.first.length()) && x.second.first.length() == x.first.length();
 }));
 
 MAKE_MAP(
@@ -174,12 +174,12 @@ MAKE_MAP(
     P1(L"\x1b0o", P1(L"\x1b0\x1a1", 1)), //
 );
 debug_ensure(std::all_of(transitions_wv_c2.begin(), transitions_wv_c2.end(), [](const auto& x) {
-    return x.second.second < x.second.first.length() && x.second.first.length() == x.first.length();
+    return std::cmp_less(x.second.second, x.second.first.length()) && x.second.first.length() == x.first.length();
 }));
 
 MAKE_MAP(transitions_wv_c2_q, false, std::wstring_view, TransitionV, P1(L"\x1b0o", P1(L"\x1b0\x1a1", 1)));
 debug_ensure(std::all_of(transitions_wv_c2_q.begin(), transitions_wv_c2_q.end(), [](const auto& x) {
-    return x.second.second < x.second.first.length() && x.second.first.length() == x.first.length();
+    return std::cmp_less(x.second.second, x.second.first.length()) && x.second.first.length() == x.first.length();
 }));
 
 MAKE_MAP(
@@ -885,8 +885,8 @@ MAKE_MAP(
 );
 debug_ensure(std::all_of(transitions_telex.begin(), transitions_telex.end(), [](const auto& x) {
     // the ends_with checks are for making sure [] won't trigger transitions
-    return !x.first.ends_with(L'\x1b0') && !x.first.ends_with(L'\x1a1') && x.second.second < x.second.first.length() &&
-           x.second.first.length() <= x.first.length();
+    return !x.first.ends_with(L'\x1b0') && !x.first.ends_with(L'\x1a1') &&
+           std::cmp_less(x.second.second, x.second.first.length()) && x.second.first.length() <= x.first.length();
 }));
 
 MAKE_MAP(
@@ -916,7 +916,7 @@ MAKE_MAP(
     P1(L"\x1b0o", P1(L"\x1b0\x1a1", 1)),   //
 );
 debug_ensure(std::all_of(transitions_vni.begin(), transitions_vni.end(), [](const auto& x) {
-    return x.second.second < x.second.first.length() && x.second.first.length() <= x.first.length();
+    return std::cmp_less(x.second.second, x.second.first.length()) && x.second.first.length() <= x.first.length();
 }));
 
 MAKE_MAP(

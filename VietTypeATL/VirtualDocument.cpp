@@ -91,7 +91,8 @@ _Check_return_ HRESULT GetFullContext(
         long emulatedVal;
         hr = emulated.Initialize(dim, clientId, GUID_Compartment_TsfEmulatedDocumentMgr);
         if (SUCCEEDED(hr) && SUCCEEDED(emulated.GetValue(&emulatedVal)) && (emulatedVal & 1)) {
-            // emulated
+            // emulated (CUAS)
+            *fullContext = nullptr;
             return E_NOTIMPL;
         } else {
             *fullContext = context;
@@ -104,6 +105,7 @@ _Check_return_ HRESULT GetFullContext(
         hr = (*fullContext)->GetStatus(&st);
         HRESULT_CHECK_RETURN_OUTPTR(hr, fullContext, L"fullContext->GetStatus failed");
         if (st.dwStaticFlags & TF_SS_TRANSITORY) {
+            // full context unexpectedly transitory
             (*fullContext)->Release();
             *fullContext = nullptr;
             return E_FAIL;

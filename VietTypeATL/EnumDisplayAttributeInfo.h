@@ -41,7 +41,7 @@ public:
     }
 
     void AddAttribute(_In_ ITfDisplayAttributeInfo* item);
-    _Ret_valid_ ITfDisplayAttributeInfo* GetAttribute(_In_ info_vector_type::size_type index);
+    _Ret_maybenull_ ITfDisplayAttributeInfo* GetAttribute(_In_ info_vector_type::size_type index);
     _Check_return_ HRESULT FindAttributeByGuid(_In_ const GUID& guid, _COM_Outptr_ ITfDisplayAttributeInfo** info);
 
 private:

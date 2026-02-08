@@ -75,7 +75,8 @@ void EnumDisplayAttributeInfo::AddAttribute(_In_ ITfDisplayAttributeInfo* item) 
     _items.emplace_back(item);
 }
 
-_Ret_valid_ ITfDisplayAttributeInfo* EnumDisplayAttributeInfo::GetAttribute(_In_ info_vector_type::size_type index) {
+_Ret_maybenull_ ITfDisplayAttributeInfo* EnumDisplayAttributeInfo::GetAttribute(
+    _In_ info_vector_type::size_type index) {
     if (index < _items.size())
         return _items.at(index);
     else
