@@ -6,12 +6,24 @@
 #include <Windows.h>
 #include <strsafe.h>
 
-// comment out the following line to write logs to the system debugger (warning: noisy, includes keystroke data)
-#define VIETTYPE_QUIET
+// system debug log controls (warning: VietType logs can potentially includes keystroke data)
+
+// global log control
+#define VIETTYPE_LOG 0
+// noisy log control
+#define VIETTYPE_DEBUG_LOG 0
+
+#if !defined(VIETTYPE_LOG) && _DEBUG
+#define VIETTYPE_LOG 1
+#endif
+
+#if !defined(VIETTYPE_DEBUG_LOG) && _DEBUG
+#define VIETTYPE_DEBUG_LOG 1
+#endif
 
 /// <summary>support function, do not use directly</summary>
 template <typename... Args>
-void _dprint(_In_ LPCWSTR func, _In_ int line, _In_ LPCWSTR fmt, Args... args) {
+static void _dprint(_In_ LPCWSTR func, _In_ int line, _In_ LPCWSTR fmt, Args... args) {
     std::array<WCHAR, 512> buf;
     StringCchPrintf(&buf[0], buf.size(), fmt, func, line, args...);
     OutputDebugString(&buf[0]);
@@ -19,7 +31,7 @@ void _dprint(_In_ LPCWSTR func, _In_ int line, _In_ LPCWSTR fmt, Args... args) {
 
 /// <summary>support function, do not use directly</summary>
 template <typename... Args>
-void _errorprint(_In_ LPCWSTR func, _In_ int line, _In_ DWORD err, _In_ LPCWSTR fmt, Args... args) {
+static void _errorprint(_In_ LPCWSTR func, _In_ int line, _In_ DWORD err, _In_ LPCWSTR fmt, Args... args) {
     std::array<WCHAR, 256> errmessage;
     auto chars = FormatMessage(
         FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
@@ -44,7 +56,7 @@ void _errorprint(_In_ LPCWSTR func, _In_ int line, _In_ DWORD err, _In_ LPCWSTR 
     OutputDebugString(&buf[0]);
 }
 
-#ifndef VIETTYPE_QUIET
+#if VIETTYPE_LOG
 // print formatted string to debugger output
 #define DPRINT(fmt, ...) _dprint(__FUNCTIONW__, __LINE__, L"%s:%d: " fmt L"\n", __VA_ARGS__)
 
@@ -86,7 +98,7 @@ void _errorprint(_In_ LPCWSTR func, _In_ int line, _In_ DWORD err, _In_ LPCWSTR 
         return hr;                                                                                                     \
     }
 
-#ifdef _DEBUG
+#if VIETTYPE_DEBUG_LOG
 // if in debug builds, print formatted string to debugger output
 #define DBG_DPRINT DPRINT
 // if in debug builds, check if HRESULT is successful; if not, print error information to debugger output

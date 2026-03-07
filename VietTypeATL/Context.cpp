@@ -117,7 +117,7 @@ HRESULT Context::StartCompositionNow(_In_ TfEditCookie ec) {
 
     ITfComposition* composition;
     hr = contextComposition->StartComposition(ec, insertRange, compositionSink, &composition);
-    HRESULT_CHECK_RETURN(hr, L"contextComposition->StartComposition failed") else {
+    if (SUCCEEDED(hr)) {
         _composition = composition;
 
         TF_SELECTION sel;
@@ -126,6 +126,8 @@ HRESULT Context::StartCompositionNow(_In_ TfEditCookie ec) {
         sel.style.fInterimChar = FALSE;
         hr = _context->SetSelection(ec, 1, &sel);
         DBG_HRESULT_CHECK(hr, L"context->SetSelection failed");
+    } else {
+        HRESULT_CHECK_RETURN(hr, L"contextComposition->StartComposition failed")
     }
 
     return S_OK;

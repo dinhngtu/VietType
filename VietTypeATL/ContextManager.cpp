@@ -56,7 +56,7 @@ HRESULT ContextManager::OnFocusContext(_In_opt_ ITfContext* context) {
 #ifdef _DEBUG
     TF_STATUS st;
     hr = context->GetStatus(&st);
-    DBG_HRESULT_CHECK(hr, L"context->GetStatus failed") else {
+    if (SUCCEEDED(hr)) {
         DBG_DPRINT(
             L"d=%c%c%c%c%c%c%c%c%c s=%c%c%c%c%c%c%c",
             (st.dwDynamicFlags & TS_SD_READONLY) ? L'R' : L'_',
@@ -75,6 +75,8 @@ HRESULT ContextManager::OnFocusContext(_In_opt_ ITfContext* context) {
             (st.dwStaticFlags & TS_SS_TKBAUTOCORRECTENABLE) ? L'A' : L'_',
             (st.dwStaticFlags & TS_SS_TKBPREDICTIONENABLE) ? L'P' : L'_',
             (st.dwStaticFlags & TS_SS_UWPCONTROL) ? L'U' : L'_');
+    } else {
+        DBG_HRESULT_CHECK(hr, L"context->GetStatus failed");
     }
 #endif
 
