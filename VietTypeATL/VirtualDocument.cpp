@@ -32,7 +32,7 @@ GetVirtualDocumentMgr(_In_ ITfDocumentMgr* dim, _Outptr_result_maybenull_ ITfDoc
     HRESULT_CHECK_RETURN_OUTPTR(hr, virtualDim, L"transitoryCompartment->GetValue failed");
     if (v.vt != VT_UNKNOWN || !v.punkVal) {
         *virtualDim = nullptr;
-        return E_NOINTERFACE;
+        return S_FALSE;
     }
 
     hr = v.punkVal->QueryInterface(virtualDim);
