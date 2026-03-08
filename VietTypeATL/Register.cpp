@@ -9,6 +9,7 @@
 
 static constexpr DWORD ILOT_UNINSTALL = 0x00000001;
 using InstallLayoutOrTip_t = BOOL(CALLBACK*)(_In_ LPCWSTR psz, DWORD dwFlags);
+using SetDefaultLayoutOrTip_t = BOOL(CALLBACK*)(_In_ LPCWSTR psz, _In_ DWORD dwFlags);
 
 static const std::array<const GUID*, 6> SupportedCategories = {
     &GUID_TFCAT_TIP_KEYBOARD,
@@ -230,6 +231,7 @@ static HRESULT InstallTip(bool install) {
     HRESULT hr;
     HMODULE inputDll = NULL;
     InstallLayoutOrTip_t ilot = NULL;
+    SetDefaultLayoutOrTip_t sdlot = NULL;
 
     auto tipString = GetTipString();
     if (tipString.empty()) {
@@ -237,7 +239,7 @@ static HRESULT InstallTip(bool install) {
         goto out;
     }
 
-    inputDll = LoadLibraryW(L"input.dll");
+    inputDll = LoadLibraryExW(L"input.dll", NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
     if (!inputDll) {
         hr = HRESULT_FROM_WIN32(GetLastError());
         goto out;
@@ -249,8 +251,28 @@ static HRESULT InstallTip(bool install) {
         goto out_module;
     }
 
-    hr = ilot(tipString.c_str(), install ? 0 : ILOT_UNINSTALL) ? S_OK : E_FAIL;
+    sdlot = reinterpret_cast<SetDefaultLayoutOrTip_t>(GetProcAddress(inputDll, "SetDefaultLayoutOrTip"));
+    if (!sdlot) {
+        hr = HRESULT_FROM_WIN32(GetLastError());
+        goto out_module;
+    }
 
+    if (!ilot(tipString.c_str(), install ? 0 : ILOT_UNINSTALL)) {
+        hr = E_FAIL;
+        goto out_module;
+    }
+
+    if (install && !sdlot(tipString.c_str(), 0)) {
+        hr = E_FAIL;
+        goto out_ilot;
+    }
+
+    return S_OK;
+
+out_ilot:
+    if (install) {
+        ilot(tipString.c_str(), ILOT_UNINSTALL);
+    }
 out_module:
     FreeLibrary(inputDll);
 out:
