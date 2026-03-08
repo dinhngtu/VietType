@@ -137,7 +137,7 @@ private:
         _In_ wchar_t push);
 
 private:
-    ContextManager* _parent;
+    ContextManager* _parent = nullptr;
     CComPtr<ITfContext> _context;
     TfGuidAtom _displayAtom = TF_INVALID_GUIDATOM;
     bool _blocked = false;
