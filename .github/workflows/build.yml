@@ -71,8 +71,8 @@ jobs:
     uses: dinhngtu/github-workflows/.github/workflows/attest.yml@45ccba67d9af835a21d0c4cb8aea444e4e6d7600
     permissions:
       id-token: write
-      contents: read
       attestations: write
+      artifact-metadata: write
     with:
       subject-name: ${{ needs.build.outputs.subject-name }}
       subject-digest: ${{ needs.build.outputs.subject-digest }}
