@@ -17,6 +17,12 @@
       <UniqueIdentifier>{223edd06-5f22-4d25-b32f-918b9ec2e875}</UniqueIdentifier>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
+    <Filter Include="Source Files\Context">
+      <UniqueIdentifier>{4b3909a5-8672-443b-99e1-13af51b062bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ContextManager">
+      <UniqueIdentifier>{e2d19d46-f0a8-4ba2-b575-b9bae9dc9b20}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -32,15 +38,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Globals.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="KeyEventSink.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ContextManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="KeyHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Register.cpp">
@@ -64,12 +61,6 @@
     <ClCompile Include="Compartment.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="EditBlocked.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="EditSurroundingWord.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SettingsStore.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -79,11 +70,26 @@
     <ClCompile Include="KeyTranslator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="EditSessions.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Context.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Context</Filter>
+    </ClCompile>
+    <ClCompile Include="ContextManager.cpp">
+      <Filter>Source Files\ContextManager</Filter>
+    </ClCompile>
+    <ClCompile Include="EditBlocked.cpp">
+      <Filter>Source Files\Context</Filter>
+    </ClCompile>
+    <ClCompile Include="EditSessions.cpp">
+      <Filter>Source Files\Context</Filter>
+    </ClCompile>
+    <ClCompile Include="EditSurroundingWord.cpp">
+      <Filter>Source Files\Context</Filter>
+    </ClCompile>
+    <ClCompile Include="KeyEventSink.cpp">
+      <Filter>Source Files\ContextManager</Filter>
+    </ClCompile>
+    <ClCompile Include="KeyHandler.cpp">
+      <Filter>Source Files\Context</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
