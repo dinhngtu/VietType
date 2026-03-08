@@ -56,7 +56,7 @@ _Check_return_ HRESULT StatusController::InitLanguageBar() {
         &_indicatorButton,
         this,
         _langBarItemMgr,
-        Globals::GUID_LBI_INPUTMODE,
+        Globals::GUID_VIETTYPE_LBI_INPUTMODE,
         TF_LBI_STYLE_BTN_BUTTON | TF_LBI_STYLE_SHOWNINTRAY,
         0,
         Globals::TextServiceDescription);

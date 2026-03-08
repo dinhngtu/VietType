@@ -43,5 +43,6 @@
 #include <strsafe.h>
 #include <msctf.h>
 #include <InputScope.h>
+#include <ctffunc.h>
 #include <ShlObj_core.h>
 #include <shellapi.h>

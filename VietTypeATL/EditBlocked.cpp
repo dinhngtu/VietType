@@ -52,7 +52,7 @@ HRESULT Context::EditBlocked(_In_ TfEditCookie ec, _In_ Context* context) {
     // check input scopes
 
     CComPtr<ITfReadOnlyProperty> prop;
-    hr = context->GetContext()->GetAppProperty(Globals::GUID_PROP_INPUTSCOPE, &prop);
+    hr = context->GetContext()->GetAppProperty(Globals::GUID_VIETTYPE_PROP_INPUTSCOPE, &prop);
     EB_HRESULT_CHECK_COMMIT(hr, context, L"context->GetAppProperty failed");
 
     if (!prop) {
