@@ -263,16 +263,11 @@ static HRESULT InstallTip(bool install) {
     }
 
     if (install && !sdlot(tipString.c_str(), 0)) {
-        hr = E_FAIL;
-        goto out_ilot;
+        DPRINT(L"SetDefaultLayoutOrTip failed");
     }
 
     return S_OK;
 
-out_ilot:
-    if (install) {
-        ilot(tipString.c_str(), ILOT_UNINSTALL);
-    }
 out_module:
     FreeLibrary(inputDll);
 out:
