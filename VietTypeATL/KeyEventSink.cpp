@@ -163,7 +163,7 @@ STDMETHODIMP ContextManager::OnTestKeyDown(
 
     // break off the composition early at OnTestKeyDown on an uneaten key
     if (!*pfEaten && context->GetComposition()) {
-        hr = CallKeyEdit(context, wParam, lParam, _keyState);
+        hr = CallKeyEdit(context, wParam, lParam, _keyState, false);
         HRESULT_CHECK_RETURN(hr, L"CallKeyEdit failed");
     }
 
@@ -226,7 +226,7 @@ STDMETHODIMP ContextManager::OnKeyDown(
             hr = CallKeyEditRetype(context, wParam, lParam, _keyState, c);
             break;
         default:
-            hr = CallKeyEdit(context, wParam, lParam, _keyState);
+            hr = CallKeyEdit(context, wParam, lParam, _keyState, *pfEaten);
             break;
         }
         HRESULT_CHECK_RETURN(hr, L"CallKeyEdit failed");
@@ -264,9 +264,17 @@ STDMETHODIMP ContextManager::OnPreservedKey(_In_ ITfContext* pic, _In_ REFGUID r
 }
 
 HRESULT ContextManager::CallKeyEdit(
-    _In_ Context* context, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_reads_(256) const BYTE* keyState) {
+    _In_ Context* context,
+    _In_ WPARAM wParam,
+    _In_ LPARAM lParam,
+    _In_reads_(256) const BYTE* keyState,
+    _In_ bool eaten) {
     HRESULT hr, hrSession;
-    hr = context->RequestEditKey(&hrSession, wParam, lParam, keyState);
+    hr = context->RequestEditKey(&hrSession, wParam, lParam, keyState, !eaten);
+    if (!eaten && hr == TF_E_SYNCHRONOUS) {
+        DBG_DPRINT(L"fallback to asynchronous composition breaking");
+        hr = context->RequestEditKey(&hrSession, wParam, lParam, keyState, false);
+    }
     HRESULT_CHECK_RETURN(hr, L"_contextManager->RequestEditSession failed");
     HRESULT_CHECK_RETURN(hrSession, L"KeyHandlerEditSession failed");
 

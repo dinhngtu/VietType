@@ -61,9 +61,17 @@ public:
     // edit session initiators
     HRESULT UpdateBlocked(_Out_ HRESULT* hrSession);
     HRESULT RequestEditKey(
-        _Out_ HRESULT* hrSession, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_reads_(256) const BYTE* keyState) {
-        return RequestEditSessionEx(
-            EditKey, TF_ES_ASYNCDONTCARE | TF_ES_READWRITE, hrSession, wParam, lParam, keyState);
+        _Out_ HRESULT* hrSession,
+        _In_ WPARAM wParam,
+        _In_ LPARAM lParam,
+        _In_reads_(256) const BYTE* keyState,
+        _In_ bool synchronous) {
+        DWORD flags = TF_ES_READWRITE;
+        if (synchronous)
+            flags |= TF_ES_SYNC;
+        else
+            flags |= TF_ES_ASYNCDONTCARE;
+        return RequestEditSessionEx(EditKey, flags, hrSession, wParam, lParam, keyState);
     }
     HRESULT RequestEditLastWord(_In_ int ignore, _In_ wchar_t push);
 

@@ -124,7 +124,11 @@ private:
         _In_reads_(256) const BYTE* keyState,
         _In_ wchar_t push);
     HRESULT CallKeyEdit(
-        _In_ Context* context, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_reads_(256) const BYTE* keyState);
+        _In_ Context* context,
+        _In_ WPARAM wParam,
+        _In_ LPARAM lParam,
+        _In_reads_(256) const BYTE* keyState,
+        _In_ bool eaten);
 
 private:
     // from parent
