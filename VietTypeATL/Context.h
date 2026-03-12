@@ -60,7 +60,7 @@ public:
 
     // edit session initiators
     HRESULT RequestEditBlocked(_Out_ HRESULT* hrSession) {
-        return RequestEditSessionEx(EditBlockedAndUpdate, TF_ES_ASYNCDONTCARE | TF_ES_READWRITE, hrSession);
+        return RequestEditSessionEx(EditBlockedAndUpdate, TF_ES_ASYNCDONTCARE | TF_ES_READ, hrSession);
     }
     HRESULT RequestEditKey(
         _Out_ HRESULT* hrSession, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_reads_(256) const BYTE* keyState) {
