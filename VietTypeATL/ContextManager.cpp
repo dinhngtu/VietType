@@ -81,7 +81,7 @@ HRESULT ContextManager::OnFocusContext(_In_opt_ ITfContext* context) {
 #endif
 
     _focus->GetEngine()->SetConfig(_config);
-    hr = _focus->RequestEditBlocked(&hrSession);
+    hr = _focus->UpdateBlocked(&hrSession);
     if (FAILED(hr) || FAILED(hrSession)) {
         DBG_HRESULT_CHECK(hr, L"ContextManager::RequestEditSession failed");
     }

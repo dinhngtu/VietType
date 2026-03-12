@@ -59,9 +59,7 @@ public:
     }
 
     // edit session initiators
-    HRESULT RequestEditBlocked(_Out_ HRESULT* hrSession) {
-        return RequestEditSessionEx(EditBlockedAndUpdate, TF_ES_ASYNCDONTCARE | TF_ES_READ, hrSession);
-    }
+    HRESULT UpdateBlocked(_Out_ HRESULT* hrSession);
     HRESULT RequestEditKey(
         _Out_ HRESULT* hrSession, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_reads_(256) const BYTE* keyState) {
         return RequestEditSessionEx(
@@ -104,6 +102,8 @@ private:
     HRESULT EditNextState(_In_ TfEditCookie ec, _In_ Telex::TelexStates state);
     HRESULT EditCommit(_In_ TfEditCookie ec);
 
+    HRESULT DoUpdateBlocked(_Out_ HRESULT* hrSession);
+
     // edit sessions
     static HRESULT _StartComposition(TfEditCookie ec, Context* context) {
         return context->StartCompositionNow(ec);
@@ -112,7 +112,6 @@ private:
         return context->EndCompositionNow(ec);
     }
     static HRESULT EditBlocked(_In_ TfEditCookie ec, _In_ Context* context);
-    static HRESULT EditBlockedAndUpdate(_In_ TfEditCookie ec, _In_ Context* context);
     static HRESULT EditKey(
         _In_ TfEditCookie ec,
         _In_ Context* context,

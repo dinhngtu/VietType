@@ -16,38 +16,46 @@ namespace VietType {
         }                                                                                                              \
     } while (0);
 
-HRESULT Context::EditBlocked(_In_ TfEditCookie ec, _In_ Context* context) {
+HRESULT Context::DoUpdateBlocked(_Out_ HRESULT* hrSession) {
     HRESULT hr;
 
-    DBG_DPRINT(L"EditBlocked ec = %ld context = %p", ec, context->GetContext());
+    *hrSession = S_OK;
 
     // check GUID_COMPARTMENT_KEYBOARD_DISABLED
 
     Compartment<long> compDisabled;
-    hr = compDisabled.Initialize(context->GetContext(), context->GetClientId(), GUID_COMPARTMENT_KEYBOARD_DISABLED);
-    EB_HRESULT_CHECK_COMMIT(hr, context, L"compDisabled.Initialize failed");
+    hr = compDisabled.Initialize(GetContext(), GetClientId(), GUID_COMPARTMENT_KEYBOARD_DISABLED);
+    EB_HRESULT_CHECK_COMMIT(hr, this, L"compDisabled.Initialize failed");
 
     long contextDisabled;
     hr = compDisabled.GetValue(&contextDisabled);
-    EB_HRESULT_CHECK_COMMIT(hr, context, L"compDisabled.GetValue failed");
+    EB_HRESULT_CHECK_COMMIT(hr, this, L"compDisabled.GetValue failed");
 
     if (hr == S_OK && contextDisabled) {
         DBG_DPRINT(L"scopeBlocked: context disabled");
-        context->_blocked = true;
+        _blocked = true;
         return S_OK;
     }
 
     // check transitory context
 
     TF_STATUS st;
-    hr = context->GetContext()->GetStatus(&st);
-    EB_HRESULT_CHECK_COMMIT(hr, context, L"context->GetStatus failed");
+    hr = GetContext()->GetStatus(&st);
+    EB_HRESULT_CHECK_COMMIT(hr, this, L"context->GetStatus failed");
     if (st.dwStaticFlags & TF_SS_TRANSITORY) {
         // transitory context doesn't seem to support input scopes, free right away
         DBG_DPRINT(L"free: transitory context");
-        context->_blocked = false;
+        _blocked = false;
         return S_OK;
     }
+
+    return RequestEditSessionEx(EditBlocked, TF_ES_SYNC | TF_ES_READ, hrSession);
+}
+
+HRESULT Context::EditBlocked(_In_ TfEditCookie ec, _In_ Context* context) {
+    HRESULT hr;
+
+    DBG_DPRINT(L"EditBlocked ec = %ld context = %p", ec, context->GetContext());
 
     // check input scopes
 
@@ -119,11 +127,11 @@ commit:
     return hr;
 }
 
-HRESULT Context::EditBlockedAndUpdate(_In_ TfEditCookie ec, _In_ Context* context) {
+HRESULT Context::UpdateBlocked(_Out_ HRESULT* hrSession) {
     HRESULT hr;
 
-    hr = EditBlocked(ec, context);
-    context->UpdateStatus();
+    hr = DoUpdateBlocked(hrSession);
+    UpdateStatus();
     return hr;
 }
 
