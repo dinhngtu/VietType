@@ -55,6 +55,23 @@ HRESULT Context::EditCommit(_In_ TfEditCookie ec, _In_ wchar_t appendChar) {
             auto str = GetEngine()->Retrieve();
             hr = SetCompositionText(ec, &str[0], static_cast<LONG>(str.length()));
             DBG_HRESULT_CHECK(hr, L"_contextManager->EnsureCompositionText failed");
+
+            // push the committed text out of the composition range
+            CComPtr<ITfRange> compRange;
+            if (SUCCEEDED(_composition->GetRange(&compRange))) {
+                CComPtr<ITfRange> newStart;
+                if (SUCCEEDED(compRange->Clone(&newStart)) && SUCCEEDED(newStart->Collapse(ec, TF_ANCHOR_END))) {
+                    hr = _composition->ShiftStart(ec, newStart);
+                    DBG_HRESULT_CHECK(hr, L"_composition->ShiftStart failed");
+
+                    TF_SELECTION sel;
+                    sel.range = newStart;
+                    sel.style.ase = TF_AE_NONE;
+                    sel.style.fInterimChar = FALSE;
+                    hr = _context->SetSelection(ec, 1, &sel);
+                    DBG_HRESULT_CHECK(hr, L"_context->SetSelection failed");
+                }
+            }
         } else {
             assert(txstate == Telex::TelexStates::Committed || txstate == Telex::TelexStates::CommittedInvalid);
             hr = E_FAIL;
