@@ -180,6 +180,7 @@ HRESULT ContextManager::UpdateStatus(bool foreground) {
 
         _settings->IsDefaultEnabled(&_defaultEnabled);
         _settings->IsBackconvert(&_backconvert);
+        _settings->IsEatCommitKey(&_eatCommitKey);
 
         hr = _settings->LoadTelexSettings(_config);
         if (_focus) {

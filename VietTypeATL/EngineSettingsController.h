@@ -34,6 +34,7 @@ public:
 
     void IsDefaultEnabled(_Out_ DWORD* pde);
     void IsBackconvert(_Out_ DWORD* pde);
+    void IsEatCommitKey(_Out_ DWORD* pde);
     void GetPreservedKeyToggle(_Out_ TF_PRESERVEDKEY* pde);
     void IsShowingComposingAttr(_Out_ DWORD* pde);
 

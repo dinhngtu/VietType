@@ -46,7 +46,7 @@ HRESULT Context::EditNextState(_In_ TfEditCookie ec, _In_ Telex::TelexStates sta
     return S_OK;
 }
 
-HRESULT Context::EditCommit(_In_ TfEditCookie ec) {
+HRESULT Context::EditCommit(_In_ TfEditCookie ec, _In_ wchar_t appendChar) {
     HRESULT hr = S_OK;
 
     if (GetComposition()) {
@@ -63,6 +63,17 @@ HRESULT Context::EditCommit(_In_ TfEditCookie ec) {
 
     GetEngine()->Reset();
     EndCompositionNow(ec);
+
+    if (appendChar != L'\0') {
+        DBG_DPRINT(L"InsertTextAtSelection char=%lc", appendChar);
+
+        CComPtr<ITfInsertAtSelection> insertAtSel;
+        if (SUCCEEDED(_context->QueryInterface(&insertAtSel))) {
+            CComPtr<ITfRange> insertedRange;
+            hr = insertAtSel->InsertTextAtSelection(ec, 0, &appendChar, 1, &insertedRange);
+            DBG_HRESULT_CHECK(hr, L"InsertTextAtSelection failed");
+        }
+    }
 
     return S_OK;
 }

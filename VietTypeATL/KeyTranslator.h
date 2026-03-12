@@ -8,6 +8,9 @@
 
 namespace VietType {
 
+_Success_(return) bool IsTranslatableKey(
+    _In_ WPARAM wParam, _In_ LPARAM lParam, _In_reads_(256) const BYTE* keyState, _Out_opt_ wchar_t* chr);
+
 bool IsEditKey(_In_ WPARAM wParam, _In_ LPARAM lParam, _In_reads_(256) const BYTE* keyState);
 
 bool IsModifier(_In_reads_(256) const BYTE* keyState);

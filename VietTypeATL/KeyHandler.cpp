@@ -12,7 +12,8 @@ HRESULT Context::EditKey(
     _In_ Context* context,
     _In_ WPARAM wParam,
     _In_ LPARAM lParam,
-    _In_reads_(256) const BYTE* keyState) {
+    _In_reads_(256) const BYTE* keyState,
+    _In_ wchar_t appendChar) {
     DBG_DPRINT(L"KeyHandler ec = %ld", ec);
 
     HRESULT hr;
@@ -46,7 +47,7 @@ HRESULT Context::EditKey(
         // drop shift
     } else {
         // uneaten, commits
-        context->EditCommit(ec);
+        context->EditCommit(ec, appendChar);
     }
 
     return S_OK;

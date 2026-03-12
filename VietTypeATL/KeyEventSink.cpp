@@ -163,7 +163,22 @@ STDMETHODIMP ContextManager::OnTestKeyDown(
 
     // break off the composition early at OnTestKeyDown on an uneaten key
     if (!*pfEaten && context->GetComposition()) {
-        hr = CallKeyEdit(context, wParam, lParam, _keyState, false);
+        bool eatKey = false;
+        if (_eatCommitKey && context->IsTransitoryContext()) {
+            if (wParam == VK_RETURN) {
+                *pfEaten = TRUE;
+                _eatCommitKeyChar = L'\0';
+                eatKey = true;
+            } else {
+                wchar_t appendChar;
+                if (IsTranslatableKey(wParam, lParam, _keyState, &appendChar) && appendChar >= L' ') {
+                    *pfEaten = TRUE;
+                    _eatCommitKeyChar = appendChar;
+                    eatKey = true;
+                }
+            }
+        }
+        hr = CallKeyEdit(context, wParam, lParam, _keyState, eatKey);
         HRESULT_CHECK_RETURN(hr, L"CallKeyEdit failed");
     }
 
@@ -269,11 +284,14 @@ HRESULT ContextManager::CallKeyEdit(
     _In_ LPARAM lParam,
     _In_reads_(256) const BYTE* keyState,
     _In_ bool eaten) {
+    wchar_t appendChar = _eatCommitKeyChar;
+    _eatCommitKeyChar = L'\0'; // consume
+
     HRESULT hr, hrSession;
-    hr = context->RequestEditKey(&hrSession, wParam, lParam, keyState, !eaten);
+    hr = context->RequestEditKey(&hrSession, wParam, lParam, keyState, !eaten, appendChar);
     if (!eaten && hr == TF_E_SYNCHRONOUS) {
         DBG_DPRINT(L"fallback to asynchronous composition breaking");
-        hr = context->RequestEditKey(&hrSession, wParam, lParam, keyState, false);
+        hr = context->RequestEditKey(&hrSession, wParam, lParam, keyState, false, appendChar);
     }
     HRESULT_CHECK_RETURN(hr, L"_contextManager->RequestEditSession failed");
     HRESULT_CHECK_RETURN(hrSession, L"KeyHandlerEditSession failed");

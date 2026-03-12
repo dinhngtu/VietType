@@ -50,6 +50,10 @@ public:
     constexpr bool IsBlocked() const {
         return _blocked;
     }
+    bool IsTransitoryContext() const {
+        TF_STATUS st;
+        return SUCCEEDED(_context->GetStatus(&st)) && (st.dwStaticFlags & TF_SS_TRANSITORY);
+    }
     void UpdateStatus();
 
     HRESULT StartComposition();
@@ -65,13 +69,14 @@ public:
         _In_ WPARAM wParam,
         _In_ LPARAM lParam,
         _In_reads_(256) const BYTE* keyState,
-        _In_ bool synchronous) {
+        _In_ bool synchronous,
+        _In_ wchar_t appendChar = L'\0') {
         DWORD flags = TF_ES_READWRITE;
         if (synchronous)
             flags |= TF_ES_SYNC;
         else
             flags |= TF_ES_ASYNCDONTCARE;
-        return RequestEditSessionEx(EditKey, flags, hrSession, wParam, lParam, keyState);
+        return RequestEditSessionEx(EditKey, flags, hrSession, wParam, lParam, keyState, appendChar);
     }
     HRESULT RequestEditLastWord(_In_ int ignore, _In_ wchar_t push);
 
@@ -108,7 +113,7 @@ private:
     HRESULT ClearRangeDisplayAttribute(_In_ TfEditCookie ec, _In_ ITfRange* range);
 
     HRESULT EditNextState(_In_ TfEditCookie ec, _In_ Telex::TelexStates state);
-    HRESULT EditCommit(_In_ TfEditCookie ec);
+    HRESULT EditCommit(_In_ TfEditCookie ec, _In_ wchar_t appendChar = L'\0');
 
     HRESULT DoUpdateBlocked(_Out_ HRESULT* hrSession);
 
@@ -125,7 +130,8 @@ private:
         _In_ Context* context,
         _In_ WPARAM wParam,
         _In_ LPARAM lParam,
-        _In_reads_(256) const BYTE* keyState);
+        _In_reads_(256) const BYTE* keyState,
+        _In_ wchar_t appendChar);
 
     static HRESULT SelectLastWord(
         _In_ TfEditCookie ec,

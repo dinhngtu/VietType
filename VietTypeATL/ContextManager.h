@@ -147,6 +147,7 @@ private:
     // cached settings
     DWORD _defaultEnabled = 0;
     DWORD _backconvert = 0;
+    DWORD _eatCommitKey = 1;
 
     CComPtr<CompartmentNotifier> _systemNotify;
 
@@ -160,6 +161,8 @@ private:
 
     // shared key state buffer; for temporary use only
     BYTE _keyState[256] = {0};
+
+    wchar_t _eatCommitKeyChar = L'\0';
 };
 
 } // namespace VietType
