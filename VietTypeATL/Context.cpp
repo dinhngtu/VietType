@@ -9,14 +9,59 @@
 namespace VietType {
 
 STDMETHODIMP Context::OnCompositionTerminated(_In_ TfEditCookie ecWrite, __RPC__in_opt ITfComposition* pComposition) {
-    HRESULT hr;
-
     DBG_DPRINT(L"ecWrite = %ld", ecWrite);
 
     if (_composition == pComposition) {
         _engine->Reset();
-        hr = EndCompositionNow(ecWrite);
-        DBG_HRESULT_CHECK(hr, L"EndCompositionNow failed");
+
+        CComPtr<ITfRange> range;
+        if (SUCCEEDED(_composition->GetRange(&range)) && _displayAtom != TF_INVALID_GUIDATOM) {
+            ClearRangeDisplayAttribute(ecWrite, range);
+        }
+
+        // composition already dead
+        _composition.Release();
+    }
+
+    return S_OK;
+}
+
+STDMETHODIMP Context::OnEndEdit(
+    __RPC__in_opt ITfContext* pic, TfEditCookie ecReadOnly, __RPC__in_opt ITfEditRecord* pEditRecord) {
+    HRESULT hr;
+
+    if (!_composition || !pEditRecord) {
+        return S_OK;
+    }
+
+    BOOL selChanged = FALSE;
+    pEditRecord->GetSelectionStatus(&selChanged);
+    if (!selChanged) {
+        return S_OK;
+    }
+
+    TF_SELECTION sel;
+    ULONG fetched = 0;
+    hr = _context->GetSelection(ecReadOnly, TF_DEFAULT_SELECTION, 1, &sel, &fetched);
+    if (FAILED(hr) || fetched == 0) {
+        return S_OK;
+    }
+    CComPtr<ITfRange> selRange = sel.range;
+
+    CComPtr<ITfRange> compRange;
+    hr = _composition->GetRange(&compRange);
+    if (FAILED(hr)) {
+        return S_OK;
+    }
+
+    // at or after the composition end?
+    LONG cmp = 0;
+    hr = selRange->CompareStart(ecReadOnly, compRange, TF_ANCHOR_END, &cmp);
+    if (SUCCEEDED(hr) && cmp >= 0) {
+        // might have closed the composition somehow (like clicking away in file rename box)?
+        DBG_DPRINT(L"OnEndEdit: selection outside composition, committing");
+        HRESULT hrSession;
+        RequestEditKey(&hrSession, 0, 0, nullptr, false);
     }
 
     return S_OK;
@@ -37,6 +82,9 @@ HRESULT Context::Initialize(
 
     _engine.reset(Telex::TelexNew(config));
 
+    HRESULT hr = _textEditSinkAdvisor.Advise(_context, this);
+    DBG_HRESULT_CHECK(hr, L"_textEditSinkAdvisor.Advise failed");
+
     return S_OK;
 }
 
@@ -45,6 +93,7 @@ HRESULT Context::Uninitialize() {
     _engine.release();
     _blocked = true;
     _displayAtom = TF_INVALID_GUIDATOM;
+    _textEditSinkAdvisor.Unadvise();
     _context.Release();
     _parent = nullptr;
 

@@ -6,12 +6,13 @@
 #include "Common.h"
 #include "Telex.h"
 #include "EditSession.h"
+#include "SinkAdvisor.h"
 
 namespace VietType {
 
 class ContextManager;
 
-class Context : public CComObjectRootEx<CComSingleThreadModel>, public ITfCompositionSink {
+class Context : public CComObjectRootEx<CComSingleThreadModel>, public ITfCompositionSink, public ITfTextEditSink {
 public:
     Context() = default;
     Context(const Context&) = delete;
@@ -22,12 +23,17 @@ public:
     DECLARE_NOT_AGGREGATABLE(Context)
     BEGIN_COM_MAP(Context)
     COM_INTERFACE_ENTRY(ITfCompositionSink)
+    COM_INTERFACE_ENTRY(ITfTextEditSink)
     END_COM_MAP()
     DECLARE_PROTECT_FINAL_CONSTRUCT()
 
     // Inherited via ITfCompositionSink
     virtual STDMETHODIMP OnCompositionTerminated(
         _In_ TfEditCookie ecWrite, __RPC__in_opt ITfComposition* pComposition) override;
+
+    // Inherited via ITfTextEditSink
+    virtual STDMETHODIMP OnEndEdit(
+        __RPC__in_opt ITfContext* pic, TfEditCookie ecReadOnly, __RPC__in_opt ITfEditRecord* pEditRecord) override;
 
     HRESULT Initialize(
         _In_ ContextManager* parent,
@@ -156,6 +162,7 @@ private:
     bool _blocked = false;
 
     std::unique_ptr<Telex::ITelexEngine> _engine;
+    SinkAdvisor<ITfTextEditSink> _textEditSinkAdvisor;
     CComPtr<ITfComposition> _composition;
 };
 
