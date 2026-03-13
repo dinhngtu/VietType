@@ -116,6 +116,8 @@ private:
     HRESULT EmptyCompositionText(_In_ TfEditCookie ec);
     HRESULT MoveCaretToEnd(_In_ TfEditCookie ec);
     HRESULT EnsureCompositionText(_In_ TfEditCookie ec, _In_z_ LPCWSTR str, _In_ LONG length);
+    // return S_FALSE if nothing to commit
+    HRESULT CommitCompositionText(_In_ TfEditCookie ec);
 
     HRESULT SetRangeDisplayAttribute(_In_ TfEditCookie ec, _In_ ITfRange* range);
     HRESULT ClearRangeDisplayAttribute(_In_ TfEditCookie ec, _In_ ITfRange* range);
