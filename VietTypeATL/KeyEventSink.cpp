@@ -89,6 +89,7 @@ HRESULT ContextManager::OnKeyDownCommon(
         WINERROR_GLE_RETURN_HRESULT(L"GetKeyboardState failed");
     }
 
+    // TODO: check if we can do a special backconvert for the sake of CUAS
     *isBackconvert = _backconvert;
     switch (*isBackconvert) {
     case BackconvertOnBackspace:
@@ -164,7 +165,7 @@ STDMETHODIMP ContextManager::OnTestKeyDown(
     // break off the composition early at OnTestKeyDown on an uneaten key
     if (!*pfEaten && context->GetComposition()) {
         bool eatKey = false;
-        if (_eatCommitKey && context->IsTransitoryContext()) {
+        if (_eatCommitKey && context->IsTransitory()) {
             if (wParam == VK_RETURN) {
                 *pfEaten = TRUE;
                 _eatCommitKeyChar = L'\0';

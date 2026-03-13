@@ -6,6 +6,8 @@
 #include "Common.h"
 
 namespace VietType {
+class Context;
+
 namespace VirtualDocument {
 
 _Check_return_ HRESULT GetVirtualDocumentContext(
@@ -18,7 +20,7 @@ enum class FullContextType {
 };
 
 _Check_return_ HRESULT GetFullContext(
-    _In_ ITfContext* context,
+    _In_ Context* context,
     _In_ TfClientId clientId,
     _COM_Outptr_ ITfContext** fullContext,
     _Out_ FullContextType* contextType);

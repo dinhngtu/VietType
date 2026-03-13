@@ -56,9 +56,11 @@ public:
     constexpr bool IsBlocked() const {
         return _blocked;
     }
-    bool IsTransitoryContext() const {
-        TF_STATUS st;
-        return SUCCEEDED(_context->GetStatus(&st)) && (st.dwStaticFlags & TF_SS_TRANSITORY);
+    bool IsTransitory() const {
+        return _isTransitory;
+    }
+    bool IsCuas() const {
+        return _isCuas;
     }
     void UpdateStatus();
 
@@ -158,6 +160,8 @@ private:
 private:
     ContextManager* _parent = nullptr;
     CComPtr<ITfContext> _context;
+    bool _isTransitory = false;
+    bool _isCuas = false;
     TfGuidAtom _displayAtom = TF_INVALID_GUIDATOM;
     bool _blocked = false;
 

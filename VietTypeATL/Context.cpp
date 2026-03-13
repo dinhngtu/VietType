@@ -5,6 +5,7 @@
 #include "Context.h"
 #include "Telex.h"
 #include "ContextManager.h"
+#include "Compartment.h"
 
 namespace VietType {
 
@@ -30,7 +31,7 @@ STDMETHODIMP Context::OnEndEdit(
     __RPC__in_opt ITfContext* pic, TfEditCookie ecReadOnly, __RPC__in_opt ITfEditRecord* pEditRecord) {
     HRESULT hr;
 
-    if (!_composition || !pEditRecord) {
+    if (!IsCuas() || !_composition || !pEditRecord) {
         return S_OK;
     }
 
@@ -72,6 +73,8 @@ HRESULT Context::Initialize(
     _In_ ITfContext* context,
     _In_ const Telex::TelexConfig& config,
     _In_ TfGuidAtom displayAttrAtom) {
+    HRESULT hr;
+
     if (!context) {
         return E_INVALIDARG;
     }
@@ -82,8 +85,44 @@ HRESULT Context::Initialize(
 
     _engine.reset(Telex::TelexNew(config));
 
-    HRESULT hr = _textEditSinkAdvisor.Advise(_context, this);
+    hr = _textEditSinkAdvisor.Advise(_context, this);
     DBG_HRESULT_CHECK(hr, L"_textEditSinkAdvisor.Advise failed");
+
+    do {
+        _isTransitory = false;
+
+        TF_STATUS st;
+        hr = _context->GetStatus(&st);
+        if (FAILED(hr)) {
+            break;
+        }
+
+        _isTransitory = SUCCEEDED(hr) && (st.dwStaticFlags & TF_SS_TRANSITORY);
+    } while (0);
+
+    do {
+        _isCuas = false;
+
+        CComPtr<ITfDocumentMgr> dim;
+        hr = _context->GetDocumentMgr(&dim);
+        if (FAILED(hr) || !dim) {
+            break;
+        }
+
+        Compartment<long> emulated;
+        hr = emulated.Initialize(dim, GetClientId(), Globals::GUID_Compartment_TsfEmulatedDocumentMgr);
+        if (FAILED(hr)) {
+            break;
+        }
+
+        long emulatedVal;
+        hr = emulated.GetValue(&emulatedVal);
+        if (FAILED(hr)) {
+            break;
+        }
+
+        _isCuas = !!(emulatedVal & 1);
+    } while (0);
 
     return S_OK;
 }
@@ -94,6 +133,8 @@ HRESULT Context::Uninitialize() {
     _blocked = true;
     _displayAtom = TF_INVALID_GUIDATOM;
     _textEditSinkAdvisor.Unadvise();
+    _isTransitory = false;
+    _isCuas = false;
     _context.Release();
     _parent = nullptr;
 

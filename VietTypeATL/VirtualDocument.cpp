@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "VirtualDocument.h"
+#include "Context.h"
 #include "Compartment.h"
 
 namespace VietType {
@@ -59,49 +60,42 @@ _Check_return_ HRESULT GetVirtualDocumentContext(
 }
 
 _Check_return_ HRESULT GetFullContext(
-    _In_ ITfContext* context,
+    _In_ Context* context,
     _In_ TfClientId clientId,
     _COM_Outptr_ ITfContext** fullContext,
     _Out_ FullContextType* contextType) {
     HRESULT hr;
 
     CComPtr<ITfDocumentMgr> dim;
-    hr = context->GetDocumentMgr(&dim);
+    hr = context->GetContext()->GetDocumentMgr(&dim);
     HRESULT_CHECK_RETURN_OUTPTR(hr, fullContext, L"context->GetDocumentMgr failed");
     if (!dim) {
         *fullContext = nullptr;
         return E_NOINTERFACE;
     }
 
-    TF_STATUS st;
-    hr = context->GetStatus(&st);
-    HRESULT_CHECK_RETURN_OUTPTR(hr, fullContext, L"context->GetStatus failed");
-    if (!(st.dwStaticFlags & TF_SS_TRANSITORY)) {
-        *fullContext = context;
+    if (!context->IsTransitory()) {
+        *fullContext = context->GetContext();
         (*fullContext)->AddRef();
         *contextType = FullContextType::Original;
         return S_OK;
     }
 
-    hr = VirtualDocument::GetVirtualDocumentContext(context, dim, fullContext);
+    hr = VirtualDocument::GetVirtualDocumentContext(context->GetContext(), dim, fullContext);
     HRESULT_CHECK_RETURN_OUTPTR(hr, fullContext, L"VirtualDocument::GetVirtualDocumentContext failed");
     if (hr == S_FALSE) {
-        // GUID_COMPARTMENT_TRANSITORYEXTENSION_PARENT not found, *fullContext should be nullptr
-        Compartment<long> emulated;
-        long emulatedVal;
-        hr = emulated.Initialize(dim, clientId, GUID_Compartment_TsfEmulatedDocumentMgr);
-        if (SUCCEEDED(hr) && SUCCEEDED(emulated.GetValue(&emulatedVal)) && (emulatedVal & 1)) {
-            // emulated (CUAS)
+        if (context->IsCuas()) {
             *fullContext = nullptr;
             return E_NOTIMPL;
         } else {
-            *fullContext = context;
+            *fullContext = context->GetContext();
             (*fullContext)->AddRef();
             *contextType = FullContextType::Chromium;
             return S_OK;
         }
     } else {
         // succeeded
+        TF_STATUS st;
         hr = (*fullContext)->GetStatus(&st);
         HRESULT_CHECK_RETURN_OUTPTR(hr, fullContext, L"fullContext->GetStatus failed");
         if (st.dwStaticFlags & TF_SS_TRANSITORY) {

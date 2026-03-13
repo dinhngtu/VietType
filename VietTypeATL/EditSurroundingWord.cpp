@@ -213,7 +213,7 @@ HRESULT Context::RequestEditLastWord(_In_ int ignore, _In_ wchar_t push) {
 
     CComPtr<ITfContext> fullContext;
     VirtualDocument::FullContextType contextType;
-    hr = VirtualDocument::GetFullContext(_context, GetClientId(), &fullContext, &contextType);
+    hr = VirtualDocument::GetFullContext(this, GetClientId(), &fullContext, &contextType);
     HRESULT_CHECK(hr, L"VirtualDocument::GetFullContext failed");
     if (FAILED(hr)) {
         // just open a new composition

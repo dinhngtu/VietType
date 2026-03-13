@@ -39,10 +39,7 @@ HRESULT Context::DoUpdateBlocked(_Out_ HRESULT* hrSession) {
 
     // check transitory context
 
-    TF_STATUS st;
-    hr = GetContext()->GetStatus(&st);
-    EB_HRESULT_CHECK_COMMIT(hr, this, L"context->GetStatus failed");
-    if (st.dwStaticFlags & TF_SS_TRANSITORY) {
+    if (IsTransitory()) {
         // transitory context doesn't seem to support input scopes, free right away
         DBG_DPRINT(L"free: transitory context");
         _blocked = false;

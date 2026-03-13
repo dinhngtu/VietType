@@ -25,6 +25,9 @@ DEFINE_GUID(GUID_Compartment_Backconvert, 0xc36cf93e, 0x2fe6, 0x4132, 0x92, 0xe5
 // {B2FBD2E7-922F-4996-BE77-21085B91A8F0}
 DEFINE_GUID(GUID_Compartment_SystemNotify, 0xb2fbd2e7, 0x922f, 0x4996, 0xbe, 0x77, 0x21, 0x8, 0x5b, 0x91, 0xa8, 0xf0);
 
+// {A94C5FD2-C471-4031-9546-709C17300CB9}
+DEFINE_GUID(GUID_Compartment_TsfEmulatedDocumentMgr, 0xa94c5fd2, 0xc471, 0x4031, 0x95, 0x46, 0x70, 0x9c, 0x17, 0x30, 0x0c, 0xb9);
+
 extern const DECLSPEC_SELECTANY wchar_t TextServiceDescription[] = L"VietType";
 extern const DECLSPEC_SELECTANY wchar_t ConfigKeyName[] = L"Software\\VietType";
 
