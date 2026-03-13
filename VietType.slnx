@@ -17,6 +17,9 @@
   </Folder>
   <Project Path="Telex/Telex.vcxproj" Id="4c4ce742-99a9-40e7-b03a-68a3cbe0ae77" />
   <Project Path="TestLib/TestLib.vcxproj" Id="39086f5e-94a0-4de8-9fb0-3df69721a97c" />
+  <Project Path="TfDebug/TfDebug.csproj" Id="7c1da769-d422-471f-9e5f-50549e91a5c9">
+    <Build Project="false" />
+  </Project>
   <Project Path="TfDumper/TfDumper.vcxproj" Id="62f82c74-9fdc-4673-b392-06399e06ce45">
     <Build Project="false" />
   </Project>
