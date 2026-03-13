@@ -53,33 +53,6 @@ HRESULT ContextManager::OnFocusContext(_In_opt_ ITfContext* context) {
         return S_OK;
     }
 
-#ifdef _DEBUG
-    TF_STATUS st;
-    hr = context->GetStatus(&st);
-    if (SUCCEEDED(hr)) {
-        DBG_DPRINT(
-            L"d=%c%c%c%c%c%c%c%c%c s=%c%c%c%c%c%c%c",
-            (st.dwDynamicFlags & TS_SD_READONLY) ? L'R' : L'_',
-            (st.dwDynamicFlags & TS_SD_LOADING) ? L'L' : L'_',
-            (st.dwDynamicFlags & TS_SD_RESERVED) ? L'?' : L'_',
-            (st.dwDynamicFlags & TS_SD_TKBAUTOCORRECTENABLE) ? L'A' : L'_',
-            (st.dwDynamicFlags & TS_SD_TKBPREDICTIONENABLE) ? L'P' : L'_',
-            (st.dwDynamicFlags & TS_SD_UIINTEGRATIONENABLE) ? L'I' : L'_',
-            (st.dwDynamicFlags & TS_SD_INPUTPANEMANUALDISPLAYENABLE) ? L'M' : L'_',
-            (st.dwDynamicFlags & TS_SD_EMBEDDEDHANDWRITINGVIEW_ENABLED) ? L'H' : L'_',
-            (st.dwDynamicFlags & TS_SD_EMBEDDEDHANDWRITINGVIEW_VISIBLE) ? L'V' : L'_',
-            (st.dwStaticFlags & TS_SS_DISJOINTSEL) ? L'D' : L'_',
-            (st.dwStaticFlags & TS_SS_REGIONS) ? L'R' : L'_',
-            (st.dwStaticFlags & TS_SS_TRANSITORY) ? L'T' : L'_',
-            (st.dwStaticFlags & TS_SS_NOHIDDENTEXT) ? L'H' : L'_',
-            (st.dwStaticFlags & TS_SS_TKBAUTOCORRECTENABLE) ? L'A' : L'_',
-            (st.dwStaticFlags & TS_SS_TKBPREDICTIONENABLE) ? L'P' : L'_',
-            (st.dwStaticFlags & TS_SS_UWPCONTROL) ? L'U' : L'_');
-    } else {
-        DBG_HRESULT_CHECK(hr, L"context->GetStatus failed");
-    }
-#endif
-
     _focus->GetEngine()->SetConfig(_config);
     hr = _focus->UpdateBlocked(&hrSession);
     if (FAILED(hr) || FAILED(hrSession)) {
