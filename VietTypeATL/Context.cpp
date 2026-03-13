@@ -55,12 +55,17 @@ STDMETHODIMP Context::OnEndEdit(
         return S_OK;
     }
 
-    // at or after the composition end?
-    LONG cmp = 0;
-    hr = selRange->CompareStart(ecReadOnly, compRange, TF_ANCHOR_END, &cmp);
-    if (SUCCEEDED(hr) && cmp >= 0) {
+    LONG cmpStart = 0, cmpEnd = 0;
+    bool startOk = false, endOk = false;
+    if (SUCCEEDED(compRange->CompareStart(ecReadOnly, selRange, TF_ANCHOR_START, &cmpStart))) {
+        startOk = cmpStart <= 0;
+    }
+    if (SUCCEEDED(compRange->CompareEnd(ecReadOnly, selRange, TF_ANCHOR_END, &cmpEnd))) {
+        endOk = cmpEnd >= 0;
+    }
+    if (!startOk || !endOk) {
         // might have closed the composition somehow (like clicking away in file rename box)?
-        DBG_DPRINT(L"OnEndEdit: selection outside composition, committing");
+        DBG_DPRINT(L"selection outside composition, committing (startOk=%d endOk=%d)", startOk, endOk);
         HRESULT hrSession;
         RequestEditKey(&hrSession, 0, 0, nullptr, false);
     }
