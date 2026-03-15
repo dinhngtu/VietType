@@ -4,9 +4,10 @@
 #pragma once
 
 #include "Common.h"
-#include "Telex.h"
-#include "EditSession.h"
 #include "SinkAdvisor.h"
+#include "EditSession.h"
+#include "KeyTranslator.h"
+#include "Telex.h"
 
 namespace VietType {
 
@@ -72,19 +73,13 @@ public:
 
     // edit session initiators
     HRESULT UpdateBlocked(_Out_ HRESULT* hrSession);
-    HRESULT RequestEditKey(
-        _Out_ HRESULT* hrSession,
-        _In_ WPARAM wParam,
-        _In_ LPARAM lParam,
-        _In_reads_(256) const BYTE* keyState,
-        _In_ bool synchronous,
-        _In_ wchar_t appendChar = L'\0') {
+    HRESULT RequestEditKey(_Out_ HRESULT* hrSession, _In_ bool sync, _In_ KeyResult keyResult, _In_ wchar_t push) {
         DWORD flags = TF_ES_READWRITE;
-        if (synchronous)
+        if (sync)
             flags |= TF_ES_SYNC;
         else
             flags |= TF_ES_ASYNCDONTCARE;
-        return RequestEditSessionEx(EditKey, flags, hrSession, wParam, lParam, keyState, appendChar);
+        return RequestEditSessionEx(EditKey, flags, hrSession, keyResult, push);
     }
     HRESULT RequestEditLastWord(_In_ int ignore, _In_ wchar_t push);
 
@@ -135,13 +130,7 @@ private:
         return context->EndCompositionNow(ec);
     }
     static HRESULT EditBlocked(_In_ TfEditCookie ec, _In_ Context* context);
-    static HRESULT EditKey(
-        _In_ TfEditCookie ec,
-        _In_ Context* context,
-        _In_ WPARAM wParam,
-        _In_ LPARAM lParam,
-        _In_reads_(256) const BYTE* keyState,
-        _In_ wchar_t appendChar);
+    static HRESULT EditKey(_In_ TfEditCookie ec, _In_ Context* context, _In_ KeyResult keyResult, _In_ wchar_t push);
 
     static HRESULT SelectLastWord(
         _In_ TfEditCookie ec,

@@ -67,10 +67,6 @@ void EngineSettingsController::IsBackconvert(_Out_ DWORD* pde) {
     SettingsStore::GetValueOrDefault<DWORD>(_settingsKey, L"backconvert_on_backspace", pde, 0);
 }
 
-void EngineSettingsController::IsEatCommitKey(_Out_ DWORD* pde) {
-    SettingsStore::GetValueOrDefault<DWORD>(_settingsKey, L"eat_commit_key", pde, 1);
-}
-
 void EngineSettingsController::GetPreservedKeyToggle(_Out_ TF_PRESERVEDKEY* pde) {
     DWORD val;
     if (_settingsKey.m_hKey != nullptr && _settingsKey.QueryDWORDValue(L"pk_toggle", val) == ERROR_SUCCESS) {

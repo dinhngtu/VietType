@@ -9,9 +9,9 @@
 // system debug log controls (warning: VietType logs can potentially includes keystroke data)
 
 // global log control
-#define VIETTYPE_LOG 0
+#define VIETTYPE_LOG 1
 // noisy log control
-#define VIETTYPE_DEBUG_LOG 0
+#define VIETTYPE_DEBUG_LOG 1
 
 #if !defined(VIETTYPE_LOG) && _DEBUG
 #define VIETTYPE_LOG 1

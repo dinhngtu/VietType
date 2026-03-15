@@ -6,6 +6,7 @@
 #include "Common.h"
 #include "SinkAdvisor.h"
 #include "SettingsStore.h"
+#include "KeyTranslator.h"
 #include "Telex.h"
 
 namespace VietType {
@@ -13,12 +14,6 @@ namespace VietType {
 class StatusController;
 class EngineSettingsController;
 class Context;
-
-enum BackconvertModes : DWORD {
-    BackconvertDisabled = 0,
-    BackconvertOnBackspace = 1,
-    BackconvertOnType = 2,
-};
 
 extern const GUID GUID_KeyEventSink_PreservedKey_Toggle;
 
@@ -98,37 +93,17 @@ private:
     long IsEnabled(_In_ Context* context) const;
     HRESULT UpdateStatus(bool foreground);
 
-    DWORD OnBackconvertBackspace(
-        _In_ Context* context, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten, _In_ DWORD prevBackconvert);
-    DWORD OnBackconvertRetype(
+    HRESULT OnKeyCommon(
         _In_ Context* context,
         _In_ WPARAM wParam,
         _In_ LPARAM lParam,
-        _Out_ BOOL* pfEaten,
-        _In_ DWORD prevBackconvert,
-        _Out_ wchar_t* acceptedChar);
-    HRESULT OnKeyDownCommon(
-        _In_ Context* context,
-        _In_ WPARAM wParam,
-        _In_ LPARAM lParam,
-        _Out_ BOOL* pfEaten,
-        _Out_ DWORD* isBackconvert,
+        _In_ bool update,
+        _Out_ KeyResult* keyResult,
         _Out_ wchar_t* acceptedChar);
 
-    HRESULT CallKeyEditBackspace(
-        _In_ Context* context, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_reads_(256) const BYTE* keyState);
-    HRESULT CallKeyEditRetype(
-        _In_ Context* context,
-        _In_ WPARAM wParam,
-        _In_ LPARAM lParam,
-        _In_reads_(256) const BYTE* keyState,
-        _In_ wchar_t push);
-    HRESULT CallKeyEdit(
-        _In_ Context* context,
-        _In_ WPARAM wParam,
-        _In_ LPARAM lParam,
-        _In_reads_(256) const BYTE* keyState,
-        _In_ bool eaten);
+    HRESULT CallKeyEditBackspace(_In_ Context* context);
+    HRESULT CallKeyEditRetype(_In_ Context* context, _In_ wchar_t push);
+    HRESULT CallKeyEdit(_In_ Context* context, _In_ KeyResult keyResult, _In_ wchar_t push);
 
 private:
     // from parent
@@ -146,8 +121,7 @@ private:
 
     // cached settings
     DWORD _defaultEnabled = 0;
-    DWORD _backconvert = 0;
-    DWORD _eatCommitKey = 1;
+    BackconvertModes _backconvert = BackconvertDisabled;
 
     CComPtr<CompartmentNotifier> _systemNotify;
 

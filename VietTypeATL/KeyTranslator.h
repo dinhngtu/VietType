@@ -8,28 +8,34 @@
 
 namespace VietType {
 
-_Success_(return) bool IsTranslatableKey(
-    _In_ WPARAM wParam, _In_ LPARAM lParam, _In_reads_(256) const BYTE* keyState, _Out_opt_ wchar_t* chr);
+enum BackconvertModes : DWORD {
+    BackconvertDisabled = 0,
+    BackconvertOnBackspace = 1,
+    BackconvertOnType = 2,
+};
 
-bool IsEditKey(_In_ WPARAM wParam, _In_ LPARAM lParam, _In_reads_(256) const BYTE* keyState);
+enum class KeyResult {
+    NotEaten,
+    NotEatenEndComposition,
+    BreakingCharacter,
+    Dropped,
+    BackconvertingCharacter,
+    BackconvertingBackspace,
+    ComposingCharacter,
+    ComposingBackspace,
+    ComposingEscape,
+};
 
-bool IsModifier(_In_reads_(256) const BYTE* keyState);
+PCWSTR GetKeyResult(KeyResult keyResult);
 
-_Success_(return) bool IsKeyAccepted(
+KeyResult ClassifyKey(
     _In_ Telex::ITelexEngine* engine,
+    _In_ bool isComposing,
+    _In_ BackconvertModes backconvert,
     _In_ WPARAM wParam,
     _In_ LPARAM lParam,
     _In_reads_(256) const BYTE* keyState,
-    _Out_ wchar_t* c);
-
-bool IsKeyEaten(
-    _In_ Telex::ITelexEngine* engine,
-    _In_ bool isComposing,
-    _In_ WPARAM wParam,
-    _In_ LPARAM lParam,
-    _In_reads_(256) const BYTE* keyState);
-
-Telex::TelexStates PushKey(
-    _In_ Telex::ITelexEngine* engine, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_reads_(256) const BYTE* keyState);
+    _In_ bool update,
+    _Out_ wchar_t* chr);
 
 } // namespace VietType

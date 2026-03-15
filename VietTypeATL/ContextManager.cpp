@@ -152,8 +152,7 @@ HRESULT ContextManager::UpdateStatus(bool foreground) {
         DBG_HRESULT_CHECK(hr, L"_openclose->SetValue failed");
 
         _settings->IsDefaultEnabled(&_defaultEnabled);
-        _settings->IsBackconvert(&_backconvert);
-        _settings->IsEatCommitKey(&_eatCommitKey);
+        _settings->IsBackconvert(reinterpret_cast<DWORD*>(&_backconvert));
 
         hr = _settings->LoadTelexSettings(_config);
         if (_focus) {
