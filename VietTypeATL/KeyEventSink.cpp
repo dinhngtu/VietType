@@ -61,6 +61,7 @@ HRESULT ContextManager::CallKeyEditBackspace(_In_ Context* context) {
     HRESULT hr;
 
     hr = context->RequestEditLastWord(1, L'\0');
+    HRESULT_CHECK(hr, L"context->RequestEditLastWord failed");
     if (FAILED(hr)) {
         DBG_DPRINT(L"backspace SendInput fallback");
 
@@ -140,10 +141,16 @@ STDMETHODIMP ContextManager::OnKeyDown(
     hr = OnKeyCommon(context, wParam, lParam, true, &keyResult, &c);
     HRESULT_CHECK_RETURN(hr, L"OnKeyCommon failed");
 
-    DBG_DPRINT(L"OnKeyDown wParam = %lx %s", wParam, GetKeyResult(keyResult));
-
     hr = context->RequestQueryCompositionSync(&hrSession);
     bool hasComposition = SUCCEEDED(hr) && hrSession == S_OK;
+
+    DBG_DPRINT(
+        L"OnKeyDown wParam %lx %s RQCS %x %x (%s)",
+        wParam,
+        GetKeyResult(keyResult),
+        hr,
+        hrSession,
+        hasComposition ? L"has comp" : L"no comp");
 
     hr = S_OK;
     switch (keyResult) {
@@ -171,9 +178,12 @@ STDMETHODIMP ContextManager::OnKeyDown(
         }
         break;
     case KeyResult::Backspace:
-        if (_backconvert == BackconvertOnBackspace || hasComposition) {
+        if (_backconvert == BackconvertOnBackspace && !hasComposition) {
             *pfEaten = TRUE;
             hr = CallKeyEditBackspace(context);
+        } else if (hasComposition) {
+            *pfEaten = TRUE;
+            hr = CallKeyEdit(context, false, keyResult, c);
         } else {
             *pfEaten = FALSE;
         }
@@ -188,7 +198,7 @@ STDMETHODIMP ContextManager::OnKeyDown(
         *pfEaten = FALSE;
         break;
     }
-    HRESULT_CHECK_RETURN(hr, L"edit session failed");
+    HRESULT_CHECK(hr, L"edit session failed");
 
     // swallow the error from the edit session
     return S_OK;
