@@ -10,9 +10,6 @@ class Context;
 
 namespace VirtualDocument {
 
-_Check_return_ HRESULT GetVirtualDocumentContext(
-    _In_ ITfContext* context, _In_ ITfDocumentMgr* dim, _Outptr_result_maybenull_ ITfContext** pContext);
-
 enum class FullContextType {
     Original,
     Transitory,

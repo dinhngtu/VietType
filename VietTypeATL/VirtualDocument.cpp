@@ -13,8 +13,10 @@ static const GUID GUID_Compartment_TsfEmulatedDocumentMgr = {
     0xa94c5fd2, 0xc471, 0x4031, {0x95, 0x46, 0x70, 0x9c, 0x17, 0x30, 0x0c, 0xb9}};
 
 static _Check_return_ HRESULT
-GetVirtualDocumentMgr(_In_ ITfDocumentMgr* dim, _Outptr_result_maybenull_ ITfDocumentMgr** virtualDim) {
+GetVirtualDocumentMgr(_In_ ITfDocumentMgr* dim, _COM_Outptr_result_maybenull_ ITfDocumentMgr** virtualDim) {
     HRESULT hr;
+
+    *virtualDim = nullptr;
 
     CComPtr<ITfCompartmentMgr> tcMgr;
     hr = dim->QueryInterface(&tcMgr);
@@ -41,16 +43,14 @@ GetVirtualDocumentMgr(_In_ ITfDocumentMgr* dim, _Outptr_result_maybenull_ ITfDoc
     return S_OK;
 }
 
-_Check_return_ HRESULT GetVirtualDocumentContext(
-    _In_ ITfContext* context, _In_ ITfDocumentMgr* dim, _Outptr_result_maybenull_ ITfContext** pContext) {
+static _Check_return_ HRESULT GetVirtualDocumentContext(
+    _In_ ITfContext* context, _In_ ITfDocumentMgr* dim, _COM_Outptr_result_maybenull_ ITfContext** pContext) {
     HRESULT hr;
+
+    *pContext = nullptr;
 
     CComPtr<ITfDocumentMgr> virtualDim;
     hr = GetVirtualDocumentMgr(dim, &virtualDim);
-    if (hr == S_FALSE) {
-        *pContext = nullptr;
-        return hr;
-    }
     HRESULT_CHECK_RETURN_OUTPTR(hr, pContext, L"GetVirtualDocumentMgr failed");
 
     hr = virtualDim->GetTop(pContext);
@@ -66,11 +66,12 @@ _Check_return_ HRESULT GetFullContext(
     _Out_ FullContextType* contextType) {
     HRESULT hr;
 
+    *fullContext = nullptr;
+
     CComPtr<ITfDocumentMgr> dim;
     hr = context->GetContext()->GetDocumentMgr(&dim);
     HRESULT_CHECK_RETURN_OUTPTR(hr, fullContext, L"context->GetDocumentMgr failed");
     if (!dim) {
-        *fullContext = nullptr;
         return E_NOINTERFACE;
     }
 
@@ -83,18 +84,7 @@ _Check_return_ HRESULT GetFullContext(
 
     hr = VirtualDocument::GetVirtualDocumentContext(context->GetContext(), dim, fullContext);
     HRESULT_CHECK_RETURN_OUTPTR(hr, fullContext, L"VirtualDocument::GetVirtualDocumentContext failed");
-    if (hr == S_FALSE) {
-        if (context->IsCuas()) {
-            *fullContext = nullptr;
-            return E_NOTIMPL;
-        } else {
-            *fullContext = context->GetContext();
-            (*fullContext)->AddRef();
-            *contextType = FullContextType::Chromium;
-            return S_OK;
-        }
-    } else {
-        // succeeded
+    if (*fullContext) {
         TF_STATUS st;
         hr = (*fullContext)->GetStatus(&st);
         HRESULT_CHECK_RETURN_OUTPTR(hr, fullContext, L"fullContext->GetStatus failed");
@@ -105,6 +95,15 @@ _Check_return_ HRESULT GetFullContext(
             return E_FAIL;
         } else {
             *contextType = FullContextType::Transitory;
+            return S_OK;
+        }
+    } else {
+        if (context->IsCuas()) {
+            return E_NOTIMPL;
+        } else {
+            *fullContext = context->GetContext();
+            (*fullContext)->AddRef();
+            *contextType = FullContextType::Chromium;
             return S_OK;
         }
     }
