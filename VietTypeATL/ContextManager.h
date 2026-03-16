@@ -90,12 +90,7 @@ private:
     HRESULT UpdateStatus(bool foreground);
 
     HRESULT OnKeyCommon(
-        _In_ Context* context,
-        _In_ WPARAM wParam,
-        _In_ LPARAM lParam,
-        _In_ bool update,
-        _Out_ KeyResult* keyResult,
-        _Out_ wchar_t* acceptedChar);
+        _In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_ bool update, _Out_ BOOL* pfEaten);
 
     HRESULT CallKeyEditBackspace(_In_ Context* context);
     HRESULT CallKeyEditRetype(_In_ Context* context, _In_ wchar_t push);

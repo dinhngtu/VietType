@@ -35,21 +35,101 @@ STDMETHODIMP ContextManager::OnSetFocus(_In_ BOOL fForeground) {
 }
 
 HRESULT ContextManager::OnKeyCommon(
-    _In_ Context* context,
-    _In_ WPARAM wParam,
-    _In_ LPARAM lParam,
-    _In_ bool update,
-    _Out_ KeyResult* keyResult,
-    _Out_ wchar_t* acceptedChar) {
-    *keyResult = KeyResult::NotEaten;
-    *acceptedChar = 0;
+    _In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_ bool update, _Out_ BOOL* pfEaten) {
+    HRESULT hr;
+
+    *pfEaten = FALSE;
+
+    auto it = _map.find(pic);
+    if (it == _map.end()) {
+        return S_OK;
+    }
+    auto context = it->second.p;
+
+    if (update && context->IsInjecting(wParam, lParam)) {
+        context->ClearInjecting();
+        return S_OK;
+    }
+
+    if (!IsEnabled(context)) {
+        return S_OK;
+    }
 
     if (!GetKeyboardState(_keyState)) {
         WINERROR_GLE_RETURN_HRESULT(L"GetKeyboardState failed");
     }
 
-    *keyResult = ClassifyKey(context->GetEngine(), wParam, lParam, _keyState, update, acceptedChar);
+    wchar_t c = 0;
+    auto keyResult = ClassifyKey(context->GetEngine(), wParam, lParam, _keyState, update, &c);
+    bool active = context->GetEngine()->Count() != 0;
+    DBG_DPRINT(
+        L"%s wParam %lx %s, currently %s",
+        update ? L"OnKeyDown" : L"OnTestKeyDown",
+        wParam,
+        GetKeyResult(keyResult),
+        active ? L"active" : L"inactive");
 
+    hr = S_OK;
+    switch (keyResult) {
+    case KeyResult::Dropped:
+        *pfEaten = TRUE;
+        break;
+    case KeyResult::BreakingCharacter:
+        if (active) {
+            // in this case, we can eat because we know the char will be appended
+            *pfEaten = TRUE;
+            // if we know there's a composition, then we need to clear it with an ES
+            if (update) {
+                hr = CallKeyEdit(context, false, keyResult, c);
+            }
+        } else {
+            // if we can't know for sure, then it becomes best-effort as anything we do afterwards risks being wrong
+            *pfEaten = FALSE;
+            if (update) {
+                hr = CallKeyEdit(context, false, keyResult, L'\0');
+            }
+        }
+        break;
+    case KeyResult::Character:
+        *pfEaten = TRUE;
+        if (update) {
+            if (_backconvert == BackconvertOnType) {
+                hr = CallKeyEditRetype(context, c);
+            } else {
+                hr = CallKeyEdit(context, false, keyResult, c);
+            }
+        }
+        break;
+    case KeyResult::Backspace:
+        if (_backconvert == BackconvertOnBackspace && !active) {
+            *pfEaten = TRUE;
+            if (update) {
+                hr = CallKeyEditBackspace(context);
+            }
+        } else if (active) {
+            *pfEaten = TRUE;
+            if (update) {
+                hr = CallKeyEdit(context, false, keyResult, c);
+            }
+        } else {
+            *pfEaten = FALSE;
+        }
+        break;
+    case KeyResult::NotEaten:
+    case KeyResult::NotEatenEndComposition:
+    case KeyResult::Escape:
+        *pfEaten = FALSE;
+        if (update) {
+            hr = CallKeyEdit(context, false, keyResult, L'\0');
+        }
+        break;
+    default:
+        *pfEaten = FALSE;
+        break;
+    }
+    HRESULT_CHECK(hr, L"edit session failed");
+
+    // swallow the error from the edit session
     return S_OK;
 }
 
@@ -82,19 +162,11 @@ HRESULT ContextManager::CallKeyEditRetype(_In_ Context* context, _In_ wchar_t pu
 
 STDMETHODIMP ContextManager::OnTestKeyDown(
     _In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten) {
-    *pfEaten = FALSE;
+    HRESULT hr;
 
-    auto it = _map.find(pic);
-    if (it == _map.end()) {
-        return S_OK;
-    }
-    auto context = it->second.p;
+    hr = OnKeyCommon(pic, wParam, lParam, false, pfEaten);
+    HRESULT_CHECK_RETURN(hr, L"OnKeyCommon failed");
 
-    if (!IsEnabled(context)) {
-        return S_OK;
-    }
-
-    *pfEaten = TRUE;
     return S_OK;
 }
 
@@ -106,90 +178,11 @@ STDMETHODIMP ContextManager::OnTestKeyUp(
 
 STDMETHODIMP ContextManager::OnKeyDown(
     _In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten) {
-    KeyResult keyResult;
-    wchar_t c;
-    HRESULT hr, hrSession;
+    HRESULT hr;
 
-    *pfEaten = FALSE;
-
-    auto it = _map.find(pic);
-    if (it == _map.end()) {
-        return S_OK;
-    }
-    auto context = it->second.p;
-
-    if (context->IsInjecting(wParam, lParam)) {
-        context->ClearInjecting();
-        return S_OK;
-    }
-
-    if (!IsEnabled(context)) {
-        return S_OK;
-    }
-
-    hr = OnKeyCommon(context, wParam, lParam, true, &keyResult, &c);
+    hr = OnKeyCommon(pic, wParam, lParam, true, pfEaten);
     HRESULT_CHECK_RETURN(hr, L"OnKeyCommon failed");
 
-    hr = context->RequestQueryCompositionSync(&hrSession);
-    bool hasComposition = SUCCEEDED(hr) && hrSession == S_OK;
-
-    DBG_DPRINT(
-        L"OnKeyDown wParam %lx %s RQCS %x %x (%s)",
-        wParam,
-        GetKeyResult(keyResult),
-        hr,
-        hrSession,
-        hasComposition ? L"has comp" : L"no comp");
-
-    hr = S_OK;
-    switch (keyResult) {
-    case KeyResult::Dropped:
-        *pfEaten = TRUE;
-        break;
-    case KeyResult::BreakingCharacter:
-        if (hasComposition) {
-            // in this case, we can eat because we know the char will be appended
-            *pfEaten = TRUE;
-            // if we know there's a composition, then we need to clear it with an ES
-            hr = CallKeyEdit(context, false, keyResult, c);
-        } else {
-            // if we can't know for sure, then it becomes best-effort as anything we do afterwards risks being wrong
-            *pfEaten = FALSE;
-            hr = CallKeyEdit(context, false, keyResult, L'\0');
-        }
-        break;
-    case KeyResult::Character:
-        *pfEaten = TRUE;
-        if (_backconvert == BackconvertOnType) {
-            hr = CallKeyEditRetype(context, c);
-        } else {
-            hr = CallKeyEdit(context, false, keyResult, c);
-        }
-        break;
-    case KeyResult::Backspace:
-        if (_backconvert == BackconvertOnBackspace && !hasComposition) {
-            *pfEaten = TRUE;
-            hr = CallKeyEditBackspace(context);
-        } else if (hasComposition) {
-            *pfEaten = TRUE;
-            hr = CallKeyEdit(context, false, keyResult, c);
-        } else {
-            *pfEaten = FALSE;
-        }
-        break;
-    case KeyResult::NotEaten:
-    case KeyResult::NotEatenEndComposition:
-    case KeyResult::Escape:
-        *pfEaten = FALSE;
-        hr = CallKeyEdit(context, false, keyResult, L'\0');
-        break;
-    default:
-        *pfEaten = FALSE;
-        break;
-    }
-    HRESULT_CHECK(hr, L"edit session failed");
-
-    // swallow the error from the edit session
     return S_OK;
 }
 
