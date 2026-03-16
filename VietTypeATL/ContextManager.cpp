@@ -10,10 +10,6 @@
 
 namespace VietType {
 
-// {B31B741B-63CE-413A-9B5A-D2B69C695A78}
-static const GUID GUID_Compartment_EnabledToggle = {
-    0xb31b741b, 0x63ce, 0x413a, {0x9b, 0x5a, 0xd2, 0xb6, 0x9c, 0x69, 0x5a, 0x78}};
-
 static HRESULT IsContextEmpty(_In_ ITfContext* context, _In_ TfClientId clientid, _Out_ bool* isempty) {
     HRESULT hr;
 
@@ -45,14 +41,6 @@ HRESULT ContextManager::OnFocusContext(_In_opt_ ITfContext* context) {
     HRESULT_CHECK_RETURN(hr, L"creating context with OnPushContext failed");
     _focus = _map.at(context);
 
-    bool isempty;
-    hr = IsContextEmpty(context, _clientid, &isempty);
-    HRESULT_CHECK_RETURN(hr, L"IsContextEmpty failed");
-    if (isempty) {
-        _focus.Release();
-        return S_OK;
-    }
-
     _focus->GetEngine()->SetConfig(_config);
     hr = _focus->UpdateBlocked(&hrSession);
     if (FAILED(hr) || FAILED(hrSession)) {
@@ -69,36 +57,14 @@ HRESULT ContextManager::OnOpenClose() {
         return S_FALSE;
     }
 
-    long enabled;
-    hr = this->IsUserEnabled(&enabled);
-    DBG_HRESULT_CHECK(hr, L"this->IsUserEnabled failed");
-
     long openclose;
     hr = _openclose->GetValue(&openclose);
     HRESULT_CHECK_RETURN(hr, L"_openclose->GetValue failed");
 
-    if (!!enabled != !!openclose) {
-        hr = _enabled->SetValue(openclose ? 0 : -1);
-        HRESULT_CHECK_RETURN(hr, L"_enabled->SetValue failed");
-
-        hr = UpdateStatus(false);
-        DBG_HRESULT_CHECK(hr, L"UpdateStatus failed");
-    }
+    hr = UpdateStatus(false);
+    DBG_HRESULT_CHECK(hr, L"UpdateStatus failed");
 
     return S_OK;
-}
-
-_Check_return_ HRESULT ContextManager::IsUserEnabled(_Out_ long* penabled) const {
-    HRESULT hr;
-
-    hr = _enabled->GetValueOrWriteback(penabled, static_cast<LONG>(IsDefaultEnabled()));
-    if (*penabled != 0 && *penabled != -1) {
-        DBG_DPRINT(L"resetting enabled from %ld to %ld", *penabled, IsDefaultEnabled());
-        // _enabled may contain garbage value, reset if it's the case
-        *penabled = IsDefaultEnabled() == 0 ? 0 : -1;
-        DBG_HRESULT_CHECK(_enabled->SetValue(*penabled), L"_enabled reset failed");
-    }
-    return hr;
 }
 
 HRESULT ContextManager::ToggleUserEnabled() {
@@ -109,29 +75,50 @@ HRESULT ContextManager::ToggleUserEnabled() {
         return S_OK;
     }
 
-    long enabled;
-    hr = IsUserEnabled(&enabled);
-    HRESULT_CHECK(hr, L"this->IsUserEnabled failed");
+    long openclose;
+    hr = _openclose->GetValue(&openclose);
+    HRESULT_CHECK(hr, L"_openclose->GetValue failed");
     if (FAILED(hr)) {
-        enabled = false;
+        openclose = 0;
     }
 
-    DBG_DPRINT(L"toggling enabled from %ld", enabled);
-    hr = _enabled->SetValue(enabled == 0 ? -1 : 0);
-    HRESULT_CHECK_RETURN(hr, L"_enabled->SetValue failed");
+    DBG_DPRINT(L"toggling openclose from %ld", openclose);
+    hr = _openclose->SetValue(openclose == 0 ? 1 : 0);
+    HRESULT_CHECK_RETURN(hr, L"_openclose->SetValue failed");
     hr = UpdateStatus(true);
-    DBG_HRESULT_CHECK(hr, L"UpdateEnabled failed");
+    DBG_HRESULT_CHECK(hr, L"UpdateStatus failed");
 
     return S_OK;
 }
 
-long ContextManager::IsEnabled(_In_ Context* context) const {
-    if (!context)
+bool ContextManager::IsEnabled(_In_ Context* context) const {
+    HRESULT hr;
+
+    if (!context) {
         return false;
-    long enabled;
-    HRESULT hr = IsUserEnabled(&enabled);
-    HRESULT_CHECK(hr, L"this->IsUserEnabled failed");
-    return !!enabled && !context->IsBlocked();
+    }
+
+    long openclose;
+    hr = _openclose->GetValue(&openclose);
+    HRESULT_CHECK(hr, L"_openclose->GetValue failed");
+    if (FAILED(hr) || !openclose) {
+        return false;
+    }
+
+    long disabled;
+    Compartment<long> compDisabled;
+    hr = compDisabled.Initialize(context->GetContext(), _clientid, GUID_COMPARTMENT_KEYBOARD_DISABLED);
+    HRESULT_CHECK(hr, L"compDisabled.Initialize failed");
+    if (FAILED(hr)) {
+        return false;
+    }
+    hr = compDisabled.GetValue(&disabled);
+    HRESULT_CHECK(hr, L"compDisabled.GetValue failed");
+    if (FAILED(hr) || disabled) {
+        return false;
+    }
+
+    return !context->IsBlocked();
 }
 
 HRESULT ContextManager::UpdateStatus(bool foreground) {
@@ -141,16 +128,13 @@ HRESULT ContextManager::UpdateStatus(bool foreground) {
         return S_FALSE;
     }
 
-    long enabled;
-    hr = this->IsUserEnabled(&enabled);
-    DBG_HRESULT_CHECK(hr, L"this->IsUserEnabled failed");
+    long openclose;
+    hr = _openclose->GetValue(&openclose);
+    DBG_HRESULT_CHECK(hr, L"_openclose->GetValue failed");
 
-    DBG_DPRINT(L"enabled = %ld", enabled);
+    DBG_DPRINT(L"openclose = %ld", openclose);
 
     if (foreground) {
-        hr = _openclose->SetValue(!!enabled);
-        DBG_HRESULT_CHECK(hr, L"_openclose->SetValue failed");
-
         _settings->IsDefaultEnabled(&_defaultEnabled);
         _settings->IsBackconvert(reinterpret_cast<DWORD*>(&_backconvert));
 
@@ -160,7 +144,7 @@ HRESULT ContextManager::UpdateStatus(bool foreground) {
         }
     }
 
-    hr = _status->UpdateStatus(IsEnabled(_focus), _focus ? _focus->IsBlocked() : true);
+    hr = _status->UpdateStatus(!!openclose, _focus ? _focus->IsBlocked() : true);
     DBG_HRESULT_CHECK(hr, L"_langBarButton->Refresh failed");
 
     return S_OK;
@@ -265,19 +249,6 @@ _Check_return_ HRESULT ContextManager::Initialize(
     hr = CreateInitialize(&_status, this, _threadMgr);
     HRESULT_CHECK_RETURN(hr, L"CreateInitialize(&_status) failed");
 
-    // GUID_Compartment_EnabledToggle is global
-    hr = CreateInitialize(&_enabled, threadMgr, clientid, GUID_Compartment_EnabledToggle, true, [this] {
-        HRESULT hr = UpdateStatus(false);
-        DBG_HRESULT_CHECK(hr, L"UpdateStatus failed");
-        return S_OK;
-    });
-    HRESULT_CHECK_RETURN(hr, L"_enabled->Initialize failed");
-#ifdef _DEBUG
-    long dbgEnabled = 0;
-    [[maybe_unused]] HRESULT dbgHr = _enabled->GetValueDirect(&dbgEnabled);
-    DBG_DPRINT(L"dbgHr %ld dbgEnabled %ld", dbgHr, dbgEnabled);
-#endif // _DEBUG
-
     hr = CreateInitialize(
         &_openclose, threadMgr, clientid, GUID_COMPARTMENT_KEYBOARD_OPENCLOSE, false, [this] { return OnOpenClose(); });
     DBG_HRESULT_CHECK(hr, L"_openclose->Initialize failed");
@@ -291,12 +262,6 @@ _Check_return_ HRESULT ContextManager::Initialize(
     DBG_HRESULT_CHECK(hr, L"_systemNotify->Initialize failed");
     // must cache defaultEnabled early since it's used right away
     _settings->IsDefaultEnabled(&_defaultEnabled);
-
-    long enabled;
-    // this already sets enabled state if the compartment is empty
-    hr = IsUserEnabled(&enabled);
-    HRESULT_CHECK_RETURN(hr, L"_status->IsUserEnabled failed");
-    DBG_DPRINT(L"init hr = %ld, enabled = %ld", hr, enabled);
 
     // must enable self before we get focus events from the threadmgr event sink
     _initialized = true;
@@ -354,9 +319,6 @@ HRESULT ContextManager::Uninitialize() {
     if (_openclose)
         _openclose->Uninitialize();
     _openclose.Release();
-    if (_enabled)
-        _enabled->Uninitialize();
-    _enabled.Release();
 
     if (_status)
         _status->Uninitialize();

@@ -44,10 +44,6 @@ HRESULT ContextManager::OnKeyCommon(
     *keyResult = KeyResult::NotEaten;
     *acceptedChar = 0;
 
-    if (!IsEnabled(context)) {
-        return S_OK;
-    }
-
     if (!GetKeyboardState(_keyState)) {
         WINERROR_GLE_RETURN_HRESULT(L"GetKeyboardState failed");
     }
@@ -86,11 +82,6 @@ HRESULT ContextManager::CallKeyEditRetype(_In_ Context* context, _In_ wchar_t pu
 
 STDMETHODIMP ContextManager::OnTestKeyDown(
     _In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten) {
-    /*
-    KeyResult keyResult;
-    wchar_t c;
-    HRESULT hr;
-
     *pfEaten = FALSE;
 
     auto it = _map.find(pic);
@@ -99,14 +90,9 @@ STDMETHODIMP ContextManager::OnTestKeyDown(
     }
     auto context = it->second.p;
 
-    hr = OnKeyCommon(context, wParam, lParam, false, &keyResult, &c);
-    HRESULT_CHECK_RETURN(hr, L"OnKeyCommon failed");
-
-    DBG_DPRINT(L"OnTestKeyDown wParam = %lx %s", wParam, GetKeyResult(keyResult));
-
-    *pfEaten = IsKeyEaten(keyResult);
-    return S_OK;
-    */
+    if (!IsEnabled(context)) {
+        return S_OK;
+    }
 
     *pfEaten = TRUE;
     return S_OK;
@@ -134,7 +120,10 @@ STDMETHODIMP ContextManager::OnKeyDown(
 
     if (context->IsInjecting(wParam, lParam)) {
         context->ClearInjecting();
-        *pfEaten = FALSE;
+        return S_OK;
+    }
+
+    if (!IsEnabled(context)) {
         return S_OK;
     }
 

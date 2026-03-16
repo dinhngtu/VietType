@@ -84,13 +84,12 @@ public:
     constexpr bool IsDefaultEnabled() const {
         return _defaultEnabled;
     }
-    _Check_return_ HRESULT IsUserEnabled(_Out_ long* penabled) const;
     HRESULT ToggleUserEnabled();
 
     HRESULT UpdateStatus(_In_ Context* context);
 
 private:
-    long IsEnabled(_In_ Context* context) const;
+    bool IsEnabled(_In_ Context* context) const;
     HRESULT UpdateStatus(bool foreground);
 
     HRESULT OnKeyCommon(
@@ -116,7 +115,6 @@ private:
     CComPtr<StatusController> _status;
 
     Telex::TelexConfig _config{};
-    CComPtr<CachedCompartmentSetting<long>> _enabled;
     CComPtr<CachedCompartmentSetting<long>> _openclose;
 
     // cached settings

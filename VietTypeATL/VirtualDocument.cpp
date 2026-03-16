@@ -9,9 +9,6 @@
 namespace VietType {
 namespace VirtualDocument {
 
-static const GUID GUID_Compartment_TsfEmulatedDocumentMgr = {
-    0xa94c5fd2, 0xc471, 0x4031, {0x95, 0x46, 0x70, 0x9c, 0x17, 0x30, 0x0c, 0xb9}};
-
 static _Check_return_ HRESULT
 GetVirtualDocumentMgr(_In_ ITfDocumentMgr* dim, _COM_Outptr_result_maybenull_ ITfDocumentMgr** virtualDim) {
     HRESULT hr;

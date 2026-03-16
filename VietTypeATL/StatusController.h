@@ -32,8 +32,8 @@ public:
     HRESULT UpdateStatus(bool isEnabled, bool isBlocked);
 
     // for langbars
-    constexpr bool IsEnabled() const {
-        return _enabled;
+    constexpr bool IsOpenClose() const {
+        return _openclose;
     }
     constexpr bool IsBlocked() const {
         return _blocked;
@@ -52,7 +52,7 @@ private:
     CComPtr<LanguageBarButton> _langBarButton;
 
     // cached
-    bool _enabled = false;
+    bool _openclose = false;
     bool _blocked = true;
 };
 
