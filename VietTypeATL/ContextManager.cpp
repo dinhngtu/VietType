@@ -25,48 +25,6 @@ static HRESULT IsContextEmpty(_In_ ITfContext* context, _In_ TfClientId clientid
     return hr;
 }
 
-HRESULT ContextManager::OnFocusContext(_In_opt_ ITfContext* context) {
-    HRESULT hr, hrSession;
-
-    if (!context) {
-        _focus.Release();
-        return S_OK;
-    }
-
-    if (_focus && _focus->GetContext() == context) {
-        return S_OK;
-    }
-
-    hr = OnPushContext(context);
-    HRESULT_CHECK_RETURN(hr, L"creating context with OnPushContext failed");
-    _focus = _map.at(context);
-
-    _focus->GetEngine()->SetConfig(_config);
-    hr = _focus->UpdateBlocked(&hrSession);
-    if (FAILED(hr) || FAILED(hrSession)) {
-        DBG_HRESULT_CHECK(hr, L"ContextManager::RequestEditSession failed");
-    }
-
-    return S_OK;
-}
-
-HRESULT ContextManager::OnOpenClose() {
-    HRESULT hr;
-
-    if (!this->_initialized) {
-        return S_FALSE;
-    }
-
-    long openclose;
-    hr = _openclose->GetValue(&openclose);
-    HRESULT_CHECK_RETURN(hr, L"_openclose->GetValue failed");
-
-    hr = UpdateStatus(false);
-    DBG_HRESULT_CHECK(hr, L"UpdateStatus failed");
-
-    return S_OK;
-}
-
 HRESULT ContextManager::ToggleUserEnabled() {
     HRESULT hr;
 
@@ -82,8 +40,9 @@ HRESULT ContextManager::ToggleUserEnabled() {
         openclose = 0;
     }
 
-    DBG_DPRINT(L"toggling openclose from %ld", openclose);
-    hr = _openclose->SetValue(openclose == 0 ? 1 : 0);
+    long newOpenClose = openclose == 0 ? 1 : 0;
+    DBG_DPRINT(L"toggling openclose to %ld", newOpenClose);
+    hr = _openclose->SetValue(newOpenClose);
     HRESULT_CHECK_RETURN(hr, L"_openclose->SetValue failed");
     hr = UpdateStatus(true);
     DBG_HRESULT_CHECK(hr, L"UpdateStatus failed");
@@ -168,7 +127,7 @@ STDMETHODIMP ContextManager::OnUninitDocumentMgr(__RPC__in_opt ITfDocumentMgr* p
     CComPtr<IEnumTfContexts> contexts;
     hr = pdim->EnumContexts(&contexts);
     if (FAILED(hr)) {
-        _map.clear();
+        _contextMap.clear();
         return hr;
     }
 
@@ -177,7 +136,7 @@ STDMETHODIMP ContextManager::OnUninitDocumentMgr(__RPC__in_opt ITfDocumentMgr* p
         ULONG fetched;
         hr = contexts->Next(1, &context, &fetched);
         if (SUCCEEDED(hr) && fetched) {
-            _map.erase(context.p);
+            _contextMap.erase(context.p);
         } else {
             break;
         }
@@ -188,7 +147,7 @@ STDMETHODIMP ContextManager::OnUninitDocumentMgr(__RPC__in_opt ITfDocumentMgr* p
 
 STDMETHODIMP ContextManager::OnSetFocus(
     __RPC__in_opt ITfDocumentMgr* pdimFocus, __RPC__in_opt ITfDocumentMgr* pdimPrevFocus) {
-    HRESULT hr;
+    HRESULT hr, hrSession;
 
     DBG_DPRINT(L"pdimFocus = %p", pdimFocus);
 
@@ -204,8 +163,24 @@ STDMETHODIMP ContextManager::OnSetFocus(
         return S_OK;
     }
 
-    hr = OnFocusContext(context);
-    HRESULT_CHECK_RETURN(hr, L"OnNewContext failed");
+    if (!context) {
+        _focus.Release();
+        return S_OK;
+    }
+
+    if (_focus && _focus->GetContext() == context) {
+        return S_OK;
+    }
+
+    hr = OnPushContext(context);
+    HRESULT_CHECK_RETURN(hr, L"creating context with OnPushContext failed");
+    _focus = _contextMap.at(context);
+
+    _focus->GetEngine()->SetConfig(_config);
+    hr = _focus->UpdateBlocked(&hrSession);
+    if (FAILED(hr) || FAILED(hrSession)) {
+        DBG_HRESULT_CHECK(hr, L"ContextManager::RequestEditSession failed");
+    }
 
     return S_OK;
 }
@@ -215,12 +190,12 @@ STDMETHODIMP ContextManager::OnPushContext(__RPC__in_opt ITfContext* pic) {
 
     DBG_DPRINT(L"context = %p", pic);
 
-    auto it = _map.lower_bound(pic);
-    if (it == _map.end() || _map.key_comp()(pic, it->first) != 0) {
+    auto it = _contextMap.lower_bound(pic);
+    if (it == _contextMap.end() || _contextMap.key_comp()(pic, it->first) != 0) {
         CComPtr<Context> context;
         hr = CreateInitialize(&context, this, pic, static_cast<const Telex::TelexConfig&>(_config), _displayAtom);
         HRESULT_CHECK_RETURN(hr, "Create Context failed");
-        _map.insert(it, {pic, std::move(context)});
+        _contextMap.insert(it, {pic, std::move(context)});
     }
 
     return S_OK;
@@ -229,7 +204,7 @@ STDMETHODIMP ContextManager::OnPushContext(__RPC__in_opt ITfContext* pic) {
 STDMETHODIMP ContextManager::OnPopContext(__RPC__in_opt ITfContext* pic) {
     DBG_DPRINT(L"context = %p", pic);
 
-    _map.erase(pic);
+    _contextMap.erase(pic);
 
     return S_OK;
 }
@@ -249,8 +224,9 @@ _Check_return_ HRESULT ContextManager::Initialize(
     hr = CreateInitialize(&_status, this, _threadMgr);
     HRESULT_CHECK_RETURN(hr, L"CreateInitialize(&_status) failed");
 
-    hr = CreateInitialize(
-        &_openclose, threadMgr, clientid, GUID_COMPARTMENT_KEYBOARD_OPENCLOSE, false, [this] { return OnOpenClose(); });
+    hr = CreateInitialize(&_openclose, threadMgr, clientid, GUID_COMPARTMENT_KEYBOARD_OPENCLOSE, false, [this] {
+        return UpdateStatus(false);
+    });
     DBG_HRESULT_CHECK(hr, L"_openclose->Initialize failed");
 
     // init settings compartment & listener
@@ -289,7 +265,7 @@ HRESULT ContextManager::Uninitialize() {
 
     _initialized = false;
 
-    _map.clear();
+    _contextMap.clear();
 
     if (_threadMgr) {
         CComPtr<ITfKeystrokeMgr> keystrokeMgr;

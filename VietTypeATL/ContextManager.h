@@ -73,9 +73,6 @@ public:
         return _settings;
     }
 
-    HRESULT OnFocusContext(_In_opt_ ITfContext* context);
-    HRESULT OnOpenClose();
-
     constexpr TfClientId GetClientId() const {
         return _clientid;
     }
@@ -119,13 +116,11 @@ private:
 
     bool _initialized = false;
 
-    ContextMap _map;
+    ContextMap _contextMap;
     CComPtr<Context> _focus;
 
     // shared key state buffer; for temporary use only
     BYTE _keyState[256] = {0};
-
-    wchar_t _eatCommitKeyChar = L'\0';
 };
 
 } // namespace VietType

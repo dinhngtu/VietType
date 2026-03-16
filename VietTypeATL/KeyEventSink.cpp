@@ -40,8 +40,8 @@ HRESULT ContextManager::OnKeyCommon(
 
     *pfEaten = FALSE;
 
-    auto it = _map.find(pic);
-    if (it == _map.end()) {
+    auto it = _contextMap.find(pic);
+    if (it == _contextMap.end()) {
         return S_OK;
     }
     auto context = it->second.p;
@@ -197,8 +197,8 @@ STDMETHODIMP ContextManager::OnPreservedKey(_In_ ITfContext* pic, _In_ REFGUID r
 
     *pfEaten = FALSE;
 
-    auto it = _map.find(pic);
-    if (it == _map.end()) {
+    auto it = _contextMap.find(pic);
+    if (it == _contextMap.end()) {
         return S_OK;
     }
     auto context = it->second.p;
