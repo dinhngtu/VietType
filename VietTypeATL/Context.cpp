@@ -241,30 +241,4 @@ HRESULT Context::EndComposition() {
     return S_OK;
 }
 
-HRESULT Context::InjectKey(WORD vk) {
-    if (_injecting) {
-        return E_ABORT;
-    }
-    _injecting = vk;
-    INPUT inp[2];
-    ZeroMemory(inp, sizeof(inp));
-    inp[0].type = inp[1].type = INPUT_KEYBOARD;
-    inp[0].ki.wVk = inp[1].ki.wVk = vk;
-    inp[1].ki.dwFlags = KEYEVENTF_KEYUP;
-    if (!SendInput(ARRAYSIZE(inp), inp, sizeof(INPUT))) {
-        _injecting = 0;
-        WINERROR_GLE_RETURN_HRESULT(L"SendInput failed");
-    }
-    return S_OK;
-}
-
-bool Context::IsInjecting(WPARAM wParam, LPARAM lParam) const {
-    UNREFERENCED_PARAMETER(lParam);
-    return wParam == _injecting;
-}
-
-void Context::ClearInjecting() {
-    _injecting = 0;
-}
-
 } // namespace VietType

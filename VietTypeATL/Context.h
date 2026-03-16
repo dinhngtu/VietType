@@ -83,10 +83,6 @@ public:
         return RequestEditSessionEx(_QueryComposition, TF_ES_READ | TF_ES_SYNC, hrSession);
     }
 
-    HRESULT InjectKey(WORD vk);
-    bool IsInjecting(WPARAM wParam, LPARAM lParam) const;
-    void ClearInjecting();
-
 private:
     template <typename... Args>
     _Check_return_ HRESULT RequestEditSessionEx(
@@ -176,8 +172,6 @@ private:
 
     std::unique_ptr<Telex::ITelexEngine> _engine;
     SinkAdvisor<ITfTextEditSink> _textEditSinkAdvisor;
-
-    WORD _injecting = 0;
 };
 
 } // namespace VietType

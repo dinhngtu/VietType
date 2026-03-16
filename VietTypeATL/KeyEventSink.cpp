@@ -46,11 +46,6 @@ HRESULT ContextManager::OnKeyCommon(
     }
     auto context = it->second.p;
 
-    if (update && context->IsInjecting(wParam, lParam)) {
-        context->ClearInjecting();
-        return S_OK;
-    }
-
     if (!IsEnabled(context)) {
         return S_OK;
     }
@@ -137,16 +132,7 @@ HRESULT ContextManager::CallKeyEditBackspace(_In_ Context* context) {
     HRESULT hr;
 
     hr = context->RequestEditLastWord(1, L'\0');
-    HRESULT_CHECK(hr, L"context->RequestEditLastWord failed");
-    if (FAILED(hr)) {
-        DBG_DPRINT(L"backspace SendInput fallback");
-
-        if (context != _focus)
-            return E_FAIL;
-
-        hr = context->InjectKey(VK_BACK);
-        HRESULT_CHECK_RETURN(hr, L"context->InjectKey failed");
-    }
+    HRESULT_CHECK_RETURN(hr, L"context->RequestEditLastWord failed");
 
     return S_OK;
 }
