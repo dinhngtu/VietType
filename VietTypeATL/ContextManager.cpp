@@ -112,9 +112,10 @@ bool ContextManager::IsEnabled(_In_ Context* context) const {
     if (FAILED(hr)) {
         return false;
     }
+
     hr = compDisabled.GetValue(&disabled);
     HRESULT_CHECK(hr, L"compDisabled.GetValue failed");
-    if (FAILED(hr) || disabled) {
+    if (SUCCEEDED(hr) && disabled) {
         return false;
     }
 

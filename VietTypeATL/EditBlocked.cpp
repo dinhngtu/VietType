@@ -17,25 +17,7 @@ namespace VietType {
     } while (0);
 
 HRESULT Context::DoUpdateBlocked(_Out_ HRESULT* hrSession) {
-    HRESULT hr;
-
     *hrSession = S_OK;
-
-    // check GUID_COMPARTMENT_KEYBOARD_DISABLED
-
-    Compartment<long> compDisabled;
-    hr = compDisabled.Initialize(GetContext(), GetClientId(), GUID_COMPARTMENT_KEYBOARD_DISABLED);
-    EB_HRESULT_CHECK_COMMIT(hr, this, L"compDisabled.Initialize failed");
-
-    long contextDisabled;
-    hr = compDisabled.GetValue(&contextDisabled);
-    EB_HRESULT_CHECK_COMMIT(hr, this, L"compDisabled.GetValue failed");
-
-    if (hr == S_OK && contextDisabled) {
-        DBG_DPRINT(L"scopeBlocked: context disabled");
-        _blocked = true;
-        return S_OK;
-    }
 
     // check transitory context
 
