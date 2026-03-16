@@ -146,6 +146,18 @@ namespace VietTypeConfig2 {
         #endregion
 
         #region Control settings
+        public bool DefaultEnabled {
+            get {
+                return _settings.DefaultEnabled;
+            }
+            set {
+                if (_settings.DefaultEnabled != value) {
+                    _settings.DefaultEnabled = value;
+                    OnPropertyChanged(nameof(DefaultEnabled));
+                }
+            }
+        }
+
         public BackconvertModes Backconvert {
             get {
                 return (BackconvertModes)_settings.Backconvert;

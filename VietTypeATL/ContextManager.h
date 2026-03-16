@@ -78,6 +78,9 @@ public:
     }
 
     // API for context uses
+    constexpr bool IsDefaultEnabled() const {
+        return _defaultEnabled;
+    }
     HRESULT ToggleUserEnabled();
 
     HRESULT UpdateStatus(_In_ Context* context);
@@ -107,6 +110,7 @@ private:
     CComPtr<CachedCompartmentSetting<long>> _openclose;
 
     // cached settings
+    DWORD _defaultEnabled = 0;
     BackconvertModes _backconvert = BackconvertDisabled;
 
     CComPtr<CompartmentNotifier> _systemNotify;

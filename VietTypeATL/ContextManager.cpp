@@ -95,6 +95,7 @@ HRESULT ContextManager::UpdateStatus(bool foreground) {
     DBG_DPRINT(L"openclose = %ld", openclose);
 
     if (foreground) {
+        _settings->IsDefaultEnabled(&_defaultEnabled);
         _settings->IsBackconvert(reinterpret_cast<DWORD*>(&_backconvert));
 
         hr = _settings->LoadTelexSettings(_config);
@@ -236,6 +237,8 @@ _Check_return_ HRESULT ContextManager::Initialize(
         return S_OK;
     });
     DBG_HRESULT_CHECK(hr, L"_systemNotify->Initialize failed");
+    // must cache defaultEnabled early since it's used right away
+    _settings->IsDefaultEnabled(&_defaultEnabled);
 
     // must enable self before we get focus events from the threadmgr event sink
     _initialized = true;

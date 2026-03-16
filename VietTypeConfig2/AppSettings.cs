@@ -146,6 +146,19 @@ namespace VietTypeConfig2 {
         #endregion
 
         #region Control settings
+        bool default_enabled = false;
+        public bool DefaultEnabled {
+            get {
+                return default_enabled;
+            }
+            set {
+                if (default_enabled != value) {
+                    default_enabled = value;
+                    OnPropertyChanged(nameof(DefaultEnabled));
+                }
+            }
+        }
+
         /// <summary>
         /// Legacy name for backconvert setting
         /// </summary>
@@ -202,6 +215,7 @@ namespace VietTypeConfig2 {
                 setting.OptimizeMultilang = ToInt(regKey.GetValue(nameof(optimize_multilang))) ?? setting.OptimizeMultilang;
                 setting.Autocorrect = ToBool(regKey.GetValue(nameof(autocorrect))) ?? setting.Autocorrect;
 
+                setting.DefaultEnabled = ToBool(regKey.GetValue(nameof(default_enabled))) ?? setting.DefaultEnabled;
                 setting.Backconvert = ToInt(regKey.GetValue(nameof(backconvert_on_backspace))) ?? setting.Backconvert;
                 setting.PkToggle = ToInt(regKey.GetValue(nameof(pk_toggle))) ?? setting.PkToggle;
                 setting.ShowComposingAttr = ToInt(regKey.GetValue(nameof(show_composing_attr))) ?? setting.ShowComposingAttr;
@@ -221,6 +235,7 @@ namespace VietTypeConfig2 {
                 regKey.SetValue(nameof(optimize_multilang), settings.OptimizeMultilang);
                 regKey.SetValue(nameof(autocorrect), settings.Autocorrect ? 1 : 0);
 
+                regKey.SetValue(nameof(default_enabled), settings.DefaultEnabled ? 1 : 0);
                 regKey.SetValue(nameof(backconvert_on_backspace), settings.Backconvert);
                 regKey.SetValue(nameof(pk_toggle), settings.PkToggle);
                 regKey.SetValue(nameof(show_composing_attr), settings.ShowComposingAttr);

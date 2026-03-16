@@ -135,6 +135,15 @@ namespace VietTypeConfig2.LocalizedResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Vietnamese mode by de_fault.
+        /// </summary>
+        public static string MainWindow_CheckBox_DefaultEnabled_Content {
+            get {
+                return ResourceManager.GetString("MainWindow_CheckBox_DefaultEnabled_Content", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to _Use &quot;oà&quot;, &quot;uý&quot; instead of &quot;òa&quot;, &quot;úy&quot;.
         /// </summary>
         public static string MainWindow_CheckBox_OaUyTone1_Content {

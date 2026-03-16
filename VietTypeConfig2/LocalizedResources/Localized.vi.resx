@@ -129,6 +129,9 @@
   <data name="MainWindow_CheckBox_BackspaceInvalid_Content" xml:space="preserve">
     <value>Giữ trạng thái sai khi xóa từ sai (_I)</value>
   </data>
+  <data name="MainWindow_CheckBox_DefaultEnabled_Content" xml:space="preserve">
+    <value>Mặc định bật tiếng Việt (_F)</value>
+  </data>
   <data name="MainWindow_CheckBox_OaUyTone1_Content" xml:space="preserve">
     <value>Gõ "oà", "uý" thay vì "òa", "úy" (_U)</value>
   </data>
