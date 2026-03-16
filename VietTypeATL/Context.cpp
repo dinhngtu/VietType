@@ -12,20 +12,11 @@ namespace VietType {
 STDMETHODIMP Context::OnCompositionTerminated(_In_ TfEditCookie ecWrite, __RPC__in_opt ITfComposition* pComposition) {
     DBG_DPRINT(L"ecWrite = %ld", ecWrite);
 
-    if (_composition == pComposition) {
-        CComPtr<ITfRange> range;
-        if (SUCCEEDED(_composition->GetRange(&range)) && _displayAtom != TF_INVALID_GUIDATOM) {
-            ClearRangeDisplayAttribute(ecWrite, range);
-        }
-
-        CommitCompositionText(ecWrite);
-
-        _engine->Reset();
-
-        // composition already dead
-        _composition.Release();
+    if (pComposition) {
+        EndCompositionNow(ecWrite, pComposition);
     }
 
+    _engine->Reset();
     return S_OK;
 }
 
@@ -33,7 +24,13 @@ STDMETHODIMP Context::OnEndEdit(
     __RPC__in_opt ITfContext* pic, TfEditCookie ecReadOnly, __RPC__in_opt ITfEditRecord* pEditRecord) {
     HRESULT hr;
 
-    if (!IsCuas() || !_composition || !pEditRecord) {
+    if (pic != GetContext() || !IsCuas() || !pEditRecord) {
+        return S_OK;
+    }
+
+    CComPtr<ITfComposition> composition;
+    hr = GetComposition(ecReadOnly, &composition);
+    if (FAILED(hr) || !composition) {
         return S_OK;
     }
 
@@ -49,10 +46,11 @@ STDMETHODIMP Context::OnEndEdit(
     if (FAILED(hr) || fetched == 0) {
         return S_OK;
     }
-    CComPtr<ITfRange> selRange = sel.range;
+    CComPtr<ITfRange> selRange;
+    selRange.Attach(sel.range);
 
     CComPtr<ITfRange> compRange;
-    hr = _composition->GetRange(&compRange);
+    hr = composition->GetRange(&compRange);
     if (FAILED(hr)) {
         return S_OK;
     }
@@ -69,7 +67,7 @@ STDMETHODIMP Context::OnEndEdit(
         // might have closed the composition somehow (like clicking away in file rename box)?
         DBG_DPRINT(L"selection outside composition, committing (startOk=%d endOk=%d)", startOk, endOk);
         HRESULT hrSession;
-        RequestEditKey(&hrSession, 0, 0, nullptr, false);
+        RequestEditKey(&hrSession, true, KeyResult::NotEatenEndComposition, L'\0');
     }
 
     return S_OK;
@@ -155,7 +153,6 @@ HRESULT Context::Initialize(
 }
 
 HRESULT Context::Uninitialize() {
-    _composition.Release();
     _engine.release();
     _blocked = true;
     _displayAtom = TF_INVALID_GUIDATOM;
@@ -172,6 +169,43 @@ TfClientId Context::GetClientId() const {
     return _parent->GetClientId();
 }
 
+HRESULT Context::GetComposition(_In_ TfEditCookie ec, _COM_Outptr_result_maybenull_ ITfComposition** composition) {
+    HRESULT hr;
+
+    *composition = nullptr;
+
+    CComPtr<ITfContextComposition> contextComposition;
+    hr = _context->QueryInterface(&contextComposition);
+    HRESULT_CHECK_RETURN(hr, L"_context->QueryInterface failed");
+
+    CComPtr<IEnumITfCompositionView> compositions;
+    hr = contextComposition->FindComposition(ec, nullptr, &compositions);
+    HRESULT_CHECK_RETURN(hr, L"contextComposition->FindComposition failed");
+
+    while (1) {
+        CComPtr<ITfCompositionView> compositionView;
+        ULONG fetched;
+
+        hr = compositions->Next(1, &compositionView, &fetched);
+        if (FAILED(hr)) {
+            return hr;
+        }
+        if (!fetched) {
+            return S_FALSE;
+        }
+
+        CLSID clsid;
+        if (FAILED(compositionView->GetOwnerClsid(&clsid)) || clsid != Globals::CLSID_TextService) {
+            continue;
+        }
+
+        hr = compositionView->QueryInterface(composition);
+        if (FAILED(hr)) {
+            continue;
+        }
+    }
+}
+
 void Context::UpdateStatus() {
     HRESULT hr = _parent->UpdateStatus(this);
     DBG_HRESULT_CHECK(hr, "_parent->UpdateStatus failed");
@@ -180,7 +214,7 @@ void Context::UpdateStatus() {
 HRESULT Context::StartComposition() {
     HRESULT hr, hrSession;
 
-    if (GetClientId() == TF_CLIENTID_NULL || _composition) {
+    if (GetClientId() == TF_CLIENTID_NULL) {
         DBG_DPRINT(L"bad composition request");
         return E_FAIL;
     }
@@ -198,15 +232,39 @@ HRESULT Context::EndComposition() {
         return E_FAIL;
     }
 
-    if (_composition) {
-        HRESULT hr, hrSession;
+    HRESULT hr, hrSession;
 
-        hr = RequestEditSessionEx(&_EndComposition, TF_ES_ASYNCDONTCARE | TF_ES_READWRITE, &hrSession);
-        HRESULT_CHECK_RETURN(hr, "RequestEditSessionEx failed");
-        HRESULT_CHECK_RETURN(hrSession, "_EndComposition failed");
-    }
+    hr = RequestEditSessionEx(&_EndComposition, TF_ES_ASYNCDONTCARE | TF_ES_READWRITE, &hrSession);
+    HRESULT_CHECK_RETURN(hr, "RequestEditSessionEx failed");
+    HRESULT_CHECK_RETURN(hrSession, "_EndComposition failed");
 
     return S_OK;
+}
+
+HRESULT Context::InjectKey(WORD vk) {
+    if (_injecting) {
+        return E_ABORT;
+    }
+    _injecting = vk;
+    INPUT inp[2];
+    ZeroMemory(inp, sizeof(inp));
+    inp[0].type = inp[1].type = INPUT_KEYBOARD;
+    inp[0].ki.wVk = inp[1].ki.wVk = vk;
+    inp[1].ki.dwFlags = KEYEVENTF_KEYUP;
+    if (!SendInput(ARRAYSIZE(inp), inp, sizeof(INPUT))) {
+        _injecting = 0;
+        WINERROR_GLE_RETURN_HRESULT(L"SendInput failed");
+    }
+    return S_OK;
+}
+
+bool Context::IsInjecting(WPARAM wParam, LPARAM lParam) const {
+    UNREFERENCED_PARAMETER(lParam);
+    return wParam == _injecting;
+}
+
+void Context::ClearInjecting() {
+    _injecting = 0;
 }
 
 } // namespace VietType

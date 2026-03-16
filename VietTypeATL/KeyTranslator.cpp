@@ -16,19 +16,29 @@ PCWSTR GetKeyResult(KeyResult keyResult) {
         return L"BreakingCharacter";
     case KeyResult::Dropped:
         return L"Dropped";
-    case KeyResult::BackconvertingCharacter:
-        return L"BackconvertingCharacter";
-    case KeyResult::BackconvertingBackspace:
-        return L"BackconvertingBackspace";
-    case KeyResult::ComposingCharacter:
-        return L"ComposingCharacter";
-    case KeyResult::ComposingBackspace:
-        return L"ComposingBackspace";
-    case KeyResult::ComposingEscape:
-        return L"ComposingEscape";
+    case KeyResult::Character:
+        return L"Character";
+    case KeyResult::Backspace:
+        return L"Backspace";
+    case KeyResult::Escape:
+        return L"Escape";
     default:
         return L"Unknown";
     }
+}
+
+static bool IsKeyEndComposition(_In_ WPARAM wParam, _In_ LPARAM lParam, _In_reads_(256) const BYTE* keyState) {
+    // only for control keys that are uneaten, cause compositions to end, and don't come with a character
+    if ((keyState[VK_CONTROL] & 0x80) || (keyState[VK_MENU] & 0x80)) {
+        return true;
+    }
+    if (wParam >= VK_PRIOR && wParam <= VK_DOWN) {
+        return true;
+    }
+    if (wParam == VK_TAB || wParam == VK_DELETE) {
+        return true;
+    }
+    return false;
 }
 
 static _Success_(return) _Check_return_ bool IsKeyChar(
@@ -43,34 +53,8 @@ static _Success_(return) _Check_return_ bool IsKeyChar(
     return true;
 }
 
-static bool IsKeyEndComposition(_In_ WPARAM wParam, _In_ LPARAM lParam, _In_reads_(256) const BYTE* keyState) {
-    // only for edit keys that are uneaten and cause compositions to end
-    if ((keyState[VK_CONTROL] & 0x80) || (keyState[VK_MENU] & 0x80)) {
-        return true;
-    }
-    if (wParam >= 33 && wParam <= 40) {
-        return true;
-    }
-    if (wParam == VK_DELETE) {
-        return true;
-    }
-    return false;
-}
-
-static _Success_(return) bool IsKeyAcceptedChar(
-    _In_ Telex::ITelexEngine* engine,
-    _In_ WPARAM wParam,
-    _In_ LPARAM lParam,
-    _In_reads_(256) const BYTE* keyState,
-    _In_ bool update,
-    _Out_ wchar_t* c) {
-    return IsKeyChar(wParam, lParam, keyState, update, c) && engine->AcceptsChar(*c);
-}
-
 KeyResult ClassifyKey(
     _In_ Telex::ITelexEngine* engine,
-    _In_ bool isComposing,
-    _In_ BackconvertModes backconvert,
     _In_ WPARAM wParam,
     _In_ LPARAM lParam,
     _In_reads_(256) const BYTE* keyState,
@@ -84,39 +68,19 @@ KeyResult ClassifyKey(
         // engine doesn't want modifiers, but the other modifiers are already checked in IsKeyEndComposition
         return KeyResult::NotEaten;
     }
-    if (isComposing) {
-        if (wParam == VK_BACK) {
-            return KeyResult::ComposingBackspace;
-        } else if (wParam == VK_ESCAPE) {
-            return KeyResult::ComposingEscape;
-        }
-    } else if (backconvert == BackconvertOnBackspace && wParam == VK_BACK) {
-        return KeyResult::BackconvertingBackspace;
+    if (wParam == VK_BACK) {
+        return KeyResult::Backspace;
+    } else if (wParam == VK_ESCAPE) {
+        return KeyResult::Escape;
     }
     if (IsKeyChar(wParam, lParam, keyState, update, chr)) {
         if (engine->AcceptsChar(*chr)) {
-            if (!isComposing && backconvert == BackconvertOnType) {
-                return KeyResult::BackconvertingCharacter;
-            } else {
-                return KeyResult::ComposingCharacter;
-            }
+            return KeyResult::Character;
         } else {
             return KeyResult::BreakingCharacter;
         }
     } else {
-        return KeyResult::NotEaten;
-    }
-}
-
-Telex::TelexStates PushKey(
-    _In_ Telex::ITelexEngine* engine, _In_ WPARAM wParam, _In_ LPARAM lParam, _In_reads_(256) const BYTE* keyState) {
-    wchar_t c;
-    if (IsKeyAcceptedChar(engine, wParam, lParam, keyState, true, &c)) {
-        return engine->PushChar(c);
-    } else if (wParam == VK_BACK) {
-        return engine->Backspace();
-    } else {
-        return Telex::TelexStates::TxError;
+        return KeyResult::NotEatenEndComposition;
     }
 }
 

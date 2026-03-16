@@ -19,19 +19,15 @@ enum class KeyResult {
     NotEatenEndComposition,
     BreakingCharacter,
     Dropped,
-    BackconvertingCharacter,
-    BackconvertingBackspace,
-    ComposingCharacter,
-    ComposingBackspace,
-    ComposingEscape,
+    Character,
+    Backspace,
+    Escape,
 };
 
 PCWSTR GetKeyResult(KeyResult keyResult);
 
 KeyResult ClassifyKey(
     _In_ Telex::ITelexEngine* engine,
-    _In_ bool isComposing,
-    _In_ BackconvertModes backconvert,
     _In_ WPARAM wParam,
     _In_ LPARAM lParam,
     _In_reads_(256) const BYTE* keyState,

@@ -103,7 +103,7 @@ private:
 
     HRESULT CallKeyEditBackspace(_In_ Context* context);
     HRESULT CallKeyEditRetype(_In_ Context* context, _In_ wchar_t push);
-    HRESULT CallKeyEdit(_In_ Context* context, _In_ KeyResult keyResult, _In_ wchar_t push);
+    HRESULT CallKeyEdit(_In_ Context* context, _In_ bool sync, _In_ KeyResult keyResult, _In_ wchar_t push);
 
 private:
     // from parent

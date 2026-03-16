@@ -13,17 +13,6 @@ namespace VietType {
 const GUID GUID_KeyEventSink_PreservedKey_Toggle = {
     0x8cc27cf8, 0x93d2, 0x416c, {0xb1, 0xa3, 0x66, 0x82, 0x7f, 0x54, 0x24, 0x4a}};
 
-static inline BOOL IsKeyEaten(KeyResult keyResult) {
-    switch (keyResult) {
-    case KeyResult::NotEaten:
-    case KeyResult::NotEatenEndComposition:
-    case KeyResult::BreakingCharacter:
-        return FALSE;
-    default:
-        return TRUE;
-    }
-}
-
 STDMETHODIMP ContextManager::OnSetFocus(_In_ BOOL fForeground) {
     HRESULT hr;
 
@@ -63,8 +52,7 @@ HRESULT ContextManager::OnKeyCommon(
         WINERROR_GLE_RETURN_HRESULT(L"GetKeyboardState failed");
     }
 
-    *keyResult = ClassifyKey(
-        context->GetEngine(), context->GetComposition(), _backconvert, wParam, lParam, _keyState, update, acceptedChar);
+    *keyResult = ClassifyKey(context->GetEngine(), wParam, lParam, _keyState, update, acceptedChar);
 
     return S_OK;
 }
@@ -79,14 +67,8 @@ HRESULT ContextManager::CallKeyEditBackspace(_In_ Context* context) {
         if (context != _focus)
             return E_FAIL;
 
-        INPUT inp[2];
-        ZeroMemory(inp, sizeof(inp));
-        inp[0].type = inp[1].type = INPUT_KEYBOARD;
-        inp[0].ki.wVk = inp[1].ki.wVk = VK_BACK;
-        inp[1].ki.dwFlags = KEYEVENTF_KEYUP;
-        if (!SendInput(ARRAYSIZE(inp), inp, sizeof(INPUT))) {
-            WINERROR_GLE_RETURN_HRESULT(L"SendInput failed");
-        }
+        hr = context->InjectKey(VK_BACK);
+        HRESULT_CHECK_RETURN(hr, L"context->InjectKey failed");
     }
 
     return S_OK;
@@ -103,6 +85,7 @@ HRESULT ContextManager::CallKeyEditRetype(_In_ Context* context, _In_ wchar_t pu
 
 STDMETHODIMP ContextManager::OnTestKeyDown(
     _In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten) {
+    /*
     KeyResult keyResult;
     wchar_t c;
     HRESULT hr;
@@ -118,33 +101,19 @@ STDMETHODIMP ContextManager::OnTestKeyDown(
     hr = OnKeyCommon(context, wParam, lParam, false, &keyResult, &c);
     HRESULT_CHECK_RETURN(hr, L"OnKeyCommon failed");
 
+    DBG_DPRINT(L"OnTestKeyDown wParam = %lx %s", wParam, GetKeyResult(keyResult));
+
     *pfEaten = IsKeyEaten(keyResult);
+    return S_OK;
+    */
+
+    *pfEaten = TRUE;
     return S_OK;
 }
 
 STDMETHODIMP ContextManager::OnTestKeyUp(
     _In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten) {
-    KeyResult keyResult;
-    wchar_t c;
-    HRESULT hr;
-
     *pfEaten = FALSE;
-
-    auto it = _map.find(pic);
-    if (it == _map.end()) {
-        return S_OK;
-    }
-    auto context = it->second.p;
-
-    // essentially we eat the KeyUp event if a composition is active; is this the correct behavior?
-    if (!context->GetComposition()) {
-        return S_OK;
-    }
-
-    hr = OnKeyCommon(context, wParam, lParam, false, &keyResult, &c);
-    HRESULT_CHECK_RETURN(hr, L"OnKeyCommon failed");
-
-    *pfEaten = IsKeyEaten(keyResult);
     return S_OK;
 }
 
@@ -152,7 +121,7 @@ STDMETHODIMP ContextManager::OnKeyDown(
     _In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten) {
     KeyResult keyResult;
     wchar_t c;
-    HRESULT hr;
+    HRESULT hr, hrSession;
 
     *pfEaten = FALSE;
 
@@ -162,32 +131,61 @@ STDMETHODIMP ContextManager::OnKeyDown(
     }
     auto context = it->second.p;
 
+    if (context->IsInjecting(wParam, lParam)) {
+        context->ClearInjecting();
+        *pfEaten = FALSE;
+        return S_OK;
+    }
+
     hr = OnKeyCommon(context, wParam, lParam, true, &keyResult, &c);
     HRESULT_CHECK_RETURN(hr, L"OnKeyCommon failed");
 
     DBG_DPRINT(L"OnKeyDown wParam = %lx %s", wParam, GetKeyResult(keyResult));
 
-    *pfEaten = IsKeyEaten(keyResult);
+    hr = context->RequestQueryCompositionSync(&hrSession);
+    bool hasComposition = SUCCEEDED(hr) && hrSession == S_OK;
+
     hr = S_OK;
     switch (keyResult) {
-    case KeyResult::NotEaten:
     case KeyResult::Dropped:
+        *pfEaten = TRUE;
         break;
-    case KeyResult::BackconvertingBackspace:
-        hr = CallKeyEditBackspace(context);
-        break;
-    case KeyResult::BackconvertingCharacter:
-        hr = CallKeyEditRetype(context, c);
-        break;
-    case KeyResult::NotEatenEndComposition:
     case KeyResult::BreakingCharacter:
-    case KeyResult::ComposingCharacter:
-    case KeyResult::ComposingBackspace:
-    case KeyResult::ComposingEscape:
-        hr = CallKeyEdit(context, keyResult, c);
+        if (hasComposition) {
+            // in this case, we can eat because we know the char will be appended
+            *pfEaten = TRUE;
+            // if we know there's a composition, then we need to clear it with an ES
+            hr = CallKeyEdit(context, false, keyResult, c);
+        } else {
+            // if we can't know for sure, then it becomes best-effort as anything we do afterwards risks being wrong
+            *pfEaten = FALSE;
+            hr = CallKeyEdit(context, false, keyResult, L'\0');
+        }
+        break;
+    case KeyResult::Character:
+        *pfEaten = TRUE;
+        if (_backconvert == BackconvertOnType) {
+            hr = CallKeyEditRetype(context, c);
+        } else {
+            hr = CallKeyEdit(context, false, keyResult, c);
+        }
+        break;
+    case KeyResult::Backspace:
+        if (_backconvert == BackconvertOnBackspace || hasComposition) {
+            *pfEaten = TRUE;
+            hr = CallKeyEditBackspace(context);
+        } else {
+            *pfEaten = FALSE;
+        }
+        break;
+    case KeyResult::NotEaten:
+    case KeyResult::NotEatenEndComposition:
+    case KeyResult::Escape:
+        *pfEaten = FALSE;
+        hr = CallKeyEdit(context, false, keyResult, L'\0');
         break;
     default:
-        hr = E_NOTIMPL;
+        *pfEaten = FALSE;
         break;
     }
     HRESULT_CHECK_RETURN(hr, L"edit session failed");
@@ -198,27 +196,7 @@ STDMETHODIMP ContextManager::OnKeyDown(
 
 STDMETHODIMP ContextManager::OnKeyUp(
     _In_ ITfContext* pic, _In_ WPARAM wParam, _In_ LPARAM lParam, _Out_ BOOL* pfEaten) {
-    KeyResult keyResult;
-    wchar_t c;
-    HRESULT hr;
-
     *pfEaten = FALSE;
-
-    auto it = _map.find(pic);
-    if (it == _map.end()) {
-        return S_OK;
-    }
-    auto context = it->second.p;
-
-    // essentially we eat the KeyUp event if a composition is active; is this the correct behavior?
-    if (!context->GetComposition()) {
-        return S_OK;
-    }
-
-    hr = OnKeyCommon(context, wParam, lParam, true, &keyResult, &c);
-    HRESULT_CHECK_RETURN(hr, L"OnKeyCommon failed");
-
-    *pfEaten = IsKeyEaten(keyResult);
     return S_OK;
 }
 
@@ -245,12 +223,12 @@ STDMETHODIMP ContextManager::OnPreservedKey(_In_ ITfContext* pic, _In_ REFGUID r
     return S_OK;
 }
 
-HRESULT ContextManager::CallKeyEdit(_In_ Context* context, _In_ KeyResult keyResult, _In_ wchar_t push) {
+HRESULT ContextManager::CallKeyEdit(
+    _In_ Context* context, _In_ bool sync, _In_ KeyResult keyResult, _In_ wchar_t push) {
     HRESULT hr, hrSession;
-    auto eaten = IsKeyEaten(keyResult);
-    hr = context->RequestEditKey(&hrSession, !eaten, keyResult, push);
-    if (!eaten && hr == TF_E_SYNCHRONOUS) {
-        DBG_DPRINT(L"fallback to asynchronous composition breaking");
+    hr = context->RequestEditKey(&hrSession, sync, keyResult, push);
+    if (sync && hr == TF_E_SYNCHRONOUS) {
+        DBG_DPRINT(L"fallback to asynchronous ES");
         hr = context->RequestEditKey(&hrSession, false, keyResult, push);
     }
     HRESULT_CHECK_RETURN(hr, L"_contextManager->RequestEditSession failed");

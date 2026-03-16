@@ -6,11 +6,36 @@
 
 namespace VietType {
 
-HRESULT Context::StartCompositionNow(_In_ TfEditCookie ec) {
+static PCWSTR GetTelexStateName(Telex::TelexStates state) {
+    switch (state) {
+    case Telex::TelexStates::Valid:
+        return L"Valid";
+    case Telex::TelexStates::Invalid:
+        return L"Invalid";
+    case Telex::TelexStates::Committed:
+        return L"Committed";
+    case Telex::TelexStates::CommittedInvalid:
+        return L"CommittedInvalid";
+    case Telex::TelexStates::BackconvertFailed:
+        return L"BackconvertFailed";
+    case Telex::TelexStates::TxError:
+        return L"TxError";
+    default:
+        return L"Unknown";
+    }
+}
+
+HRESULT Context::StartCompositionNow(_In_ TfEditCookie ec, _COM_Outptr_opt_ ITfComposition** outComposition) {
     HRESULT hr;
 
-    if (_composition) {
-        return TF_E_LOCKED;
+    if (outComposition) {
+        *outComposition = nullptr;
+    }
+
+    CComPtr<ITfComposition> composition;
+    hr = GetComposition(ec, &composition);
+    if (SUCCEEDED(hr) && composition) {
+        return TF_E_ALREADY_EXISTS;
     }
 
     CComPtr<ITfCompositionSink> compositionSink;
@@ -29,124 +54,120 @@ HRESULT Context::StartCompositionNow(_In_ TfEditCookie ec) {
     hr = _context->QueryInterface(&contextComposition);
     HRESULT_CHECK_RETURN(hr, L"context->QueryInterface failed");
 
-    ITfComposition* composition;
-    hr = contextComposition->StartComposition(ec, insertRange, compositionSink, &composition);
-    if (SUCCEEDED(hr)) {
-        _composition = composition;
+    hr = contextComposition->StartComposition(ec, insertRange, compositionSink, &composition.p);
+    HRESULT_CHECK_RETURN(hr, L"contextComposition->StartComposition failed");
 
-        TF_SELECTION sel;
-        sel.range = insertRange;
-        sel.style.ase = TF_AE_NONE;
-        sel.style.fInterimChar = FALSE;
-        hr = _context->SetSelection(ec, 1, &sel);
-        DBG_HRESULT_CHECK(hr, L"context->SetSelection failed");
-    } else {
-        HRESULT_CHECK_RETURN(hr, L"contextComposition->StartComposition failed")
+    if (!composition) {
+        return E_ABORT;
     }
 
+    if (outComposition) {
+        *outComposition = composition;
+        (*outComposition)->AddRef();
+    }
     return S_OK;
 }
 
-HRESULT Context::EndCompositionNow(_In_ TfEditCookie ec) {
+HRESULT Context::EndCompositionNow(_In_ TfEditCookie ec, _In_opt_ ITfComposition* composition) {
     HRESULT hr;
+
+    if (!composition) {
+        return S_OK;
+    }
 
     DBG_DPRINT(L"ending composition");
 
-    if (_composition) {
-        CComPtr<ITfRange> range;
-        hr = _composition->GetRange(&range);
-        if (SUCCEEDED(hr)) {
-            if (_displayAtom != TF_INVALID_GUIDATOM) {
-                hr = ClearRangeDisplayAttribute(ec, range);
-                DBG_HRESULT_CHECK(hr, L"ClearRangeDisplayAttribute failed");
-            }
-
-            hr = MoveCaretToEnd(ec);
-            DBG_HRESULT_CHECK(hr, L"MoveCaretToEnd failed");
-
-            hr = _composition->EndComposition(ec);
-            DBG_HRESULT_CHECK(hr, L"_composition->EndComposition failed");
-        } else {
-            HRESULT_CHECK(hr, L"_composition->GetRange failed");
+    CComPtr<ITfRange> range;
+    hr = composition->GetRange(&range);
+    if (SUCCEEDED(hr)) {
+        if (_displayAtom != TF_INVALID_GUIDATOM) {
+            hr = ClearRangeDisplayAttribute(ec, range);
+            DBG_HRESULT_CHECK(hr, L"ClearRangeDisplayAttribute failed");
         }
 
-        _composition.Release();
-    }
-
-    return S_OK;
-}
-
-HRESULT Context::SetCompositionText(_In_ TfEditCookie ec, _In_z_ LPCWSTR str, _In_ LONG length) {
-    HRESULT hr;
-
-    if (_composition) {
-        CComPtr<ITfRange> range;
-        hr = _composition->GetRange(&range);
-        HRESULT_CHECK_RETURN(hr, L"_composition->GetRange failed");
-
-        hr = range->SetText(ec, 0, str, length);
-        HRESULT_CHECK_RETURN(hr, L"range->SetText failed");
-
-        hr = SetRangeDisplayAttribute(ec, range);
-        HRESULT_CHECK_RETURN(hr, L"SetRangeDisplayAttribute failed");
-
-        hr = MoveCaretToEnd(ec);
+        hr = MoveCaretToEnd(ec, composition, true);
         DBG_HRESULT_CHECK(hr, L"MoveCaretToEnd failed");
+
+        hr = composition->EndComposition(ec);
+        DBG_HRESULT_CHECK(hr, L"_composition->EndComposition failed");
+    } else {
+        HRESULT_CHECK(hr, L"_composition->GetRange failed");
     }
 
     return S_OK;
 }
 
-HRESULT Context::EmptyCompositionText(_In_ TfEditCookie ec) {
+HRESULT Context::EnsureComposition(_In_ TfEditCookie ec, CComPtr<ITfComposition>& composition) {
+    if (composition) {
+        return S_OK;
+    }
+    HRESULT hr = GetComposition(ec, &composition);
+    if (SUCCEEDED(hr) && composition) {
+        return S_OK;
+    }
+    return StartCompositionNow(ec, &composition);
+}
+
+HRESULT Context::SetCompositionText(
+    _In_ TfEditCookie ec, _In_ ITfComposition* composition, _In_z_ LPCWSTR str, _In_ LONG length) {
     HRESULT hr;
 
-    if (_composition) {
-        CComPtr<ITfRange> range;
-        hr = _composition->GetRange(&range);
-        HRESULT_CHECK_RETURN(hr, L"composition->GetRange failed");
+    CComPtr<ITfRange> range;
+    hr = composition->GetRange(&range);
+    HRESULT_CHECK_RETURN(hr, L"_composition->GetRange failed");
 
-        hr = range->SetText(ec, 0, nullptr, 0);
-        HRESULT_CHECK_RETURN(hr, L"range->SetText failed");
-    }
+    hr = range->SetText(ec, 0, str, length);
+    HRESULT_CHECK_RETURN(hr, L"range->SetText failed");
+
+    hr = SetRangeDisplayAttribute(ec, range);
+    HRESULT_CHECK_RETURN(hr, L"SetRangeDisplayAttribute failed");
+
+    hr = MoveCaretToEnd(ec, composition);
+    DBG_HRESULT_CHECK(hr, L"MoveCaretToEnd failed");
 
     return S_OK;
 }
 
-HRESULT Context::MoveCaretToEnd(_In_ TfEditCookie ec) {
+HRESULT Context::EmptyCompositionText(_In_ TfEditCookie ec, _In_ ITfComposition* composition) {
     HRESULT hr;
 
-    if (_composition) {
-        CComPtr<ITfRange> range;
-        hr = _composition->GetRange(&range);
-        HRESULT_CHECK_RETURN(hr, L"_composition->GetRange failed");
+    CComPtr<ITfRange> range;
+    hr = composition->GetRange(&range);
+    HRESULT_CHECK_RETURN(hr, L"composition->GetRange failed");
 
-        CComPtr<ITfRange> rangeClone;
-        hr = range->Clone(&rangeClone);
-        HRESULT_CHECK_RETURN(hr, L"range->Clone failed");
-
-        hr = rangeClone->Collapse(ec, TF_ANCHOR_END);
-        HRESULT_CHECK_RETURN(hr, L"rangeClone->Collapse failed");
-
-        TF_SELECTION sel;
-        sel.range = rangeClone;
-        sel.style.ase = TF_AE_NONE;
-        sel.style.fInterimChar = FALSE;
-        hr = _context->SetSelection(ec, 1, &sel);
-        HRESULT_CHECK_RETURN(hr, L"_context->SetSelection failed");
-    }
+    hr = range->SetText(ec, 0, nullptr, 0);
+    HRESULT_CHECK_RETURN(hr, L"range->SetText failed");
 
     return S_OK;
 }
 
-HRESULT Context::EnsureCompositionText(_In_ TfEditCookie ec, _In_z_ LPCWSTR str, _In_ LONG length) {
+HRESULT Context::MoveCaretToEnd(_In_ TfEditCookie ec, _In_ ITfComposition* composition, bool collapse) {
     HRESULT hr;
 
-    if (!_composition) {
-        hr = StartCompositionNow(ec);
-        HRESULT_CHECK_RETURN(hr, L"StartCompositionNow failed");
+    CComPtr<ITfRange> range;
+    hr = composition->GetRange(&range);
+    HRESULT_CHECK_RETURN(hr, L"_composition->GetRange failed");
+
+    CComPtr<ITfRange> rangeClone;
+    hr = range->Clone(&rangeClone);
+    HRESULT_CHECK_RETURN(hr, L"range->Clone failed");
+
+    hr = rangeClone->Collapse(ec, TF_ANCHOR_END);
+    HRESULT_CHECK_RETURN(hr, L"rangeClone->Collapse failed");
+
+    if (collapse) {
+        hr = composition->ShiftStart(ec, rangeClone);
+        HRESULT_CHECK_RETURN(hr, L"composition->ShiftStart failed");
     }
 
-    return SetCompositionText(ec, str, length);
+    TF_SELECTION sel;
+    sel.range = rangeClone;
+    sel.style.ase = TF_AE_NONE;
+    sel.style.fInterimChar = FALSE;
+    hr = _context->SetSelection(ec, 1, &sel);
+    HRESULT_CHECK_RETURN(hr, L"_context->SetSelection failed");
+
+    return S_OK;
 }
 
 HRESULT Context::SetRangeDisplayAttribute(_In_ TfEditCookie ec, _In_ ITfRange* range) {
@@ -180,93 +201,63 @@ HRESULT Context::ClearRangeDisplayAttribute(_In_ TfEditCookie ec, _In_ ITfRange*
     return S_OK;
 }
 
-HRESULT Context::EditNextState(_In_ TfEditCookie ec, _In_ Telex::TelexStates state) {
+HRESULT Context::DoEditNextState(
+    _In_ TfEditCookie ec,
+    _Inout_ CComPtr<ITfComposition>& composition,
+    _In_ Telex::TelexStates state,
+    _In_ wchar_t nonEngineAppend) {
     HRESULT hr;
 
-    DBG_DPRINT(L"");
-
+    std::wstring str;
     switch (state) {
-    case Telex::TelexStates::Valid: {
-        if (GetEngine()->Count()) {
-            auto str = GetEngine()->Peek();
-            hr = EnsureCompositionText(ec, &str[0], static_cast<LONG>(str.length()));
-            DBG_HRESULT_CHECK(hr, L"_contextManager->EnsureCompositionText failed");
-        } else {
-            // backspace returns Valid on an empty buffer
-            GetEngine()->Reset();
-            // EndComposition* will not empty composition text so we have to do it manually
-            hr = EmptyCompositionText(ec);
-            HRESULT_CHECK_RETURN(hr, L"_contextManager->EmptyCompositionText failed");
-            hr = EndCompositionNow(ec);
-            HRESULT_CHECK_RETURN(hr, L"_contextManager->EndCompositionNow failed");
-        }
+    case Telex::TelexStates::Valid:
+        str = GetEngine()->Peek();
         break;
-    }
-
-    case Telex::TelexStates::Invalid: {
-        assert(GetEngine()->Count() > 0);
-        auto str = GetEngine()->RetrieveRaw();
-        hr = EnsureCompositionText(ec, &str[0], static_cast<LONG>(str.length()));
-        DBG_HRESULT_CHECK(hr, L"_contextManager->EnsureCompositionText failed");
+    case Telex::TelexStates::Invalid:
+        str = GetEngine()->RetrieveRaw();
         break;
-    }
-
+    case Telex::TelexStates::Committed:
+        str = GetEngine()->Retrieve();
+        GetEngine()->Reset();
+        break;
     default:
-        DBG_DPRINT(L"PushKey returned unexpected value");
-        assert(0);
+        str = GetEngine()->RetrieveRaw();
+        GetEngine()->Reset();
         break;
     }
 
-    return S_OK;
-}
-
-HRESULT Context::CommitCompositionText(_In_ TfEditCookie ec) {
-    if (!GetComposition() || !GetEngine()->Count()) {
-        return S_FALSE;
+    if (nonEngineAppend) {
+        str += nonEngineAppend;
     }
 
-    auto txstate = GetEngine()->Commit();
-    if (txstate != Telex::TelexStates::Committed && txstate != Telex::TelexStates::CommittedInvalid) {
-        assert(false);
-        return E_FAIL;
+    DBG_DPRINT(
+        L"%s, state %s, append '%c', strlen %zu, next state %s, next count %zu",
+        composition ? L"composing" : L"not composing",
+        GetTelexStateName(state),
+        nonEngineAppend ? nonEngineAppend : L'?',
+        str.length(),
+        GetTelexStateName(GetEngine()->GetState()),
+        GetEngine()->Count());
+
+    // sync the composition state with the supposed string state
+    if (!str.empty()) {
+        hr = EnsureComposition(ec, composition);
+        HRESULT_CHECK_RETURN(hr, L"EnsureComposition failed");
+        hr = SetCompositionText(ec, composition, &str[0], static_cast<LONG>(str.length()));
+        HRESULT_CHECK_RETURN(hr, L"SetCompositionText failed");
+    } else if (composition) {
+        // EndComposition* will not empty composition text so we have to do it manually
+        hr = EmptyCompositionText(ec, composition);
+        HRESULT_CHECK_RETURN(hr, L"_contextManager->EmptyCompositionText failed");
     }
 
-    auto str = GetEngine()->Retrieve();
-    HRESULT hr = SetCompositionText(ec, str.c_str(), static_cast<LONG>(str.length()));
-    DBG_HRESULT_CHECK(hr, L"SetCompositionText failed");
-
-    // push the committed text out of the composition range
-    CComPtr<ITfRange> compRange;
-    if (SUCCEEDED(_composition->GetRange(&compRange))) {
-        CComPtr<ITfRange> newStart;
-        if (SUCCEEDED(compRange->Clone(&newStart)) && SUCCEEDED(newStart->Collapse(ec, TF_ANCHOR_END))) {
-            hr = _composition->ShiftStart(ec, newStart);
-            DBG_HRESULT_CHECK(hr, L"ShiftStart failed");
-
-            TF_SELECTION sel = {newStart, {TF_AE_NONE, FALSE}};
-            hr = _context->SetSelection(ec, 1, &sel);
-            DBG_HRESULT_CHECK(hr, L"SetSelection failed");
-        }
-    }
-
-    return S_OK;
-}
-
-HRESULT Context::EditCommit(_In_ TfEditCookie ec, _In_ wchar_t appendChar) {
-    CommitCompositionText(ec);
-
-    GetEngine()->Reset();
-    EndCompositionNow(ec);
-
-    if (appendChar != L'\0') {
-        DBG_DPRINT(L"InsertTextAtSelection char=%lc", appendChar);
-
-        CComPtr<ITfInsertAtSelection> insertAtSel;
-        if (SUCCEEDED(_context->QueryInterface(&insertAtSel))) {
-            CComPtr<ITfRange> insertedRange;
-            HRESULT hr = insertAtSel->InsertTextAtSelection(ec, 0, &appendChar, 1, &insertedRange);
-            DBG_HRESULT_CHECK(hr, L"InsertTextAtSelection failed");
-        }
+    // now sync the engine state with the composition state
+    if (GetEngine()->Count()) {
+        // EnsureComposition should already be called above
+    } else if (composition) {
+        hr = EndCompositionNow(ec, composition);
+        HRESULT_CHECK_RETURN(hr, L"_contextManager->EndCompositionNow failed");
+        composition.Release();
     }
 
     return S_OK;

@@ -181,12 +181,13 @@ HRESULT Context::BackconvertWord(
     _In_ wchar_t push) {
     HRESULT hr;
 
-    hr = context->StartCompositionNow(ec);
+    CComPtr<ITfComposition> composition;
+    hr = context->StartCompositionNow(ec, &composition);
     HRESULT_CHECK_RETURN(hr, L"context->StartCompositionNow failed");
 
     if (range) {
-        hr = context->GetComposition()->ShiftStart(ec, range);
-        HRESULT_CHECK_RETURN(hr, L"context->GetComposition()->ShiftStart failed");
+        hr = composition->ShiftStart(ec, range);
+        HRESULT_CHECK_RETURN(hr, L"composition->ShiftStart failed");
     }
 
     auto engine = context->GetEngine();
@@ -194,23 +195,32 @@ HRESULT Context::BackconvertWord(
     engine->Backconvert(*word);
 
     auto displayText = engine->Peek();
-    context->SetCompositionText(ec, displayText.c_str(), static_cast<LONG>(displayText.length()));
+    context->SetCompositionText(ec, composition, displayText.c_str(), static_cast<LONG>(displayText.length()));
 
     if (!push)
         return S_OK;
 
-    return context->EditNextState(ec, context->GetEngine()->PushChar(push));
+    return context->DoEditNextState(ec, composition, context->GetEngine()->PushChar(push), L'\0');
 }
 
 HRESULT Context::RequestEditLastWord(_In_ int ignore, _In_ wchar_t push) {
     HRESULT hr, hrSession;
     std::wstring word;
 
-    if (GetComposition())
-        return E_PENDING;
+    hr = RequestQueryCompositionSync(&hrSession);
+    if (SUCCEEDED(hr) && hrSession == S_OK) {
+        if (!ignore && push) {
+            // this must be the OnType case, so async is OK
+            hr = RequestEditKey(&hrSession, false, KeyResult::Character, push);
+            HRESULT_CHECK_RETURN(hr, L"RequestEditKey failed");
+            HRESULT_CHECK_RETURN(hrSession, L"EditKey failed");
+            return S_OK;
+        } else {
+            return TF_E_ALREADY_EXISTS;
+        }
+    }
 
     // get the full context
-
     CComPtr<ITfContext> fullContext;
     VirtualDocument::FullContextType contextType;
     hr = VirtualDocument::GetFullContext(this, GetClientId(), &fullContext, &contextType);

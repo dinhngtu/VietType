@@ -67,9 +67,6 @@ public:
 
     HRESULT StartComposition();
     HRESULT EndComposition();
-    ITfComposition* GetComposition() const {
-        return _composition;
-    }
 
     // edit session initiators
     HRESULT UpdateBlocked(_Out_ HRESULT* hrSession);
@@ -82,6 +79,13 @@ public:
         return RequestEditSessionEx(EditKey, flags, hrSession, keyResult, push);
     }
     HRESULT RequestEditLastWord(_In_ int ignore, _In_ wchar_t push);
+    HRESULT RequestQueryCompositionSync(_Out_ HRESULT* hrSession) {
+        return RequestEditSessionEx(_QueryComposition, TF_ES_READ | TF_ES_SYNC, hrSession);
+    }
+
+    HRESULT InjectKey(WORD vk);
+    bool IsInjecting(WPARAM wParam, LPARAM lParam) const;
+    void ClearInjecting();
 
 private:
     template <typename... Args>
@@ -105,29 +109,43 @@ private:
         return hr;
     }
 
-    HRESULT StartCompositionNow(_In_ TfEditCookie ec);
-    HRESULT EndCompositionNow(_In_ TfEditCookie ec);
-    HRESULT SetCompositionText(_In_ TfEditCookie ec, _In_z_ LPCWSTR str, _In_ LONG length);
-    HRESULT EmptyCompositionText(_In_ TfEditCookie ec);
-    HRESULT MoveCaretToEnd(_In_ TfEditCookie ec);
-    HRESULT EnsureCompositionText(_In_ TfEditCookie ec, _In_z_ LPCWSTR str, _In_ LONG length);
-    // return S_FALSE if nothing to commit
-    HRESULT CommitCompositionText(_In_ TfEditCookie ec);
+    HRESULT GetComposition(_In_ TfEditCookie ec, _COM_Outptr_result_maybenull_ ITfComposition** composition);
+    HRESULT StartCompositionNow(_In_ TfEditCookie ec, _COM_Outptr_opt_ ITfComposition** composition);
+    HRESULT EndCompositionNow(_In_ TfEditCookie ec, _In_opt_ ITfComposition* composition);
+    HRESULT EnsureComposition(_In_ TfEditCookie ec, CComPtr<ITfComposition>& composition);
+    HRESULT SetCompositionText(
+        _In_ TfEditCookie ec, _In_ ITfComposition* composition, _In_z_ LPCWSTR str, _In_ LONG length);
+    HRESULT EmptyCompositionText(_In_ TfEditCookie ec, _In_ ITfComposition* composition);
+    HRESULT MoveCaretToEnd(_In_ TfEditCookie ec, _In_ ITfComposition* composition, bool collapse = false);
 
     HRESULT SetRangeDisplayAttribute(_In_ TfEditCookie ec, _In_ ITfRange* range);
     HRESULT ClearRangeDisplayAttribute(_In_ TfEditCookie ec, _In_ ITfRange* range);
 
-    HRESULT EditNextState(_In_ TfEditCookie ec, _In_ Telex::TelexStates state);
-    HRESULT EditCommit(_In_ TfEditCookie ec, _In_ wchar_t appendChar = L'\0');
+    HRESULT DoEditNextState(
+        _In_ TfEditCookie ec,
+        _Inout_ CComPtr<ITfComposition>& composition,
+        _In_ Telex::TelexStates state,
+        _In_ wchar_t nonEngineAppend);
 
     HRESULT DoUpdateBlocked(_Out_ HRESULT* hrSession);
 
     // edit sessions
     static HRESULT _StartComposition(TfEditCookie ec, Context* context) {
-        return context->StartCompositionNow(ec);
+        return context->StartCompositionNow(ec, nullptr);
     }
     static HRESULT _EndComposition(TfEditCookie ec, Context* context) {
-        return context->EndCompositionNow(ec);
+        CComPtr<ITfComposition> composition;
+        HRESULT hr = context->GetComposition(ec, &composition);
+        if (SUCCEEDED(hr) && composition) {
+            return context->EndCompositionNow(ec, composition);
+        }
+        return S_OK;
+    }
+    static HRESULT _QueryComposition(_In_ TfEditCookie ec, _In_ Context* context) {
+        CComPtr<ITfComposition> composition;
+        HRESULT hr = context->GetComposition(ec, &composition);
+        HRESULT_CHECK_RETURN(hr, L"context->GetComposition failed");
+        return composition ? S_OK : S_FALSE;
     }
     static HRESULT EditBlocked(_In_ TfEditCookie ec, _In_ Context* context);
     static HRESULT EditKey(_In_ TfEditCookie ec, _In_ Context* context, _In_ KeyResult keyResult, _In_ wchar_t push);
@@ -158,7 +176,8 @@ private:
 
     std::unique_ptr<Telex::ITelexEngine> _engine;
     SinkAdvisor<ITfTextEditSink> _textEditSinkAdvisor;
-    CComPtr<ITfComposition> _composition;
+
+    WORD _injecting = 0;
 };
 
 } // namespace VietType
