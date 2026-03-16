@@ -74,7 +74,7 @@ public:
     NotifiedSetting& operator=(const NotifiedSetting&) = delete;
     ~NotifiedSetting() = default;
 
-    virtual _Check_return_ HRESULT GetValue(_Out_ T* val) = 0;
+    virtual _Check_return_ HRESULT GetValue(_Out_ T* val, const T& defaultValue = T()) = 0;
     virtual _Check_return_ HRESULT GetValueOrWriteback(_Out_ T* val, const T& defaultValue) = 0;
     virtual HRESULT SetValue(const T& val) = 0;
 
@@ -100,24 +100,15 @@ public:
     END_COM_MAP()
     DECLARE_PROTECT_FINAL_CONSTRUCT()
 
-    // Inherited via Setting
-    virtual _Check_return_ HRESULT GetValue(_Out_ long* val) override {
-        return _compartment.GetValue(val);
+    // Inherited via NotifiedSetting
+    virtual _Check_return_ HRESULT GetValue(_Out_ long* val, const long& defaultValue = 0) override {
+        return _compartment.GetValue(val, defaultValue);
     }
     virtual _Check_return_ HRESULT GetValueOrWriteback(_Out_ long* val, const long& defaultValue) override {
         return _compartment.GetValueOrWriteback(val, defaultValue);
     }
     virtual HRESULT SetValue(const long& val) override {
         return _compartment.SetValue(val);
-    }
-    HRESULT Increment() {
-        long val;
-        HRESULT hr = GetValueOrWriteback(&val, 0);
-        if (SUCCEEDED(hr)) {
-            return SetValue(static_cast<unsigned long>(val) + 1);
-        } else {
-            return hr;
-        }
     }
 
     _Check_return_ HRESULT Initialize(
@@ -153,13 +144,13 @@ public:
     END_COM_MAP()
     DECLARE_PROTECT_FINAL_CONSTRUCT()
 
-    // Inherited via Setting
-    virtual _Check_return_ HRESULT GetValue(_Out_ T* val) override {
+    // Inherited via NotifiedSetting
+    virtual _Check_return_ HRESULT GetValue(_Out_ long* val, const long& defaultValue = 0) override {
         if (_cache.has_value()) {
             *val = _cache.value();
             return S_OK;
         } else {
-            HRESULT hr = _dataCompartment.GetValue(val);
+            HRESULT hr = _dataCompartment.GetValue(val, defaultValue);
             if (SUCCEEDED(hr)) {
                 _cache = *val;
             }
@@ -182,10 +173,6 @@ public:
             _cache = val;
         }
         return hr;
-    }
-
-    _Check_return_ HRESULT GetValueDirect(_Out_ T* val) {
-        return _dataCompartment.GetValue(val);
     }
 
     _Check_return_ HRESULT Initialize(

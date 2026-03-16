@@ -39,12 +39,13 @@ protected:
 template <typename T>
 class Compartment : public CompartmentBase {
 public:
-    _Check_return_ _Success_(return == S_OK) HRESULT GetValue(_Out_ T* val) {
+    _Check_return_ _Success_(return == S_OK) HRESULT GetValue(_Out_ T* val, const T& defaultValue = T()) {
         HRESULT hr;
 
         CComVariant v;
         hr = _compartment->GetValue(&v);
         if (hr == S_FALSE) {
+            *val = defaultValue;
             return S_FALSE;
         } else if (hr == S_OK) {
             if (v.vt != variantInfo<T>::vartype) {
