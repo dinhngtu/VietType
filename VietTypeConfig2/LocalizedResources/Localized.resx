@@ -129,9 +129,6 @@
   <data name="MainWindow_CheckBox_BackspaceInvalid_Content" xml:space="preserve">
     <value>Backspaced _invalid word stays invalid</value>
   </data>
-  <data name="MainWindow_CheckBox_DefaultEnabled_Content" xml:space="preserve">
-    <value>Vietnamese mode by de_fault</value>
-  </data>
   <data name="MainWindow_CheckBox_OaUyTone1_Content" xml:space="preserve">
     <value>_Use "oà", "uý" instead of "òa", "úy"</value>
   </data>

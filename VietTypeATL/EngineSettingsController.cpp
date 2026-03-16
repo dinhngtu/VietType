@@ -59,10 +59,6 @@ HRESULT EngineSettingsController::LoadTelexSettings(_Inout_ Telex::TelexConfig& 
     return S_OK;
 }
 
-void EngineSettingsController::IsDefaultEnabled(_Out_ DWORD* pde) {
-    SettingsStore::GetValueOrDefault<DWORD>(_settingsKey, L"default_enabled", pde, 0);
-}
-
 void EngineSettingsController::IsBackconvert(_Out_ DWORD* pde) {
     SettingsStore::GetValueOrDefault<DWORD>(_settingsKey, L"backconvert_on_backspace", pde, 0);
 }

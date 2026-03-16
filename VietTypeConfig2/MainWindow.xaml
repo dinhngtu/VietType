@@ -146,9 +146,6 @@
         </GroupBox>
         <GroupBox Grid.Row="2" Margin="0,7,0,0" Header="{local:Localized Key=MainWindow_GroupBox_ControlSettings_Header}">
             <StackPanel Margin="3,7,3,7">
-                <CheckBox
-                    IsChecked="{Binding DefaultEnabled}"
-                    Content="{local:Localized Key=MainWindow_CheckBox_DefaultEnabled_Content}" />
                 <Grid Margin="0,7,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />

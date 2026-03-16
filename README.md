@@ -44,7 +44,6 @@ Chương trình VietType Settings cho phép cài đặt lựa chọn của VietT
 - *Enable autocorrect/Bật tự sửa từ*: Bật một số phương pháp sửa từ tự động khi gõ sai (ví dụ: "miếgn" -> "miếng").
 
 **Lựa chọn hệ thống:**
-- *Vietnamese mode by default/Mặc định bật tiếng Việt:* bật/tắt tiếng Việt khi khởi động VietType;
 - *Word reconversion mode/Chế độ chuyển ngược từ:* cho phép sửa từ sau khi đã gõ xong từ đó;
 - *Toggle key/Phím chuyển:* chọn phím chuyển Anh/Việt;
 - *Current word highlight mode/Kiểu hiển thị từ đang gõ:* chọn kiểu gạch chân dưới từ đang gõ.
