@@ -78,7 +78,7 @@ HRESULT Context::EditBlocked(_In_ TfEditCookie ec, _In_ Context* context) {
     hr = prop->GetValue(ec, range, &var);
     EB_HRESULT_CHECK_COMMIT(hr, context, L"prop->GetValue failed");
 
-    if (var.vt != VT_UNKNOWN) {
+    if (var.vt != VT_UNKNOWN || !var.punkVal) {
         hr = E_NOINTERFACE;
         EB_HRESULT_CHECK_COMMIT(hr, context, L"bad variant type %d", static_cast<int>(var.vt));
     }

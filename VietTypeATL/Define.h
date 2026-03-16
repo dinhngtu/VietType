@@ -61,7 +61,7 @@ static void _errorprint(_In_ LPCWSTR func, _In_ int line, _In_ DWORD err, _In_ L
 #define DPRINT(fmt, ...) _dprint(__FUNCTIONW__, __LINE__, L"%s:%d: " fmt L"\n", __VA_ARGS__)
 
 #define HRESULT_PRINT(hr, fmt, ...)                                                                                    \
-    _errorprint(__FUNCTIONW__, __LINE__, hr, L"%s:%d: HRESULT error %lx (%s): " fmt, __VA_ARGS__)
+    _errorprint(__FUNCTIONW__, __LINE__, hr, L"%s:%d: HRESULT error %lx (%s): " fmt L"\n", __VA_ARGS__)
 
 // format win32 error and print formatted string to debugger output
 #define WINERROR_PRINT(err, fmt, ...)                                                                                  \
