@@ -484,7 +484,6 @@
     <ClCompile Include="EnumDisplayAttributeInfo.cpp" />
     <ClCompile Include="Globals.cpp" />
     <ClCompile Include="KeyEventSink.cpp" />
-    <ClCompile Include="KeyHandler.cpp" />
     <ClCompile Include="KeyTranslator.cpp" />
     <ClCompile Include="LanguageBarButton.cpp" />
     <ClCompile Include="Register.cpp" />

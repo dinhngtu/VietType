@@ -88,9 +88,6 @@
     <ClCompile Include="KeyEventSink.cpp">
       <Filter>Source Files\ContextManager</Filter>
     </ClCompile>
-    <ClCompile Include="KeyHandler.cpp">
-      <Filter>Source Files\Context</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
