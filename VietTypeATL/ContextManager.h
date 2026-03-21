@@ -15,8 +15,6 @@ class StatusController;
 class EngineSettingsController;
 class Context;
 
-extern const GUID GUID_KeyEventSink_PreservedKey_Toggle;
-
 using ContextMap = std::map<ITfContext*, CComPtr<Context>>;
 
 class ATL_NO_VTABLE ContextManager : public CComObjectRootEx<CComSingleThreadModel>,

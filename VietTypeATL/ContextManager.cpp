@@ -285,7 +285,7 @@ _Check_return_ HRESULT ContextManager::Initialize(
         HRESULT_CHECK_RETURN(hr, L"_keystrokeMgr->AdviseKeyEventSink failed");
 
         _settings->GetPreservedKeyToggle(&_pk_toggle);
-        hr = keystrokeMgr->PreserveKey(_clientid, GUID_KeyEventSink_PreservedKey_Toggle, &_pk_toggle, NULL, 0);
+        hr = keystrokeMgr->PreserveKey(_clientid, Globals::GUID_KeyEventSink_PreservedKey_Toggle, &_pk_toggle, NULL, 0);
         // probably not fatal
         DBG_HRESULT_CHECK(hr, L"_keystrokeMgr->PreserveKey failed");
     } else {
@@ -306,7 +306,7 @@ HRESULT ContextManager::Uninitialize() {
         CComPtr<ITfKeystrokeMgr> keystrokeMgr;
         hr = _threadMgr->QueryInterface(&keystrokeMgr);
         if (SUCCEEDED(hr)) {
-            hr = keystrokeMgr->UnpreserveKey(GUID_KeyEventSink_PreservedKey_Toggle, &_pk_toggle);
+            hr = keystrokeMgr->UnpreserveKey(Globals::GUID_KeyEventSink_PreservedKey_Toggle, &_pk_toggle);
             DBG_HRESULT_CHECK(hr, L"_keystrokeMgr->UnpreserveKey failed");
 
             hr = keystrokeMgr->UnadviseKeyEventSink(_clientid);

@@ -9,10 +9,6 @@
 
 namespace VietType {
 
-// {8CC27CF8-93D2-416C-B1A3-66827F54244A}
-const GUID GUID_KeyEventSink_PreservedKey_Toggle = {
-    0x8cc27cf8, 0x93d2, 0x416c, {0xb1, 0xa3, 0x66, 0x82, 0x7f, 0x54, 0x24, 0x4a}};
-
 STDMETHODIMP ContextManager::OnSetFocus(_In_ BOOL fForeground) {
     HRESULT hr;
 
@@ -189,7 +185,7 @@ STDMETHODIMP ContextManager::OnPreservedKey(_In_ ITfContext* pic, _In_ REFGUID r
     }
     auto context = it->second.p;
 
-    if (GUID_KeyEventSink_PreservedKey_Toggle == rguid) {
+    if (Globals::GUID_KeyEventSink_PreservedKey_Toggle == rguid) {
         *pfEaten = TRUE;
         context->GetEngine()->Reset();
         hr = context->EndComposition();
