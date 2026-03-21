@@ -37,8 +37,8 @@ HRESULT StatusController::Uninitialize() {
     return S_OK;
 }
 
-HRESULT StatusController::UpdateStatus(bool isOpenClose, bool isBlocked) {
-    _openclose = isOpenClose;
+HRESULT StatusController::UpdateStatus(bool isEnabled, bool isBlocked) {
+    _enabled = isEnabled;
     _blocked = isBlocked;
     _indicatorButton->Refresh();
     _langBarButton->Refresh();

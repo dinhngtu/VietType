@@ -25,7 +25,35 @@ static HRESULT IsContextEmpty(_In_ ITfContext* context, _In_ TfClientId clientid
     return hr;
 }
 
+HRESULT ContextManager::OnToggle(bool fromOpenClose) {
+    long enabled;
+    HRESULT hr;
+
+    if (!this->_initialized) {
+        return S_FALSE;
+    }
+
+    if (fromOpenClose) {
+        hr = _openclose->GetValue(&enabled);
+        HRESULT_CHECK_RETURN(hr, L"_openclose->GetValue failed");
+    } else {
+        hr = _enabled->GetValue(&enabled, _defaultEnabled);
+        HRESULT_CHECK_RETURN(hr, L"_enabled->GetValue failed");
+    }
+
+    hr = _openclose->SetValue(enabled);
+    HRESULT_CHECK_RETURN(hr, L"_openclose->SetValue failed");
+    hr = _enabled->SetValue(enabled);
+    HRESULT_CHECK_RETURN(hr, L"_enabled->SetValue failed");
+
+    hr = UpdateStatus(false);
+    DBG_HRESULT_CHECK(hr, L"UpdateStatus failed");
+
+    return S_OK;
+}
+
 HRESULT ContextManager::ToggleUserEnabled() {
+    long enabled;
     HRESULT hr;
 
     if (!_focus || _focus->IsBlocked()) {
@@ -33,19 +61,17 @@ HRESULT ContextManager::ToggleUserEnabled() {
         return S_OK;
     }
 
-    long openclose;
-    hr = _openclose->GetValue(&openclose);
-    HRESULT_CHECK(hr, L"_openclose->GetValue failed");
-    if (FAILED(hr)) {
-        openclose = 0;
-    }
+    hr = _enabled->GetValue(&enabled, !_defaultEnabled);
+    HRESULT_CHECK_RETURN(hr, L"_enabled->GetValue failed");
 
-    long newOpenClose = openclose == 0 ? 1 : 0;
-    DBG_DPRINT(L"toggling openclose to %ld", newOpenClose);
-    hr = _openclose->SetValue(newOpenClose);
+    enabled = !enabled;
+    hr = _openclose->SetValue(enabled);
     HRESULT_CHECK_RETURN(hr, L"_openclose->SetValue failed");
+    hr = _enabled->SetValue(enabled);
+    HRESULT_CHECK_RETURN(hr, L"_enabled->SetValue failed");
+
     hr = UpdateStatus(true);
-    DBG_HRESULT_CHECK(hr, L"UpdateStatus failed");
+    DBG_HRESULT_CHECK(hr, L"UpdateEnabled failed");
 
     return S_OK;
 }
@@ -225,8 +251,14 @@ _Check_return_ HRESULT ContextManager::Initialize(
     hr = CreateInitialize(&_status, this, _threadMgr);
     HRESULT_CHECK_RETURN(hr, L"CreateInitialize(&_status) failed");
 
+    // GUID_Compartment_EnabledToggle is global
+    hr = CreateInitialize(&_enabled, threadMgr, clientid, Globals::GUID_Compartment_EnabledToggle, true, [this] {
+        return OnToggle(false);
+    });
+    HRESULT_CHECK_RETURN(hr, L"_enabled->Initialize failed");
+
     hr = CreateInitialize(&_openclose, threadMgr, clientid, GUID_COMPARTMENT_KEYBOARD_OPENCLOSE, false, [this] {
-        return UpdateStatus(false);
+        return OnToggle(true);
     });
     DBG_HRESULT_CHECK(hr, L"_openclose->Initialize failed");
 
@@ -296,6 +328,9 @@ HRESULT ContextManager::Uninitialize() {
     if (_openclose)
         _openclose->Uninitialize();
     _openclose.Release();
+    if (_enabled)
+        _enabled->Uninitialize();
+    _enabled.Release();
 
     if (_status)
         _status->Uninitialize();

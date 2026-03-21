@@ -238,7 +238,7 @@ STDMETHODIMP LanguageBarButton::GetIcon(__RPC__deref_out_opt HICON* phIcon) {
     if (_status->IsBlocked()) {
         *phIcon = static_cast<HICON>(LoadImage(
             Globals::DllInstance, MAKEINTRESOURCE(light ? IDI_ICONXL : IDI_ICONXD), IMAGE_ICON, iconx, icony, 0));
-    } else if (_status->IsOpenClose()) {
+    } else if (_status->IsEnabled()) {
         *phIcon = static_cast<HICON>(LoadImage(
             Globals::DllInstance, MAKEINTRESOURCE(light ? IDI_ICONVL : IDI_ICONVD), IMAGE_ICON, iconx, icony, 0));
     } else {
@@ -252,7 +252,7 @@ STDMETHODIMP LanguageBarButton::GetText(__RPC__deref_out_opt BSTR* pbstrText) {
     if (!pbstrText) {
         return E_INVALIDARG;
     }
-    *pbstrText = SysAllocString(_status->IsOpenClose() ? L"VIE" : L"ENG");
+    *pbstrText = SysAllocString(_status->IsEnabled() ? L"VIE" : L"ENG");
     return *pbstrText ? S_OK : E_OUTOFMEMORY;
 }
 
@@ -262,7 +262,7 @@ STDMETHODIMP LanguageBarButton::GetTooltipString(__RPC__deref_out_opt BSTR* pbst
     }
     const wchar_t* status = Globals::TextServiceDescription;
     if (!_status->IsBlocked()) {
-        status = _status->IsOpenClose() ? L"Ti\x1ebfng Vi\x1ec7t" : L"English";
+        status = _status->IsEnabled() ? L"Ti\x1ebfng Vi\x1ec7t" : L"English";
     }
     *pbstrText = SysAllocString(status);
     return *pbstrText ? S_OK : E_OUTOFMEMORY;
