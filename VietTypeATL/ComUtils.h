@@ -29,6 +29,7 @@ _Check_return_ HRESULT CreateInitialize(_COM_Outptr_ T** ppout, Args... args) {
         hr = (*ppout)->Initialize(args...);
         if (FAILED(hr)) {
             HRESULT_CHECK(hr, L"%hs->Initialize failed", typeid(T).name());
+            p->Uninitialize();
             p->Release();
             *ppout = nullptr;
         }

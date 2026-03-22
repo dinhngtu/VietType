@@ -48,16 +48,28 @@ STDMETHODIMP TextService::ActivateEx(_In_ ITfThreadMgr* ptim, _In_ TfClientId ti
     HRESULT hr;
 
     hr = CreateInstance2(&_attributeStore);
-    HRESULT_CHECK_RETURN(hr, L"CreateInstance2(&_attributeStore) failed");
+    HRESULT_CHECK(hr, L"CreateInstance2(&_attributeStore) failed");
+    if (FAILED(hr)) {
+        Deactivate();
+        return hr;
+    }
 
     hr = CreateInitialize(&_settings, ptim, tid);
-    HRESULT_CHECK_RETURN(hr, L"CreateInitialize(_settings) failed");
+    HRESULT_CHECK(hr, L"CreateInitialize(_settings) failed");
+    if (FAILED(hr)) {
+        Deactivate();
+        return hr;
+    }
 
     hr = InitializeDisplayAttributes(ptim, tid);
     DBG_HRESULT_CHECK(hr, L"InitializeDisplayAttributes failed");
 
     hr = CreateInitialize(&_contextManager, ptim, tid, _settings, _displayAtom);
-    HRESULT_CHECK_RETURN(hr, L"CreateInitialize(&_contextManager) failed");
+    HRESULT_CHECK(hr, L"CreateInitialize(&_contextManager) failed");
+    if (FAILED(hr)) {
+        Deactivate();
+        return hr;
+    }
 
     return S_OK;
 }

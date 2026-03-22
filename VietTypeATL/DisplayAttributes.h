@@ -32,6 +32,8 @@ public:
 
 public:
     HRESULT Initialize(_In_ const GUID& guid, _In_z_ const wchar_t* description, _In_ const TF_DISPLAYATTRIBUTE& attr);
+    void Uninitialize() {
+    }
 
 private:
     GUID _guid = {0};
