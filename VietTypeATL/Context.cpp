@@ -208,11 +208,6 @@ HRESULT Context::GetComposition(_In_ TfEditCookie ec, _COM_Outptr_result_maybenu
     }
 }
 
-void Context::UpdateStatus() {
-    HRESULT hr = _parent->UpdateStatus(this);
-    DBG_HRESULT_CHECK(hr, "_parent->UpdateStatus failed");
-}
-
 HRESULT Context::StartComposition() {
     HRESULT hr, hrSession;
 

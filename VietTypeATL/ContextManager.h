@@ -19,6 +19,7 @@ using ContextMap = std::map<ITfContext*, CComPtr<Context>>;
 
 class ATL_NO_VTABLE ContextManager : public CComObjectRootEx<CComSingleThreadModel>,
                                      public ITfThreadMgrEventSink,
+                                     public ITfThreadFocusSink,
                                      public ITfKeyEventSink {
 public:
     ContextManager() = default;
@@ -30,6 +31,7 @@ public:
     DECLARE_NOT_AGGREGATABLE(ContextManager)
     BEGIN_COM_MAP(ContextManager)
     COM_INTERFACE_ENTRY(ITfThreadMgrEventSink)
+    COM_INTERFACE_ENTRY(ITfThreadFocusSink)
     COM_INTERFACE_ENTRY(ITfKeyEventSink)
     END_COM_MAP()
     DECLARE_PROTECT_FINAL_CONSTRUCT()
@@ -41,6 +43,10 @@ public:
         __RPC__in_opt ITfDocumentMgr* pdimFocus, __RPC__in_opt ITfDocumentMgr* pdimPrevFocus) override;
     virtual STDMETHODIMP OnPushContext(__RPC__in_opt ITfContext* pic) override;
     virtual STDMETHODIMP OnPopContext(__RPC__in_opt ITfContext* pic) override;
+
+    // Inherited via ITfThreadFocusSink
+    virtual STDMETHODIMP OnSetThreadFocus() override;
+    virtual STDMETHODIMP OnKillThreadFocus() override;
 
     // Inherited via ITfKeyEventSink
     virtual STDMETHODIMP OnSetFocus(_In_ BOOL fForeground) override;
@@ -78,20 +84,14 @@ public:
         return _clientid;
     }
 
-    // API for context uses
-    constexpr bool IsDefaultEnabled() const {
-        return _defaultEnabled;
-    }
     HRESULT ToggleUserEnabled();
 
-    HRESULT UpdateStatus(_In_ Context* context);
-
 private:
-    HRESULT OnToggle(bool fromOpenClose);
     bool IsEnabled(_In_ Context* context) const;
 
     HRESULT OnToggle(bool fromOpenClose);
     HRESULT OnSettingsChange();
+    // `foreground` is only advisory as we'll update status when `foreground == false` if we have input focus
     HRESULT UpdateStatus(bool foreground);
 
     HRESULT OnKeyCommon(
@@ -123,6 +123,7 @@ private:
     CComPtr<CompartmentNotifier> _systemNotify;
 
     SinkAdvisor<ITfThreadMgrEventSink> _threadMgrEventSinkAdvisor;
+    SinkAdvisor<ITfThreadFocusSink> _threadFocusSinkAdvisor;
     TF_PRESERVEDKEY _pk_toggle;
 
     bool _initialized = false;

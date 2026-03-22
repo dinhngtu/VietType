@@ -10,24 +10,7 @@
 namespace VietType {
 
 STDMETHODIMP ContextManager::OnSetFocus(_In_ BOOL fForeground) {
-    HRESULT hr;
-
-    DBG_DPRINT(L"foreground %d", fForeground);
-
-    _focus.Release();
-
-    if (!fForeground) {
-        return S_OK;
-    }
-
-    CComPtr<ITfDocumentMgr> docMgr;
-    hr = _threadMgr->GetFocus(&docMgr);
-    if (FAILED(hr)) {
-        // we don't care about the error since there might be no focused document manager
-        return S_OK;
-    }
-
-    return OnSetFocus(docMgr, nullptr);
+    return S_OK;
 }
 
 HRESULT ContextManager::OnKeyCommon(

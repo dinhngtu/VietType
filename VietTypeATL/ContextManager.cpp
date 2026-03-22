@@ -26,25 +26,29 @@ static HRESULT IsContextEmpty(_In_ ITfContext* context, _In_ TfClientId clientid
 }
 
 HRESULT ContextManager::OnToggle(bool fromOpenClose) {
-    long enabled;
+    long openclose, enabled;
     HRESULT hr;
 
     if (!this->_initialized) {
         return S_FALSE;
     }
 
-    if (fromOpenClose) {
-        hr = _openclose->GetValue(&enabled);
-        HRESULT_CHECK_RETURN(hr, L"_openclose->GetValue failed");
-    } else {
-        hr = _enabled->GetValue(&enabled, _defaultEnabled);
-        HRESULT_CHECK_RETURN(hr, L"_enabled->GetValue failed");
-    }
+    hr = _openclose->GetValue(&openclose);
+    HRESULT_CHECK_RETURN(hr, L"_openclose->GetValue failed");
+    hr = _enabled->GetValue(&enabled, _defaultEnabled);
+    HRESULT_CHECK_RETURN(hr, L"_enabled->GetValue failed");
 
-    hr = _openclose->SetValue(enabled);
-    HRESULT_CHECK_RETURN(hr, L"_openclose->SetValue failed");
-    hr = _enabled->SetValue(enabled);
-    HRESULT_CHECK_RETURN(hr, L"_enabled->SetValue failed");
+    DBG_DPRINT(
+        L"%s openclose %ld enabled %ld", fromOpenClose ? L"from openclose" : L"from enabled", openclose, enabled);
+    if (!!openclose != !!enabled) {
+        if (fromOpenClose) {
+            hr = _enabled->SetValue(enabled);
+            DBG_HRESULT_CHECK(hr, L"_enabled->SetValue failed");
+        } else {
+            hr = _openclose->SetValue(enabled);
+            DBG_HRESULT_CHECK(hr, L"_openclose->SetValue failed");
+        }
+    }
 
     hr = UpdateStatus(fromOpenClose);
     DBG_HRESULT_CHECK(hr, L"UpdateStatus failed");
@@ -65,6 +69,7 @@ HRESULT ContextManager::OnSettingsChange() {
         _config = newConfig;
         _configVersion++;
     }
+    DBG_DPRINT(L"config version %llu", _configVersion);
 
     hr = UpdateStatus(false);
     DBG_HRESULT_CHECK(hr, L"UpdateStatus failed");
@@ -77,16 +82,14 @@ HRESULT ContextManager::ToggleUserEnabled() {
     HRESULT hr;
 
     if (!_focus || _focus->IsBlocked()) {
-        DBG_DPRINT("write enabled skipped since engine is blocked");
         return S_OK;
     }
 
     hr = _enabled->GetValue(&enabled, !_defaultEnabled);
     HRESULT_CHECK_RETURN(hr, L"_enabled->GetValue failed");
 
+    DBG_DPRINT(L"%ld -> %ld", enabled, !enabled);
     enabled = !enabled;
-    hr = _openclose->SetValue(enabled);
-    HRESULT_CHECK_RETURN(hr, L"_openclose->SetValue failed");
     hr = _enabled->SetValue(enabled);
     HRESULT_CHECK_RETURN(hr, L"_enabled->SetValue failed");
 
@@ -128,36 +131,34 @@ bool ContextManager::IsEnabled(_In_ Context* context) const {
 }
 
 HRESULT ContextManager::UpdateStatus(bool foreground) {
+    BOOL threadFocus;
     HRESULT hr;
 
     if (!this->_initialized) {
         return S_FALSE;
     }
 
+    if (!foreground) {
+        hr = _threadMgr->IsThreadFocus(&threadFocus);
+        if (FAILED(hr)) {
+            threadFocus = true;
+        }
+        if (!threadFocus) {
+            DBG_DPRINT(L"no thread focus");
+            return S_FALSE;
+        }
+    }
+
     long openclose;
     hr = _openclose->GetValue(&openclose);
     DBG_HRESULT_CHECK(hr, L"_openclose->GetValue failed");
 
-    DBG_DPRINT(L"openclose = %ld", openclose);
+    DBG_DPRINT(L"openclose %ld, blocked %ld", openclose, _focus ? _focus->IsBlocked() : true);
 
-    if (foreground) {
-        _settings->IsDefaultEnabled(&_defaultEnabled);
-        _settings->IsBackconvert(reinterpret_cast<DWORD*>(&_backconvert));
-
-        hr = _settings->LoadTelexSettings(_config);
-        if (_focus) {
-            _focus->GetEngine()->SetConfig(_config);
-        }
-    }
-
-    hr = _status->UpdateStatus(!!openclose, _focus ? _focus->IsBlocked() : true);
+    hr = _status->UpdateStatus(openclose, _focus ? _focus->IsBlocked() : true);
     DBG_HRESULT_CHECK(hr, L"_langBarButton->Refresh failed");
 
     return S_OK;
-}
-
-HRESULT ContextManager::UpdateStatus(_In_ Context* context) {
-    return UpdateStatus(context == _focus);
 }
 
 STDMETHODIMP ContextManager::OnInitDocumentMgr(__RPC__in_opt ITfDocumentMgr* pdim) {
@@ -194,7 +195,7 @@ STDMETHODIMP ContextManager::OnUninitDocumentMgr(__RPC__in_opt ITfDocumentMgr* p
 
 STDMETHODIMP ContextManager::OnSetFocus(
     __RPC__in_opt ITfDocumentMgr* pdimFocus, __RPC__in_opt ITfDocumentMgr* pdimPrevFocus) {
-    HRESULT hr, hrSession;
+    HRESULT hr;
 
     DBG_DPRINT(L"pdimFocus = %p", pdimFocus);
 
@@ -204,45 +205,45 @@ STDMETHODIMP ContextManager::OnSetFocus(
         return S_OK;
     }
 
-    CComPtr<ITfContext> context;
-    hr = pdimFocus->GetTop(&context);
+    CComPtr<ITfContext> pic;
+    hr = pdimFocus->GetTop(&pic);
     if (FAILED(hr)) {
         return S_OK;
     }
 
-    if (!context) {
+    if (!pic) {
         _focus.Release();
         return S_OK;
     }
 
-    if (_focus && _focus->GetContext() == context) {
+    if (_focus && _focus->GetContext() == pic) {
         return S_OK;
     }
 
-    hr = OnPushContext(context);
+    hr = OnPushContext(pic);
     HRESULT_CHECK_RETURN(hr, L"creating context with OnPushContext failed");
-    _focus = _contextMap.at(context);
-
-    _focus->GetEngine()->SetConfig(_config);
-    hr = _focus->UpdateBlocked(&hrSession);
-    if (FAILED(hr) || FAILED(hrSession)) {
-        DBG_HRESULT_CHECK(hr, L"ContextManager::RequestEditSession failed");
-    }
+    _focus = _contextMap.at(pic);
 
     return S_OK;
 }
 
 STDMETHODIMP ContextManager::OnPushContext(__RPC__in_opt ITfContext* pic) {
-    HRESULT hr;
+    HRESULT hr, hrSession;
 
     DBG_DPRINT(L"context = %p", pic);
 
     auto it = _contextMap.lower_bound(pic);
     if (it == _contextMap.end() || _contextMap.key_comp()(pic, it->first) != 0) {
         CComPtr<Context> context;
-        hr = CreateInitialize(&context, this, pic, static_cast<const Telex::TelexConfig&>(_config), _displayAtom);
+        hr = CreateInitialize(
+            &context, this, pic, static_cast<const Telex::TelexConfig&>(_config), _configVersion, _displayAtom);
         HRESULT_CHECK_RETURN(hr, "Create Context failed");
-        _contextMap.insert(it, {pic, std::move(context)});
+        it = _contextMap.insert(it, {pic, std::move(context)});
+    }
+
+    hr = it->second->UpdateBlocked(&hrSession);
+    if (FAILED(hr) || FAILED(hrSession)) {
+        DBG_HRESULT_CHECK(hr, L"ContextManager::RequestEditSession failed");
     }
 
     return S_OK;
@@ -251,7 +252,44 @@ STDMETHODIMP ContextManager::OnPushContext(__RPC__in_opt ITfContext* pic) {
 STDMETHODIMP ContextManager::OnPopContext(__RPC__in_opt ITfContext* pic) {
     DBG_DPRINT(L"context = %p", pic);
 
+    if (_focus && _focus->GetContext() == pic) {
+        _focus.Release();
+    }
     _contextMap.erase(pic);
+
+    return S_OK;
+}
+
+STDMETHODIMP ContextManager::OnSetThreadFocus() {
+    HRESULT hr;
+
+    DBG_DPRINT(L"");
+
+    CComPtr<ITfDocumentMgr> docMgr;
+    hr = _threadMgr->GetFocus(&docMgr);
+    DBG_HRESULT_CHECK(hr, L"_threadMgr->GetFocus failed");
+    if (FAILED(hr)) {
+        docMgr = nullptr;
+    }
+    hr = OnSetFocus(docMgr, nullptr);
+    DBG_HRESULT_CHECK(hr, L"OnSetFocus failed");
+
+    hr = UpdateStatus(true);
+    DBG_HRESULT_CHECK(hr, L"UpdateStatus failed");
+
+    return S_OK;
+}
+
+STDMETHODIMP ContextManager::OnKillThreadFocus() {
+    HRESULT hr;
+
+    DBG_DPRINT(L"");
+
+    hr = OnSetFocus(nullptr, nullptr);
+    DBG_HRESULT_CHECK(hr, L"OnSetFocus failed");
+
+    hr = UpdateStatus(false);
+    DBG_HRESULT_CHECK(hr, L"UpdateStatus failed");
 
     return S_OK;
 }
@@ -291,12 +329,16 @@ _Check_return_ HRESULT ContextManager::Initialize(
     DBG_HRESULT_CHECK(hr, L"_systemNotify->Initialize failed");
 
     OnSettingsChange();
+    OnToggle(false);
 
     // must enable self before we get focus events from the threadmgr event sink
     _initialized = true;
 
     hr = _threadMgrEventSinkAdvisor.Advise(threadMgr, this);
     HRESULT_CHECK_RETURN(hr, L"_threadMgrEventSinkAdvisor.Advise failed");
+
+    hr = _threadFocusSinkAdvisor.Advise(threadMgr, this);
+    HRESULT_CHECK_RETURN(hr, L"_threadFocusSinkAdvisor.Advise failed");
 
     CComPtr<ITfKeystrokeMgr> keystrokeMgr;
     hr = _threadMgr->QueryInterface(&keystrokeMgr);
@@ -311,6 +353,8 @@ _Check_return_ HRESULT ContextManager::Initialize(
     } else {
         DBG_HRESULT_CHECK(hr, L"_threadMgr->QueryInterface failed");
     }
+
+    OnSetThreadFocus();
 
     return S_OK;
 }
@@ -336,6 +380,7 @@ HRESULT ContextManager::Uninitialize() {
         }
     }
 
+    _threadFocusSinkAdvisor.Unadvise();
     _threadMgrEventSinkAdvisor.Unadvise();
 
     if (_systemNotify)

@@ -16,21 +16,6 @@ namespace VietType {
         }                                                                                                              \
     } while (0);
 
-HRESULT Context::DoUpdateBlocked(_Out_ HRESULT* hrSession) {
-    *hrSession = S_OK;
-
-    // check transitory context
-
-    if (IsTransitory()) {
-        // transitory context doesn't seem to support input scopes, free right away
-        DBG_DPRINT(L"free: transitory context");
-        _blocked = false;
-        return S_OK;
-    }
-
-    return RequestEditSessionEx(EditBlocked, TF_ES_SYNC | TF_ES_READ, hrSession);
-}
-
 HRESULT Context::EditBlocked(_In_ TfEditCookie ec, _In_ Context* context) {
     HRESULT hr;
 
@@ -107,11 +92,18 @@ commit:
 }
 
 HRESULT Context::UpdateBlocked(_Out_ HRESULT* hrSession) {
-    HRESULT hr;
+    *hrSession = S_OK;
 
-    hr = DoUpdateBlocked(hrSession);
-    UpdateStatus();
-    return hr;
+    // check transitory context
+
+    if (IsTransitory()) {
+        // transitory context doesn't seem to support input scopes, free right away
+        DBG_DPRINT(L"free: transitory context");
+        _blocked = false;
+        return S_OK;
+    }
+
+    return RequestEditSessionEx(EditBlocked, TF_ES_SYNC | TF_ES_READ, hrSession);
 }
 
 } // namespace VietType

@@ -72,7 +72,6 @@ public:
     bool IsCuas() const {
         return _isCuas;
     }
-    void UpdateStatus();
 
     HRESULT StartComposition();
     HRESULT EndComposition();
@@ -132,7 +131,6 @@ private:
         _In_ Telex::TelexStates state,
         _In_ wchar_t nonEngineAppend);
 
-    HRESULT DoUpdateBlocked(_Out_ HRESULT* hrSession);
 
     // edit sessions
     static HRESULT _StartComposition(TfEditCookie ec, Context* context) {
