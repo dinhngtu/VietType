@@ -46,6 +46,26 @@ HRESULT ContextManager::OnToggle(bool fromOpenClose) {
     hr = _enabled->SetValue(enabled);
     HRESULT_CHECK_RETURN(hr, L"_enabled->SetValue failed");
 
+    hr = UpdateStatus(fromOpenClose);
+    DBG_HRESULT_CHECK(hr, L"UpdateStatus failed");
+
+    return S_OK;
+}
+
+HRESULT ContextManager::OnSettingsChange() {
+    Telex::TelexConfig newConfig;
+    HRESULT hr;
+
+    _settings->IsDefaultEnabled(&_defaultEnabled);
+    _settings->IsBackconvert(reinterpret_cast<DWORD*>(&_backconvert));
+
+    hr = _settings->LoadTelexSettings(newConfig);
+    HRESULT_CHECK(hr, L"LoadTelexSettings failed");
+    if (SUCCEEDED(hr)) {
+        _config = newConfig;
+        _configVersion++;
+    }
+
     hr = UpdateStatus(false);
     DBG_HRESULT_CHECK(hr, L"UpdateStatus failed");
 
@@ -264,13 +284,13 @@ _Check_return_ HRESULT ContextManager::Initialize(
 
     // init settings compartment & listener
     hr = CreateInitialize(&_systemNotify, threadMgr, clientid, Globals::GUID_Compartment_SystemNotify, true, [this] {
-        HRESULT hr = UpdateStatus(true);
-        DBG_HRESULT_CHECK(hr, L"UpdateStatus failed");
+        HRESULT hr = OnSettingsChange();
+        DBG_HRESULT_CHECK(hr, L"OnSettingsChange failed");
         return S_OK;
     });
     DBG_HRESULT_CHECK(hr, L"_systemNotify->Initialize failed");
-    // must cache defaultEnabled early since it's used right away
-    _settings->IsDefaultEnabled(&_defaultEnabled);
+
+    OnSettingsChange();
 
     // must enable self before we get focus events from the threadmgr event sink
     _initialized = true;

@@ -67,6 +67,9 @@ public:
     const Telex::TelexConfig& GetConfig() const {
         return _config;
     }
+    uint64_t GetConfigVersion() const {
+        return _configVersion;
+    }
     EngineSettingsController* GetSettings() const {
         return _settings;
     }
@@ -86,6 +89,9 @@ public:
 private:
     HRESULT OnToggle(bool fromOpenClose);
     bool IsEnabled(_In_ Context* context) const;
+
+    HRESULT OnToggle(bool fromOpenClose);
+    HRESULT OnSettingsChange();
     HRESULT UpdateStatus(bool foreground);
 
     HRESULT OnKeyCommon(
@@ -106,6 +112,7 @@ private:
     CComPtr<StatusController> _status;
 
     Telex::TelexConfig _config{};
+    uint64_t _configVersion = 0;
     CComPtr<CachedCompartmentSetting<long>> _enabled;
     CComPtr<CachedCompartmentSetting<long>> _openclose;
 

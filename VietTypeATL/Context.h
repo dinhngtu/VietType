@@ -40,6 +40,7 @@ public:
         _In_ ContextManager* parent,
         _In_ ITfContext* context,
         _In_ const Telex::TelexConfig& config,
+        _In_ uint64_t configVersion,
         _In_ TfGuidAtom displayAtom);
     HRESULT Uninitialize();
     void FinalRelease() {
@@ -52,6 +53,14 @@ public:
     }
     Telex::ITelexEngine* GetEngine() const {
         return _engine.get();
+    }
+    bool UpdateConfig(_In_ const Telex::TelexConfig& config, _In_ uint64_t configVersion) {
+        if (configVersion > _configVersion) {
+            _engine->SetConfig(config);
+            _configVersion = configVersion;
+            return true;
+        }
+        return false;
     }
 
     constexpr bool IsBlocked() const {
@@ -171,6 +180,7 @@ private:
     bool _blocked = false;
 
     std::unique_ptr<Telex::ITelexEngine> _engine;
+    uint64_t _configVersion = 0;
     SinkAdvisor<ITfTextEditSink> _textEditSinkAdvisor;
 };
 

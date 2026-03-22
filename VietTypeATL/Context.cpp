@@ -77,6 +77,7 @@ HRESULT Context::Initialize(
     _In_ ContextManager* parent,
     _In_ ITfContext* context,
     _In_ const Telex::TelexConfig& config,
+    _In_ uint64_t configVersion,
     _In_ TfGuidAtom displayAttrAtom) {
     HRESULT hr;
 
@@ -89,6 +90,7 @@ HRESULT Context::Initialize(
     _displayAtom = displayAttrAtom;
 
     _engine.reset(Telex::TelexNew(config));
+    _configVersion = configVersion;
 
     hr = _textEditSinkAdvisor.Advise(_context, this);
     DBG_HRESULT_CHECK(hr, L"_textEditSinkAdvisor.Advise failed");
