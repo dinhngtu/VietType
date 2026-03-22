@@ -38,14 +38,7 @@ jobs:
       - uses: actions/checkout@v6
 
       - name: Add MSBuild to PATH
-        uses: microsoft/setup-msbuild@v2
-
-      - name: Setup VSTest.console.exe
-        shell: powershell
-        run: |
-          $ErrorActionPreference = "Stop"
-          $vs = & "${Env:ProgramFiles(x86)}/Microsoft Visual Studio/Installer/vswhere.exe" -latest -property installationPath
-          Add-Content $Env:GITHUB_PATH "$vs/Common7/IDE/Extensions/TestPlatform"
+        uses: microsoft/setup-msbuild@v3
 
       - name: Build unit tests
         run: msbuild.exe -m -target:VietTypeUnitTests:Rebuild -p:Configuration=${{matrix.configuration}} -p:Platform=${{matrix.platform}} .
