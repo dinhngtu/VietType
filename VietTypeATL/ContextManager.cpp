@@ -184,6 +184,9 @@ STDMETHODIMP ContextManager::OnUninitDocumentMgr(__RPC__in_opt ITfDocumentMgr* p
         ULONG fetched;
         hr = contexts->Next(1, &context, &fetched);
         if (SUCCEEDED(hr) && fetched) {
+            if (_focus && _focus->GetContext() == context.p) {
+                _focus.Release();
+            }
             _contextMap.erase(context.p);
         } else {
             break;
