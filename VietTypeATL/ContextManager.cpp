@@ -329,7 +329,6 @@ _Check_return_ HRESULT ContextManager::Initialize(
     DBG_HRESULT_CHECK(hr, L"_systemNotify->Initialize failed");
 
     OnSettingsChange();
-    OnToggle(false);
 
     // must enable self before we get focus events from the threadmgr event sink
     _initialized = true;
@@ -355,6 +354,7 @@ _Check_return_ HRESULT ContextManager::Initialize(
     }
 
     OnSetThreadFocus();
+    OnToggle(false);
 
     return S_OK;
 }
