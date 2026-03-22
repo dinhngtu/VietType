@@ -55,7 +55,7 @@ static _Check_return_ HRESULT GetVirtualDocumentContext(
     }
 
     hr = virtualDim->GetTop(pContext);
-    HRESULT_CHECK_RETURN_OUTPTR(hr, pContext, L"pdim->GetTop failed");
+    HRESULT_CHECK_RETURN_OUTPTR(hr, pContext, L"virtualDim->GetTop failed");
 
     return S_OK;
 }

@@ -45,7 +45,7 @@ HRESULT Context::StartCompositionNow(_In_ TfEditCookie ec, _COM_Outptr_opt_ ITfC
 
     CComPtr<ITfInsertAtSelection> insertAtSelection;
     hr = _context->QueryInterface(&insertAtSelection);
-    HRESULT_CHECK_RETURN(hr, L"context->QueryInterface failed");
+    HRESULT_CHECK_RETURN(hr, L"_context->QueryInterface failed");
 
     CComPtr<ITfRange> insertRange;
     hr = insertAtSelection->InsertTextAtSelection(ec, TF_IAS_QUERYONLY, NULL, 0, &insertRange);
@@ -53,7 +53,7 @@ HRESULT Context::StartCompositionNow(_In_ TfEditCookie ec, _COM_Outptr_opt_ ITfC
 
     CComPtr<ITfContextComposition> contextComposition;
     hr = _context->QueryInterface(&contextComposition);
-    HRESULT_CHECK_RETURN(hr, L"context->QueryInterface failed");
+    HRESULT_CHECK_RETURN(hr, L"_context->QueryInterface failed");
 
     hr = contextComposition->StartComposition(ec, insertRange, compositionSink, &composition.p);
     HRESULT_CHECK_RETURN(hr, L"contextComposition->StartComposition failed");
@@ -80,6 +80,7 @@ HRESULT Context::EndCompositionNow(_In_ TfEditCookie ec, _In_opt_ ITfComposition
 
     CComPtr<ITfRange> range;
     hr = composition->GetRange(&range);
+    HRESULT_CHECK(hr, L"composition->GetRange failed");
     if (SUCCEEDED(hr)) {
         if (_displayAtom != TF_INVALID_GUIDATOM) {
             hr = ClearRangeDisplayAttribute(ec, range);
@@ -90,9 +91,7 @@ HRESULT Context::EndCompositionNow(_In_ TfEditCookie ec, _In_opt_ ITfComposition
         DBG_HRESULT_CHECK(hr, L"MoveCaretToEnd failed");
 
         hr = composition->EndComposition(ec);
-        DBG_HRESULT_CHECK(hr, L"_composition->EndComposition failed");
-    } else {
-        HRESULT_CHECK(hr, L"_composition->GetRange failed");
+        DBG_HRESULT_CHECK(hr, L"composition->EndComposition failed");
     }
 
     return S_OK;
@@ -115,7 +114,7 @@ HRESULT Context::SetCompositionText(
 
     CComPtr<ITfRange> range;
     hr = composition->GetRange(&range);
-    HRESULT_CHECK_RETURN(hr, L"_composition->GetRange failed");
+    HRESULT_CHECK_RETURN(hr, L"composition->GetRange failed");
 
     hr = range->SetText(ec, 0, str, length);
     HRESULT_CHECK_RETURN(hr, L"range->SetText failed");
@@ -147,7 +146,7 @@ HRESULT Context::MoveCaretToEnd(_In_ TfEditCookie ec, _In_ ITfComposition* compo
 
     CComPtr<ITfRange> range;
     hr = composition->GetRange(&range);
-    HRESULT_CHECK_RETURN(hr, L"_composition->GetRange failed");
+    HRESULT_CHECK_RETURN(hr, L"composition->GetRange failed");
 
     CComPtr<ITfRange> rangeClone;
     hr = range->Clone(&rangeClone);
@@ -180,7 +179,7 @@ HRESULT Context::SetRangeDisplayAttribute(_In_ TfEditCookie ec, _In_ ITfRange* r
 
     CComPtr<ITfProperty> prop;
     hr = _context->GetProperty(GUID_PROP_ATTRIBUTE, &prop);
-    HRESULT_CHECK_RETURN(hr, L"context->GetProperty failed");
+    HRESULT_CHECK_RETURN(hr, L"_context->GetProperty failed");
 
     CComVariant v = static_cast<int>(_displayAtom);
     hr = prop->SetValue(ec, range, &v);
@@ -194,7 +193,7 @@ HRESULT Context::ClearRangeDisplayAttribute(_In_ TfEditCookie ec, _In_ ITfRange*
 
     CComPtr<ITfProperty> prop;
     hr = _context->GetProperty(GUID_PROP_ATTRIBUTE, &prop);
-    HRESULT_CHECK_RETURN(hr, L"context->GetProperty failed");
+    HRESULT_CHECK_RETURN(hr, L"_context->GetProperty failed");
 
     hr = prop->Clear(ec, range);
     HRESULT_CHECK_RETURN(hr, L"prop->Clear failed");
@@ -249,7 +248,7 @@ HRESULT Context::DoEditNextState(
     } else if (composition) {
         // EndComposition* will not empty composition text so we have to do it manually
         hr = EmptyCompositionText(ec, composition);
-        HRESULT_CHECK_RETURN(hr, L"_contextManager->EmptyCompositionText failed");
+        HRESULT_CHECK_RETURN(hr, L"EmptyCompositionText failed");
     }
 
     // now sync the engine state with the composition state
@@ -257,7 +256,7 @@ HRESULT Context::DoEditNextState(
         // EnsureComposition should already be called above
     } else if (composition) {
         hr = EndCompositionNow(ec, composition);
-        HRESULT_CHECK_RETURN(hr, L"_contextManager->EndCompositionNow failed");
+        HRESULT_CHECK_RETURN(hr, L"EndCompositionNow failed");
         composition.Release();
     }
 

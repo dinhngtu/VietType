@@ -126,7 +126,7 @@ HRESULT TextService::InitializeDisplayAttributes(_In_ ITfThreadMgr* ptim, _In_ T
 
     GUID guid;
     hr = composingAttrib->GetGUID(&guid);
-    HRESULT_CHECK_RETURN(hr, L"attr->GetGUID failed");
+    HRESULT_CHECK_RETURN(hr, L"composingAttrib->GetGUID failed");
 
     hr = categoryMgr->RegisterGUID(guid, &_displayAtom);
     HRESULT_CHECK_RETURN(hr, L"categoryMgr->RegisterGUID failed");
@@ -163,7 +163,7 @@ HRESULT TextService::UpdateDisplayAttributes(_COM_Outptr_opt_ ITfDisplayAttribut
     CComPtr<DisplayAttributeInfo> composingAttrib(static_cast<DisplayAttributeInfo*>(_attributeStore->GetAttribute(0)));
     if (composingAttrib) {
         hr = composingAttrib->SetAttributeInfo(&ComposingAttributes[showComposingAttr]);
-        HRESULT_CHECK_RETURN(hr, L"SetAttributeInfo failed");
+        HRESULT_CHECK_RETURN(hr, L"composingAttrib->SetAttributeInfo failed");
 
     } else {
         hr = CreateInitialize(

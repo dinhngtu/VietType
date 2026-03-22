@@ -15,11 +15,11 @@ static HRESULT IsContextEmpty(_In_ ITfContext* context, _In_ TfClientId clientid
 
     Compartment<long> compEmpty;
     hr = compEmpty.Initialize(context, clientid, GUID_COMPARTMENT_EMPTYCONTEXT);
-    HRESULT_CHECK_RETURN(hr, L"compEmpty->Initialize failed");
+    HRESULT_CHECK_RETURN(hr, L"compEmpty.Initialize failed");
 
     long contextEmpty;
     hr = compEmpty.GetValue(&contextEmpty);
-    HRESULT_CHECK_RETURN(hr, L"compDisabled->GetValue failed");
+    HRESULT_CHECK_RETURN(hr, L"compEmpty.GetValue failed");
 
     *isempty = hr == S_OK && contextEmpty;
     return hr;
@@ -85,6 +85,7 @@ HRESULT ContextManager::ToggleUserEnabled() {
         return S_OK;
     }
 
+    // have to use _enabled here, since we can't use _defaultEnabled otherwise
     hr = _enabled->GetValue(&enabled, !_defaultEnabled);
     HRESULT_CHECK_RETURN(hr, L"_enabled->GetValue failed");
 
@@ -94,7 +95,7 @@ HRESULT ContextManager::ToggleUserEnabled() {
     HRESULT_CHECK_RETURN(hr, L"_enabled->SetValue failed");
 
     hr = UpdateStatus(true);
-    DBG_HRESULT_CHECK(hr, L"UpdateEnabled failed");
+    DBG_HRESULT_CHECK(hr, L"UpdateStatus failed");
 
     return S_OK;
 }
@@ -156,7 +157,7 @@ HRESULT ContextManager::UpdateStatus(bool foreground) {
     DBG_DPRINT(L"openclose %ld, blocked %ld", openclose, _focus ? _focus->IsBlocked() : true);
 
     hr = _status->UpdateStatus(openclose, _focus ? _focus->IsBlocked() : true);
-    DBG_HRESULT_CHECK(hr, L"_langBarButton->Refresh failed");
+    DBG_HRESULT_CHECK(hr, L"_status->UpdateStatus failed");
 
     return S_OK;
 }
@@ -240,13 +241,13 @@ STDMETHODIMP ContextManager::OnPushContext(__RPC__in_opt ITfContext* pic) {
         CComPtr<Context> context;
         hr = CreateInitialize(
             &context, this, pic, static_cast<const Telex::TelexConfig&>(_config), _configVersion, _displayAtom);
-        HRESULT_CHECK_RETURN(hr, "Create Context failed");
+        HRESULT_CHECK_RETURN(hr, "creating Context object failed");
         it = _contextMap.insert(it, {pic, std::move(context)});
     }
 
     hr = it->second->UpdateBlocked(&hrSession);
     if (FAILED(hr) || FAILED(hrSession)) {
-        DBG_HRESULT_CHECK(hr, L"ContextManager::RequestEditSession failed");
+        DBG_HRESULT_CHECK(hr, L"UpdateBlocked failed");
     }
 
     return S_OK;
@@ -344,18 +345,18 @@ _Check_return_ HRESULT ContextManager::Initialize(
 
     CComPtr<ITfKeystrokeMgr> keystrokeMgr;
     hr = _threadMgr->QueryInterface(&keystrokeMgr);
+    DBG_HRESULT_CHECK(hr, L"_threadMgr->QueryInterface failed");
     if (SUCCEEDED(hr)) {
         hr = keystrokeMgr->AdviseKeyEventSink(_clientid, this, TRUE);
-        HRESULT_CHECK_RETURN(hr, L"_keystrokeMgr->AdviseKeyEventSink failed");
+        HRESULT_CHECK_RETURN(hr, L"keystrokeMgr->AdviseKeyEventSink failed");
 
         _settings->GetPreservedKeyToggle(&_pk_toggle);
         hr = keystrokeMgr->PreserveKey(_clientid, Globals::GUID_KeyEventSink_PreservedKey_Toggle, &_pk_toggle, NULL, 0);
         // probably not fatal
-        DBG_HRESULT_CHECK(hr, L"_keystrokeMgr->PreserveKey failed");
-    } else {
-        DBG_HRESULT_CHECK(hr, L"_threadMgr->QueryInterface failed");
+        DBG_HRESULT_CHECK(hr, L"keystrokeMgr->PreserveKey failed");
     }
 
+    // note the timing since these 2 methods check _initialized
     OnSetThreadFocus();
     OnToggle(false);
 
@@ -372,14 +373,13 @@ HRESULT ContextManager::Uninitialize() {
     if (_threadMgr) {
         CComPtr<ITfKeystrokeMgr> keystrokeMgr;
         hr = _threadMgr->QueryInterface(&keystrokeMgr);
+        DBG_HRESULT_CHECK(hr, L"_threadMgr->QueryInterface failed");
         if (SUCCEEDED(hr)) {
             hr = keystrokeMgr->UnpreserveKey(Globals::GUID_KeyEventSink_PreservedKey_Toggle, &_pk_toggle);
-            DBG_HRESULT_CHECK(hr, L"_keystrokeMgr->UnpreserveKey failed");
+            DBG_HRESULT_CHECK(hr, L"keystrokeMgr->UnpreserveKey failed");
 
             hr = keystrokeMgr->UnadviseKeyEventSink(_clientid);
-            DBG_HRESULT_CHECK(hr, L"_keystrokeMgr->UnadviseKeyEventSink failed");
-        } else {
-            DBG_HRESULT_CHECK(hr, L"_threadMgr->QueryInterface failed");
+            DBG_HRESULT_CHECK(hr, L"keystrokeMgr->UnadviseKeyEventSink failed");
         }
     }
 

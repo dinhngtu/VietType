@@ -89,9 +89,10 @@ public:
 private:
     bool IsEnabled(_In_ Context* context) const;
 
+    // fromOpenClose = was openclose the source of the toggle? or was it global enabled?
     HRESULT OnToggle(bool fromOpenClose);
     HRESULT OnSettingsChange();
-    // `foreground` is only advisory as we'll update status when `foreground == false` if we have input focus
+    // foreground is here as an optimization; we'll update status even when foreground == false if we have input focus
     HRESULT UpdateStatus(bool foreground);
 
     HRESULT OnKeyCommon(
@@ -129,6 +130,7 @@ private:
     bool _initialized = false;
 
     ContextMap _contextMap;
+    // _focus should only be used for the langbar
     CComPtr<Context> _focus;
 
     // shared key state buffer; for temporary use only

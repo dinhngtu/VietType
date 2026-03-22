@@ -120,7 +120,7 @@ HRESULT ContextManager::CallKeyEditRetype(_In_ Context* context, _In_ wchar_t pu
     HRESULT hr;
 
     hr = context->RequestEditLastWord(0, push);
-    HRESULT_CHECK_RETURN(hr, L"RequestEditSession EditLastWord failed");
+    HRESULT_CHECK_RETURN(hr, L"context->RequestEditLastWord failed");
 
     return S_OK;
 }
@@ -172,9 +172,9 @@ STDMETHODIMP ContextManager::OnPreservedKey(_In_ ITfContext* pic, _In_ REFGUID r
         *pfEaten = TRUE;
         context->GetEngine()->Reset();
         hr = context->EndComposition();
-        DBG_HRESULT_CHECK(hr, L"_contextManager->EndComposition failed");
+        DBG_HRESULT_CHECK(hr, L"context->EndComposition failed");
         hr = ToggleUserEnabled();
-        DBG_HRESULT_CHECK(hr, L"_engine->ToggleEnabled failed");
+        DBG_HRESULT_CHECK(hr, L"ToggleUserEnabled failed");
     }
 
     return S_OK;
@@ -188,8 +188,8 @@ HRESULT ContextManager::CallKeyEdit(
         DBG_DPRINT(L"fallback to asynchronous ES");
         hr = context->RequestEditKey(&hrSession, false, keyResult, push);
     }
-    HRESULT_CHECK_RETURN(hr, L"_contextManager->RequestEditSession failed");
-    HRESULT_CHECK_RETURN(hrSession, L"KeyHandlerEditSession failed");
+    HRESULT_CHECK_RETURN(hr, L"context->RequestEditKey failed");
+    HRESULT_CHECK_RETURN(hrSession, L"EditKey failed");
 
     return S_OK;
 }

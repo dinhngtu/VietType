@@ -101,7 +101,10 @@ static HRESULT CopyTfMenu(_In_ ITfMenu* menu) {
 
 static HRESULT GetSettingsProgPath(std::wstring& path) {
     PWSTR pathStr;
-    HRESULT_CHECK_RETURN(SHGetKnownFolderPath(FOLDERID_ProgramFilesX86, 0, nullptr, &pathStr), L"SHGetKnownFolderPath");
+    HRESULT hr;
+
+    hr = SHGetKnownFolderPath(FOLDERID_ProgramFilesX86, 0, nullptr, &pathStr);
+    HRESULT_CHECK_RETURN(hr, L"SHGetKnownFolderPath failed");
     path = std::wstring(pathStr) + Globals::SettingsProgSubpath;
     LocalFree(pathStr);
     return S_OK;

@@ -20,18 +20,18 @@ _Check_return_ HRESULT InitializeSink(
 
     CComPtr<ITfSource> source;
     hr = compartment.GetCompartmentSource(&source);
-    HRESULT_CHECK_RETURN(hr, L"_notifyCompartment.GetCompartmentSource failed");
+    HRESULT_CHECK_RETURN(hr, L"compartment.GetCompartmentSource failed");
     hr = sinkAdvisor.Advise(source, sink);
-    HRESULT_CHECK_RETURN(hr, L"_compartmentEventSink.Advise failed");
+    HRESULT_CHECK_RETURN(hr, L"sinkAdvisor.Advise failed");
 
     return S_OK;
 }
 
 HRESULT UninitializeSink(_In_ CompartmentBase& compartment, _In_ SinkAdvisor<ITfCompartmentEventSink>& sinkAdvisor) {
     HRESULT hr = sinkAdvisor.Unadvise();
-    HRESULT_CHECK_RETURN(hr, L"_compartmentEventSink.Unadvise failed");
+    HRESULT_CHECK_RETURN(hr, L"sinkAdvisor.Unadvise failed");
     hr = compartment.Uninitialize();
-    HRESULT_CHECK_RETURN(hr, L"_notifyCompartment.Uninitialize failed");
+    HRESULT_CHECK_RETURN(hr, L"compartment.Uninitialize failed");
     return S_OK;
 }
 
