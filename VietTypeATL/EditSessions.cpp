@@ -160,7 +160,7 @@ HRESULT Context::MoveCaretToEnd(_In_ TfEditCookie ec, _In_ ITfComposition* compo
 
     TF_SELECTION sel;
     sel.range = rangeClone;
-    sel.style.ase = TF_AE_NONE;
+    sel.style.ase = TF_AE_END;
     sel.style.fInterimChar = FALSE;
     hr = _context->SetSelection(ec, 1, &sel);
     HRESULT_CHECK_RETURN(hr, L"_context->SetSelection failed");
