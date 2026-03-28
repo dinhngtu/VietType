@@ -278,7 +278,7 @@ extern "C" HRESULT __cdecl ActivateProfiles() {
     HRESULT hr;
     LSTATUS err;
 
-    {
+    if (PRIMARYLANGID(VietType::Globals::TextServiceLangId) == LANG_VIETNAMESE) {
         CRegKey key;
         err = key.Create(HKEY_CURRENT_USER, L"Keyboard Layout\\Substitutes", nullptr, 0, KEY_SET_VALUE);
         WINERROR_CHECK_RETURN_HRESULT(err, L"key.Create(Keyboard Layout\\Substitutes) failed");
@@ -315,7 +315,7 @@ extern "C" HRESULT __cdecl DeactivateProfiles() {
     hr = InstallTip(false);
     HRESULT_CHECK_RETURN(hr, L"InstallTip failed");
 
-    {
+    if (PRIMARYLANGID(VietType::Globals::TextServiceLangId) == LANG_VIETNAMESE) {
         CRegKey key;
         err = key.Create(HKEY_CURRENT_USER, L"Keyboard Layout\\Substitutes", nullptr, 0, KEY_SET_VALUE);
         WINERROR_CHECK_RETURN_HRESULT(err, L"key.Create(Keyboard Layout\\Substitutes) failed");
