@@ -211,7 +211,7 @@ HRESULT Context::RequestEditLastWord(_In_ int ignore, _In_ wchar_t push) {
     if (SUCCEEDED(hr) && hrSession == S_OK) {
         if (!ignore && push) {
             // this must be the OnType case, so async is OK
-            hr = RequestEditKey(&hrSession, false, KeyResult::Character, push);
+            hr = RequestEditKey(&hrSession, TF_ES_ASYNCDONTCARE, KeyResult::Character, push);
             HRESULT_CHECK_RETURN(hr, L"RequestEditKey failed");
             HRESULT_CHECK_RETURN(hrSession, L"EditKey failed");
             return S_OK;

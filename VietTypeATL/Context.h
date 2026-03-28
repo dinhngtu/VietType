@@ -80,16 +80,11 @@ public:
     HRESULT UpdateBlocked(_Out_ HRESULT* hrSession);
     HRESULT RequestEditKey(
         _Out_ HRESULT* hrSession,
-        _In_ bool sync,
+        _In_ DWORD syncFlags,
         _In_ KeyResult keyResult,
         _In_ wchar_t push,
         _In_ bool newComposition = false) {
-        DWORD flags = TF_ES_READWRITE;
-        if (sync)
-            flags |= TF_ES_SYNC;
-        else
-            flags |= TF_ES_ASYNC;
-        return RequestEditSessionEx(EditKey, flags, hrSession, keyResult, push, newComposition);
+        return RequestEditSessionEx(EditKey, TF_ES_READWRITE | syncFlags, hrSession, keyResult, push, newComposition);
     }
     HRESULT RequestEditLastWord(_In_ int ignore, _In_ wchar_t push);
     HRESULT RequestQueryCompositionSync(_Out_ HRESULT* hrSession) {

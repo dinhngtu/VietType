@@ -183,10 +183,10 @@ STDMETHODIMP ContextManager::OnPreservedKey(_In_ ITfContext* pic, _In_ REFGUID r
 HRESULT ContextManager::CallKeyEdit(
     _In_ Context* context, _In_ bool sync, _In_ KeyResult keyResult, _In_ wchar_t push) {
     HRESULT hr, hrSession;
-    hr = context->RequestEditKey(&hrSession, sync, keyResult, push);
+    hr = context->RequestEditKey(&hrSession, sync ? TF_ES_SYNC : TF_ES_ASYNCDONTCARE, keyResult, push);
     if (sync && hr == TF_E_SYNCHRONOUS) {
         DBG_DPRINT(L"fallback to asynchronous ES");
-        hr = context->RequestEditKey(&hrSession, false, keyResult, push);
+        hr = context->RequestEditKey(&hrSession, TF_ES_ASYNC, keyResult, push);
     }
     HRESULT_CHECK_RETURN(hr, L"context->RequestEditKey failed");
     HRESULT_CHECK_RETURN(hrSession, L"EditKey failed");

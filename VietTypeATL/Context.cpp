@@ -33,20 +33,13 @@ STDMETHODIMP Context::OnCompositionTerminated(_In_ TfEditCookie ecWrite, __RPC__
         HRESULT_CHECK(hr, L"pComposition->GetRange failed");
 
         if (SUCCEEDED(hr)) {
-            std::array<WCHAR, 16> buf;
-            ULONG retrieved;
-            hr = range->GetText(ecWrite, 0, &buf[0], 16, &retrieved);
-            if (SUCCEEDED(hr)) {
-                DBG_DPRINT(L"range text '%.*s'", retrieved, buf);
-            }
-
             if (_displayAtom != TF_INVALID_GUIDATOM) {
                 hr = ClearRangeDisplayAttribute(ecWrite, range);
                 DBG_HRESULT_CHECK(hr, L"ClearRangeDisplayAttribute failed");
             }
         }
 
-        RequestEditKey(&hrSession, false, KeyResult::NotEatenEndComposition, L'\0', true);
+        RequestEditKey(&hrSession, TF_ES_ASYNCDONTCARE, KeyResult::NotEatenEndComposition, L'\0', true);
     } else {
         _engine->Reset();
     }
@@ -93,7 +86,8 @@ STDMETHODIMP Context::OnEndEdit(
 
     if (!IsRangeCovered(ecReadOnly, selRange, compRange)) {
         DBG_DPRINT(L"out of range, sending NotEatenEndComposition");
-        RequestEditKey(&hrSession, false, KeyResult::NotEatenEndComposition, L'\0');
+        RequestEditKey(&hrSession, TF_ES_ASYNCDONTCARE, KeyResult::NotEatenEndComposition, L'\0');
+        return S_OK;
     }
 
     BOOL compEmpty;
@@ -104,7 +98,8 @@ STDMETHODIMP Context::OnEndEdit(
 
     if (compEmpty) {
         DBG_DPRINT(L"empty composition range, sending NotEatenEndComposition");
-        RequestEditKey(&hrSession, false, KeyResult::NotEatenEndComposition, L'\0');
+        RequestEditKey(&hrSession, TF_ES_ASYNCDONTCARE, KeyResult::NotEatenEndComposition, L'\0');
+        return S_OK;
     }
 
     return S_OK;
