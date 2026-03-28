@@ -200,7 +200,7 @@ HRESULT Context::BackconvertWord(
     if (!push)
         return S_OK;
 
-    return context->DoEditNextState(ec, composition, context->GetEngine()->PushChar(push), L'\0');
+    return context->DoEditNextState(ec, context->GetEngine()->PushChar(push), L'\0', composition);
 }
 
 HRESULT Context::RequestEditLastWord(_In_ int ignore, _In_ wchar_t push) {

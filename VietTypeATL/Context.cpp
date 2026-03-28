@@ -9,22 +9,58 @@
 
 namespace VietType {
 
+// Copied from SampleIME.
+static bool IsRangeCovered(_In_ TfEditCookie ec, _In_ ITfRange* testRange, _In_ ITfRange* coverRange) {
+    LONG result = 0;
+
+    if (FAILED(coverRange->CompareStart(ec, testRange, TF_ANCHOR_START, &result)) || (result > 0)) {
+        return false;
+    }
+    if (FAILED(coverRange->CompareEnd(ec, testRange, TF_ANCHOR_END, &result)) || (result < 0)) {
+        return false;
+    }
+    return true;
+}
+
 STDMETHODIMP Context::OnCompositionTerminated(_In_ TfEditCookie ecWrite, __RPC__in_opt ITfComposition* pComposition) {
     DBG_DPRINT(L"ecWrite = %ld", ecWrite);
 
     if (pComposition) {
-        EndCompositionNow(ecWrite, pComposition);
+        HRESULT hr, hrSession;
+
+        CComPtr<ITfRange> range;
+        hr = pComposition->GetRange(&range);
+        HRESULT_CHECK(hr, L"pComposition->GetRange failed");
+
+        if (SUCCEEDED(hr)) {
+            std::array<WCHAR, 16> buf;
+            ULONG retrieved;
+            hr = range->GetText(ecWrite, 0, &buf[0], 16, &retrieved);
+            if (SUCCEEDED(hr)) {
+                DBG_DPRINT(L"range text '%.*s'", retrieved, buf);
+            }
+
+            if (_displayAtom != TF_INVALID_GUIDATOM) {
+                hr = ClearRangeDisplayAttribute(ecWrite, range);
+                DBG_HRESULT_CHECK(hr, L"ClearRangeDisplayAttribute failed");
+            }
+        }
+
+        RequestEditKey(&hrSession, false, KeyResult::NotEatenEndComposition, L'\0', true);
+    } else {
+        _engine->Reset();
     }
 
-    _engine->Reset();
     return S_OK;
 }
 
 STDMETHODIMP Context::OnEndEdit(
     __RPC__in_opt ITfContext* pic, TfEditCookie ecReadOnly, __RPC__in_opt ITfEditRecord* pEditRecord) {
-    HRESULT hr;
+    HRESULT hr, hrSession;
 
-    if (pic != GetContext() || !IsCuas() || !pEditRecord) {
+    DBG_DPRINT(L"ecReadOnly = %ld", ecReadOnly);
+
+    if (pic != GetContext() || !pEditRecord) {
         return S_OK;
     }
 
@@ -35,16 +71,16 @@ STDMETHODIMP Context::OnEndEdit(
     }
 
     BOOL selChanged = FALSE;
-    pEditRecord->GetSelectionStatus(&selChanged);
-    if (!selChanged) {
+    hr = pEditRecord->GetSelectionStatus(&selChanged);
+    if (FAILED(hr) || !selChanged) {
         return S_OK;
     }
 
     TF_SELECTION sel;
     ULONG fetched = 0;
     hr = _context->GetSelection(ecReadOnly, TF_DEFAULT_SELECTION, 1, &sel, &fetched);
-    if (FAILED(hr) || fetched == 0) {
-        return S_OK;
+    if (FAILED(hr) || fetched != 1) {
+        return S_FALSE;
     }
     CComPtr<ITfRange> selRange;
     selRange.Attach(sel.range);
@@ -55,19 +91,20 @@ STDMETHODIMP Context::OnEndEdit(
         return S_OK;
     }
 
-    LONG cmpStart = 0, cmpEnd = 0;
-    bool startOk = false, endOk = false;
-    if (SUCCEEDED(compRange->CompareStart(ecReadOnly, selRange, TF_ANCHOR_START, &cmpStart))) {
-        startOk = cmpStart <= 0;
+    if (!IsRangeCovered(ecReadOnly, selRange, compRange)) {
+        DBG_DPRINT(L"out of range, sending NotEatenEndComposition");
+        RequestEditKey(&hrSession, false, KeyResult::NotEatenEndComposition, L'\0');
     }
-    if (SUCCEEDED(compRange->CompareEnd(ecReadOnly, selRange, TF_ANCHOR_END, &cmpEnd))) {
-        endOk = cmpEnd >= 0;
+
+    BOOL compEmpty;
+    hr = compRange->IsEmpty(ecReadOnly, &compEmpty);
+    if (FAILED(hr)) {
+        return S_OK;
     }
-    if (!startOk || !endOk) {
-        // might have closed the composition somehow (like clicking away in file rename box)?
-        DBG_DPRINT(L"selection outside composition, committing (startOk=%d endOk=%d)", startOk, endOk);
-        HRESULT hrSession;
-        RequestEditKey(&hrSession, true, KeyResult::NotEatenEndComposition, L'\0');
+
+    if (compEmpty) {
+        DBG_DPRINT(L"empty composition range, sending NotEatenEndComposition");
+        RequestEditKey(&hrSession, false, KeyResult::NotEatenEndComposition, L'\0');
     }
 
     return S_OK;

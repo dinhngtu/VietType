@@ -33,12 +33,6 @@ HRESULT Context::StartCompositionNow(_In_ TfEditCookie ec, _COM_Outptr_opt_ ITfC
         *outComposition = nullptr;
     }
 
-    CComPtr<ITfComposition> composition;
-    hr = GetComposition(ec, &composition);
-    if (SUCCEEDED(hr) && composition) {
-        return TF_E_ALREADY_EXISTS;
-    }
-
     CComPtr<ITfCompositionSink> compositionSink;
     hr = QueryInterface2(this, &compositionSink);
     HRESULT_CHECK_RETURN(hr, L"this->QueryInterface failed");
@@ -55,12 +49,15 @@ HRESULT Context::StartCompositionNow(_In_ TfEditCookie ec, _COM_Outptr_opt_ ITfC
     hr = _context->QueryInterface(&contextComposition);
     HRESULT_CHECK_RETURN(hr, L"_context->QueryInterface failed");
 
-    hr = contextComposition->StartComposition(ec, insertRange, compositionSink, &composition.p);
+    CComPtr<ITfComposition> composition;
+    hr = contextComposition->StartComposition(ec, insertRange, compositionSink, &composition);
     HRESULT_CHECK_RETURN(hr, L"contextComposition->StartComposition failed");
 
     if (!composition) {
         return E_ABORT;
     }
+
+    DBG_DPRINT(L"started composition %p", composition.p);
 
     if (outComposition) {
         *outComposition = composition;
@@ -76,7 +73,7 @@ HRESULT Context::EndCompositionNow(_In_ TfEditCookie ec, _In_opt_ ITfComposition
         return S_OK;
     }
 
-    DBG_DPRINT(L"ending composition");
+    DBG_DPRINT(L"ending composition %p", composition);
 
     CComPtr<ITfRange> range;
     hr = composition->GetRange(&range);
@@ -103,6 +100,7 @@ HRESULT Context::EnsureComposition(_In_ TfEditCookie ec, CComPtr<ITfComposition>
     }
     HRESULT hr = GetComposition(ec, &composition);
     if (SUCCEEDED(hr) && composition) {
+        DBG_DPRINT(L"existing composition %p", composition.p);
         return S_OK;
     }
     return StartCompositionNow(ec, &composition);
@@ -203,12 +201,15 @@ HRESULT Context::ClearRangeDisplayAttribute(_In_ TfEditCookie ec, _In_ ITfRange*
 
 HRESULT Context::DoEditNextState(
     _In_ TfEditCookie ec,
-    _Inout_ CComPtr<ITfComposition>& composition,
     _In_ Telex::TelexStates state,
-    _In_ wchar_t nonEngineAppend) {
+    _In_ wchar_t nonEngineAppend,
+    _In_opt_ ITfComposition* existingComposition,
+    _In_ bool newComposition,
+    _In_ bool resetAnyway) {
     HRESULT hr;
 
     std::wstring str;
+    auto prevCount = GetEngine()->Count();
     switch (state) {
     case Telex::TelexStates::Valid:
         str = GetEngine()->Peek();
@@ -225,24 +226,46 @@ HRESULT Context::DoEditNextState(
         GetEngine()->Reset();
         break;
     }
+    if (resetAnyway) {
+        GetEngine()->Reset();
+    }
 
     if (nonEngineAppend) {
         str += nonEngineAppend;
     }
 
+    CComPtr<ITfComposition> composition(existingComposition);
+    if (newComposition) {
+        hr = EndCompositionNow(ec, composition);
+        HRESULT_CHECK(hr, L"EndCompositionNow failed");
+        composition.Release();
+    } else {
+        if (!composition) {
+            hr = GetComposition(ec, &composition);
+            HRESULT_CHECK(hr, L"context->GetComposition failed");
+        }
+    }
+
     DBG_DPRINT(
-        L"%s, state %s, append '%c', strlen %zu, next state %s, next count %zu",
-        composition ? L"composing" : L"not composing",
+        L"existing %p, current %p, %s composition, %s, "
+        L"state %s, count %zu, append '%c', str '%s', next state %s, next count %zu",
+        existingComposition,
+        composition.p,
+        newComposition ? L"new" : L"existing",
+        resetAnyway ? L"reset" : L"no reset",
         GetTelexStateName(state),
-        nonEngineAppend ? nonEngineAppend : L'?',
-        str.length(),
+        prevCount,
+        nonEngineAppend ? nonEngineAppend : L'_',
+        str.c_str(),
         GetTelexStateName(GetEngine()->GetState()),
         GetEngine()->Count());
 
     // sync the composition state with the supposed string state
     if (!str.empty()) {
-        hr = EnsureComposition(ec, composition);
-        HRESULT_CHECK_RETURN(hr, L"EnsureComposition failed");
+        if (!composition) {
+            hr = StartCompositionNow(ec, &composition);
+            HRESULT_CHECK_RETURN(hr, L"StartCompositionNow failed");
+        }
         hr = SetCompositionText(ec, composition, &str[0], static_cast<LONG>(str.length()));
         HRESULT_CHECK_RETURN(hr, L"SetCompositionText failed");
     } else if (composition) {
@@ -251,7 +274,7 @@ HRESULT Context::DoEditNextState(
         HRESULT_CHECK_RETURN(hr, L"EmptyCompositionText failed");
     }
 
-    // now sync the engine state with the composition state
+    // now sync the composition state with the engine state
     if (GetEngine()->Count()) {
         // EnsureComposition should already be called above
     } else if (composition) {
@@ -263,8 +286,13 @@ HRESULT Context::DoEditNextState(
     return S_OK;
 }
 
-HRESULT Context::EditKey(_In_ TfEditCookie ec, _In_ Context* context, _In_ KeyResult keyResult, _In_ wchar_t push) {
-    DBG_DPRINT(L"KeyHandler ec = %ld %s '%c'", ec, GetKeyResult(keyResult), push ? push : L'?');
+HRESULT Context::EditKey(
+    _In_ TfEditCookie ec,
+    _In_ Context* context,
+    _In_ KeyResult keyResult,
+    _In_ wchar_t push,
+    _In_ bool newComposition) {
+    DBG_DPRINT(L"ec = %ld %s '%c'", ec, GetKeyResult(keyResult), push ? push : L'_');
 
     HRESULT hr;
     Telex::ITelexEngine* engine = context->GetEngine();
@@ -273,24 +301,19 @@ HRESULT Context::EditKey(_In_ TfEditCookie ec, _In_ Context* context, _In_ KeyRe
     hr = context->GetComposition(ec, &composition);
     HRESULT_CHECK_RETURN(hr, L"context->GetComposition failed");
 
-    // recover from situations that terminate the composition without us knowing (e.g. mouse clicks)
-    if (!composition && engine->Count()) {
-        DBG_DPRINT("resetting");
-        engine->Reset();
-    }
-
     switch (keyResult) {
     case KeyResult::BreakingCharacter:
-        return context->DoEditNextState(ec, composition, engine->Commit(), push);
+        return context->DoEditNextState(ec, engine->Commit(), push, composition, newComposition);
     case KeyResult::Character:
-        return context->DoEditNextState(ec, composition, engine->PushChar(push), L'\0');
+        return context->DoEditNextState(ec, engine->PushChar(push), L'\0', composition, newComposition);
     case KeyResult::Backspace:
-        return context->DoEditNextState(ec, composition, engine->Backspace(), L'\0');
+        return context->DoEditNextState(ec, engine->Backspace(), L'\0', composition, newComposition);
     case KeyResult::Escape:
-        return context->DoEditNextState(ec, composition, engine->Cancel(), L'\0');
+        return context->DoEditNextState(ec, engine->Cancel(), L'\0', composition, newComposition);
     case KeyResult::NotEaten:
     case KeyResult::NotEatenEndComposition:
     default:
+        // return context->DoEditNextState(ec, engine->GetState(), L'\0', composition, newComposition, true);
         engine->Reset();
         return context->EndCompositionNow(ec, composition);
     }

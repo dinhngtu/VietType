@@ -78,13 +78,18 @@ public:
 
     // edit session initiators
     HRESULT UpdateBlocked(_Out_ HRESULT* hrSession);
-    HRESULT RequestEditKey(_Out_ HRESULT* hrSession, _In_ bool sync, _In_ KeyResult keyResult, _In_ wchar_t push) {
+    HRESULT RequestEditKey(
+        _Out_ HRESULT* hrSession,
+        _In_ bool sync,
+        _In_ KeyResult keyResult,
+        _In_ wchar_t push,
+        _In_ bool newComposition = false) {
         DWORD flags = TF_ES_READWRITE;
         if (sync)
             flags |= TF_ES_SYNC;
         else
-            flags |= TF_ES_ASYNCDONTCARE;
-        return RequestEditSessionEx(EditKey, flags, hrSession, keyResult, push);
+            flags |= TF_ES_ASYNC;
+        return RequestEditSessionEx(EditKey, flags, hrSession, keyResult, push, newComposition);
     }
     HRESULT RequestEditLastWord(_In_ int ignore, _In_ wchar_t push);
     HRESULT RequestQueryCompositionSync(_Out_ HRESULT* hrSession) {
@@ -127,10 +132,11 @@ private:
 
     HRESULT DoEditNextState(
         _In_ TfEditCookie ec,
-        _Inout_ CComPtr<ITfComposition>& composition,
         _In_ Telex::TelexStates state,
-        _In_ wchar_t nonEngineAppend);
-
+        _In_ wchar_t nonEngineAppend,
+        _In_opt_ ITfComposition* existingComposition = nullptr,
+        _In_ bool newComposition = false,
+        _In_ bool resetAnyway = false);
 
     // edit sessions
     static HRESULT _StartComposition(TfEditCookie ec, Context* context) {
@@ -151,7 +157,12 @@ private:
         return composition ? S_OK : S_FALSE;
     }
     static HRESULT EditBlocked(_In_ TfEditCookie ec, _In_ Context* context);
-    static HRESULT EditKey(_In_ TfEditCookie ec, _In_ Context* context, _In_ KeyResult keyResult, _In_ wchar_t push);
+    static HRESULT EditKey(
+        _In_ TfEditCookie ec,
+        _In_ Context* context,
+        _In_ KeyResult keyResult,
+        _In_ wchar_t push,
+        _In_ bool newComposition);
 
     static HRESULT SelectLastWord(
         _In_ TfEditCookie ec,
