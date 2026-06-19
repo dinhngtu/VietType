@@ -8,7 +8,11 @@
 
 namespace VietType {
 
-static constexpr TF_PRESERVEDKEY PK_Toggle = {VK_OEM_3, TF_MOD_ALT}; // Alt-`
+// Alt-` is not usable on Japanese keyboard
+static constexpr TF_PRESERVEDKEY PK_Toggle = {
+    PRIMARYLANGID(Globals::TextServiceLangId) == LANG_JAPANESE ? 'Z' : VK_OEM_3,
+    TF_MOD_ALT,
+};
 
 _Check_return_ HRESULT EngineSettingsController::Initialize(_In_ ITfThreadMgr* threadMgr, _In_ TfClientId clientid) {
     _settingsKey.Open(HKEY_CURRENT_USER, Globals::ConfigKeyName, KEY_QUERY_VALUE);
