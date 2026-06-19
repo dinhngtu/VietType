@@ -3,6 +3,8 @@
 
 // dllmain.h : Declaration of module class.
 
+#include "stdafx.h"
+
 class CVietTypeATLModule : public ATL::CAtlDllModuleT<CVietTypeATLModule> {};
 
 extern class CVietTypeATLModule _AtlModule;

@@ -4,7 +4,6 @@
 #include "stdafx.h"
 #include "VirtualDocument.h"
 #include "Context.h"
-#include "Compartment.h"
 
 namespace VietType {
 namespace VirtualDocument {

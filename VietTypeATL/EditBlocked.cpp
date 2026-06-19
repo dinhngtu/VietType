@@ -3,7 +3,6 @@
 
 #include "stdafx.h"
 #include "Context.h"
-#include "Compartment.h"
 
 namespace VietType {
 
@@ -79,6 +78,8 @@ HRESULT Context::EditBlocked(_In_ TfEditCookie ec, _In_ Context* context) {
         case IS_ALPHANUMERIC_PIN_SET:
             scopeBlocked = true;
             goto commit;
+        default:
+            break;
         }
     }
     scopeBlocked = false;

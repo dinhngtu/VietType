@@ -5,6 +5,8 @@
 
 // convenience header that includes all other commonly-used headers
 
+// IWYU pragma: begin_exports
+
 #include "stdafx.h"
 #include "Define.h"
 #include "Globals.h"
@@ -12,3 +14,5 @@
 #include "ComUtils.h"
 
 using namespace ATL;
+
+// IWYU pragma: end_exports

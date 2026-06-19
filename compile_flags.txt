@@ -1,0 +1,6 @@
+-xc++
+-std=c++20
+-DUNICODE
+-D_UNICODE
+-D_WINDLL
+-ITelex/

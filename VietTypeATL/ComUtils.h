@@ -3,8 +3,7 @@
 
 #pragma once
 
-#include <typeinfo>
-#include <atlbase.h>
+#include "stdafx.h"
 
 template <typename T>
 _Check_return_ HRESULT CreateInstance2(_COM_Outptr_ T** ppout) {

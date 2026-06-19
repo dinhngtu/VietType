@@ -3,8 +3,7 @@
 
 #pragma once
 
-#include <Windows.h>
-#include <strsafe.h>
+#include "stdafx.h"
 
 // system debug log controls (warning: VietType logs can potentially includes keystroke data)
 

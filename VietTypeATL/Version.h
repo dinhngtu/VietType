@@ -3,5 +3,9 @@
 
 #pragma once
 
+// IWYU pragma: begin_exports
+
 #include "VersionNumbers.h"
 #include "VersionVCS.h"
+
+// IWYU pragma: end_exports
