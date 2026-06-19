@@ -17,6 +17,8 @@ on:
       - master
   workflow_dispatch:
 
+permissions: {}
+
 env:
   SOLUTION_FILE_PATH: .
 
@@ -26,6 +28,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
 
       - name: Add MSBuild to PATH
         uses: microsoft/setup-msbuild@30375c66a4eea26614e0d39710365f22f8b0af57 # v3
@@ -68,11 +72,10 @@ jobs:
   attest:
     if: ${{ github.event_name == 'workflow_dispatch' }}
     needs: [build]
-    uses: dinhngtu/github-workflows/.github/workflows/attest.yml@45ccba67d9af835a21d0c4cb8aea444e4e6d7600
+    uses: dinhngtu/github-workflows/.github/workflows/attest.yml@f10ce70ad81acc4b9196bbda4617e799ffec1892
     permissions:
       id-token: write
       attestations: write
-      artifact-metadata: write
     with:
       subject-name: ${{ needs.build.outputs.subject-name }}
       subject-digest: ${{ needs.build.outputs.subject-digest }}
