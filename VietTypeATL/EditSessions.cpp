@@ -209,7 +209,7 @@ HRESULT Context::DoEditNextState(
     HRESULT hr;
 
     std::wstring str;
-    auto prevCount = GetEngine()->Count();
+    [[maybe_unused]] auto prevCount = GetEngine()->Count();
     switch (state) {
     case Telex::TelexStates::Valid:
         str = GetEngine()->Peek();

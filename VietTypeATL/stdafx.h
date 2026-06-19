@@ -7,6 +7,8 @@
 
 #pragma once
 
+// IWYU pragma: begin_exports
+
 #ifndef STRICT
 #define STRICT
 #endif
@@ -46,3 +48,5 @@
 #include <ctffunc.h>
 #include <ShlObj_core.h>
 #include <shellapi.h>
+
+// IWYU pragma: end_exports
