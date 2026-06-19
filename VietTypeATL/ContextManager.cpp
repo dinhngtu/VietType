@@ -26,28 +26,20 @@ static HRESULT IsContextEmpty(_In_ ITfContext* context, _In_ TfClientId clientid
 }
 
 HRESULT ContextManager::OnToggle(bool fromOpenClose) {
-    long openclose, enabled;
+    long enabled;
     HRESULT hr;
 
     if (!this->_initialized) {
         return S_FALSE;
     }
 
-    hr = _openclose->GetValue(&openclose);
-    HRESULT_CHECK_RETURN(hr, L"_openclose->GetValue failed");
     hr = _enabled->GetValue(&enabled, _defaultEnabled);
     HRESULT_CHECK_RETURN(hr, L"_enabled->GetValue failed");
 
-    DBG_DPRINT(
-        L"%s openclose %ld enabled %ld", fromOpenClose ? L"from openclose" : L"from enabled", openclose, enabled);
-    if (!!openclose != !!enabled) {
-        if (fromOpenClose) {
-            hr = _enabled->SetValue(enabled);
-            DBG_HRESULT_CHECK(hr, L"_enabled->SetValue failed");
-        } else {
-            hr = _openclose->SetValue(enabled);
-            DBG_HRESULT_CHECK(hr, L"_openclose->SetValue failed");
-        }
+    DBG_DPRINT(L"%s enabled %ld", fromOpenClose ? L"from openclose" : L"from enabled", enabled);
+    if (!fromOpenClose) {
+        hr = _openclose->SetValue(!!enabled);
+        DBG_HRESULT_CHECK(hr, L"_openclose->SetValue failed");
     }
 
     hr = UpdateStatus(fromOpenClose);
@@ -94,6 +86,9 @@ HRESULT ContextManager::ToggleUserEnabled() {
     hr = _enabled->SetValue(enabled);
     HRESULT_CHECK_RETURN(hr, L"_enabled->SetValue failed");
 
+    hr = _openclose->SetValue(!!enabled);
+    DBG_HRESULT_CHECK(hr, L"_openclose->SetValue failed");
+
     hr = UpdateStatus(true);
     DBG_HRESULT_CHECK(hr, L"UpdateStatus failed");
 
@@ -107,10 +102,10 @@ bool ContextManager::IsEnabled(_In_ Context* context) const {
         return false;
     }
 
-    long openclose;
-    hr = _openclose->GetValue(&openclose);
-    HRESULT_CHECK(hr, L"_openclose->GetValue failed");
-    if (FAILED(hr) || !openclose) {
+    long enabled;
+    hr = _enabled->GetValue(&enabled, _defaultEnabled);
+    HRESULT_CHECK(hr, L"_enabled->GetValue failed");
+    if (FAILED(hr) || !enabled) {
         return false;
     }
 
@@ -150,13 +145,13 @@ HRESULT ContextManager::UpdateStatus(bool foreground) {
         }
     }
 
-    long openclose;
-    hr = _openclose->GetValue(&openclose);
-    DBG_HRESULT_CHECK(hr, L"_openclose->GetValue failed");
+    long enabled;
+    hr = _enabled->GetValue(&enabled, _defaultEnabled);
+    DBG_HRESULT_CHECK(hr, L"_enabled->GetValue failed");
 
-    DBG_DPRINT(L"openclose %ld, blocked %ld", openclose, _focus ? _focus->IsBlocked() : true);
+    DBG_DPRINT(L"enabled %ld, blocked %ld", enabled, _focus ? _focus->IsBlocked() : true);
 
-    hr = _status->UpdateStatus(openclose, _focus ? _focus->IsBlocked() : true);
+    hr = _status->UpdateStatus(!!enabled, _focus ? _focus->IsBlocked() : true);
     DBG_HRESULT_CHECK(hr, L"_status->UpdateStatus failed");
 
     return S_OK;
