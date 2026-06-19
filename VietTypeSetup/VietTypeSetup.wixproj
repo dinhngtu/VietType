@@ -1,18 +1,17 @@
-<Project>
-  <Import Project="Sdk.props" Sdk="WixToolset.Sdk" Version="6.0.2" />
-  <Import Project="Sdk.targets" Sdk="WixToolset.Sdk" Version="6.0.2" />
+<Project Sdk="WixToolset.Sdk/7.0.0">
   <PropertyGroup>
     <OutputName>VietTypeSetup$(Platform)</OutputName>
     <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
     <SuppressSpecificWarnings>1103</SuppressSpecificWarnings>
     <SuppressIces>ICE61</SuppressIces>
+    <AcceptEula>wix7</AcceptEula>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DefineConstants>Debug</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="WixToolset.Util.wixext" Version="6.0.2" />
-    <PackageReference Include="WixToolset.UI.wixext" Version="6.0.2" />
+    <PackageReference Include="WixToolset.Util.wixext" Version="7.0.0" />
+    <PackageReference Include="WixToolset.UI.wixext" Version="7.0.0" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="licembed.rtf" />
