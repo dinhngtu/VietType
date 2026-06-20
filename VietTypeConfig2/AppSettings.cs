@@ -12,7 +12,6 @@ namespace VietTypeConfig2 {
         private static readonly Guid CLSID_TF_ThreadMgr = Guid.Parse("{529a9e6b-6587-4f23-ab9e-9c7d683e3c50}");
         private static readonly Guid CLSID_TextService = Guid.Parse("{c0dd01a1-0deb-454b-8b42-d22ced1b4b23}");
         private static readonly Guid GUID_Profile = Guid.Parse("{8D93D10A-203B-4C5F-A122-8898EF9C56F5}");
-        private const ushort TextServiceLangId = 0x42a;
 
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged(string propName) {
@@ -175,7 +174,7 @@ namespace VietTypeConfig2 {
             }
         }
 
-        int pk_toggle = 0x100c0; // alt+`
+        int pk_toggle = unchecked((int)(VersionDetector.Instance.Value.DefaultPkToggle ?? 0x100c0)); // alt+`
         public int PkToggle {
             get {
                 return pk_toggle;
@@ -258,7 +257,11 @@ namespace VietTypeConfig2 {
         }
 
         public static void SetDefault() {
-            NativeMethods.SetInputMethodOverride(string.Format("{0:X4}:{{{1}}}{{{2}}}", TextServiceLangId, CLSID_TextService.ToString(), GUID_Profile.ToString()));
+            NativeMethods.SetInputMethodOverride(
+                string.Format("{0:X4}:{{{1}}}{{{2}}}",
+                VersionDetector.Instance.Value.LangId ?? 0x42a,
+                CLSID_TextService.ToString(),
+                GUID_Profile.ToString()));
         }
     }
 }

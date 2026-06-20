@@ -39,6 +39,14 @@ namespace VietTypeConfig2 {
         int GetValue(out object value);
     }
 
+    [StructLayout(LayoutKind.Sequential)]
+    public struct VIETTYPE_INFORMATION_V1 {
+        public uint MaxVersion;
+        public uint Version;
+        public uint DefaultPkToggle;
+        public ushort LangId;
+    }
+
     internal static class VietTypeRegistrar {
         public const int S_OK = 0;
         public const int S_FALSE = 1;
@@ -57,6 +65,11 @@ namespace VietTypeConfig2 {
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
         public static extern int IsProfileActivated();
+
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        public static extern unsafe int GetVersionInfo(
+            void* information,
+            uint informationSize);
     }
 
     internal static class NativeMethods {

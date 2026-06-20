@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2025 Dinh Ngoc Tu
 // SPDX-License-Identifier: GPL-3.0-only
 
+using System;
 using System.Runtime.InteropServices;
 using System.Windows;
 
@@ -11,6 +12,17 @@ namespace VietTypeConfig2 {
     public partial class MainWindow : Window {
         public MainWindow() {
             InitializeComponent();
+            try {
+                _ = VersionDetector.Instance.Value;
+            }
+            catch (Exception ex) {
+                MessageBox.Show(
+                    string.Format("DLL version detection failed {0}", ex.HResult),
+                    LocalizationManager.Instance["MainWindow_ProgramName"],
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                Application.Current.Shutdown(1);
+            }
+
             var vm = DataContext as MainWindowViewModel;
             vm.RequestClose += Vm_RequestClose;
             vm.RequestAbout += Vm_RequestAbout;
@@ -35,13 +47,15 @@ namespace VietTypeConfig2 {
                         LocalizationManager.Instance["MainWindow_EnableOkText"],
                         LocalizationManager.Instance["MainWindow_ProgramName"],
                         MessageBoxButton.OK, MessageBoxImage.Information);
-                } else {
+                }
+                else {
                     MessageBox.Show(
                         LocalizationManager.Instance["MainWindow_DisableOkText"],
                         LocalizationManager.Instance["MainWindow_ProgramName"],
                         MessageBoxButton.OK, MessageBoxImage.Information);
                 }
-            } else {
+            }
+            else {
                 var message = Marshal.GetExceptionForHR(e.ErrorCode).Message;
                 MessageBox.Show(
                     string.Format(LocalizationManager.Instance["MainWindow_ToggleFailFormat"], message),
