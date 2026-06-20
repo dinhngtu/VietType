@@ -10,3 +10,4 @@ EXPORTS
     ActivateProfiles
     DeactivateProfiles
     IsProfileActivated
+    GetVersionInfo

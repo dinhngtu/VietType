@@ -11,6 +11,23 @@ static constexpr DWORD ILOT_UNINSTALL = 0x00000001;
 using InstallLayoutOrTip_t = BOOL(CALLBACK*)(_In_ LPCWSTR psz, DWORD dwFlags);
 using SetDefaultLayoutOrTip_t = BOOL(CALLBACK*)(_In_ LPCWSTR psz, _In_ DWORD dwFlags);
 
+struct VIETTYPE_INFORMATION {
+    UINT MaxVersion;
+    // Version described by **this structure**
+    UINT Version;
+
+    struct {
+        DWORD DefaultPkToggle;
+        LANGID LangId;
+    } V1;
+
+    CHAR End[0];
+};
+
+constexpr UINT InformationVersionMax = 1;
+constexpr DWORD InformationSizeV0 = offsetof(VIETTYPE_INFORMATION, V1);
+constexpr DWORD InformationSizeV1 = offsetof(VIETTYPE_INFORMATION, End);
+
 static const std::array<const GUID*, 6> SupportedCategories = {
     &GUID_TFCAT_TIP_KEYBOARD,
     &GUID_TFCAT_TIPCAP_UIELEMENTENABLED,  // UI-less
@@ -343,4 +360,26 @@ extern "C" HRESULT __cdecl IsProfileActivated() {
     HRESULT_CHECK_RETURN(hr, L"profileMgr->GetProfile failed");
 
     return (profile.dwFlags & TF_IPP_FLAG_ENABLED) ? S_OK : S_FALSE;
+}
+
+extern "C" HRESULT __cdecl GetVersionInfo(
+    _Out_writes_bytes_(informationSize) VIETTYPE_INFORMATION* information, _In_ DWORD informationSize) {
+    if (!information) {
+        return S_OK;
+    }
+
+    if (informationSize < InformationSizeV0) {
+        return E_INVALIDARG;
+    }
+
+    information->MaxVersion = InformationVersionMax;
+    information->Version = 0;
+
+    if (informationSize >= InformationSizeV1) {
+        information->Version = 1;
+        information->V1.DefaultPkToggle = VietType::Globals::PkToDword(VietType::Globals::PK_Toggle);
+        information->V1.LangId = VietType::Globals::TextServiceLangId;
+    }
+
+    return S_OK;
 }
