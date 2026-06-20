@@ -145,8 +145,22 @@ DEFINE_GUID(
 extern const DECLSPEC_SELECTANY wchar_t TextServiceDescription[] = L"VietType";
 extern const DECLSPEC_SELECTANY wchar_t ConfigKeyName[] = L"Software\\VietType";
 
+extern const DECLSPEC_SELECTANY wchar_t SettingsProgSubpath[] = L"\\VietType\\VietTypeConfig2.exe";
+
 constexpr LANGID TextServiceLangId = MAKELANGID(LANG_VIETNAMESE, SUBLANG_VIETNAMESE_VIETNAM);
 
-extern const DECLSPEC_SELECTANY wchar_t SettingsProgSubpath[] = L"\\VietType\\VietTypeConfig2.exe";
+// Alt-` is not usable on Japanese keyboard
+constexpr TF_PRESERVEDKEY PK_Toggle = {
+    PRIMARYLANGID(Globals::TextServiceLangId) == LANG_JAPANESE ? 'Z' : VK_OEM_3,
+    TF_MOD_ALT,
+};
+
+constexpr TF_PRESERVEDKEY DwordToPk(DWORD val) {
+    return TF_PRESERVEDKEY{static_cast<UINT>(val & 0xffff), static_cast<UINT>((val >> 16) & 0xffff)};
+}
+
+constexpr DWORD PkToDword(TF_PRESERVEDKEY pk) {
+    return (pk.uVKey & 0xffff) | ((pk.uModifiers & 0xffff) << 16);
+}
 
 } // namespace VietType::Globals
