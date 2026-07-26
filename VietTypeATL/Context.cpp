@@ -187,7 +187,7 @@ HRESULT Context::Initialize(
 }
 
 HRESULT Context::Uninitialize() {
-    _engine.release();
+    _engine.reset();
     _blocked = true;
     _displayAtom = TF_INVALID_GUIDATOM;
     _textEditSinkAdvisor.Unadvise();
