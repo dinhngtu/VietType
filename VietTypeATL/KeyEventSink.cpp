@@ -50,12 +50,13 @@ HRESULT ContextManager::OnKeyCommon(
         break;
     case KeyResult::BreakingCharacter:
         if (active) {
-            // in this case, we can eat because we know the char will be appended
-            *pfEaten = TRUE;
-            // if we know there's a composition, then we need to clear it with an ES
-            if (update) {
-                hr = CallKeyEdit(context, false, keyResult, c);
-            }
+            // Request to end the composition from both OnTestKeyDown and OnKeyDown. Use ASYNCDONTCARE here because
+            // forcing a synchronous write while the key is being tested can make some hosts apply this uneaten key
+            // before the composition result ("a " becomes " a"); let TSF choose a safe point for the edit instead.
+            // Calling CallKeyEdit from both callbacks is safe because a second queued commit from OnKeyDown is harmless
+            // once the first one has reset the engine and ended the composition.
+            *pfEaten = FALSE;
+            hr = CallKeyEdit(context, false, keyResult, L'\0');
         } else {
             // if we can't know for sure, then it becomes best-effort as anything we do afterwards risks being wrong
             *pfEaten = FALSE;
@@ -184,10 +185,6 @@ HRESULT ContextManager::CallKeyEdit(
     _In_ Context* context, _In_ bool sync, _In_ KeyResult keyResult, _In_ wchar_t push) {
     HRESULT hr, hrSession;
     hr = context->RequestEditKey(&hrSession, sync ? TF_ES_SYNC : TF_ES_ASYNCDONTCARE, keyResult, push);
-    if (sync && hr == TF_E_SYNCHRONOUS) {
-        DBG_DPRINT(L"fallback to asynchronous ES");
-        hr = context->RequestEditKey(&hrSession, TF_ES_ASYNC, keyResult, push);
-    }
     HRESULT_CHECK_RETURN(hr, L"context->RequestEditKey failed");
     HRESULT_CHECK_RETURN(hrSession, L"EditKey failed");
 
