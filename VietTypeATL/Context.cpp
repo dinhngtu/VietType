@@ -1,6 +1,16 @@
 // SPDX-FileCopyrightText: Copyright (c) 2026 Dinh Ngoc Tu
 // SPDX-License-Identifier: GPL-3.0-only
 
+// Portions derived from Microsoft's SampleIME source code included in the Windows classic samples,
+// whose original copyright and permission notice is included below:
+//
+//     THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF
+//     ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO
+//     THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
+//     PARTICULAR PURPOSE.
+//
+//     Copyright (c) Microsoft Corporation. All rights reserved
+
 #include "stdafx.h"
 #include "Context.h"
 #include "Telex.h"
