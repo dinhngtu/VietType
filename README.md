@@ -34,16 +34,16 @@ VietType sử dụng cách gõ Telex tự do. VietType thể hiện trạng thá
 
 Chương trình VietType Settings cho phép cài đặt lựa chọn của VietType. VietType có những lựa chọn sau:
 
-**Lựa chọn kiểu gõ:**
+**Cài đặt bộ gõ (Engine settings):**
 - *Typing style/Kiểu gõ:* lựa chọn kiểu gõ Simple Telex, VNI hoặc Telex truyền thống ("TelexComplicated");
 - *Use "oà", "uý" instead of "òa", "úy"/Gõ "oà", "uý" thay vì "òa", "úy:"* lựa chọn cách bỏ dấu cho các vần "oà", "uý", v.v.;
-- *Accept 'd' anywhere/Gõ 'đ' tự do:* cho phép gõ "d" để chuyển "d" -> "đ" tại bất cứ nơi nào trong từ;
+- *Accept 'd' anywhere/Gõ 'đ' tự do:* cho phép gõ "d" để chuyển "d" thành "đ" tại bất cứ nơi nào trong từ;
 - *Allow "đ" abbreviations/Viết tắt chữ "đ" ("đc", "QĐ", "SĐT"):* gõ được các từ viết tắt có chữ "đ";
 - *Backspaced invalid word stays invalid/Giữ trạng thái sai khi xóa từ sai:* quy định có giữ tiếng Việt khi xóa từ sai hay không;
 - *Multilingual typing optimization level/Mức tối ưu gõ nhiều ngôn ngữ:* thay đổi phương pháp gõ để phù hợp với người thường xuyên gõ nhiều ngôn ngữ (đặc biệt là tiếng Anh);
-- *Enable autocorrect/Bật tự sửa từ*: Bật một số phương pháp sửa từ tự động khi gõ sai (ví dụ: "miếgn" -> "miếng").
+- *Enable autocorrect/Bật tự sửa từ*: bật một số phương pháp sửa từ tự động khi gõ sai (ví dụ: "miếgn" thành "miếng").
 
-**Lựa chọn hệ thống:**
+**Cài đặt giao diện (Control settings):**
 - *Vietnamese mode by default/Mặc định bật tiếng Việt:* bật/tắt tiếng Việt khi khởi động VietType;
 - *Word reconversion mode/Chế độ chuyển ngược từ:* cho phép sửa từ sau khi đã gõ xong từ đó;
 - *Toggle key/Phím chuyển:* chọn phím chuyển Anh/Việt;
