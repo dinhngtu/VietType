@@ -11,6 +11,8 @@ static constexpr DWORD ILOT_UNINSTALL = 0x00000001;
 using InstallLayoutOrTip_t = BOOL(CALLBACK*)(_In_ LPCWSTR psz, DWORD dwFlags);
 using SetDefaultLayoutOrTip_t = BOOL(CALLBACK*)(_In_ LPCWSTR psz, _In_ DWORD dwFlags);
 
+#pragma warning(push)
+#pragma warning(disable : 4200)
 struct VIETTYPE_INFORMATION {
     UINT MaxVersion;
     // Version described by **this structure**
@@ -23,6 +25,7 @@ struct VIETTYPE_INFORMATION {
 
     CHAR End[0];
 };
+#pragma warning(pop)
 
 constexpr UINT InformationVersionMax = 1;
 constexpr DWORD InformationSizeV0 = offsetof(VIETTYPE_INFORMATION, V1);
